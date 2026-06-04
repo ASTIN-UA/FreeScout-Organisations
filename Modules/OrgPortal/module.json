@@ -12,7 +12,5 @@
     "aliases": {},
     "files": [],
     "requires": [],
-    "requiredModules": {
-        "enduserportal": "1.0.0"
-    }
+    "requiredModules": {}
 }

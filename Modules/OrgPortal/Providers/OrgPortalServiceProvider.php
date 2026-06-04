@@ -30,7 +30,9 @@ class OrgPortalServiceProvider extends ServiceProvider
         $this->registerConversationHooks();
         $this->registerKanbanHooks();
         $this->registerSearchHooks();
-        $this->registerEupHooks();
+        if (\Module::isActive('enduserportal')) {
+            $this->registerEupHooks();
+        }
         $this->registerNotificationHooks();
     }
 

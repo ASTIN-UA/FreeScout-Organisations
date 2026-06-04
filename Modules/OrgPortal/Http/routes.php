@@ -79,7 +79,8 @@ if (array_key_exists('api.key', app('router')->getMiddleware())) {
     });
 }
 
-// ─── Portal (EUP) routes — same middleware stack as EndUserPortal ─────────────
+// ─── Portal (EUP) routes — only when End-User Portal module is active ────────
+if (\Module::isActive('enduserportal')) :
 Route::group([
     'prefix'    => $subdirectory . 'help/{mailbox_id}/org',
     'middleware' => [
@@ -111,3 +112,4 @@ Route::group([
     Route::post('settings', 'OrgPortalFrontController@saveSettings')
         ->name('orgportal.portal.settings.save');
 });
+endif;
