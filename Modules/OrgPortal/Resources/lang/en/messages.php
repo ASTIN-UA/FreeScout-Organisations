@@ -74,6 +74,11 @@ return [
     'notify_new_ticket_label'=> 'Receive email notification when a member of my organization opens a new ticket',
     'settings_saved'         => 'Settings saved.',
 
+    // Customer edit form
+    'customer_organization'  => 'Organization',
+    'no_organization'        => '— None —',
+    'customer_role'          => 'Role in organization',
+
     // Errors
     'access_denied'          => 'Access denied. Manager role required.',
 

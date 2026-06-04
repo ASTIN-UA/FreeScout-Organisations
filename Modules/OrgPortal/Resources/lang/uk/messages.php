@@ -74,6 +74,11 @@ return [
     'notify_new_ticket_label'=> 'Отримувати email-сповіщення, коли учасник моєї організації відкриває новий тікет',
     'settings_saved'         => 'Налаштування збережено.',
 
+    // Customer edit form
+    'customer_organization'  => 'Організація',
+    'no_organization'        => '— Без організації —',
+    'customer_role'          => 'Роль в організації',
+
     // Errors
     'access_denied'          => 'Доступ заборонено. Потрібна роль менеджера.',
 

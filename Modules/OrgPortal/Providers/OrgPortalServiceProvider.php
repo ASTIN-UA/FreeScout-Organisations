@@ -20,6 +20,7 @@ class OrgPortalServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
 
         $this->registerMenuHooks();
+        $this->registerCustomerHooks();
         $this->registerEupHooks();
         $this->registerNotificationHooks();
     }
@@ -40,6 +41,62 @@ class OrgPortalServiceProvider extends ServiceProvider
             echo '<li><a href="' . route('orgportal.admin.index') . '">'
                 . __('orgportal::messages.organizations') . '</a></li>';
         }, 20, 0);
+    }
+
+    protected function registerCustomerHooks()
+    {
+        // Inject organization selector into the customer edit form
+        \Eventy::addAction('customer.edit.after_fields', function ($customer, $errors) {
+            $organizations   = \Modules\OrgPortal\Models\Organization::orderBy('name')->get();
+            $currentMember   = \Modules\OrgPortal\Models\OrganizationMember::where('customer_id', $customer->id)->first();
+            $currentOrgId    = $currentMember ? $currentMember->organization_id : null;
+            $currentRole     = $currentMember ? $currentMember->role : 'member';
+
+            echo view('orgportal::admin.partials.customer_org_field', [
+                'organizations' => $organizations,
+                'currentOrgId'  => $currentOrgId,
+                'currentRole'   => $currentRole,
+                'errors'        => $errors,
+            ])->render();
+        }, 20, 2);
+
+        // Save organization assignment when customer form is submitted
+        \Eventy::addAction('customer.updated', function ($customer) {
+            $orgId = request()->input('orgportal_organization_id');
+            $role  = request()->input('orgportal_role', 'member');
+
+            if (!in_array($role, ['member', 'manager'])) {
+                $role = 'member';
+            }
+
+            $existing = \Modules\OrgPortal\Models\OrganizationMember::where('customer_id', $customer->id)->first();
+
+            // "— None —" selected: remove from any org
+            if (!$orgId) {
+                if ($existing) {
+                    $existing->delete();
+                }
+                return;
+            }
+
+            // Verify the organization exists
+            if (!\Modules\OrgPortal\Models\Organization::where('id', $orgId)->exists()) {
+                return;
+            }
+
+            if ($existing) {
+                // Update org / role
+                $existing->organization_id = $orgId;
+                $existing->role            = $role;
+                $existing->save();
+            } else {
+                \Modules\OrgPortal\Models\OrganizationMember::create([
+                    'organization_id' => $orgId,
+                    'customer_id'     => $customer->id,
+                    'role'            => $role,
+                ]);
+            }
+        }, 20, 1);
     }
 
     protected function registerEupHooks()
