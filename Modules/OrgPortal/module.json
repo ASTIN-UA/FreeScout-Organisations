@@ -11,7 +11,8 @@
     ],
     "aliases": {},
     "files": [],
-    "requires": [
-        {"freescout": ">=1.8.147"}
-    ]
+    "requires": [],
+    "requiredModules": {
+        "endusrportal": "1.0.0"
+    }
 }
