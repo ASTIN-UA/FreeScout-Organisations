@@ -87,6 +87,16 @@ return [
     'no_organization'        => '— Без організації —',
     'customer_role'          => 'Роль в організації',
 
+    // Module settings
+    'settings'               => 'Налаштування',
+    'module_settings'        => 'Налаштування OrgPortal',
+    'display_settings'       => 'Налаштування відображення',
+    'show_badge_conversation'=> 'Показувати плашку організації на сторінці тікета (поруч з тегами)',
+    'show_badge_kanban'      => 'Показувати плашку організації на картках канбану',
+
+    // Kanban filter
+    'kanban_filter_org'      => 'Організація',
+
     // Errors
     'access_denied'          => 'Доступ заборонено. Потрібна роль менеджера.',
 

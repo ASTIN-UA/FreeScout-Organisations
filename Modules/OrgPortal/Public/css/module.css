@@ -19,3 +19,21 @@
     background-color: #4a8ac4;
     text-decoration: none;
 }
+
+/* Kanban org filter dropdown */
+.orgportal-kn-filter-wrap {
+    display: inline-block;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+.orgportal-kn-org-filter {
+    display: inline-block;
+    width: auto;
+    min-width: 130px;
+    max-width: 220px;
+    height: 30px;
+    padding: 4px 8px;
+    font-size: 13px;
+    line-height: 1.4;
+    vertical-align: middle;
+}

@@ -117,6 +117,23 @@ class OrgPortalAdminController extends Controller
             ->with('flash_success', __('orgportal::messages.member_removed'));
     }
 
+    public function settings()
+    {
+        return view('orgportal::admin.settings', [
+            'show_badge_conversation' => (bool) \Option::get('orgportal.show_badge_conversation', true),
+            'show_badge_kanban'       => (bool) \Option::get('orgportal.show_badge_kanban', true),
+        ]);
+    }
+
+    public function saveSettings(Request $request)
+    {
+        \Option::set('orgportal.show_badge_conversation', (bool) $request->input('show_badge_conversation'));
+        \Option::set('orgportal.show_badge_kanban', (bool) $request->input('show_badge_kanban'));
+
+        return redirect()->route('orgportal.admin.settings')
+            ->with('flash_success', __('orgportal::messages.settings_saved'));
+    }
+
     /**
      * AJAX: search customers by name or email for the member-add form.
      */

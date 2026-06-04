@@ -87,6 +87,16 @@ return [
     'no_organization'        => '— None —',
     'customer_role'          => 'Role in organization',
 
+    // Module settings
+    'settings'               => 'Settings',
+    'module_settings'        => 'OrgPortal Settings',
+    'display_settings'       => 'Display Settings',
+    'show_badge_conversation'=> 'Show organization badge on ticket page (near tags)',
+    'show_badge_kanban'      => 'Show organization badge on Kanban cards',
+
+    // Kanban filter
+    'kanban_filter_org'      => 'Organization',
+
     // Errors
     'access_denied'          => 'Access denied. Manager role required.',
 

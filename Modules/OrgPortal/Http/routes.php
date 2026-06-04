@@ -37,6 +37,12 @@ Route::group([
 
     Route::get('customers/search', 'OrgPortalAdminController@searchCustomers')
         ->name('orgportal.admin.customers.search');
+
+    Route::get('settings', 'OrgPortalAdminController@settings')
+        ->name('orgportal.admin.settings');
+
+    Route::post('settings', 'OrgPortalAdminController@saveSettings')
+        ->name('orgportal.admin.settings.save');
 });
 
 // ─── API routes — requires API and Webhooks module (middleware: api.key) ──────

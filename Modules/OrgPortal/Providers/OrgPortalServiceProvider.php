@@ -28,6 +28,7 @@ class OrgPortalServiceProvider extends ServiceProvider
         $this->registerMenuHooks();
         $this->registerCustomerHooks();
         $this->registerConversationHooks();
+        $this->registerKanbanHooks();
         $this->registerSearchHooks();
         $this->registerEupHooks();
         $this->registerNotificationHooks();
@@ -44,10 +45,11 @@ class OrgPortalServiceProvider extends ServiceProvider
 
     protected function registerMenuHooks()
     {
-        // Add "Organizations" item to Manage menu
         \Eventy::addAction('menu.manage.append', function () {
             echo '<li><a href="' . route('orgportal.admin.index') . '">'
                 . __('orgportal::messages.organizations') . '</a></li>';
+            echo '<li><a href="' . route('orgportal.admin.settings') . '">'
+                . __('orgportal::messages.module_settings') . '</a></li>';
         }, 20, 0);
     }
 
@@ -111,6 +113,9 @@ class OrgPortalServiceProvider extends ServiceProvider
     {
         // Render org badge next to tags in the conversation subject area
         \Eventy::addAction('conversation.after_subject', function ($conversation, $mailbox) {
+            if (!\Option::get('orgportal.show_badge_conversation', true)) {
+                return;
+            }
             if (!$conversation->customer_id) {
                 return;
             }
@@ -130,6 +135,50 @@ class OrgPortalServiceProvider extends ServiceProvider
                 'searchUrl'    => $searchUrl,
             ])->render();
         }, 20, 2);
+    }
+
+    protected function registerKanbanHooks()
+    {
+        // Show org badge on Kanban card subjects (cards.blade.php fires conversations_table.after_subject)
+        \Eventy::addAction('conversations_table.after_subject', function ($conversation) {
+            if (!\Option::get('orgportal.show_badge_kanban', true)) {
+                return;
+            }
+            if (!$conversation || !$conversation->customer_id) {
+                return;
+            }
+
+            $member = OrganizationMember::where('customer_id', $conversation->customer_id)
+                ->with('organization')
+                ->first();
+
+            if (!$member || !$member->organization) {
+                return;
+            }
+
+            $searchUrl = route('conversations.search') . '?f[organization]=' . $member->organization_id;
+
+            echo view('orgportal::partials.org_badge', [
+                'organization' => $member->organization,
+                'searchUrl'    => $searchUrl,
+            ])->render();
+        }, 20, 1);
+
+        // Inject org filter UI into Kanban page
+        \Eventy::addAction('layout.body_bottom', function () {
+            if (!\Route::is('kanban.show')) {
+                return;
+            }
+
+            $organizations = Organization::orderBy('name')->get(['id', 'name']);
+            if ($organizations->isEmpty()) {
+                return;
+            }
+
+            echo view('orgportal::partials.kanban_org_filter', [
+                'organizations' => $organizations,
+            ])->render();
+        }, 25, 0);
     }
 
     protected function registerSearchHooks()
