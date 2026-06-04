@@ -47,6 +47,7 @@ class OrgPortalFrontController extends Controller
     {
         $member = OrganizationMember::where('customer_id', $customer->id)
             ->where('role', 'manager')
+            ->with('organization')
             ->first();
 
         if (!$member) {
@@ -69,6 +70,7 @@ class OrgPortalFrontController extends Controller
 
         $conversations = Conversation::whereIn('customer_id', $orgMemberIds)
             ->where('status', '!=', Conversation::STATUS_SPAM)
+            ->where('state', '!=', Conversation::STATE_DELETED)
             ->orderBy('updated_at', 'desc')
             ->with('customer')
             ->paginate(25);
@@ -153,14 +155,17 @@ class OrgPortalFrontController extends Controller
         $thread->from                = $customer->getMainEmail();
         $thread->save();
 
-        $conversation->status        = Conversation::STATUS_ACTIVE;
-        $conversation->last_reply_at = now();
+        $conversation->status          = Conversation::STATUS_ACTIVE;
+        $conversation->last_reply_at   = now();
         $conversation->last_reply_from = Conversation::PERSON_CUSTOMER;
         $conversation->save();
 
         $conversation = \Eventy::filter('conversation.customer_replied', $conversation, $thread, $customer);
         $conversation->save();
 
+        // Fire the Laravel event so FreeScout's native agent notifications and
+        // third-party modules (Workflows, Mobile Notifications) are triggered.
+        event(new \App\Events\CustomerReplied($conversation, $thread));
         \Eventy::action('conversation.customer_replied', $conversation, $thread, $customer);
 
         return redirect()
@@ -198,7 +203,11 @@ class OrgPortalFrontController extends Controller
 
         $member = OrganizationMember::where('customer_id', $customer->id)
             ->where('role', 'manager')
-            ->firstOrFail();
+            ->first();
+
+        if (!$member) {
+            abort(403, __('orgportal::messages.access_denied'));
+        }
 
         $member->notify_on_new_ticket = (bool) $request->input('notify_on_new_ticket', false);
         $member->save();

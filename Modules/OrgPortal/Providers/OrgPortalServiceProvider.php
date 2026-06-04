@@ -19,6 +19,12 @@ class OrgPortalServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
 
+        // Enqueue module CSS via the standard stylesheets filter
+        \Eventy::addFilter('stylesheets', function ($styles) {
+            $styles[] = \Module::getPublicPath(ORGPORTAL_MODULE) . '/css/module.css';
+            return $styles;
+        });
+
         $this->registerMenuHooks();
         $this->registerCustomerHooks();
         $this->registerConversationHooks();
@@ -215,6 +221,16 @@ class OrgPortalServiceProvider extends ServiceProvider
                 ->where('customer_id', '!=', $customer->id)
                 ->with('customer')
                 ->get();
+
+            // Set the mailbox mail driver so the correct SMTP is used.
+            try {
+                $mailbox = \App\Mailbox::find($conversation->mailbox_id);
+                if ($mailbox) {
+                    \MailHelper::setMailDriver($mailbox);
+                }
+            } catch (\Exception $e) {
+                \Helper::logException($e);
+            }
 
             foreach ($managers as $manager) {
                 if (!$manager->customer) {

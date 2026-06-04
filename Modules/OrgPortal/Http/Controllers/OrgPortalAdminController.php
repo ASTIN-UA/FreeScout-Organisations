@@ -12,7 +12,7 @@ class OrgPortalAdminController extends Controller
 {
     public function index()
     {
-        $organizations = Organization::orderBy('name')->paginate(20);
+        $organizations = Organization::withCount('members')->orderBy('name')->paginate(20);
 
         return view('orgportal::admin.index', compact('organizations'));
     }
@@ -89,11 +89,17 @@ class OrgPortalAdminController extends Controller
                 ->with('flash_error', __('orgportal::messages.already_in_org'));
         }
 
-        OrganizationMember::create([
-            'organization_id' => $id,
-            'customer_id'     => $customerId,
-            'role'            => $request->input('role'),
-        ]);
+        try {
+            OrganizationMember::create([
+                'organization_id' => $id,
+                'customer_id'     => $customerId,
+                'role'            => $request->input('role'),
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Unique constraint: concurrent request already added this customer
+            return redirect()->route('orgportal.admin.edit', $id)
+                ->with('flash_error', __('orgportal::messages.already_member'));
+        }
 
         return redirect()->route('orgportal.admin.edit', $id)
             ->with('flash_success', __('orgportal::messages.member_added'));

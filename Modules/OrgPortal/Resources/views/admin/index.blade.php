@@ -36,7 +36,7 @@
                                     {{ $org->name }}
                                 </a>
                             </td>
-                            <td>{{ $org->members()->count() }}</td>
+                            <td>{{ $org->members_count }}</td>
                             <td class="text-right">
                                 <a href="{{ route('orgportal.admin.edit', $org->id) }}"
                                    class="btn btn-xs btn-default">
