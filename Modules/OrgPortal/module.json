@@ -13,6 +13,6 @@
     "files": [],
     "requires": [],
     "requiredModules": {
-        "endusrportal": "1.0.0"
+        "enduserportal": "1.0.0"
     }
 }

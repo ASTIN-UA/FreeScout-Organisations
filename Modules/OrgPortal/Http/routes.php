@@ -29,21 +29,17 @@ Route::group([
     Route::delete('organizations/{id}', 'OrgPortalAdminController@destroy')
         ->name('orgportal.admin.destroy');
 
-    // Member management
     Route::post('organizations/{id}/members', 'OrgPortalAdminController@addMember')
         ->name('orgportal.admin.members.add');
 
     Route::delete('organizations/{id}/members/{memberId}', 'OrgPortalAdminController@removeMember')
         ->name('orgportal.admin.members.remove');
 
-    // AJAX customer search
     Route::get('customers/search', 'OrgPortalAdminController@searchCustomers')
         ->name('orgportal.admin.customers.search');
 });
 
 // ─── API routes — requires API and Webhooks module (middleware: api.key) ──────
-// Middleware 'api.key' is registered by the API and Webhooks module.
-// These routes are silently skipped if that middleware is not registered.
 if (array_key_exists('api.key', app('router')->getMiddleware())) {
     Route::group([
         'prefix'     => $subdirectory . 'api',
@@ -51,7 +47,6 @@ if (array_key_exists('api.key', app('router')->getMiddleware())) {
         'namespace'  => 'Modules\OrgPortal\Http\Controllers\Api',
     ], function () {
 
-        // Organizations CRUD
         Route::get('organizations', 'OrgPortalApiController@listOrganizations')
             ->name('orgportal.api.organizations.list');
 
@@ -67,7 +62,6 @@ if (array_key_exists('api.key', app('router')->getMiddleware())) {
         Route::delete('organizations/{id}', 'OrgPortalApiController@deleteOrganization')
             ->name('orgportal.api.organizations.delete');
 
-        // Customer membership
         Route::get('customers/{customerId}/organization', 'OrgPortalApiController@getCustomerOrganization')
             ->name('orgportal.api.customer.org.get');
 
@@ -79,20 +73,30 @@ if (array_key_exists('api.key', app('router')->getMiddleware())) {
     });
 }
 
-// ─── Portal (EUP) routes — protected by OrgPortal's own EUP session check ────
+// ─── Portal (EUP) routes — same middleware stack as EndUserPortal ─────────────
 Route::group([
-    'prefix'    => $subdirectory . 'portal/org',
-    'middleware' => ['web'],
+    'prefix'    => $subdirectory . 'help/{mailbox_id}/org',
+    'middleware' => [
+        \App\Http\Middleware\EncryptCookies::class,
+        \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+        \Illuminate\Session\Middleware\StartSession::class,
+        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        \App\Http\Middleware\VerifyCsrfToken::class,
+        \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        \App\Http\Middleware\HttpsRedirect::class,
+        \App\Http\Middleware\Localize::class,
+        \App\Http\Middleware\FrameGuard::class,
+    ],
     'namespace'  => 'Modules\OrgPortal\Http\Controllers',
 ], function () {
 
     Route::get('company-tickets', 'OrgPortalFrontController@companyTickets')
         ->name('orgportal.portal.company-tickets');
 
-    Route::get('tickets/{id}', 'OrgPortalFrontController@viewTicket')
+    Route::get('ticket/{conversation_id}', 'OrgPortalFrontController@viewTicket')
         ->name('orgportal.portal.ticket');
 
-    Route::post('tickets/{id}/reply', 'OrgPortalFrontController@replyTicket')
+    Route::post('ticket/{conversation_id}/reply', 'OrgPortalFrontController@replyTicket')
         ->name('orgportal.portal.ticket.reply');
 
     Route::get('settings', 'OrgPortalFrontController@settings')

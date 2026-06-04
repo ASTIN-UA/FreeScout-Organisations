@@ -74,6 +74,9 @@ return [
     'notify_new_ticket_label'=> 'Receive email notification when a member of my organization opens a new ticket',
     'settings_saved'         => 'Settings saved.',
 
+    // EUP nav
+    'org_settings_nav'       => 'Org Settings',
+
     // Conversation badge & search
     'filter_by_org'          => 'Show all tickets from this organization',
     'all_organizations'      => 'All organizations',

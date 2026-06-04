@@ -2,47 +2,48 @@
 
 namespace Modules\OrgPortal\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Customer;
 use App\Conversation;
+use App\Customer;
+use App\Mailbox;
 use App\Thread;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Modules\OrgPortal\Models\Organization;
 use Modules\OrgPortal\Models\OrganizationMember;
 
 class OrgPortalFrontController extends Controller
 {
-    // ─── Auth helper ─────────────────────────────────────────────────────────
+    // ─── Auth / helpers ───────────────────────────────────────────────────────
 
-    /**
-     * Returns the logged-in EUP customer or aborts with redirect.
-     */
-    protected function getEupCustomer(): Customer
+    protected function authCustomer(): Customer
     {
-        $customerId = \Session::get('eup_customer_id');
-
-        if (!$customerId) {
-            throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                redirect()->route('eup.login')
-            );
-        }
-
-        $customer = Customer::find($customerId);
+        $customer = \EndUserPortal::authCustomer();
 
         if (!$customer) {
-            \Session::forget('eup_customer_id');
-            throw new \Illuminate\Http\Exceptions\HttpResponseException(
-                redirect()->route('eup.login')
+            throw new HttpResponseException(
+                redirect()->route('enduserportal.login', [
+                    'mailbox_id' => request()->route('mailbox_id'),
+                ])
             );
         }
 
         return $customer;
     }
 
-    /**
-     * Returns the OrganizationMember record for this customer or aborts 403.
-     */
-    protected function getManagerMember(Customer $customer): OrganizationMember
+    protected function getMailbox(string $encodedId): Mailbox
+    {
+        $id      = \EndUserPortal::decodeMailboxId($encodedId);
+        $mailbox = $id ? Mailbox::find($id) : null;
+
+        if (!$mailbox) {
+            abort(404);
+        }
+
+        return $mailbox;
+    }
+
+    protected function requireManager(Customer $customer): OrganizationMember
     {
         $member = OrganizationMember::where('customer_id', $customer->id)
             ->where('role', 'manager')
@@ -57,24 +58,24 @@ class OrgPortalFrontController extends Controller
 
     // ─── Company Tickets ─────────────────────────────────────────────────────
 
-    public function companyTickets(Request $request)
+    public function companyTickets(Request $request, string $mailbox_id)
     {
-        $customer = $this->getEupCustomer();
-        $member   = $this->getManagerMember($customer);
+        $mailbox  = $this->getMailbox($mailbox_id);
+        $customer = $this->authCustomer();
+        $member   = $this->requireManager($customer);
 
-        // Collect all customer IDs in the organization
         $orgMemberIds = OrganizationMember::where('organization_id', $member->organization_id)
             ->pluck('customer_id');
 
         $conversations = Conversation::whereIn('customer_id', $orgMemberIds)
-            ->whereNotIn('status', [\App\Conversation::STATUS_SPAM])
+            ->where('status', '!=', Conversation::STATUS_SPAM)
             ->orderBy('updated_at', 'desc')
+            ->with('customer')
             ->paginate(25);
 
-        // Eager-load customers for display
-        $conversations->load('customer');
-
         return view('orgportal::portal.company_tickets', [
+            'mailbox'       => $mailbox,
+            'mailbox_id'    => $mailbox_id,
             'customer'      => $customer,
             'organization'  => $member->organization,
             'conversations' => $conversations,
@@ -83,76 +84,96 @@ class OrgPortalFrontController extends Controller
 
     // ─── View single ticket ──────────────────────────────────────────────────
 
-    public function viewTicket(Request $request, int $id)
+    public function viewTicket(Request $request, string $mailbox_id, int $conversation_id)
     {
-        $customer = $this->getEupCustomer();
-        $member   = $this->getManagerMember($customer);
+        $mailbox  = $this->getMailbox($mailbox_id);
+        $customer = $this->authCustomer();
+        $member   = $this->requireManager($customer);
 
         $orgMemberIds = OrganizationMember::where('organization_id', $member->organization_id)
             ->pluck('customer_id');
 
         $conversation = Conversation::whereIn('customer_id', $orgMemberIds)
-            ->findOrFail($id);
+            ->findOrFail($conversation_id);
 
         $threads = $conversation->threads()
-            ->whereIn('type', [\App\Thread::TYPE_CUSTOMER, \App\Thread::TYPE_MESSAGE])
+            ->whereIn('type', [Thread::TYPE_CUSTOMER, Thread::TYPE_MESSAGE])
+            ->where('state', Thread::STATE_PUBLISHED)
             ->orderBy('created_at')
             ->get();
 
+        // Mark agent threads as opened
+        foreach ($threads as $thread) {
+            if ($thread->type === Thread::TYPE_MESSAGE && !$thread->opened_at) {
+                $thread->opened_at = now();
+                $thread->save();
+            }
+        }
+
         return view('orgportal::portal.ticket', [
-            'customer'     => $customer,
-            'conversation' => $conversation,
-            'threads'      => $threads,
+            'mailbox'       => $mailbox,
+            'mailbox_id'    => $mailbox_id,
+            'customer'      => $customer,
+            'conversation'  => $conversation,
+            'threads'       => $threads,
         ]);
     }
 
-    // ─── Reply to ticket ─────────────────────────────────────────────────────
+    // ─── Reply ───────────────────────────────────────────────────────────────
 
-    public function replyTicket(Request $request, int $id)
+    public function replyTicket(Request $request, string $mailbox_id, int $conversation_id)
     {
-        $customer = $this->getEupCustomer();
-        $member   = $this->getManagerMember($customer);
+        $mailbox  = $this->getMailbox($mailbox_id);
+        $customer = $this->authCustomer();
+        $member   = $this->requireManager($customer);
 
         $orgMemberIds = OrganizationMember::where('organization_id', $member->organization_id)
             ->pluck('customer_id');
 
         $conversation = Conversation::whereIn('customer_id', $orgMemberIds)
-            ->findOrFail($id);
+            ->findOrFail($conversation_id);
 
         $request->validate([
             'body' => 'required|string|min:1|max:65000',
         ]);
 
-        // Create a customer thread from the manager's own account
-        $thread = Thread::create([
-            'conversation_id' => $conversation->id,
-            'user_id'         => null,
-            'type'            => Thread::TYPE_CUSTOMER,
-            'body'            => clean($request->input('body')),
-            'status'          => Thread::STATUS_ACTIVE,
-            'state'           => Thread::STATE_PUBLISHED,
-            'customer_id'     => $customer->id,
-            'source_via'      => Thread::PERSON_CUSTOMER,
-            'source_type'     => Thread::SOURCE_TYPE_WEB,
-        ]);
+        $body = nl2br(htmlspecialchars($request->input('body')));
 
-        // Update conversation status back to active if it was closed/pending
-        if ($conversation->status !== Conversation::STATUS_ACTIVE) {
-            $conversation->status = Conversation::STATUS_ACTIVE;
-            $conversation->save();
-        }
+        $thread              = new Thread();
+        $thread->conversation_id     = $conversation->id;
+        $thread->user_id             = null;
+        $thread->type                = Thread::TYPE_CUSTOMER;
+        $thread->status              = Thread::STATUS_ACTIVE;
+        $thread->state               = Thread::STATE_PUBLISHED;
+        $thread->body                = $body;
+        $thread->source_via          = Thread::PERSON_CUSTOMER;
+        $thread->source_type         = Thread::SOURCE_TYPE_WEB;
+        $thread->customer_id         = $customer->id;
+        $thread->created_by_customer_id = $customer->id;
+        $thread->from                = $customer->getMainEmail();
+        $thread->save();
+
+        $conversation->status        = Conversation::STATUS_ACTIVE;
+        $conversation->last_reply_at = now();
+        $conversation->last_reply_from = Conversation::PERSON_CUSTOMER;
+        $conversation->save();
+
+        $conversation = \Eventy::filter('conversation.customer_replied', $conversation, $thread, $customer);
+        $conversation->save();
 
         \Eventy::action('conversation.customer_replied', $conversation, $thread, $customer);
 
-        return redirect()->route('orgportal.portal.ticket', $id)
+        return redirect()
+            ->route('orgportal.portal.ticket', ['mailbox_id' => $mailbox_id, 'conversation_id' => $conversation_id])
             ->with('flash_success', __('orgportal::messages.reply_sent'));
     }
 
     // ─── Settings ────────────────────────────────────────────────────────────
 
-    public function settings(Request $request)
+    public function settings(Request $request, string $mailbox_id)
     {
-        $customer = $this->getEupCustomer();
+        $mailbox  = $this->getMailbox($mailbox_id);
+        $customer = $this->authCustomer();
 
         $member = OrganizationMember::where('customer_id', $customer->id)
             ->where('role', 'manager')
@@ -163,14 +184,17 @@ class OrgPortalFrontController extends Controller
         }
 
         return view('orgportal::portal.settings', [
-            'customer' => $customer,
-            'member'   => $member,
+            'mailbox'    => $mailbox,
+            'mailbox_id' => $mailbox_id,
+            'customer'   => $customer,
+            'member'     => $member,
         ]);
     }
 
-    public function saveSettings(Request $request)
+    public function saveSettings(Request $request, string $mailbox_id)
     {
-        $customer = $this->getEupCustomer();
+        $this->getMailbox($mailbox_id);
+        $customer = $this->authCustomer();
 
         $member = OrganizationMember::where('customer_id', $customer->id)
             ->where('role', 'manager')
@@ -179,7 +203,8 @@ class OrgPortalFrontController extends Controller
         $member->notify_on_new_ticket = (bool) $request->input('notify_on_new_ticket', false);
         $member->save();
 
-        return redirect()->route('orgportal.portal.settings')
+        return redirect()
+            ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id])
             ->with('flash_success', __('orgportal::messages.settings_saved'));
     }
 }

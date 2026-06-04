@@ -74,6 +74,9 @@ return [
     'notify_new_ticket_label'=> 'Отримувати email-сповіщення, коли учасник моєї організації відкриває новий тікет',
     'settings_saved'         => 'Налаштування збережено.',
 
+    // EUP nav
+    'org_settings_nav'       => 'Налаштування орг.',
+
     // Conversation badge & search
     'filter_by_org'          => 'Показати всі тікети цієї організації',
     'all_organizations'      => 'Всі організації',

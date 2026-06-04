@@ -163,45 +163,34 @@ class OrgPortalServiceProvider extends ServiceProvider
 
     protected function registerEupHooks()
     {
-        // Inject "Company Tickets" tab link into EUP tickets page
-        // Hook name: verified against EndUserPortal module (see eup tickets.blade.php)
-        \Eventy::addFilter('eup.tickets.tabs', function ($tabs) {
-            $customerId = \Session::get('eup_customer_id');
-            if (!$customerId) {
-                return $tabs;
-            }
-
-            $member = OrganizationMember::where('customer_id', $customerId)
-                ->where('role', 'manager')
-                ->first();
-
-            if ($member) {
-                $tabs[] = [
-                    'id'    => 'company-tickets',
-                    'title' => __('orgportal::messages.company_tickets'),
-                    'url'   => route('orgportal.portal.company-tickets'),
-                ];
-            }
-
-            return $tabs;
-        }, 20, 1);
-
-        // Inject manager settings section into EUP settings page
-        \Eventy::addAction('eup.settings.after', function () {
-            $customerId = \Session::get('eup_customer_id');
-            if (!$customerId) {
+        // EUP has no tab/settings hooks — inject nav links via JS on layout.body_bottom.
+        // Fires on every EUP page; skipped for non-EUP pages and non-managers.
+        \Eventy::addAction('layout.body_bottom', function () {
+            if (!\EndUserPortal::isEup()) {
                 return;
             }
 
-            $member = OrganizationMember::where('customer_id', $customerId)
+            $customer = \EndUserPortal::authCustomer();
+            if (!$customer) {
+                return;
+            }
+
+            $member = OrganizationMember::where('customer_id', $customer->id)
                 ->where('role', 'manager')
                 ->first();
 
-            if ($member) {
-                echo view('orgportal::portal.settings_inline', [
-                    'member' => $member,
-                ])->render();
+            if (!$member) {
+                return;
             }
+
+            $mailboxId = request()->route('mailbox_id');
+            if (!$mailboxId) {
+                return;
+            }
+
+            echo view('orgportal::partials.eup_nav_inject', [
+                'mailbox_id' => $mailboxId,
+            ])->render();
         }, 20, 0);
     }
 
