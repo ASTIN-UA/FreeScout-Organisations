@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="logo.png" alt="OrgPortal" width="120">
+</p>
+
 # OrgPortal — Organization Portal for FreeScout
 
 Модуль для FreeScout, що додає поняття **Організації** (компанії/команди) до клієнтів, розширює End-User Portal для менеджерів і відображає плашку організації на тікетах та картках Kanban.
