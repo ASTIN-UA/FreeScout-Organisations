@@ -25,11 +25,11 @@ class OrgNewTicketMail extends Mailable
 
     public function build()
     {
-        $authorName = $this->author->getFullName('Unknown');
+        $authorName = $this->author->getFullName(__('orgportal::messages.unknown'));
         $ticketUrl  = route('orgportal.portal.ticket', $this->conversation->id);
 
         return $this
-            ->subject(__('New ticket from :name', ['name' => $authorName]))
+            ->subject(__('orgportal::messages.new_ticket_from', ['name' => $authorName]))
             ->view('orgportal::emails.new_ticket')
             ->with([
                 'manager'      => $this->manager,

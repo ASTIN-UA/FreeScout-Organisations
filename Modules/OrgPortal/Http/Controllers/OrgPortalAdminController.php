@@ -31,7 +31,7 @@ class OrgPortalAdminController extends Controller
         Organization::create(['name' => $request->input('name')]);
 
         return redirect()->route('orgportal.admin.index')
-            ->with('flash_success', __('Organization created.'));
+            ->with('flash_success', __('orgportal::messages.org_created'));
     }
 
     public function edit(int $id)
@@ -53,7 +53,7 @@ class OrgPortalAdminController extends Controller
         $organization->update(['name' => $request->input('name')]);
 
         return redirect()->route('orgportal.admin.edit', $id)
-            ->with('flash_success', __('Organization updated.'));
+            ->with('flash_success', __('orgportal::messages.org_updated'));
     }
 
     public function destroy(int $id)
@@ -61,7 +61,7 @@ class OrgPortalAdminController extends Controller
         Organization::findOrFail($id)->delete();
 
         return redirect()->route('orgportal.admin.index')
-            ->with('flash_success', __('Organization deleted.'));
+            ->with('flash_success', __('orgportal::messages.org_deleted'));
     }
 
     public function addMember(Request $request, int $id)
@@ -80,13 +80,13 @@ class OrgPortalAdminController extends Controller
             ->where('customer_id', $customerId)->exists()
         ) {
             return redirect()->route('orgportal.admin.edit', $id)
-                ->with('flash_error', __('This customer is already a member of the organization.'));
+                ->with('flash_error', __('orgportal::messages.already_member'));
         }
 
         // One org per customer — check they're not in another org
         if (OrganizationMember::where('customer_id', $customerId)->exists()) {
             return redirect()->route('orgportal.admin.edit', $id)
-                ->with('flash_error', __('This customer already belongs to another organization.'));
+                ->with('flash_error', __('orgportal::messages.already_in_org'));
         }
 
         OrganizationMember::create([
@@ -96,7 +96,7 @@ class OrgPortalAdminController extends Controller
         ]);
 
         return redirect()->route('orgportal.admin.edit', $id)
-            ->with('flash_success', __('Member added.'));
+            ->with('flash_success', __('orgportal::messages.member_added'));
     }
 
     public function removeMember(int $id, int $memberId)
@@ -108,7 +108,7 @@ class OrgPortalAdminController extends Controller
             ->delete();
 
         return redirect()->route('orgportal.admin.edit', $id)
-            ->with('flash_success', __('Member removed.'));
+            ->with('flash_success', __('orgportal::messages.member_removed'));
     }
 
     /**

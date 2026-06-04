@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', __('New Organization'))
+@section('title', __('orgportal::messages.new_organization'))
 
 @section('content')
 <div class="section-heading">
-    {{ __('New Organization') }}
+    {{ __('orgportal::messages.new_organization') }}
 </div>
 
 <div class="container">
@@ -17,7 +17,7 @@
                 @csrf
 
                 <div class="form-group {{ $errors->has('name') ? 'has-error' : '' }}">
-                    <label for="name">{{ __('Organization Name') }} <span class="text-danger">*</span></label>
+                    <label for="name">{{ __('orgportal::messages.organization_name') }} <span class="text-danger">*</span></label>
                     <input type="text"
                            id="name"
                            name="name"
@@ -32,10 +32,10 @@
 
                 <div class="form-group">
                     <button type="submit" class="btn btn-primary">
-                        {{ __('Create Organization') }}
+                        {{ __('orgportal::messages.create_organization') }}
                     </button>
                     <a href="{{ route('orgportal.admin.index') }}" class="btn btn-default">
-                        {{ __('Cancel') }}
+                        {{ __('orgportal::messages.cancel') }}
                     </a>
                 </div>
             </form>

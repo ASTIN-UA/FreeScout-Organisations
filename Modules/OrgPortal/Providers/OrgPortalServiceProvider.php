@@ -38,7 +38,7 @@ class OrgPortalServiceProvider extends ServiceProvider
         // Add "Organizations" item to Manage menu
         \Eventy::addAction('menu.manage.append', function () {
             echo '<li><a href="' . route('orgportal.admin.index') . '">'
-                . __('Organizations') . '</a></li>';
+                . __('orgportal::messages.organizations') . '</a></li>';
         }, 20, 0);
     }
 
@@ -59,7 +59,7 @@ class OrgPortalServiceProvider extends ServiceProvider
             if ($member) {
                 $tabs[] = [
                     'id'    => 'company-tickets',
-                    'title' => __('Company Tickets'),
+                    'title' => __('orgportal::messages.company_tickets'),
                     'url'   => route('orgportal.portal.company-tickets'),
                 ];
             }

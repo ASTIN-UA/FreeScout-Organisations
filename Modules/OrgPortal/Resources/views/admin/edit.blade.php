@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', __('Edit Organization'))
+@section('title', __('orgportal::messages.organizations'))
 
 @section('content')
 <div class="section-heading">
-    {{ __('Edit Organization') }}: {{ $organization->name }}
+    {{ __('orgportal::messages.organizations') }}: {{ $organization->name }}
 </div>
 
 <div class="container">
@@ -12,17 +12,17 @@
 
         @include('partials/flash_messages')
 
-        {{-- Organization name form --}}
+        {{-- Organization name --}}
         <div class="col-md-5">
             <div class="panel panel-default">
-                <div class="panel-heading"><strong>{{ __('Organization Details') }}</strong></div>
+                <div class="panel-heading"><strong>{{ __('orgportal::messages.org_details') }}</strong></div>
                 <div class="panel-body">
                     <form method="POST" action="{{ route('orgportal.admin.update', $organization->id) }}">
                         @csrf
                         @method('PUT')
 
                         <div class="form-group {{ $errors->has('name') ? 'has-error' : '' }}">
-                            <label for="name">{{ __('Name') }}</label>
+                            <label for="name">{{ __('orgportal::messages.name') }}</label>
                             <input type="text"
                                    id="name"
                                    name="name"
@@ -36,28 +36,28 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary btn-sm">
-                            {{ __('Save') }}
+                            {{ __('orgportal::messages.save') }}
                         </button>
                         <a href="{{ route('orgportal.admin.index') }}" class="btn btn-default btn-sm">
-                            {{ __('Back') }}
+                            {{ __('orgportal::messages.back') }}
                         </a>
                     </form>
                 </div>
             </div>
         </div>
 
-        {{-- Members list --}}
+        {{-- Members --}}
         <div class="col-md-7">
             <div class="panel panel-default">
-                <div class="panel-heading"><strong>{{ __('Members') }}</strong></div>
+                <div class="panel-heading"><strong>{{ __('orgportal::messages.members') }}</strong></div>
                 <div class="panel-body">
 
                     @if($members->count())
                         <table class="table table-condensed table-striped">
                             <thead>
                                 <tr>
-                                    <th>{{ __('Customer') }}</th>
-                                    <th>{{ __('Role') }}</th>
+                                    <th>{{ __('orgportal::messages.name') }}</th>
+                                    <th>{{ __('orgportal::messages.role') }}</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -69,22 +69,22 @@
                                             {{ $member->customer->getFullName() }}
                                             <small class="text-muted">#{{ $member->customer_id }}</small>
                                         @else
-                                            <em class="text-muted">{{ __('Deleted customer') }}</em>
+                                            <em class="text-muted">{{ __('orgportal::messages.deleted_customer') }}</em>
                                         @endif
                                     </td>
                                     <td>
                                         <span class="label {{ $member->role === 'manager' ? 'label-primary' : 'label-default' }}">
-                                            {{ ucfirst($member->role) }}
+                                            {{ __('orgportal::messages.' . $member->role) }}
                                         </span>
                                     </td>
                                     <td class="text-right">
                                         <form method="POST"
                                               action="{{ route('orgportal.admin.members.remove', [$organization->id, $member->id]) }}"
-                                              onsubmit="return confirm('{{ __('Remove this member?') }}')">
+                                              onsubmit="return confirm('{{ __('orgportal::messages.confirm_remove_member') }}')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-xs btn-danger">
-                                                {{ __('Remove') }}
+                                                {{ __('orgportal::messages.remove') }}
                                             </button>
                                         </form>
                                     </td>
@@ -93,41 +93,40 @@
                             </tbody>
                         </table>
                     @else
-                        <p class="text-muted">{{ __('No members yet.') }}</p>
+                        <p class="text-muted">{{ __('orgportal::messages.no_members') }}</p>
                     @endif
 
-                    {{-- Add member form --}}
                     <hr>
-                    <h5>{{ __('Add Member') }}</h5>
+                    <h5>{{ __('orgportal::messages.add_member') }}</h5>
                     <form method="POST" action="{{ route('orgportal.admin.members.add', $organization->id) }}">
                         @csrf
                         <div class="form-group">
-                            <label>{{ __('Search customer') }}</label>
+                            <label>{{ __('orgportal::messages.search_customer') }}</label>
                             <input type="hidden" id="customer_id" name="customer_id" required>
                             <input type="text"
                                    id="customer_search"
                                    class="form-control"
-                                   placeholder="{{ __('Type name or email…') }}"
+                                   placeholder="{{ __('orgportal::messages.type_name_or_email') }}"
                                    autocomplete="off">
                             <ul id="customer_suggestions"
                                 class="list-group"
                                 style="position:absolute;z-index:1000;width:100%;display:none;max-height:200px;overflow-y:auto;"></ul>
                         </div>
                         <div class="form-group">
-                            <label>{{ __('Role') }}</label>
+                            <label>{{ __('orgportal::messages.role') }}</label>
                             <select name="role" class="form-control">
-                                <option value="member">{{ __('Member') }}</option>
-                                <option value="manager">{{ __('Manager') }}</option>
+                                <option value="member">{{ __('orgportal::messages.member') }}</option>
+                                <option value="manager">{{ __('orgportal::messages.manager') }}</option>
                             </select>
                         </div>
                         <button type="submit" class="btn btn-success btn-sm" id="add_member_btn" disabled>
-                            {{ __('Add Member') }}
+                            {{ __('orgportal::messages.add_member') }}
                         </button>
                     </form>
 
                 </div>
             </div>
-        </div>{{-- /col-md-7 --}}
+        </div>
 
     </div>
 </div>

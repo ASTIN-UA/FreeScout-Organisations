@@ -49,7 +49,7 @@ class OrgPortalFrontController extends Controller
             ->first();
 
         if (!$member) {
-            abort(403, __('Access denied. Manager role required.'));
+            abort(403, __('orgportal::messages.access_denied'));
         }
 
         return $member;
@@ -145,7 +145,7 @@ class OrgPortalFrontController extends Controller
         \Eventy::action('conversation.customer_replied', $conversation, $thread, $customer);
 
         return redirect()->route('orgportal.portal.ticket', $id)
-            ->with('flash_success', __('Reply sent.'));
+            ->with('flash_success', __('orgportal::messages.reply_sent'));
     }
 
     // ─── Settings ────────────────────────────────────────────────────────────
@@ -159,7 +159,7 @@ class OrgPortalFrontController extends Controller
             ->first();
 
         if (!$member) {
-            abort(403, __('Access denied. Manager role required.'));
+            abort(403, __('orgportal::messages.access_denied'));
         }
 
         return view('orgportal::portal.settings', [
@@ -180,6 +180,6 @@ class OrgPortalFrontController extends Controller
         $member->save();
 
         return redirect()->route('orgportal.portal.settings')
-            ->with('flash_success', __('Settings saved.'));
+            ->with('flash_success', __('orgportal::messages.settings_saved'));
     }
 }

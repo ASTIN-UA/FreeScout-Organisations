@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', __('Organizations'))
+@section('title', __('orgportal::messages.organizations'))
 
 @section('content')
 <div class="section-heading">
-    {{ __('Organizations') }}
+    {{ __('orgportal::messages.organizations') }}
 </div>
 
 <div class="container">
@@ -15,7 +15,7 @@
 
             <div class="margin-bottom">
                 <a href="{{ route('orgportal.admin.create') }}" class="btn btn-primary">
-                    <i class="glyphicon glyphicon-plus"></i> {{ __('New Organization') }}
+                    <i class="glyphicon glyphicon-plus"></i> {{ __('orgportal::messages.new_organization') }}
                 </a>
             </div>
 
@@ -23,8 +23,8 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>{{ __('Name') }}</th>
-                            <th>{{ __('Members') }}</th>
+                            <th>{{ __('orgportal::messages.name') }}</th>
+                            <th>{{ __('orgportal::messages.members') }}</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -40,16 +40,16 @@
                             <td class="text-right">
                                 <a href="{{ route('orgportal.admin.edit', $org->id) }}"
                                    class="btn btn-xs btn-default">
-                                    {{ __('Edit') }}
+                                    {{ __('orgportal::messages.edit') }}
                                 </a>
                                 <form method="POST"
                                       action="{{ route('orgportal.admin.destroy', $org->id) }}"
                                       style="display:inline;"
-                                      onsubmit="return confirm('{{ __('Delete this organization?') }}')">
+                                      onsubmit="return confirm('{{ __('orgportal::messages.confirm_delete_org') }}')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-xs btn-danger">
-                                        {{ __('Delete') }}
+                                        {{ __('orgportal::messages.delete') }}
                                     </button>
                                 </form>
                             </td>
@@ -61,8 +61,8 @@
                 {{ $organizations->links() }}
             @else
                 <div class="alert alert-info">
-                    {{ __('No organizations yet.') }}
-                    <a href="{{ route('orgportal.admin.create') }}">{{ __('Create one') }}</a>.
+                    {{ __('orgportal::messages.no_organizations') }}
+                    <a href="{{ route('orgportal.admin.create') }}">{{ __('orgportal::messages.create_one') }}</a>.
                 </div>
             @endif
 

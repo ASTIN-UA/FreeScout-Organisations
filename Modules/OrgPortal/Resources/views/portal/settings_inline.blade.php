@@ -1,9 +1,6 @@
-{{--
-    Reusable partial: rendered both on the standalone settings page
-    and injected inline into EUP settings via the eup.settings.after hook.
---}}
+{{-- Reusable partial: rendered on the standalone settings page and injected via eup.settings.after hook --}}
 <div class="orgportal-settings-section" style="margin-top: 24px;">
-    <h4>{{ __('Organization') }}</h4>
+    <h4>{{ __('orgportal::messages.organization') }}</h4>
 
     <form method="POST" action="{{ route('orgportal.portal.settings.save') }}">
         @csrf
@@ -14,12 +11,12 @@
                        name="notify_on_new_ticket"
                        value="1"
                        {{ $member->notify_on_new_ticket ? 'checked' : '' }}>
-                {{ __('Receive email notification when a member of my organization opens a new ticket') }}
+                {{ __('orgportal::messages.notify_new_ticket_label') }}
             </label>
         </div>
 
         <button type="submit" class="btn btn-primary btn-sm" style="margin-top: 8px;">
-            {{ __('Save') }}
+            {{ __('orgportal::messages.save') }}
         </button>
     </form>
 </div>
