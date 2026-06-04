@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="Modules/OrgPortal/logo.png" alt="OrgPortal" width="120">
-</p>
+<img src="Modules/OrgPortal/logo.png" alt="OrgPortal" width="140" align="right">
 
 # OrgPortal — Organization Portal for FreeScout
 
