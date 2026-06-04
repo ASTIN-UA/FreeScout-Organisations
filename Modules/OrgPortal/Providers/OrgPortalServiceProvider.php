@@ -139,19 +139,30 @@ class OrgPortalServiceProvider extends ServiceProvider
 
     protected function registerKanbanHooks()
     {
-        // Show org badge on Kanban card subjects (cards.blade.php fires conversations_table.after_subject)
+        // Show org badge on Kanban card subjects (cards.blade.php fires conversations_table.after_subject).
+        // Static cache avoids N+1: one DB round-trip per unique customer_id per request.
         \Eventy::addAction('conversations_table.after_subject', function ($conversation) {
-            if (!\Option::get('orgportal.show_badge_kanban', true)) {
+            static $enabled = null;
+            static $cache   = [];
+
+            if ($enabled === null) {
+                $enabled = (bool) \Option::get('orgportal.show_badge_kanban', true);
+            }
+            if (!$enabled) {
                 return;
             }
             if (!$conversation || !$conversation->customer_id) {
                 return;
             }
 
-            $member = OrganizationMember::where('customer_id', $conversation->customer_id)
-                ->with('organization')
-                ->first();
+            $customerId = $conversation->customer_id;
+            if (!array_key_exists($customerId, $cache)) {
+                $cache[$customerId] = OrganizationMember::where('customer_id', $customerId)
+                    ->with('organization')
+                    ->first();
+            }
 
+            $member = $cache[$customerId];
             if (!$member || !$member->organization) {
                 return;
             }

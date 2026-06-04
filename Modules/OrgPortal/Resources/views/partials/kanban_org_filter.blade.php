@@ -1,7 +1,7 @@
 {{-- Injected on Kanban pages: adds org filter dropdown + client-side card filtering --}}
 <script>
 (function () {
-    var orgs = {!! $organizations->map(fn($o) => ['id' => $o->id, 'name' => $o->name])->values()->toJson() !!};
+    var orgs = {!! $organizations->map(fn($o) => ['id' => $o->id, 'name' => $o->name])->values()->toJson(JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!};
     var STORAGE_KEY = 'orgportal_kn_filter';
     var filterSelect = null;
 
