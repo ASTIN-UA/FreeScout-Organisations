@@ -34,7 +34,8 @@ class OrgNewTicketMail extends Mailable
                 'conversation_id' => $this->conversation->id,
             ]);
         } else {
-            $ticketUrl = $this->conversation->url();
+            // No customer-facing URL without EUP — omit the link button in the email.
+            $ticketUrl = null;
         }
 
         return $this

@@ -26,6 +26,7 @@
         </tr>
     </table>
 
+    @if ($ticketUrl)
     <p style="margin-top: 24px;">
         <a href="{{ $ticketUrl }}"
            style="display: inline-block; padding: 10px 22px; background: #3b82f6; color: #fff;
@@ -33,6 +34,7 @@
             {{ __('orgportal::messages.view_ticket') }}
         </a>
     </p>
+    @endif
 
     <p style="margin-top: 32px; font-size: 12px; color: #999;">
         {{ __('orgportal::messages.email_new_ticket_footer') }}
