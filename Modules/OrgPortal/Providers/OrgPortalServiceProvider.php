@@ -88,14 +88,14 @@ class OrgPortalServiceProvider extends ServiceProvider
 
     protected function registerNotificationHooks()
     {
-        // Fire email notifications to org managers when a new conversation is created
-        \Eventy::addAction('conversation.created', function ($conversation) {
-            if (!$conversation || !$conversation->customer_id) {
+        // Fire email notifications to org managers when a customer creates a new conversation.
+        // Hook: conversation.created_by_customer fires with ($conversation, $thread, $customer).
+        \Eventy::addAction('conversation.created_by_customer', function ($conversation, $thread, $customer) {
+            if (!$customer || !$customer->id) {
                 return;
             }
 
-            $authorMember = OrganizationMember::where('customer_id', $conversation->customer_id)
-                ->first();
+            $authorMember = OrganizationMember::where('customer_id', $customer->id)->first();
 
             if (!$authorMember) {
                 return;
@@ -104,18 +104,21 @@ class OrgPortalServiceProvider extends ServiceProvider
             $managers = OrganizationMember::where('organization_id', $authorMember->organization_id)
                 ->where('role', 'manager')
                 ->where('notify_on_new_ticket', true)
-                ->where('customer_id', '!=', $conversation->customer_id)
+                ->where('customer_id', '!=', $customer->id)
                 ->with('customer')
                 ->get();
 
             foreach ($managers as $manager) {
+                if (!$manager->customer) {
+                    continue;
+                }
                 $email = $this->getCustomerEmail($manager->customer);
                 if ($email) {
                     try {
                         \Mail::to($email)->send(
                             new \Modules\OrgPortal\Mail\OrgNewTicketMail(
                                 $manager->customer,
-                                $authorMember->customer,
+                                $customer,
                                 $conversation
                             )
                         );
@@ -124,7 +127,7 @@ class OrgPortalServiceProvider extends ServiceProvider
                     }
                 }
             }
-        }, 20, 1);
+        }, 20, 3);
     }
 
     // -------------------------------------------------------------------------

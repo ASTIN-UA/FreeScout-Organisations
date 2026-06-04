@@ -22,14 +22,18 @@ class OrgPortalFrontController extends Controller
         $customerId = \Session::get('eup_customer_id');
 
         if (!$customerId) {
-            abort(redirect()->route('eup.login'));
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(
+                redirect()->route('eup.login')
+            );
         }
 
         $customer = Customer::find($customerId);
 
         if (!$customer) {
             \Session::forget('eup_customer_id');
-            abort(redirect()->route('eup.login'));
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(
+                redirect()->route('eup.login')
+            );
         }
 
         return $customer;
@@ -128,7 +132,6 @@ class OrgPortalFrontController extends Controller
             'status'          => Thread::STATUS_ACTIVE,
             'state'           => Thread::STATE_PUBLISHED,
             'customer_id'     => $customer->id,
-            'created_by_customer_id' => $customer->id,
             'source_via'      => Thread::PERSON_CUSTOMER,
             'source_type'     => Thread::SOURCE_TYPE_WEB,
         ]);
