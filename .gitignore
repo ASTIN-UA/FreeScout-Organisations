@@ -28,3 +28,8 @@ Homestead.json
 .env.production
 .phpactor.json
 auth.json
+
+# Third-party paid modules (local reference copies, not part of this repo)
+/EndUserPortal/
+/Kanban/
+/.vs/
