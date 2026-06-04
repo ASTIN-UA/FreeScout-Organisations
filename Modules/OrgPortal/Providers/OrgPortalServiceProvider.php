@@ -21,6 +21,8 @@ class OrgPortalServiceProvider extends ServiceProvider
 
         $this->registerMenuHooks();
         $this->registerCustomerHooks();
+        $this->registerConversationHooks();
+        $this->registerSearchHooks();
         $this->registerEupHooks();
         $this->registerNotificationHooks();
     }
@@ -97,6 +99,66 @@ class OrgPortalServiceProvider extends ServiceProvider
                 ]);
             }
         }, 20, 1);
+    }
+
+    protected function registerConversationHooks()
+    {
+        // Render org badge next to tags in the conversation subject area
+        \Eventy::addAction('conversation.after_subject', function ($conversation, $mailbox) {
+            if (!$conversation->customer_id) {
+                return;
+            }
+
+            $member = OrganizationMember::where('customer_id', $conversation->customer_id)
+                ->with('organization')
+                ->first();
+
+            if (!$member || !$member->organization) {
+                return;
+            }
+
+            $searchUrl = route('conversations.search') . '?f[organization]=' . $member->organization_id;
+
+            echo view('orgportal::partials.org_badge', [
+                'organization' => $member->organization,
+                'searchUrl'    => $searchUrl,
+            ])->render();
+        }, 20, 2);
+    }
+
+    protected function registerSearchHooks()
+    {
+        // Inject organization dropdown into the search filters panel
+        \Eventy::addAction('search.display_filters', function ($filters) {
+            $organizations = Organization::orderBy('name')->get(['id', 'name']);
+            $currentOrgId  = $filters['organization'] ?? null;
+
+            echo view('orgportal::partials.search_org_filter', [
+                'organizations' => $organizations,
+                'currentOrgId'  => $currentOrgId,
+            ])->render();
+        }, 20, 1);
+
+        // Filter search results to conversations of org members
+        \Eventy::addFilter('search.conversations.apply_filters', function ($query, $filters, $q) {
+            if (empty($filters['organization'])) {
+                return $query;
+            }
+
+            $orgId = (int) $filters['organization'];
+
+            $memberIds = OrganizationMember::where('organization_id', $orgId)
+                ->pluck('customer_id');
+
+            if ($memberIds->isEmpty()) {
+                // Org exists but has no members — return zero results
+                $query->whereRaw('1 = 0');
+            } else {
+                $query->whereIn('conversations.customer_id', $memberIds);
+            }
+
+            return $query;
+        }, 20, 3);
     }
 
     protected function registerEupHooks()

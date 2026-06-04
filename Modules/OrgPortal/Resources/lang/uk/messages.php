@@ -74,6 +74,11 @@ return [
     'notify_new_ticket_label'=> 'Отримувати email-сповіщення, коли учасник моєї організації відкриває новий тікет',
     'settings_saved'         => 'Налаштування збережено.',
 
+    // Conversation badge & search
+    'filter_by_org'          => 'Показати всі тікети цієї організації',
+    'all_organizations'      => 'Всі організації',
+    'remove_filter'          => 'Зняти фільтр',
+
     // Customer edit form
     'customer_organization'  => 'Організація',
     'no_organization'        => '— Без організації —',

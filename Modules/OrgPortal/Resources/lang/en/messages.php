@@ -74,6 +74,11 @@ return [
     'notify_new_ticket_label'=> 'Receive email notification when a member of my organization opens a new ticket',
     'settings_saved'         => 'Settings saved.',
 
+    // Conversation badge & search
+    'filter_by_org'          => 'Show all tickets from this organization',
+    'all_organizations'      => 'All organizations',
+    'remove_filter'          => 'Remove filter',
+
     // Customer edit form
     'customer_organization'  => 'Organization',
     'no_organization'        => '— None —',
