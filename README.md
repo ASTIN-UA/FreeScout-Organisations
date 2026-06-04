@@ -115,6 +115,62 @@ Modules/OrgPortal/
 | GET | `/portal/org/settings` | Налаштування менеджера |
 | POST | `/portal/org/settings` | Зберегти налаштування |
 
+## REST API
+
+Потребує встановленого та активного модуля **API and Webhooks**.  
+Автентифікація — як у всьому FreeScout API: `?api_key=`, `X-FreeScout-API-Key` header або HTTP Basic.
+
+### Organizations
+
+| Метод | URL | Опис |
+|---|---|---|
+| GET | `/api/organizations` | Список організацій (пагінація: `?page=1&pageSize=25`) |
+| POST | `/api/organizations` | Створити організацію `{"name": "Acme"}` |
+| GET | `/api/organizations/{id}` | Отримати організацію + учасники |
+| PUT | `/api/organizations/{id}` | Оновити назву `{"name": "New Name"}` |
+| DELETE | `/api/organizations/{id}` | Видалити організацію |
+
+### Customer membership
+
+| Метод | URL | Опис |
+|---|---|---|
+| GET | `/api/customers/{id}/organization` | Поточна організація клієнта |
+| PUT | `/api/customers/{id}/organization` | Призначити/оновити `{"organizationId": 1, "role": "manager"}` |
+| DELETE | `/api/customers/{id}/organization` | Видалити клієнта з організації |
+
+### Формат відповідей
+
+**Список:**
+```json
+{
+  "_embedded": {
+    "organizations": [{ "id": 1, "name": "Acme", "createdAt": "...", "updatedAt": "..." }]
+  },
+  "page": { "size": 25, "totalElements": 42, "totalPages": 2, "number": 1 }
+}
+```
+
+**Одна організація (з учасниками):**
+```json
+{
+  "id": 1, "name": "Acme", "createdAt": "...", "updatedAt": "...",
+  "_embedded": {
+    "members": [
+      { "id": 1, "customerId": 5, "role": "manager", "notifyOnNewTicket": true, ... }
+    ]
+  }
+}
+```
+
+**Помилка:**
+```json
+{
+  "message": "Validation failed",
+  "errorCode": "VALIDATION_FAILED",
+  "_embedded": { "errors": [{ "path": "name", "message": "Name is required.", "source": "JSON" }] }
+}
+```
+
 ## Eventy хуки
 
 | Хук | Тип | Призначення |

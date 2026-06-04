@@ -41,6 +41,44 @@ Route::group([
         ->name('orgportal.admin.customers.search');
 });
 
+// ─── API routes — requires API and Webhooks module (middleware: api.key) ──────
+// Middleware 'api.key' is registered by the API and Webhooks module.
+// These routes are silently skipped if that middleware is not registered.
+if (array_key_exists('api.key', app('router')->getMiddleware())) {
+    Route::group([
+        'prefix'     => $subdirectory . 'api',
+        'middleware' => ['api.key'],
+        'namespace'  => 'Modules\OrgPortal\Http\Controllers\Api',
+    ], function () {
+
+        // Organizations CRUD
+        Route::get('organizations', 'OrgPortalApiController@listOrganizations')
+            ->name('orgportal.api.organizations.list');
+
+        Route::post('organizations', 'OrgPortalApiController@createOrganization')
+            ->name('orgportal.api.organizations.create');
+
+        Route::get('organizations/{id}', 'OrgPortalApiController@getOrganization')
+            ->name('orgportal.api.organizations.get');
+
+        Route::put('organizations/{id}', 'OrgPortalApiController@updateOrganization')
+            ->name('orgportal.api.organizations.update');
+
+        Route::delete('organizations/{id}', 'OrgPortalApiController@deleteOrganization')
+            ->name('orgportal.api.organizations.delete');
+
+        // Customer membership
+        Route::get('customers/{customerId}/organization', 'OrgPortalApiController@getCustomerOrganization')
+            ->name('orgportal.api.customer.org.get');
+
+        Route::put('customers/{customerId}/organization', 'OrgPortalApiController@setCustomerOrganization')
+            ->name('orgportal.api.customer.org.set');
+
+        Route::delete('customers/{customerId}/organization', 'OrgPortalApiController@removeCustomerOrganization')
+            ->name('orgportal.api.customer.org.remove');
+    });
+}
+
 // ─── Portal (EUP) routes — protected by OrgPortal's own EUP session check ────
 Route::group([
     'prefix'    => $subdirectory . 'portal/org',
