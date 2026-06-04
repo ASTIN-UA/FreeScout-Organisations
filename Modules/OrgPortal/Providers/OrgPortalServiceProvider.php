@@ -139,9 +139,12 @@ class OrgPortalServiceProvider extends ServiceProvider
         if (!$customer) {
             return null;
         }
-        // Customer may expose $customer->email directly or via emails() relation
-        if (!empty($customer->email)) {
-            return $customer->email;
+        // Customer has no $email property — use getMainEmail() or emails() relation
+        if (method_exists($customer, 'getMainEmail')) {
+            $email = $customer->getMainEmail();
+            if ($email) {
+                return $email;
+            }
         }
         $emailModel = $customer->emails()->first();
         return $emailModel ? $emailModel->email : null;
