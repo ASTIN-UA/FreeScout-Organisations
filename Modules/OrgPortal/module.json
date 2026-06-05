@@ -3,6 +3,7 @@
     "alias": "orgportal",
     "description": "Organization Portal — organization management with End-User Portal integration for FreeScout",
     "version": "1.0.0",
+    "img": "/modules/orgportal/logo.png",
     "keywords": ["organizations", "portal", "customers"],
     "active": 1,
     "order": 0,
