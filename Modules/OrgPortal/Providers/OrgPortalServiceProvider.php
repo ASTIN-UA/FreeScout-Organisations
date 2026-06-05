@@ -52,6 +52,9 @@ class OrgPortalServiceProvider extends ServiceProvider
     protected function registerMenuHooks()
     {
         \Eventy::addAction('menu.manage.append', function () {
+            if (!\Route::has('orgportal.admin.index')) {
+                return;
+            }
             echo '<li><a href="' . route('orgportal.admin.index') . '">'
                 . __('orgportal::messages.organizations') . '</a></li>';
             echo '<li><a href="' . route('orgportal.admin.settings') . '">'
