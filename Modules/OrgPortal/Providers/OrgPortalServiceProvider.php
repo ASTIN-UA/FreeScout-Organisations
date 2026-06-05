@@ -19,6 +19,10 @@ class OrgPortalServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
 
+        if (!app()->routesAreCached()) {
+            require __DIR__ . '/../Http/routes.php';
+        }
+
         // Enqueue module CSS via the standard stylesheets filter
         \Eventy::addFilter('stylesheets', function ($styles) {
             $styles[] = \Module::getPublicPath(ORGPORTAL_MODULE) . '/css/module.css';
