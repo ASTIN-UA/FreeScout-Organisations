@@ -14,7 +14,11 @@ class OrgPortalAdminController extends Controller
     {
         $organizations = Organization::withCount('members')->orderBy('name')->paginate(20);
 
-        return view('orgportal::admin.index', compact('organizations'));
+        return view('orgportal::admin.index', [
+            'organizations'           => $organizations,
+            'show_badge_conversation' => (bool) \Option::get('orgportal.show_badge_conversation', true),
+            'show_badge_kanban'       => (bool) \Option::get('orgportal.show_badge_kanban', true),
+        ]);
     }
 
     public function create()
@@ -130,7 +134,7 @@ class OrgPortalAdminController extends Controller
         \Option::set('orgportal.show_badge_conversation', (bool) $request->input('show_badge_conversation'));
         \Option::set('orgportal.show_badge_kanban', (bool) $request->input('show_badge_kanban'));
 
-        return redirect()->route('orgportal.admin.settings')
+        return redirect()->route('orgportal.admin.index')
             ->with('flash_success', __('orgportal::messages.settings_saved'));
     }
 

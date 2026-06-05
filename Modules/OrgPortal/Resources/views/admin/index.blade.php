@@ -68,5 +68,42 @@
 
         </div>
     </div>
+
+    <div class="row" style="margin-top:30px;">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="panel panel-default">
+                <div class="panel-heading"><strong>{{ __('orgportal::messages.display_settings') }}</strong></div>
+                <div class="panel-body">
+                    <form method="POST" action="{{ route('orgportal.admin.settings.save') }}">
+                        {{ csrf_field() }}
+
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="show_badge_conversation" value="1"
+                                        {{ $show_badge_conversation ? 'checked' : '' }}>
+                                    {{ __('orgportal::messages.show_badge_conversation') }}
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="show_badge_kanban" value="1"
+                                        {{ $show_badge_kanban ? 'checked' : '' }}>
+                                    {{ __('orgportal::messages.show_badge_kanban') }}
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            {{ __('orgportal::messages.save') }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection

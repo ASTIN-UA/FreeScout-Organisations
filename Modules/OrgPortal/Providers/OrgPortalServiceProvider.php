@@ -57,8 +57,6 @@ class OrgPortalServiceProvider extends ServiceProvider
             }
             echo '<li><a href="' . route('orgportal.admin.index') . '">'
                 . __('orgportal::messages.organizations') . '</a></li>';
-            echo '<li><a href="' . route('orgportal.admin.settings') . '">'
-                . __('orgportal::messages.module_settings') . '</a></li>';
         }, 20, 0);
     }
 
