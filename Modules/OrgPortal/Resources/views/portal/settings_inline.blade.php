@@ -1,7 +1,7 @@
 {{-- Reusable settings form; requires $member and $mailbox_id --}}
 <form method="POST"
       action="{{ route('orgportal.portal.settings.save', ['mailbox_id' => $mailbox_id]) }}">
-    @csrf
+    {{ csrf_field() }}
 
     <div class="checkbox">
         <label>

@@ -18,8 +18,8 @@
                 <div class="panel-heading"><strong>{{ __('orgportal::messages.org_details') }}</strong></div>
                 <div class="panel-body">
                     <form method="POST" action="{{ route('orgportal.admin.update', $organization->id) }}">
-                        @csrf
-                        @method('PUT')
+                        {{ csrf_field() }}
+                        {{ method_field('PUT') }}
 
                         <div class="form-group {{ $errors->has('name') ? 'has-error' : '' }}">
                             <label for="name">{{ __('orgportal::messages.name') }}</label>
@@ -81,8 +81,8 @@
                                         <form method="POST"
                                               action="{{ route('orgportal.admin.members.remove', [$organization->id, $member->id]) }}"
                                               onsubmit="return confirm('{{ __('orgportal::messages.confirm_remove_member') }}')">
-                                            @csrf
-                                            @method('DELETE')
+                                            {{ csrf_field() }}
+                                            {{ method_field('DELETE') }}
                                             <button type="submit" class="btn btn-xs btn-danger">
                                                 {{ __('orgportal::messages.remove') }}
                                             </button>
@@ -99,7 +99,7 @@
                     <hr>
                     <h5>{{ __('orgportal::messages.add_member') }}</h5>
                     <form method="POST" action="{{ route('orgportal.admin.members.add', $organization->id) }}">
-                        @csrf
+                        {{ csrf_field() }}
                         <div class="form-group">
                             <label>{{ __('orgportal::messages.search_customer') }}</label>
                             <input type="hidden" id="customer_id" name="customer_id" required>

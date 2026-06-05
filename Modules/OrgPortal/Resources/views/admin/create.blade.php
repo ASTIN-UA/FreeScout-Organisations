@@ -14,7 +14,7 @@
             @include('partials/flash_messages')
 
             <form method="POST" action="{{ route('orgportal.admin.store') }}">
-                @csrf
+                {{ csrf_field() }}
 
                 <div class="form-group {{ $errors->has('name') ? 'has-error' : '' }}">
                     <label for="name">{{ __('orgportal::messages.organization_name') }} <span class="text-danger">*</span></label>

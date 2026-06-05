@@ -46,8 +46,8 @@
                                       action="{{ route('orgportal.admin.destroy', $org->id) }}"
                                       style="display:inline;"
                                       onsubmit="return confirm('{{ __('orgportal::messages.confirm_delete_org') }}')">
-                                    @csrf
-                                    @method('DELETE')
+                                    {{ csrf_field() }}
+                                    {{ method_field('DELETE') }}
                                     <button type="submit" class="btn btn-xs btn-danger">
                                         {{ __('orgportal::messages.delete') }}
                                     </button>

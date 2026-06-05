@@ -14,7 +14,7 @@
             @include('partials/flash_messages')
 
             <form method="POST" action="{{ route('orgportal.admin.settings.save') }}">
-                @csrf
+                {{ csrf_field() }}
 
                 <div class="panel panel-default">
                     <div class="panel-heading">{{ __('orgportal::messages.display_settings') }}</div>

@@ -52,7 +52,7 @@
             <h4>{{ __('orgportal::messages.reply') }}</h4>
             <form method="POST"
                   action="{{ route('orgportal.portal.ticket.reply', ['mailbox_id' => $mailbox_id, 'conversation_id' => $conversation->id]) }}">
-                @csrf
+                {{ csrf_field() }}
                 <div class="form-group">
                     <textarea name="body"
                               class="form-control"
