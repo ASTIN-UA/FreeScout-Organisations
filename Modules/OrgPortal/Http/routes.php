@@ -7,7 +7,8 @@ $subdirectory = \Helper::getSubdirectory();
 // ─── Admin routes (require FreeScout auth + admin role) ───────────────────────
 Route::group([
     'prefix'     => $subdirectory . 'orgportal/admin',
-    'middleware' => ['web', 'auth', 'admin'],
+    'middleware' => ['web', 'auth', 'roles'],
+    'roles'      => ['admin'],
     'namespace'  => 'Modules\OrgPortal\Http\Controllers',
 ], function () {
 
