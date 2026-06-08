@@ -65,22 +65,59 @@ class OrgPortalFrontController extends Controller
         $customer = $this->authCustomer();
         $member   = $this->requireManager($customer);
 
-        $orgMemberIds = OrganizationMember::where('organization_id', $member->organization_id)
+        $orgMemberIds   = OrganizationMember::where('organization_id', $member->organization_id)
             ->pluck('customer_id');
 
-        $conversations = Conversation::whereIn('customer_id', $orgMemberIds)
+        $orderField     = 'last_reply_at';
+        $orderDirection = $request->input('order', 'desc');
+        $searchField    = $request->input('searchField', '');
+        $status         = $request->input('status', []);
+        $direction      = $orderDirection === 'asc' ? 'desc' : 'asc';
+
+        $authorId   = (int) $request->input('author_id', 0) ?: null;
+        $authorName = null;
+        if ($authorId) {
+            $author     = Customer::find($authorId);
+            $authorName = $author ? trim($author->getFullName()) : null;
+            if (!$authorName || !$orgMemberIds->contains($authorId)) {
+                $authorId = null; // ignore invalid / out-of-org author filter
+            }
+        }
+
+        $builder = Conversation::whereIn('customer_id', $orgMemberIds)
             ->where('status', '!=', Conversation::STATUS_SPAM)
             ->where('state', '!=', Conversation::STATE_DELETED)
-            ->orderBy('updated_at', 'desc')
-            ->with('customer')
-            ->paginate(25);
+            ->with(['customer', 'user'])
+            ->when($searchField, fn ($q) => $q->where('subject', 'like', "%{$searchField}%"))
+            ->when($authorId,    fn ($q) => $q->where('customer_id', $authorId))
+            ->orderBy($orderField, $orderDirection);
+
+        if (!empty($status) && is_array($status)) {
+            $convIds = \Modules\Kanban\Entities\KnCard::whereIn('kn_column_id', array_values($status))
+                ->pluck('conversation_id');
+            $builder->whereIn('id', $convIds);
+        }
+
+        $tickets = $builder->paginate(20);
+        $tickets->appends(array_filter([
+            'order'       => $request->input('order'),
+            'searchField' => $searchField  ?: null,
+            'status'      => $status       ?: null,
+            'author_id'   => $authorId     ?: null,
+        ]));
 
         return view('orgportal::portal.company_tickets', [
-            'mailbox'       => $mailbox,
-            'mailbox_id'    => $mailbox_id,
-            'customer'      => $customer,
-            'organization'  => $member->organization,
-            'conversations' => $conversations,
+            'mailbox'      => $mailbox,
+            'mailbox_id'   => $mailbox_id,
+            'customer'     => $customer,
+            'organization' => $member->organization,
+            'tickets'      => $tickets,
+            'sortField'    => $orderField,
+            'direction'    => $direction,
+            'searchField'  => $searchField,
+            'status'       => $status,
+            'authorId'     => $authorId,
+            'authorName'   => $authorName,
         ]);
     }
 

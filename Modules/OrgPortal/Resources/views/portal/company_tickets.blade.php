@@ -4,60 +4,50 @@
 
 @section('content')
 <div id="eup-container">
-    <div class="eup-container-padded">
 
+    <div class="eup-container-padded">
         <div class="heading margin-bottom text-center">
             {{ $organization->name }} — {{ __('orgportal::messages.company_tickets') }}
         </div>
 
-        @if(session('flash_success'))
-            <div class="alert alert-success">{{ session('flash_success') }}</div>
+        @if($authorId && $authorName)
+        <div style="margin-bottom:8px">
+            <span>{{ __('Автор') }}: <strong>{{ $authorName }}</strong></span>
+            <a href="{{ route('orgportal.portal.company-tickets', ['mailbox_id' => $mailbox_id]) }}"
+               class="btn btn-xs btn-default" style="margin-left:8px">×</a>
+        </div>
         @endif
 
-        @if($conversations->count())
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>{{ __('orgportal::messages.subject') }}</th>
-                        <th>{{ __('orgportal::messages.from') }}</th>
-                        <th>{{ __('orgportal::messages.updated') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($conversations as $conv)
-                    @php
-                        $statusMap = [
-                            \App\Conversation::STATUS_ACTIVE  => 'label-success',
-                            \App\Conversation::STATUS_PENDING => 'label-warning',
-                            \App\Conversation::STATUS_CLOSED  => 'label-default',
-                        ];
-                        $statusCls = $statusMap[$conv->status] ?? 'label-default';
-                        $statusLabel = \EndUserPortal::getStatusName($conv);
-                    @endphp
-                    <tr>
-                        <td>
-                            <span class="label {{ $statusCls }}">{{ $statusLabel }}</span>
-                            @if(\EndUserPortal::hasNewReplies($conv))
-                                <span class="label label-warning">{{ __('New') }}</span>
-                            @endif
-                        </td>
-                        <td>
-                            <a href="{{ route('orgportal.portal.ticket', ['mailbox_id' => $mailbox_id, 'conversation_id' => $conv->id]) }}">
-                                {{ $conv->subject ?: __('orgportal::messages.no_subject') }}
-                            </a>
-                        </td>
-                        <td>{{ optional($conv->customer)->getFullName(__('orgportal::messages.unknown')) }}</td>
-                        <td>{{ \EndUserPortal::dateFormat($conv->updated_at) }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            {{ $conversations->links() }}
-        @else
-            <div class="alert alert-info">{{ __('orgportal::messages.no_org_tickets') }}</div>
-        @endif
-
+        {{--
+            Use EUP's own tickets_filters partial if the installation provides one.
+            Falls back to our default (orgportal::partials.tickets_filters).
+            Pass showSubmitButton=false — this page is read-only for managers.
+        --}}
+        @includeFirst(
+            ['enduserportal::partials.tickets_filters', 'orgportal::partials.tickets_filters'],
+            [
+                'mailbox'           => $mailbox,
+                'sortField'         => $sortField,
+                'direction'         => $direction,
+                'searchField'       => $searchField,
+                'status'            => $status,
+                'showSubmitButton'  => false,
+                'formAction'        => route('orgportal.portal.company-tickets', ['mailbox_id' => $mailbox_id]),
+                'resetUrl'          => route('orgportal.portal.company-tickets', ['mailbox_id' => $mailbox_id]),
+            ]
+        )
     </div>
+
+    @include('orgportal::partials.company_tickets_table', [
+        'conversations' => $tickets,
+        'mailbox_id'    => $mailbox_id,
+        'sortField'     => $sortField,
+        'direction'     => $direction,
+        'searchField'   => $searchField,
+        'status'        => $status,
+        'authorId'      => $authorId,
+        'authorName'    => $authorName,
+    ])
+
 </div>
 @endsection
