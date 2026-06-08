@@ -169,12 +169,13 @@ class OrgPortalServiceProvider extends ServiceProvider
                 return;
             }
 
-            $searchBase = rtrim(url(\Helper::getSubdirectory() . 'search'), '/');
-            $searchUrl  = $searchBase . '?' . http_build_query(['f' => ['organization' => $member->organization_id]]);
-
+            // Conversations list: badge is injected inside the row's <a> link,
+            // so render it as a non-clickable <span> to avoid nested <a> (which
+            // breaks the row link and the layout).
             echo view('orgportal::partials.org_badge', [
                 'organization' => $member->organization,
-                'searchUrl'    => $searchUrl,
+                'searchUrl'    => '',
+                'asLink'       => false,
             ])->render();
         }, 20, 1);
     }

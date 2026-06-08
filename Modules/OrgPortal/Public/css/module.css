@@ -17,24 +17,28 @@
     border: 1px solid #4a8ac4;
     transition: background-color .15s;
 }
-.orgportal-org-badge:hover,
-.orgportal-org-badge:focus {
+/* Hover applies only to the clickable <a> variant */
+a.orgportal-org-badge:hover,
+a.orgportal-org-badge:focus {
     color: #fff;
     background-color: #4a8ac4;
     text-decoration: none;
 }
 
-/* Conversations list: inline badge matching fs-tag sizing/alignment exactly */
-.table-conversations .orgportal-org-badge {
+/* Conversations list: non-clickable inline <span> badge matching fs-tag
+   sizing/alignment exactly (same height as the subject text line) */
+.table-conversations span.orgportal-org-badge {
     display: inline-block;
     width: auto;
     margin-top: 0;
+    margin-right: 4px;
     font-size: 11px;
     line-height: 14px;
     padding: 2px 6px 1px 6px;
     vertical-align: baseline;
     position: relative;
     top: 1px;
+    cursor: inherit;
 }
 
 /* Single ticket view: badge sits directly below conv-subj-block,
