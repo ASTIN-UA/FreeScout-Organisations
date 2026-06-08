@@ -68,14 +68,24 @@
                                         @if($member->customer)
                                             {{ $member->customer->getFullName() }}
                                             <small class="text-muted">#{{ $member->customer_id }}</small>
+                                            @if($member->customer->getMainEmail())
+                                                <br><small class="text-muted">{{ $member->customer->getMainEmail() }}</small>
+                                            @endif
                                         @else
                                             <em class="text-muted">{{ __('orgportal::messages.deleted_customer') }}</em>
                                         @endif
                                     </td>
                                     <td>
-                                        <span class="label {{ $member->role === 'manager' ? 'label-primary' : 'label-default' }}">
-                                            {{ __('orgportal::messages.' . $member->role) }}
-                                        </span>
+                                        <form method="POST"
+                                              action="{{ route('orgportal.admin.members.role', [$organization->id, $member->id]) }}"
+                                              style="display:inline-flex;gap:4px;align-items:center">
+                                            {{ csrf_field() }}
+                                            <select name="role" class="form-control input-sm" style="width:auto">
+                                                <option value="member"  {{ $member->role === 'member'  ? 'selected' : '' }}>{{ __('orgportal::messages.member') }}</option>
+                                                <option value="manager" {{ $member->role === 'manager' ? 'selected' : '' }}>{{ __('orgportal::messages.manager') }}</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-xs btn-primary" title="{{ __('orgportal::messages.save') }}">✓</button>
+                                        </form>
                                     </td>
                                     <td class="text-right">
                                         <form method="POST"
@@ -103,14 +113,16 @@
                         <div class="form-group">
                             <label>{{ __('orgportal::messages.search_customer') }}</label>
                             <input type="hidden" id="customer_id" name="customer_id" required>
-                            <input type="text"
-                                   id="customer_search"
-                                   class="form-control"
-                                   placeholder="{{ __('orgportal::messages.type_name_or_email') }}"
-                                   autocomplete="off">
-                            <ul id="customer_suggestions"
-                                class="list-group"
-                                style="position:absolute;z-index:1000;width:100%;display:none;max-height:200px;overflow-y:auto;"></ul>
+                            <div style="position:relative">
+                                <input type="text"
+                                       id="customer_search"
+                                       class="form-control"
+                                       placeholder="{{ __('orgportal::messages.type_name_or_email') }}"
+                                       autocomplete="off">
+                                <ul id="customer_suggestions"
+                                    class="list-group"
+                                    style="position:absolute;z-index:1000;width:100%;display:none;max-height:200px;overflow-y:auto;top:100%;left:0;margin-top:2px;box-shadow:0 4px 8px rgba(0,0,0,.15);"></ul>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label>{{ __('orgportal::messages.role') }}</label>
@@ -131,7 +143,7 @@
     </div>
 </div>
 
-<script>
+<script {!! \Helper::cspNonceAttr() !!}>
 (function () {
     var searchInput = document.getElementById('customer_search');
     var hiddenInput = document.getElementById('customer_id');
@@ -165,18 +177,37 @@
                 }
                 data.forEach(function (item) {
                     var li = document.createElement('li');
-                    li.className = 'list-group-item list-group-item-action';
+                    li.className = 'list-group-item';
                     li.style.cursor = 'pointer';
-                    li.textContent = item.text;
+
+                    var nameEl = document.createElement('div');
+                    nameEl.textContent = item.name;
+
+                    if (item.email) {
+                        var emailEl = document.createElement('small');
+                        emailEl.style.color = '#999';
+                        emailEl.textContent = item.email;
+                        li.appendChild(nameEl);
+                        li.appendChild(emailEl);
+                    } else {
+                        li.appendChild(nameEl);
+                    }
+
+                    li.addEventListener('mouseenter', function () { this.style.backgroundColor = '#f5f5f5'; });
+                    li.addEventListener('mouseleave', function () { this.style.backgroundColor = ''; });
                     li.addEventListener('click', function () {
-                        searchInput.value  = item.text;
-                        hiddenInput.value  = item.id;
-                        addBtn.disabled    = false;
+                        searchInput.value = item.name;
+                        hiddenInput.value = item.id;
+                        addBtn.disabled   = false;
                         suggestions.style.display = 'none';
                     });
                     suggestions.appendChild(li);
                 });
                 suggestions.style.display = 'block';
+            })
+            .catch(function (err) {
+                console.error('[OrgPortal] customer search error:', err);
+                suggestions.style.display = 'none';
             });
         }, 300);
     });

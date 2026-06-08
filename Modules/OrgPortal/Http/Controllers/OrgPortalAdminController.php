@@ -41,7 +41,7 @@ class OrgPortalAdminController extends Controller
     public function edit(int $id)
     {
         $organization = Organization::findOrFail($id);
-        $members      = $organization->members()->with('customer')->get();
+        $members      = $organization->members()->with(['customer.emails'])->get();
 
         return view('orgportal::admin.edit', compact('organization', 'members'));
     }
@@ -109,6 +109,19 @@ class OrgPortalAdminController extends Controller
             ->with('flash_success', __('orgportal::messages.member_added'));
     }
 
+    public function updateMemberRole(Request $request, int $id, int $memberId)
+    {
+        $request->validate(['role' => 'required|in:member,manager']);
+
+        OrganizationMember::where('id', $memberId)
+            ->where('organization_id', $id)
+            ->firstOrFail()
+            ->update(['role' => $request->input('role')]);
+
+        return redirect()->route('orgportal.admin.edit', $id)
+            ->with('flash_success', __('orgportal::messages.role_updated'));
+    }
+
     public function removeMember(int $id, int $memberId)
     {
         Organization::findOrFail($id);
@@ -139,7 +152,27 @@ class OrgPortalAdminController extends Controller
     }
 
     /**
+     * Generate and redirect to a portal login link for a given customer (admin only).
+     * Usage: /orgportal/admin/impersonate/{customer_id}/{mailbox_id}
+     */
+    public function impersonatePortalLink(int $customer_id, int $mailbox_id)
+    {
+        $customer = Customer::findOrFail($customer_id);
+        $mailbox  = \App\Mailbox::findOrFail($mailbox_id);
+
+        $link = route('enduserportal.login_from_email', [
+            'id'          => \EndUserPortal::encodeMailboxId($mailbox->id),
+            'customer_id' => encrypt($customer->id),
+            'hash'        => \EndUserPortal::customerHash($customer->created_at),
+            'timestamp'   => encrypt(time()),
+        ]);
+
+        return redirect($link);
+    }
+
+    /**
      * AJAX: search customers by name or email for the member-add form.
+     * Excludes customers already in any organization (one org per customer rule).
      */
     public function searchCustomers(Request $request)
     {
@@ -150,20 +183,25 @@ class OrgPortalAdminController extends Controller
         }
 
         $customers = Customer::where(function ($q) use ($query) {
-                $q->where('first_name', 'like', "%{$query}%")
-                  ->orWhere('last_name', 'like', "%{$query}%");
+                $q->where(function ($q2) use ($query) {
+                    $q2->where('first_name', 'like', "%{$query}%")
+                       ->orWhere('last_name', 'like', "%{$query}%");
+                })
+                ->orWhereHas('emails', function ($q2) use ($query) {
+                    $q2->where('email', 'like', "%{$query}%");
+                });
             })
-            ->orWhereHas('emails', function ($q) use ($query) {
-                $q->where('email', 'like', "%{$query}%");
-            })
+            ->whereNotIn('id', OrganizationMember::select('customer_id'))
+            ->with('emails')
             ->orderBy('last_name')
-            ->limit(15)
+            ->limit(25)
             ->get(['id', 'first_name', 'last_name']);
 
         return response()->json(
             $customers->map(fn ($c) => [
-                'id'   => $c->id,
-                'text' => $c->getFullName() . ' (#' . $c->id . ')',
+                'id'    => $c->id,
+                'name'  => $c->getFullName() . ' (#' . $c->id . ')',
+                'email' => optional($c->emails->first())->email ?? '',
             ])
         );
     }
