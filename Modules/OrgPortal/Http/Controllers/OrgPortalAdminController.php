@@ -52,10 +52,14 @@ class OrgPortalAdminController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:organizations,name',
+            'name'  => 'required|string|max:255|unique:organizations,name',
+            'color' => 'nullable|string|max:20|regex:/^#[0-9a-fA-F]{3,6}$/',
         ]);
 
-        Organization::create(['name' => $request->input('name')]);
+        Organization::create([
+            'name'  => $request->input('name'),
+            'color' => $request->input('color') ?: null,
+        ]);
 
         return redirect()->route('orgportal.admin.index')
             ->with('flash_success', __('orgportal::messages.org_created'));
@@ -74,10 +78,14 @@ class OrgPortalAdminController extends Controller
         $organization = Organization::findOrFail($id);
 
         $request->validate([
-            'name' => 'required|string|max:255|unique:organizations,name,' . $id,
+            'name'  => 'required|string|max:255|unique:organizations,name,' . $id,
+            'color' => 'nullable|string|max:20|regex:/^#[0-9a-fA-F]{3,6}$/',
         ]);
 
-        $organization->update(['name' => $request->input('name')]);
+        $organization->update([
+            'name'  => $request->input('name'),
+            'color' => $request->input('color') ?: null,
+        ]);
 
         return redirect()->route('orgportal.admin.edit', $id)
             ->with('flash_success', __('orgportal::messages.org_updated'));

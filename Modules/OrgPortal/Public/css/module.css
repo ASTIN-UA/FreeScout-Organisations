@@ -57,6 +57,12 @@ a.orgportal-org-badge:focus {
     margin: -10px 0 8px 20px;
 }
 
+/* Kanban: nudge glyphicon down to match ticket-view baseline alignment */
+.kn-card-name .orgportal-org-badge .glyphicon {
+    position: relative;
+    top: 1px;
+}
+
 /* ── Kanban org filter dropdown ─────────────────────────────────────────── */
 .orgportal-kn-filter-wrap {
     display: inline-block;

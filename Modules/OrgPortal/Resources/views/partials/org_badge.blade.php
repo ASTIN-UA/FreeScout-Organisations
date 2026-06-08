@@ -21,13 +21,13 @@
    style="{{ $badgeStyle }}"
    data-org-id="{{ $organization->id }}"
    title="{{ __('orgportal::messages.filter_by_org') }}">
-    <span class="glyphicon glyphicon-briefcase" style="margin-right:3px;"></span>{{ $organization->name }}
+    <span class="glyphicon glyphicon-briefcase" style="margin-right:3px;color:#fff;"></span>{{ $organization->name }}
 </a>
 @else
 <span class="orgportal-org-badge"
       style="{{ $badgeStyle }}"
       data-org-id="{{ $organization->id }}"
       title="{{ $organization->name }}">
-    <span class="glyphicon glyphicon-briefcase" style="margin-right:3px;"></span>{{ $organization->name }}
+    <span class="glyphicon glyphicon-briefcase" style="margin-right:3px;color:#fff;"></span>{{ $organization->name }}
 </span>
 @endif
