@@ -35,14 +35,42 @@
     </div>
 </div>
 
+@php
+    $orgSearchBase = rtrim(url(\Helper::getSubdirectory() . 'search'), '/');
+    $orgTicketsUrl = $currentOrgId
+        ? $orgSearchBase . '?' . http_build_query(['f' => ['organization' => $currentOrgId]])
+        : '#';
+@endphp
+<div class="form-group orgportal-tickets-row" style="{{ $currentOrgId ? '' : 'display:none;' }}">
+    <div class="col-sm-offset-2 col-sm-6">
+        <a id="orgportal-tickets-link"
+           href="{{ $orgTicketsUrl }}"
+           class="btn btn-default btn-sm"
+           target="_blank">
+            {{ __('orgportal::messages.view_org_tickets') }}
+        </a>
+    </div>
+</div>
+
 <script>
 (function () {
-    var orgSelect  = document.querySelector('select[name="orgportal_organization_id"]');
-    var roleRow    = document.querySelector('.orgportal-role-row');
+    var orgSelect   = document.querySelector('select[name="orgportal_organization_id"]');
+    var roleRow     = document.querySelector('.orgportal-role-row');
+    var ticketsRow  = document.querySelector('.orgportal-tickets-row');
+    var ticketsLink = document.getElementById('orgportal-tickets-link');
+    var baseUrl     = '{{ $orgSearchBase }}';
+
     if (!orgSelect || !roleRow) return;
 
     orgSelect.addEventListener('change', function () {
-        roleRow.style.display = this.value ? '' : 'none';
+        var val = this.value;
+        roleRow.style.display    = val ? '' : 'none';
+        if (ticketsRow) {
+            ticketsRow.style.display = val ? '' : 'none';
+        }
+        if (ticketsLink && val) {
+            ticketsLink.href = baseUrl + '?f%5Borganization%5D=' + val;
+        }
     });
 })();
 </script>

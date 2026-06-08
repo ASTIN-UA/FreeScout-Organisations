@@ -135,7 +135,8 @@ class OrgPortalServiceProvider extends ServiceProvider
                 return;
             }
 
-            $searchUrl = route('conversations.search') . '?f[organization]=' . $member->organization_id;
+            $searchBase = rtrim(url(\Helper::getSubdirectory() . 'search'), '/');
+            $searchUrl  = $searchBase . '?' . http_build_query(['f' => ['organization' => $member->organization_id]]);
 
             echo view('orgportal::partials.org_badge', [
                 'organization' => $member->organization,
@@ -174,7 +175,8 @@ class OrgPortalServiceProvider extends ServiceProvider
                 return;
             }
 
-            $searchUrl = route('conversations.search') . '?f[organization]=' . $member->organization_id;
+            $searchBase = rtrim(url(\Helper::getSubdirectory() . 'search'), '/');
+            $searchUrl  = $searchBase . '?' . http_build_query(['f' => ['organization' => $member->organization_id]]);
 
             echo view('orgportal::partials.org_badge', [
                 'organization' => $member->organization,
