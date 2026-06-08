@@ -69,6 +69,8 @@ return [
     'write_reply'            => 'Напишіть відповідь…',
     'send_reply'             => 'Надіслати відповідь',
     'reply_sent'             => 'Відповідь надіслано.',
+    'change_author'          => 'Змінити автора',
+    'author_changed'         => 'Автора тікета оновлено.',
 
     // Portal — settings
     'org_notification_settings' => 'Налаштування сповіщень організації',

@@ -113,6 +113,9 @@ Route::group([
     Route::post('ticket/{conversation_id}/reply', 'OrgPortalFrontController@replyTicket')
         ->name('orgportal.portal.ticket.reply');
 
+    Route::post('ticket/{conversation_id}/change-author', 'OrgPortalFrontController@changeAuthor')
+        ->name('orgportal.portal.ticket.change-author');
+
     Route::get('settings', 'OrgPortalFrontController@settings')
         ->name('orgportal.portal.settings');
 

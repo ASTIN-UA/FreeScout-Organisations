@@ -69,6 +69,8 @@ return [
     'write_reply'            => 'Write your reply…',
     'send_reply'             => 'Send Reply',
     'reply_sent'             => 'Reply sent.',
+    'change_author'          => 'Change Author',
+    'author_changed'         => 'Ticket author updated.',
 
     // Portal — settings
     'org_notification_settings' => 'Organization Notification Settings',

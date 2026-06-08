@@ -149,12 +149,15 @@ class OrgPortalFrontController extends Controller
             }
         }
 
+        $orgMembers = Customer::whereIn('id', $orgMemberIds)->get();
+
         return view('orgportal::portal.ticket', [
             'mailbox'       => $mailbox,
             'mailbox_id'    => $mailbox_id,
             'customer'      => $customer,
             'conversation'  => $conversation,
             'threads'       => $threads,
+            'orgMembers'    => $orgMembers,
         ]);
     }
 
@@ -208,6 +211,43 @@ class OrgPortalFrontController extends Controller
         return redirect()
             ->route('orgportal.portal.ticket', ['mailbox_id' => $mailbox_id, 'conversation_id' => $conversation_id])
             ->with('flash_success', __('orgportal::messages.reply_sent'));
+    }
+
+    // ─── Change author ───────────────────────────────────────────────────────
+
+    public function changeAuthor(Request $request, string $mailbox_id, int $conversation_id)
+    {
+        $this->getMailbox($mailbox_id);
+        $customer = $this->authCustomer();
+        $member   = $this->requireManager($customer);
+
+        $orgMemberIds = OrganizationMember::where('organization_id', $member->organization_id)
+            ->pluck('customer_id');
+
+        $conversation = Conversation::whereIn('customer_id', $orgMemberIds)
+            ->findOrFail($conversation_id);
+
+        $request->validate([
+            'new_customer_id' => 'required|integer',
+        ]);
+
+        $newCustomerId = (int) $request->input('new_customer_id');
+
+        if (!$orgMemberIds->contains($newCustomerId)) {
+            abort(422, __('orgportal::messages.access_denied'));
+        }
+
+        if ($conversation->customer_id === $newCustomerId) {
+            return redirect()
+                ->route('orgportal.portal.ticket', ['mailbox_id' => $mailbox_id, 'conversation_id' => $conversation_id]);
+        }
+
+        $conversation->customer_id = $newCustomerId;
+        $conversation->save();
+
+        return redirect()
+            ->route('orgportal.portal.ticket', ['mailbox_id' => $mailbox_id, 'conversation_id' => $conversation_id])
+            ->with('flash_success', __('orgportal::messages.author_changed'));
     }
 
     // ─── Settings ────────────────────────────────────────────────────────────
