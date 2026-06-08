@@ -2,7 +2,8 @@
     Injected via layout.body_bottom for EUP managers only.
     Adds "Company Tickets" and settings links to the EUP navbar without touching EUP source files.
 --}}
-<script>
+<script{!! \Helper::cspNonceAttr() !!}>
+window.addEventListener('load', function () {
 (function () {
     var nav = document.querySelector('.nav.navbar-nav.navbar-right');
     if (!nav) return;
@@ -29,4 +30,5 @@
     nav.insertBefore(makeItem(settingsUrl,  '{{ __("orgportal::messages.org_settings_nav") }}', isSettingsActive), anchor);
     nav.insertBefore(makeItem(companyUrl,   '{{ __("orgportal::messages.company_tickets") }}',  isCompanyActive), anchor);
 })();
+});
 </script>

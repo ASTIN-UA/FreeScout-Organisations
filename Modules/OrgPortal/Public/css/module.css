@@ -1,13 +1,17 @@
+/* ── Org badge ─────────────────────────────────────────────────────────── */
+
 .orgportal-org-badge {
-    display: inline-block;
-    padding: 2px 8px;
-    margin: 0 0 2px 4px;
-    border-radius: 3px;
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 1.6;
+    display: block;
+    width: -webkit-fit-content;
+    width: fit-content;
+    margin-top: 3px;
+    padding: .2em .6em .3em;
+    font-size: 75%;           /* matches Bootstrap .label size */
+    font-weight: 700;
+    line-height: 1;
+    border-radius: .25em;
+    white-space: nowrap;
     text-decoration: none;
-    vertical-align: middle;
     color: #fff;
     background-color: #5b9bd5;
     border: 1px solid #4a8ac4;
@@ -20,7 +24,7 @@
     text-decoration: none;
 }
 
-/* Kanban org filter dropdown */
+/* ── Kanban org filter dropdown ─────────────────────────────────────────── */
 .orgportal-kn-filter-wrap {
     display: inline-block;
     margin-left: 6px;
