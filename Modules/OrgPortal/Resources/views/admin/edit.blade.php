@@ -35,6 +35,60 @@
                             @endif
                         </div>
 
+                        @php
+                            $defaultColor = \Modules\OrgPortal\Models\Organization::DEFAULT_COLOR;
+                            $currentColor = old('color', $organization->color ?: '');
+                            $previewColor = $currentColor ?: $defaultColor;
+                            $palette = [
+                                ['hex' => $defaultColor, 'name' => __('orgportal::messages.color_default')],
+                                ['hex' => '#5b9bd5', 'name' => 'Blue'],
+                                ['hex' => '#28a745', 'name' => 'Green'],
+                                ['hex' => '#dc3545', 'name' => 'Red'],
+                                ['hex' => '#fd7e14', 'name' => 'Orange'],
+                                ['hex' => '#6f42c1', 'name' => 'Purple'],
+                                ['hex' => '#20c997', 'name' => 'Teal'],
+                                ['hex' => '#e83e8c', 'name' => 'Pink'],
+                                ['hex' => '#17a2b8', 'name' => 'Cyan'],
+                                ['hex' => '#ffc107', 'name' => 'Yellow'],
+                                ['hex' => '#343a40', 'name' => 'Dark'],
+                                ['hex' => '#795548', 'name' => 'Brown'],
+                            ];
+                        @endphp
+
+                        <div class="form-group {{ $errors->has('color') ? 'has-error' : '' }}">
+                            <label>{{ __('orgportal::messages.badge_color') }}</label>
+
+                            {{-- Hidden input: empty value means "use default gray" --}}
+                            <input type="hidden" name="color" id="org_color_input" value="{{ $currentColor }}">
+
+                            <div id="org_color_swatches" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
+                                @foreach($palette as $i => $swatch)
+                                    @php
+                                        $isDefault = ($i === 0);
+                                        $swatchValue = $isDefault ? '' : $swatch['hex'];
+                                        $isSelected = ($swatchValue === $currentColor);
+                                    @endphp
+                                    <span class="orgportal-color-swatch{{ $isSelected ? ' is-selected' : '' }}"
+                                          data-color="{{ $swatchValue }}"
+                                          data-hex="{{ $swatch['hex'] }}"
+                                          title="{{ $swatch['name'] }}"
+                                          style="display:inline-block;width:26px;height:26px;border-radius:4px;cursor:pointer;background-color:{{ $swatch['hex'] }};border:2px solid {{ $isSelected ? '#333' : 'transparent' }};box-shadow:0 0 0 1px rgba(0,0,0,.15);"></span>
+                                @endforeach
+                            </div>
+
+                            <div>
+                                <span class="text-muted" style="font-size:12px;">{{ __('orgportal::messages.preview') }}:</span>
+                                <span class="orgportal-org-badge" id="org_color_preview"
+                                      style="background-color:{{ $previewColor }};border-color:{{ \Modules\OrgPortal\Models\Organization::darkenColor($previewColor, 0.85) }};">
+                                    <span class="glyphicon glyphicon-briefcase" style="margin-right:3px;"></span><span id="org_color_preview_name">{{ $organization->name }}</span>
+                                </span>
+                            </div>
+
+                            @if($errors->has('color'))
+                                <span class="help-block">{{ $errors->first('color') }}</span>
+                            @endif
+                        </div>
+
                         <button type="submit" class="btn btn-primary btn-sm">
                             {{ __('orgportal::messages.save') }}
                         </button>
@@ -217,6 +271,56 @@
             suggestions.style.display = 'none';
         }
     });
+})();
+
+// Badge color swatch picker
+(function () {
+    var input    = document.getElementById('org_color_input');
+    var wrap     = document.getElementById('org_color_swatches');
+    var preview  = document.getElementById('org_color_preview');
+    if (!input || !wrap || !preview) {
+        return;
+    }
+    var swatches = wrap.querySelectorAll('.orgportal-color-swatch');
+
+    // Darken a hex color by a factor (mirrors Organization::darkenColor in PHP).
+    function darken(hex, factor) {
+        hex = hex.replace('#', '');
+        if (hex.length === 3) {
+            hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+        }
+        if (hex.length !== 6) {
+            return '#' + hex;
+        }
+        var r = Math.min(255, Math.round(parseInt(hex.substr(0, 2), 16) * factor));
+        var g = Math.min(255, Math.round(parseInt(hex.substr(2, 2), 16) * factor));
+        var b = Math.min(255, Math.round(parseInt(hex.substr(4, 2), 16) * factor));
+        function pad(n) { return ('0' + n.toString(16)).slice(-2); }
+        return '#' + pad(r) + pad(g) + pad(b);
+    }
+
+    function select(swatch) {
+        var value = swatch.getAttribute('data-color'); // '' = default
+        var hex   = swatch.getAttribute('data-hex');
+
+        input.value = value;
+
+        for (var i = 0; i < swatches.length; i++) {
+            swatches[i].style.border = '2px solid transparent';
+            swatches[i].classList.remove('is-selected');
+        }
+        swatch.style.border = '2px solid #333';
+        swatch.classList.add('is-selected');
+
+        preview.style.backgroundColor = hex;
+        preview.style.borderColor     = darken(hex, 0.85);
+    }
+
+    for (var i = 0; i < swatches.length; i++) {
+        (function (swatch) {
+            swatch.addEventListener('click', function () { select(swatch); });
+        })(swatches[i]);
+    }
 })();
 </script>
 @endsection

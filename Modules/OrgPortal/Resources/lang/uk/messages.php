@@ -24,6 +24,11 @@ return [
     'org_updated'            => 'Організацію оновлено.',
     'org_deleted'            => 'Організацію видалено.',
 
+    // Admin — badge color
+    'badge_color'            => 'Колір позначки',
+    'color_default'          => 'За замовчуванням (сірий)',
+    'preview'                => 'Перегляд',
+
     // Admin — members table
     'name'                   => 'Назва',
     'email'                  => 'Email',

@@ -9,7 +9,39 @@ class Organization extends Model
 {
     protected $table = 'organizations';
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'color'];
+
+    /**
+     * Default badge color (matches FreeScout built-in .fs-tag gray).
+     */
+    const DEFAULT_COLOR = '#9eaab5';
+
+    /**
+     * Resolve the badge color, falling back to the default gray.
+     */
+    public function getBadgeColor(): string
+    {
+        return $this->color ?: self::DEFAULT_COLOR;
+    }
+
+    /**
+     * Compute a slightly darker border/hover color from a hex color.
+     */
+    public static function darkenColor(string $hex, float $factor = 0.85): string
+    {
+        $hex = ltrim($hex, '#');
+        if (strlen($hex) === 3) {
+            $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+        }
+        if (strlen($hex) !== 6) {
+            return '#' . $hex;
+        }
+        $r = max(0, min(255, (int) round(hexdec(substr($hex, 0, 2)) * $factor)));
+        $g = max(0, min(255, (int) round(hexdec(substr($hex, 2, 2)) * $factor)));
+        $b = max(0, min(255, (int) round(hexdec(substr($hex, 4, 2)) * $factor)));
+
+        return sprintf('#%02x%02x%02x', $r, $g, $b);
+    }
 
     public function members()
     {

@@ -24,6 +24,11 @@ return [
     'org_updated'            => 'Organization updated.',
     'org_deleted'            => 'Organization deleted.',
 
+    // Admin — badge color
+    'badge_color'            => 'Badge color',
+    'color_default'          => 'Default (gray)',
+    'preview'                => 'Preview',
+
     // Admin — members table
     'name'                   => 'Name',
     'email'                  => 'Email',

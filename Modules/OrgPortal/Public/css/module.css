@@ -13,15 +13,20 @@
     white-space: nowrap;
     text-decoration: none;
     color: #fff;
-    background-color: #5b9bd5;
-    border: 1px solid #4a8ac4;
-    transition: background-color .15s;
+    /* Default gray matches FreeScout's built-in .fs-tag color.
+       Per-organization colors are applied via inline style from the badge
+       partial, which overrides these defaults. */
+    background-color: #9eaab5;
+    border: 1px solid #868f99;
+    transition: -webkit-filter .15s, filter .15s;
 }
-/* Hover applies only to the clickable <a> variant */
+/* Hover applies only to the clickable <a> variant. Uses a brightness filter so
+   it works for any per-organization background color set via inline style. */
 a.orgportal-org-badge:hover,
 a.orgportal-org-badge:focus {
     color: #fff;
-    background-color: #4a8ac4;
+    -webkit-filter: brightness(0.9);
+    filter: brightness(0.9);
     text-decoration: none;
 }
 
