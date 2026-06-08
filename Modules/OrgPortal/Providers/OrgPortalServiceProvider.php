@@ -12,6 +12,14 @@ class OrgPortalServiceProvider extends ServiceProvider
 {
     protected $defer = false;
 
+    /**
+     * Global user permission ID for managing organizations.
+     * Chosen well above FreeScout's built-in range (1-10) to avoid collisions.
+     * FreeScout saves/reads this automatically because we register it via the
+     * `user_permissions.list` and `user_permissions.name` Eventy filters.
+     */
+    const PERM_MANAGE_ORGANIZATIONS = 100;
+
     public function boot()
     {
         $this->registerConfig();
@@ -38,6 +46,7 @@ class OrgPortalServiceProvider extends ServiceProvider
             $this->registerEupHooks();
         }
         $this->registerNotificationHooks();
+        $this->registerPermissionHooks();
     }
 
     public function register()
@@ -49,10 +58,57 @@ class OrgPortalServiceProvider extends ServiceProvider
     // Hooks
     // -------------------------------------------------------------------------
 
+    protected function registerPermissionHooks()
+    {
+        // Register the "Allow managing organizations" checkbox in the user
+        // permissions tab. FreeScout iterates this list both when rendering the
+        // permissions form and when saving it, so no save hook is needed.
+        \Eventy::addFilter('user_permissions.list', function ($permissions) {
+            $permissions[] = self::PERM_MANAGE_ORGANIZATIONS;
+            return $permissions;
+        });
+
+        // Provide the localized label for our permission ID.
+        \Eventy::addFilter('user_permissions.name', function ($name, $permission) {
+            if ($permission == self::PERM_MANAGE_ORGANIZATIONS) {
+                return __('orgportal::messages.perm_manage_organizations');
+            }
+            return $name;
+        }, 20, 2);
+    }
+
+    /**
+     * Whether the given user may access the OrgPortal admin pages.
+     * Admins always can; non-admins need the PERM_MANAGE_ORGANIZATIONS permission.
+     */
+    public static function userCanManageOrganizations($user)
+    {
+        if (!$user) {
+            return false;
+        }
+        if ($user->isAdmin()) {
+            return true;
+        }
+        return $user->hasPermission(self::PERM_MANAGE_ORGANIZATIONS);
+    }
+
     protected function registerMenuHooks()
     {
+        // Make the "Manage" dropdown visible for non-admin users who only hold
+        // the manage-organizations permission (otherwise FreeScout hides the
+        // whole dropdown for them and the link below would never render).
+        \Eventy::addFilter('menu.manage.can_view', function ($can_view) {
+            if ($can_view) {
+                return $can_view;
+            }
+            return self::userCanManageOrganizations(auth()->user());
+        }, 20, 1);
+
         \Eventy::addAction('menu.manage.append', function () {
             if (!\Route::has('orgportal.admin.index')) {
+                return;
+            }
+            if (!self::userCanManageOrganizations(auth()->user())) {
                 return;
             }
             echo '<li><a href="' . route('orgportal.admin.index') . '">'

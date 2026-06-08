@@ -102,6 +102,9 @@ return [
     // Kanban filter
     'kanban_filter_org'      => 'Organization',
 
+    // User permission
+    'perm_manage_organizations' => 'Allow managing organizations',
+
     // Errors
     'access_denied'          => 'Access denied. Manager role required.',
 

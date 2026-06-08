@@ -4,11 +4,13 @@ use Illuminate\Support\Facades\Route;
 
 $subdirectory = \Helper::getSubdirectory();
 
-// ─── Admin routes (require FreeScout auth + admin role) ───────────────────────
+// ─── Admin routes ─────────────────────────────────────────────────────────────
+// Require FreeScout auth. Per-action authorization (admin OR the
+// "manage organizations" user permission) is enforced inside the controller;
+// destructive/settings actions remain admin-only there.
 Route::group([
     'prefix'     => $subdirectory . 'orgportal/admin',
-    'middleware' => ['web', 'auth', 'roles'],
-    'roles'      => ['admin'],
+    'middleware' => ['web', 'auth'],
     'namespace'  => 'Modules\OrgPortal\Http\Controllers',
 ], function () {
 

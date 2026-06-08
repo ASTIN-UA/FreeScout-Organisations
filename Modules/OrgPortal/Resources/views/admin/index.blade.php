@@ -42,6 +42,7 @@
                                    class="btn btn-xs btn-default">
                                     {{ __('orgportal::messages.edit') }}
                                 </a>
+                                @if(auth()->user()->isAdmin())
                                 <form method="POST"
                                       action="{{ route('orgportal.admin.destroy', $org->id) }}"
                                       style="display:inline;"
@@ -52,6 +53,7 @@
                                         {{ __('orgportal::messages.delete') }}
                                     </button>
                                 </form>
+                                @endif
                             </td>
                         </tr>
                         @endforeach
@@ -69,6 +71,7 @@
         </div>
     </div>
 
+    @if(auth()->user()->isAdmin())
     <div class="row" style="margin-top:30px;">
         <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">
@@ -105,5 +108,6 @@
             </div>
         </div>
     </div>
+    @endif
 </div>
 @endsection

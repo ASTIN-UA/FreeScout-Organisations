@@ -7,9 +7,32 @@ use Illuminate\Http\Request;
 use App\Customer;
 use Modules\OrgPortal\Models\Organization;
 use Modules\OrgPortal\Models\OrganizationMember;
+use Modules\OrgPortal\Providers\OrgPortalServiceProvider;
 
 class OrgPortalAdminController extends Controller
 {
+    public function __construct()
+    {
+        // Every action requires either admin or the "manage organizations" permission.
+        $this->middleware(function ($request, $next) {
+            if (!OrgPortalServiceProvider::userCanManageOrganizations(auth()->user())) {
+                abort(403);
+            }
+            return $next($request);
+        });
+    }
+
+    /**
+     * Admin-only guard for destructive / system actions (delete org, settings,
+     * impersonation). Permitted non-admin managers must not reach these.
+     */
+    protected function authorizeAdmin()
+    {
+        if (!auth()->user() || !auth()->user()->isAdmin()) {
+            abort(403);
+        }
+    }
+
     public function index()
     {
         $organizations = Organization::withCount('members')->orderBy('name')->paginate(20);
@@ -62,6 +85,9 @@ class OrgPortalAdminController extends Controller
 
     public function destroy(int $id)
     {
+        // Deleting organizations is admin-only, even for permitted managers.
+        $this->authorizeAdmin();
+
         Organization::findOrFail($id)->delete();
 
         return redirect()->route('orgportal.admin.index')
@@ -136,6 +162,8 @@ class OrgPortalAdminController extends Controller
 
     public function settings()
     {
+        $this->authorizeAdmin();
+
         return view('orgportal::admin.settings', [
             'show_badge_conversation' => (bool) \Option::get('orgportal.show_badge_conversation', true),
             'show_badge_kanban'       => (bool) \Option::get('orgportal.show_badge_kanban', true),
@@ -144,6 +172,8 @@ class OrgPortalAdminController extends Controller
 
     public function saveSettings(Request $request)
     {
+        $this->authorizeAdmin();
+
         \Option::set('orgportal.show_badge_conversation', (bool) $request->input('show_badge_conversation'));
         \Option::set('orgportal.show_badge_kanban', (bool) $request->input('show_badge_kanban'));
 
@@ -157,6 +187,8 @@ class OrgPortalAdminController extends Controller
      */
     public function impersonatePortalLink(int $customer_id, int $mailbox_id)
     {
+        $this->authorizeAdmin();
+
         $customer = Customer::findOrFail($customer_id);
         $mailbox  = \App\Mailbox::findOrFail($mailbox_id);
 
