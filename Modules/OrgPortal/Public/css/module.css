@@ -20,6 +20,11 @@
     border: 1px solid #868f99;
     transition: -webkit-filter .15s, filter .15s;
 }
+/* Explicit element-qualified color to beat Kanban's .kn-card-name a specificity */
+a.orgportal-org-badge,
+span.orgportal-org-badge {
+    color: #fff;
+}
 /* Hover applies only to the clickable <a> variant. Uses a brightness filter so
    it works for any per-organization background color set via inline style. */
 a.orgportal-org-badge:hover,
