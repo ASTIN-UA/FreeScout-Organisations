@@ -26,6 +26,7 @@ return [
 
     // Admin — members table
     'name'                   => 'Назва',
+    'email'                  => 'Email',
     'members'                => 'Учасники',
     'role'                   => 'Роль',
     'member'                 => 'Учасник',
@@ -41,6 +42,7 @@ return [
     'type_name_or_email'     => 'Введіть ім\'я або email…',
 
     // Admin — member flash messages
+    'role_updated'           => 'Роль оновлено.',
     'member_added'           => 'Учасника додано.',
     'member_removed'         => 'Учасника видалено.',
     'already_member'         => 'Цей клієнт вже є учасником організації.',
@@ -86,6 +88,7 @@ return [
     'customer_organization'  => 'Організація',
     'no_organization'        => '— Без організації —',
     'customer_role'          => 'Роль в організації',
+    'view_org_tickets'       => 'Заявки організації',
 
     // Module settings
     'settings'               => 'Налаштування',

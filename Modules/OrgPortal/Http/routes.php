@@ -36,6 +36,9 @@ Route::group([
     Route::delete('organizations/{id}/members/{memberId}', 'OrgPortalAdminController@removeMember')
         ->name('orgportal.admin.members.remove');
 
+    Route::post('organizations/{id}/members/{memberId}/role', 'OrgPortalAdminController@updateMemberRole')
+        ->name('orgportal.admin.members.role');
+
     Route::get('customers/search', 'OrgPortalAdminController@searchCustomers')
         ->name('orgportal.admin.customers.search');
 
@@ -44,6 +47,9 @@ Route::group([
 
     Route::post('settings', 'OrgPortalAdminController@saveSettings')
         ->name('orgportal.admin.settings.save');
+
+    Route::get('impersonate/{customer_id}/{mailbox_id}', 'OrgPortalAdminController@impersonatePortalLink')
+        ->name('orgportal.admin.impersonate');
 });
 
 // ─── API routes — requires API and Webhooks module (middleware: api.key) ──────

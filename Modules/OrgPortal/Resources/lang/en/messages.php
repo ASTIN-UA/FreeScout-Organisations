@@ -26,6 +26,7 @@ return [
 
     // Admin — members table
     'name'                   => 'Name',
+    'email'                  => 'Email',
     'members'                => 'Members',
     'role'                   => 'Role',
     'member'                 => 'Member',
@@ -41,6 +42,7 @@ return [
     'type_name_or_email'     => 'Type name or email…',
 
     // Admin — member flash messages
+    'role_updated'           => 'Role updated.',
     'member_added'           => 'Member added.',
     'member_removed'         => 'Member removed.',
     'already_member'         => 'This customer is already a member of the organization.',
@@ -86,6 +88,7 @@ return [
     'customer_organization'  => 'Organization',
     'no_organization'        => '— None —',
     'customer_role'          => 'Role in organization',
+    'view_org_tickets'       => 'View Organization Tickets',
 
     // Module settings
     'settings'               => 'Settings',
