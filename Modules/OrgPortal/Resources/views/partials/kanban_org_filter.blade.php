@@ -65,6 +65,17 @@
         if (li) li.classList.toggle('active', selectedIds.length > 0);
     }
 
+    // Move org badges to after the thread counter in each card
+    function repositionBadges() {
+        document.querySelectorAll('.kn-card-name').forEach(function (nameDiv) {
+            var badge   = nameDiv.querySelector('.orgportal-org-badge');
+            var counter = nameDiv.querySelector('.kn-conv-counter');
+            if (badge && counter && counter.nextSibling !== badge) {
+                counter.parentNode.insertBefore(badge, counter.nextSibling);
+            }
+        });
+    }
+
     function inject() {
         if (document.querySelector('.orgportal-kn-filter-li')) return;
 
@@ -93,6 +104,9 @@
         } else {
             filterDropdown.appendChild(li);
         }
+
+        // Reposition org badges after thread counters
+        repositionBadges();
 
         // Restore saved state
         var saved = getSelected();
@@ -134,10 +148,11 @@
         var board = document.getElementById('kn-board');
         if (board) {
             new MutationObserver(function () {
-                var ids = getSelected();
-                if (ids.length) {
-                    setTimeout(function () { applyFilter(ids); }, 80);
-                }
+                setTimeout(function () {
+                    repositionBadges();
+                    var ids = getSelected();
+                    if (ids.length) applyFilter(ids);
+                }, 80);
             }).observe(board, { childList: true, subtree: false });
         }
     }

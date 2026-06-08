@@ -118,8 +118,8 @@ class OrgPortalServiceProvider extends ServiceProvider
 
     protected function registerConversationHooks()
     {
-        // Render org badge next to tags in the conversation subject area
-        \Eventy::addAction('conversation.after_subject', function ($conversation, $mailbox) {
+        // Single ticket view — renders after the entire subject+number block
+        \Eventy::addAction('conversation.after_subject_block', function ($conversation, $mailbox) {
             if (!\Option::get('orgportal.show_badge_conversation', true)) {
                 return;
             }
@@ -142,14 +142,52 @@ class OrgPortalServiceProvider extends ServiceProvider
                 'organization' => $member->organization,
                 'searchUrl'    => $searchUrl,
             ])->render();
-        }, 20, 2);
+        }, 5, 2);
+
+        // Conversations list — fires before the subject text, matching tag placement
+        // (before_subject does NOT fire in Kanban cards, so no route check needed)
+        \Eventy::addAction('conversations_table.before_subject', function ($conversation) {
+            static $enabled = null;
+            static $cache   = [];
+
+            if ($enabled === null) {
+                $enabled = (bool) \Option::get('orgportal.show_badge_conversation', true);
+            }
+            if (!$enabled || !$conversation || !$conversation->customer_id) {
+                return;
+            }
+
+            $customerId = $conversation->customer_id;
+            if (!array_key_exists($customerId, $cache)) {
+                $cache[$customerId] = OrganizationMember::where('customer_id', $customerId)
+                    ->with('organization')
+                    ->first();
+            }
+
+            $member = $cache[$customerId];
+            if (!$member || !$member->organization) {
+                return;
+            }
+
+            $searchBase = rtrim(url(\Helper::getSubdirectory() . 'search'), '/');
+            $searchUrl  = $searchBase . '?' . http_build_query(['f' => ['organization' => $member->organization_id]]);
+
+            echo view('orgportal::partials.org_badge', [
+                'organization' => $member->organization,
+                'searchUrl'    => $searchUrl,
+            ])->render();
+        }, 20, 1);
     }
 
     protected function registerKanbanHooks()
     {
-        // Show org badge on Kanban card subjects (cards.blade.php fires conversations_table.after_subject).
-        // Static cache avoids N+1: one DB round-trip per unique customer_id per request.
+        // Show org badge on Kanban cards — only fires on Kanban route.
+        // (conversations list now uses conversations_table.before_subject instead)
         \Eventy::addAction('conversations_table.after_subject', function ($conversation) {
+            if (!\Route::is('kanban.*')) {
+                return;
+            }
+
             static $enabled = null;
             static $cache   = [];
 

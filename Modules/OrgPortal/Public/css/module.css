@@ -24,6 +24,25 @@
     text-decoration: none;
 }
 
+/* Conversations list: inline badge matching fs-tag sizing/alignment exactly */
+.table-conversations .orgportal-org-badge {
+    display: inline-block;
+    width: auto;
+    margin-top: 0;
+    font-size: 11px;
+    line-height: 14px;
+    padding: 2px 6px 1px 6px;
+    vertical-align: baseline;
+    position: relative;
+    top: 1px;
+}
+
+/* Single ticket view: badge sits directly below conv-subj-block,
+   aligned with the left edge of the subject text */
+#conv-subject > .orgportal-org-badge {
+    margin: -10px 0 8px 20px;
+}
+
 /* ── Kanban org filter dropdown ─────────────────────────────────────────── */
 .orgportal-kn-filter-wrap {
     display: inline-block;
