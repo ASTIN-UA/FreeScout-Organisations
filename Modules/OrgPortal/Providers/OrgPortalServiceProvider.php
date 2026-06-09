@@ -47,6 +47,9 @@ class OrgPortalServiceProvider extends ServiceProvider
         }
         $this->registerNotificationHooks();
         $this->registerPermissionHooks();
+        if (\Module::isActive('apiwebhooks')) {
+            $this->registerApiWebhooksHooks();
+        }
     }
 
     public function register()
@@ -279,7 +282,6 @@ class OrgPortalServiceProvider extends ServiceProvider
             ])->render();
         }, 20, 1);
 
-        // Inject org filter UI into Kanban page
         \Eventy::addAction('layout.body_bottom', function () {
             if (!\Route::is('kanban.show')) {
                 return;
@@ -294,6 +296,30 @@ class OrgPortalServiceProvider extends ServiceProvider
                 'organizations' => $organizations,
             ])->render();
         }, 25, 0);
+    }
+
+    protected function registerApiWebhooksHooks()
+    {
+        // Add a link to the OrgPortal API docs on the ApiWebhooks settings page
+        // (/app-settings/apiwebhooks), without modifying the ApiWebhooks module.
+        //
+        // ApiWebhooks registers `settings.view` at priority 20 returning
+        // 'apiwebhooks::settings'. We register at a higher priority (30) so our
+        // filter runs last and wins, swapping the view for a thin OrgPortal
+        // wrapper that re-includes the original ApiWebhooks view and appends a
+        // plain server-rendered link.
+        //
+        // Why not inject via JS on layout.body_bottom: FreeScout sets a
+        // Content-Security-Policy (see layout.app cspMetaTag / cspNonceAttr).
+        // body_bottom <script> output via echo carries no nonce, so the browser
+        // refuses to execute it — the markup shows in the source but the link
+        // never appears. Rendering real HTML server-side avoids CSP entirely.
+        \Eventy::addFilter('settings.view', function ($view, $section) {
+            if ($section === 'apiwebhooks') {
+                return 'orgportal::partials.apiwebhooks_settings_wrapper';
+            }
+            return $view;
+        }, 30, 2);
     }
 
     protected function registerSearchHooks()

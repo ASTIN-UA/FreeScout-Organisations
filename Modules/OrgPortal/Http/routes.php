@@ -52,13 +52,16 @@ Route::group([
 
     Route::get('impersonate/{customer_id}/{mailbox_id}', 'OrgPortalAdminController@impersonatePortalLink')
         ->name('orgportal.admin.impersonate');
+
+    Route::get('api-docs', 'OrgPortalAdminController@apiDocs')
+        ->name('orgportal.admin.api-docs');
 });
 
-// ─── API routes — requires API and Webhooks module (middleware: api.key) ──────
-if (array_key_exists('api.key', app('router')->getMiddleware())) {
+// ─── API routes — requires API and Webhooks module ────────────────────────────
+if (\Module::isActive('apiwebhooks')) {
     Route::group([
-        'prefix'     => $subdirectory . 'api',
-        'middleware' => ['api.key'],
+        'prefix'     => \Helper::getSubdirectory(true) . 'api',
+        'middleware' => ['bindings', \Modules\ApiWebhooks\Http\Middleware\ApiAuth::class],
         'namespace'  => 'Modules\OrgPortal\Http\Controllers\Api',
     ], function () {
 

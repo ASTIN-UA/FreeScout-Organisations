@@ -245,4 +245,9 @@ class OrgPortalAdminController extends Controller
             ])
         );
     }
+
+    public function apiDocs()
+    {
+        return view('orgportal::admin.api_docs');
+    }
 }

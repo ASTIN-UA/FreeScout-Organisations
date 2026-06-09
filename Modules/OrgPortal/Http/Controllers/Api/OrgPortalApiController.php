@@ -160,7 +160,7 @@ class OrgPortalApiController extends Controller
 
         $org->update(['name' => $name]);
 
-        return response()->json(null, 204);
+        return response()->json(['success' => true, 'message' => 'Organization updated.']);
     }
 
     /**
@@ -177,7 +177,7 @@ class OrgPortalApiController extends Controller
 
         $org->delete();
 
-        return response()->json(null, 204);
+        return response()->json(['success' => true, 'message' => 'Organization deleted.']);
     }
 
     // ─── Customer membership ─────────────────────────────────────────────────
@@ -254,7 +254,7 @@ class OrgPortalApiController extends Controller
             ]);
         }
 
-        return response()->json(null, 204);
+        return response()->json(['success' => true, 'message' => 'Membership saved.']);
     }
 
     /**
@@ -273,6 +273,6 @@ class OrgPortalApiController extends Controller
             return $this->errorResponse('Customer is not a member of any organization.', 404);
         }
 
-        return response()->json(null, 204);
+        return response()->json(['success' => true, 'message' => 'Membership removed.']);
     }
 }

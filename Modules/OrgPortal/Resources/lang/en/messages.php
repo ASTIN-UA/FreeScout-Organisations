@@ -110,6 +110,9 @@ return [
     // User permission
     'perm_manage_organizations' => 'Allow managing organizations',
 
+    // ApiWebhooks settings page
+    'api_docs_link'          => 'OrgPortal API Docs',
+
     // Errors
     'access_denied'          => 'Access denied. Manager role required.',
 

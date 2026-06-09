@@ -110,6 +110,9 @@ return [
     // User permission
     'perm_manage_organizations' => 'Дозволено керувати організаціями',
 
+    // ApiWebhooks settings page
+    'api_docs_link'          => 'Документація API OrgPortal',
+
     // Errors
     'access_denied'          => 'Доступ заборонено. Потрібна роль менеджера.',
 
