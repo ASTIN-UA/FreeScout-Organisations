@@ -44,14 +44,20 @@ class OrgPortalFrontController extends Controller
         return $mailbox;
     }
 
-    protected function requireManager(Customer $customer): OrganizationMember
+    protected function requireManager(Customer $customer, Mailbox $mailbox): OrganizationMember
     {
         $member = OrganizationMember::where('customer_id', $customer->id)
             ->where('role', 'manager')
             ->with('organization')
             ->first();
 
-        if (!$member) {
+        if (!$member || !$member->organization) {
+            abort(403, __('orgportal::messages.access_denied'));
+        }
+
+        // Enforce mailbox scope: org must be global (mailbox_id IS NULL) or belong to this mailbox.
+        $orgMailboxId = $member->organization->mailbox_id;
+        if ($orgMailboxId !== null && $orgMailboxId !== (int) $mailbox->id) {
             abort(403, __('orgportal::messages.access_denied'));
         }
 
@@ -64,7 +70,7 @@ class OrgPortalFrontController extends Controller
     {
         $mailbox  = $this->getMailbox($mailbox_id);
         $customer = $this->authCustomer();
-        $member   = $this->requireManager($customer);
+        $member   = $this->requireManager($customer, $mailbox);
 
         $orgMemberIds   = OrganizationMember::where('organization_id', $member->organization_id)
             ->pluck('customer_id');
@@ -86,6 +92,7 @@ class OrgPortalFrontController extends Controller
         }
 
         $builder = Conversation::whereIn('customer_id', $orgMemberIds)
+            ->where('mailbox_id', $mailbox->id)
             ->where('status', '!=', Conversation::STATUS_SPAM)
             ->where('state', '!=', Conversation::STATE_DELETED)
             ->with(['customer', 'user'])
@@ -93,10 +100,16 @@ class OrgPortalFrontController extends Controller
             ->when($authorId,    fn ($q) => $q->where('customer_id', $authorId))
             ->orderBy($orderField, $orderDirection);
 
-        if (!empty($status) && is_array($status) && \Module::isActive('kanban')) {
-            $convIds = \Modules\Kanban\Entities\KnCard::whereIn('kn_column_id', array_values($status))
-                ->pluck('conversation_id');
-            $builder->whereIn('id', $convIds);
+        if (!empty($status) && is_array($status)) {
+            if (\Module::isActive('kanban')) {
+                $convIds = \Modules\Kanban\Entities\KnCard::whereIn('kn_column_id', array_values($status))
+                    ->pluck('conversation_id');
+                $builder->whereIn('id', $convIds);
+            } else {
+                // Kanban is inactive — status filters reference column IDs that don't exist.
+                // Return nothing rather than silently ignoring the filter.
+                $builder->whereRaw('0 = 1');
+            }
         }
 
         $tickets = $builder->paginate(20);
@@ -149,12 +162,13 @@ class OrgPortalFrontController extends Controller
     {
         $mailbox  = $this->getMailbox($mailbox_id);
         $customer = $this->authCustomer();
-        $member   = $this->requireManager($customer);
+        $member   = $this->requireManager($customer, $mailbox);
 
         $orgMemberIds = OrganizationMember::where('organization_id', $member->organization_id)
             ->pluck('customer_id');
 
         $conversation = Conversation::whereIn('customer_id', $orgMemberIds)
+            ->where('mailbox_id', $mailbox->id)
             ->findOrFail($conversation_id);
 
         $threads = $conversation->threads()
@@ -190,12 +204,13 @@ class OrgPortalFrontController extends Controller
     {
         $mailbox  = $this->getMailbox($mailbox_id);
         $customer = $this->authCustomer();
-        $member   = $this->requireManager($customer);
+        $member   = $this->requireManager($customer, $mailbox);
 
         $orgMemberIds = OrganizationMember::where('organization_id', $member->organization_id)
             ->pluck('customer_id');
 
         $conversation = Conversation::whereIn('customer_id', $orgMemberIds)
+            ->where('mailbox_id', $mailbox->id)
             ->findOrFail($conversation_id);
 
         $request->validate([
@@ -256,14 +271,15 @@ class OrgPortalFrontController extends Controller
 
     public function changeAuthor(Request $request, string $mailbox_id, int $conversation_id)
     {
-        $this->getMailbox($mailbox_id);
+        $mailbox  = $this->getMailbox($mailbox_id);
         $customer = $this->authCustomer();
-        $member   = $this->requireManager($customer);
+        $member   = $this->requireManager($customer, $mailbox);
 
         $orgMemberIds = OrganizationMember::where('organization_id', $member->organization_id)
             ->pluck('customer_id');
 
         $conversation = Conversation::whereIn('customer_id', $orgMemberIds)
+            ->where('mailbox_id', $mailbox->id)
             ->findOrFail($conversation_id);
 
         $request->validate([
@@ -307,14 +323,15 @@ class OrgPortalFrontController extends Controller
 
     public function closeTicket(Request $request, string $mailbox_id, int $conversation_id)
     {
-        $this->getMailbox($mailbox_id);
+        $mailbox  = $this->getMailbox($mailbox_id);
         $customer = $this->authCustomer();
-        $member   = $this->requireManager($customer);
+        $member   = $this->requireManager($customer, $mailbox);
 
         $orgMemberIds = OrganizationMember::where('organization_id', $member->organization_id)
             ->pluck('customer_id');
 
         $conversation = Conversation::whereIn('customer_id', $orgMemberIds)
+            ->where('mailbox_id', $mailbox->id)
             ->findOrFail($conversation_id);
 
         $prevStatus = $conversation->status;
