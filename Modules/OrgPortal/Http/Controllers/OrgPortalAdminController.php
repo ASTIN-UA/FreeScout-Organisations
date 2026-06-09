@@ -172,9 +172,12 @@ class OrgPortalAdminController extends Controller
     {
         $this->authorizeAdmin();
 
+        $companyFilters = json_decode(\Option::get('orgportal.company_filters', '[]'), true) ?: [];
+
         return view('orgportal::admin.settings', [
             'show_badge_conversation' => (bool) \Option::get('orgportal.show_badge_conversation', true),
             'show_badge_kanban'       => (bool) \Option::get('orgportal.show_badge_kanban', true),
+            'companyFilters'          => $companyFilters,
         ]);
     }
 
@@ -185,7 +188,19 @@ class OrgPortalAdminController extends Controller
         \Option::set('orgportal.show_badge_conversation', (bool) $request->input('show_badge_conversation'));
         \Option::set('orgportal.show_badge_kanban', (bool) $request->input('show_badge_kanban'));
 
-        return redirect()->route('orgportal.admin.index')
+        // Save company ticket status filters
+        $filters = [];
+        $raw = $request->input('company_filters', []);
+        foreach ($raw as $row) {
+            $id    = (int) ($row['id'] ?? 0);
+            $label = trim($row['label'] ?? '');
+            if ($id > 0 && $label !== '') {
+                $filters[] = ['id' => $id, 'label' => $label];
+            }
+        }
+        \Option::set('orgportal.company_filters', json_encode($filters));
+
+        return redirect()->route('orgportal.admin.settings')
             ->with('flash_success', __('orgportal::messages.settings_saved'));
     }
 

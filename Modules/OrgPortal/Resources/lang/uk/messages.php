@@ -105,7 +105,14 @@ return [
     'show_badge_kanban'      => 'Показувати плашку організації на картках канбану',
 
     // Kanban filter
-    'kanban_filter_org'      => 'Організація',
+    'kanban_filter_org'           => 'Організація',
+
+    // Company tickets filters (settings)
+    'company_filters_heading'     => 'Фільтри статусів тікетів компанії',
+    'company_filters_hint'        => 'Вкажіть ID колонок Kanban, які відображатимуться як чекбокси-фільтри на сторінці тікетів компанії. ID колонок можна знайти в налаштуваннях дошки Kanban.',
+    'filter_column_id'            => 'ID колонки',
+    'filter_label'                => 'Назва',
+    'filter_add'                  => 'Додати фільтр',
 
     // User permission
     'perm_manage_organizations' => 'Дозволено керувати організаціями',

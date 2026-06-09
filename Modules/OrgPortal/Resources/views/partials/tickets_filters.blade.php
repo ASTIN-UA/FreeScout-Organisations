@@ -43,30 +43,25 @@
     <input type="hidden" name="sort"  value="{{ $sortField }}" />
     <input type="hidden" name="order" value="{{ $direction }}" />
 
+    @php
+        $companyFilters = json_decode(\Option::get('orgportal.company_filters', '[]'), true) ?: [];
+    @endphp
+    @if(!empty($companyFilters))
     <div style="display: flex; flex-wrap: wrap; margin-top: 5px;">
-        <div><label class="checkbox" for="ct-new">
-            <input @if(isset($status[1])) checked @endif type="checkbox" value="1" id="ct-new" name="status[1]" /> Нові
-        </label></div>
-        <div style="margin-left: 5px;"><label class="checkbox" for="ct-wait">
-            <input @if(isset($status[2])) checked @endif type="checkbox" value="2" id="ct-wait" name="status[2]" /> Очікуємо відповідь від клієнта
-        </label></div>
-        <div style="margin-left: 5px;"><label class="checkbox" for="ct-work">
-            <input @if(isset($status[3])) checked @endif type="checkbox" value="3" id="ct-work" name="status[3]" /> В роботі
-        </label></div>
-        <div style="margin-left: 5px;"><label class="checkbox" for="ct-dev">
-            <input @if(isset($status[6])) checked @endif type="checkbox" value="6" id="ct-dev" name="status[6]" /> Передані програмісту
-        </label></div>
-        <div style="margin-left: 5px;"><label class="checkbox" for="ct-check">
-            <input @if(isset($status[4])) checked @endif type="checkbox" value="4" id="ct-check" name="status[4]" /> На перевірці
-        </label></div>
-        <div style="margin-left: 5px;"><label class="checkbox" for="ct-post">
-            <input @if(isset($status[5])) checked @endif type="checkbox" value="5" id="ct-post" name="status[5]" /> Відкладені
-        </label></div>
-        <div style="margin-left: 5px;"><label class="checkbox" for="ct-closed">
-            <input @if(isset($status[10])) checked @endif type="checkbox" value="10" id="ct-closed" name="status[10]" /> Закриті
-        </label></div>
+        @foreach($companyFilters as $filter)
+        @php $fid = (int)$filter['id']; @endphp
+        <div @if(!$loop->first) style="margin-left: 5px;" @endif>
+            <label class="checkbox" for="ct-f{{ $fid }}">
+                <input @if(isset($status[$fid])) checked @endif
+                       type="checkbox" value="{{ $fid }}"
+                       id="ct-f{{ $fid }}" name="status[{{ $fid }}]" />
+                {{ $filter['label'] }}
+            </label>
+        </div>
+        @endforeach
         <button type="submit" class="btn" style="margin-left: 5px; background-color: transparent">
             <small class="glyphicon glyphicon-refresh"></small>
         </button>
     </div>
+    @endif
 </form>

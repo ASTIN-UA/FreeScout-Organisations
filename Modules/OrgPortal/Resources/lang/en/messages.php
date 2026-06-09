@@ -105,7 +105,14 @@ return [
     'show_badge_kanban'      => 'Show organization badge on Kanban cards',
 
     // Kanban filter
-    'kanban_filter_org'      => 'Organization',
+    'kanban_filter_org'           => 'Organization',
+
+    // Company tickets filters (settings)
+    'company_filters_heading'     => 'Company Tickets Status Filters',
+    'company_filters_hint'        => 'Define which Kanban column IDs appear as filter checkboxes on the Company Tickets page. Column IDs can be found in your Kanban board settings.',
+    'filter_column_id'            => 'Column ID',
+    'filter_label'                => 'Label',
+    'filter_add'                  => 'Add filter',
 
     // User permission
     'perm_manage_organizations' => 'Allow managing organizations',
