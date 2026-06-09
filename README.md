@@ -62,6 +62,8 @@
 
 Автентифікація — заголовок `X-FreeScout-API-Key` або query-параметр `api_key`.
 
+> **Інтерактивна документація** доступна на сторінці **Manage → API & Webhooks** (посилання «OrgPortal API Docs») або напряму за адресою `/orgportal/admin/api-docs`.
+
 | Метод | Endpoint | Опис |
 |-------|----------|-------|
 | `GET` | `/api/organizations` | Список організацій (пагінація) |
@@ -203,7 +205,10 @@ curl -X PUT "https://your-freescout.com/api/organizations/1" \
   -d '{"name": "Acme Corporation"}'
 ```
 
-**204 No Content**
+**200 OK**
+```json
+{"success": true, "message": "Organization updated."}
+```
 
 ---
 
@@ -214,7 +219,10 @@ curl -X DELETE "https://your-freescout.com/api/organizations/1" \
   -H "X-FreeScout-API-Key: YOUR_API_KEY"
 ```
 
-**204 No Content** *(всі учасники каскадно видаляються)*
+**200 OK** *(всі учасники каскадно видаляються)*
+```json
+{"success": true, "message": "Organization deleted."}
+```
 
 ---
 
@@ -261,7 +269,10 @@ curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
   -d '{"organizationId": 1, "role": "member"}'
 ```
 
-**204 No Content**
+**200 OK**
+```json
+{"success": true, "message": "Membership saved."}
+```
 
 **400 Bad Request**
 ```json
@@ -285,7 +296,10 @@ curl -X DELETE "https://your-freescout.com/api/customers/42/organization" \
   -H "X-FreeScout-API-Key: YOUR_API_KEY"
 ```
 
-**204 No Content**
+**200 OK**
+```json
+{"success": true, "message": "Membership removed."}
+```
 
 ---
 
