@@ -28,7 +28,7 @@
         <div class="search" style="display: flex; justify-content:flex-start; align-items:center">
             <div style="position: relative">
                 <input type="text" value="{{ $searchField }}" class="form-control input"
-                       name="searchField" placeholder="{{ __('Шукати заявку') }}" />
+                       name="searchField" placeholder="{{ __('orgportal::messages.search_ticket') }}" />
                 <a href="{{ $resetUrl }}" type="button" class="btn btn-light btn-sm"
                    style="position: absolute;right: 0; top:0">
                     <small class="glyphicon glyphicon-remove text-danger"></small>
@@ -43,6 +43,7 @@
     <input type="hidden" name="sort"  value="{{ $sortField }}" />
     <input type="hidden" name="order" value="{{ $direction }}" />
 
+    @if(\Module::isActive('kanban'))
     @php
         $cfRaw = \Option::get('orgportal.company_filters_' . $mailbox->id, '[]');
         $companyFilters = is_array($cfRaw) ? $cfRaw : (json_decode($cfRaw, true) ?: []);
@@ -65,4 +66,5 @@
         </button>
     </div>
     @endif
+    @endif {{-- kanban --}}
 </form>

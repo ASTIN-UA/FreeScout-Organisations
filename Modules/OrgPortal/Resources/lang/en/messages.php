@@ -68,9 +68,16 @@ return [
     'ticket_hash'            => 'Ticket #',
     'updated'                => 'Updated',
     'no_subject'             => '(no subject)',
+    'responsible'            => 'Responsible',
+    'author'                 => 'Author',
+    'conv_status'            => 'Status',
+    'kanban_state'           => 'State',
+    'search_ticket'          => 'Search ticket…',
+    'filter_by_author'       => 'Show tickets by this author',
     'status_active'          => 'Active',
     'status_pending'         => 'Pending',
     'status_closed'          => 'Closed',
+    'status_spam'            => 'Spam',
 
     // Portal — ticket view
     'support_team'           => 'Support Team',

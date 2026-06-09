@@ -68,9 +68,16 @@ return [
     'ticket_hash'            => 'Тікет №',
     'updated'                => 'Оновлено',
     'no_subject'             => '(без теми)',
+    'responsible'            => 'Відповідальний',
+    'author'                 => 'Автор',
+    'conv_status'            => 'Статус',
+    'kanban_state'           => 'Стан',
+    'search_ticket'          => 'Шукати заявку…',
+    'filter_by_author'       => 'Показати заявки цього автора',
     'status_active'          => 'Активний',
     'status_pending'         => 'Очікує',
     'status_closed'          => 'Закрито',
+    'status_spam'            => 'Спам',
 
     // Portal — ticket view
     'support_team'           => 'Команда підтримки',

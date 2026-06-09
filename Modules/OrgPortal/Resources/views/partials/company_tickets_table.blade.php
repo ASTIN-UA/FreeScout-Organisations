@@ -12,20 +12,49 @@
     $sortByDateUrl = $baseUrl . '?' . http_build_query(array_merge($persistParams, ['sort' => 'last_reply_at', 'order' => $direction]));
 
     // Base URL for author filter links (no author_id — replaces it)
-    $authorBase    = $baseUrl . '?' . http_build_query(array_filter([
+    $authorBase = $baseUrl . '?' . http_build_query(array_filter([
         'searchField' => $searchField ?: null,
         'status'      => $status      ?: null,
         'sort'        => $sortField   ?: null,
         'order'       => $direction   ?: null,
     ]));
 
-    // Pre-load Kanban statuses in one query to avoid N+1
-    $knStatusMap = [];
-    $knLabels    = ['', 'Нова', 'Очікуємо відповідь від клієнта', 'В роботі', 'На перевірці', 'Відкладено', 'Передано програмісту', '', '', '', 'Завершено'];
-    if (\Module::isActive('kanban')) {
+    // Conversation status → lang key map
+    $statusLangKey = [
+        \App\Conversation::STATUS_ACTIVE  => 'status_active',
+        \App\Conversation::STATUS_PENDING => 'status_pending',
+        \App\Conversation::STATUS_CLOSED  => 'status_closed',
+        \App\Conversation::STATUS_SPAM    => 'status_spam',
+    ];
+    $statusClass = [
+        \App\Conversation::STATUS_ACTIVE  => 'text-success',
+        \App\Conversation::STATUS_PENDING => 'text-warning',
+        \App\Conversation::STATUS_CLOSED  => 'text-muted',
+        \App\Conversation::STATUS_SPAM    => 'text-danger',
+    ];
+
+    // Kanban: load card column IDs + column name map (one query each, no N+1)
+    $kanbanActive   = \Module::isActive('kanban');
+    $knStatusMap    = [];
+    $knColumnNames  = [];
+    if ($kanbanActive) {
         $knStatusMap = \Modules\Kanban\Entities\KnCard::whereIn('conversation_id', $conversations->pluck('id'))
             ->pluck('kn_column_id', 'conversation_id')
             ->all();
+
+        if (!empty($knStatusMap)) {
+            $boards = \Modules\Kanban\Entities\KnBoard::where(function ($q) use ($mailbox) {
+                $q->where('mailbox_id', $mailbox->id)->orWhereNull('mailbox_id');
+            })->get();
+            foreach ($boards as $board) {
+                foreach ((array) $board->columns as $col) {
+                    $colId = (int) ($col['id'] ?? 0);
+                    if ($colId && !isset($knColumnNames[$colId])) {
+                        $knColumnNames[$colId] = $col['name'] ?? '';
+                    }
+                }
+            }
+        }
     }
 @endphp
 
@@ -40,7 +69,8 @@
         <col class="conv-thread-count">
         <col class="conv-number">
         <col class="conv-customer">
-        @if(\Module::isActive('kanban'))<col class="conv-customer">@endif
+        <col class="conv-customer">
+        @if($kanbanActive)<col class="conv-customer">@endif
         <col class="conv-date">
     </colgroup>
     <thead>
@@ -58,23 +88,26 @@
             </a>
         </th>
         <th class="conv-attachment" style="vertical-align:middle">&nbsp;</th>
-        <th class="conv-subject" style="vertical-align:middle"><span>{{ __('Ticket') }}</span></th>
+        <th class="conv-subject" style="vertical-align:middle"><span>{{ __('orgportal::messages.subject') }}</span></th>
         <th colspan="2" class="conv-responsible" style="vertical-align:middle;text-align:right">
-            <span>{{ __('Відповідальний') }}</span>
+            <span>{{ __('orgportal::messages.responsible') }}</span>
         </th>
         <th class="conv-number" style="vertical-align:middle">&nbsp;</th>
         <th class="conv-customer" style="vertical-align:middle;text-align:center">
-            <span>{{ __('Автор') }}</span>
+            <span>{{ __('orgportal::messages.author') }}</span>
         </th>
-        @if(\Module::isActive('kanban'))
         <th class="conv-customer" style="vertical-align:middle;text-align:center">
-            <span>{{ __('Статус') }}</span>
+            <span>{{ __('orgportal::messages.conv_status') }}</span>
+        </th>
+        @if($kanbanActive)
+        <th class="conv-customer" style="vertical-align:middle;text-align:center">
+            <span>{{ __('orgportal::messages.kanban_state') }}</span>
         </th>
         @endif
         <th class="conv-date sortable" style="vertical-align:middle">
             <a href="{{ $sortByDateUrl }}" style="display:block;text-align:center">
                 <div style="display:flex;flex-direction:row;justify-content:center;align-items:center">
-                    <span>{{ __('Last Activity') }}</span>
+                    <span>{{ __('orgportal::messages.updated') }}</span>
                     <span style="margin-left:5px;display:flex;flex-direction:column;justify-content:center;align-items:center">
                         <span class="caret-up" style="margin-bottom:2px"></span>
                         <span class="caret"></span>
@@ -89,10 +122,12 @@
         @php
             $ticketUrl  = route('orgportal.portal.ticket', ['mailbox_id' => $mailbox_id, 'conversation_id' => $conversation->id]);
             $knColumnId = $knStatusMap[$conversation->id] ?? 0;
-            $knLabel    = $knLabels[$knColumnId] ?? '';
+            $knLabel    = $knColumnId ? ($knColumnNames[$knColumnId] ?? '') : '';
             $authorUrl  = $conversation->customer_id
                 ? $authorBase . '&author_id=' . $conversation->customer_id
                 : null;
+            $convStatusKey   = $statusLangKey[$conversation->status]   ?? 'status_active';
+            $convStatusClass = $statusClass[$conversation->status] ?? 'text-success';
         @endphp
         <tr class="conv-row @if(\EndUserPortal::hasNewReplies($conversation)) conv-active @endif"
             data-conversation_id="{{ $conversation->id }}">
@@ -125,22 +160,23 @@
             </td>
             <td class="conv-customer" style="text-align:center">
                 @if($conversation->customer && $authorUrl)
-                    <a href="{{ $authorUrl }}" title="{{ __('Показати заявки цього автора') }}">
+                    <a href="{{ $authorUrl }}" title="{{ __('orgportal::messages.filter_by_author') }}">
                         <small>{{ $conversation->customer->getFullName() }}</small>
                     </a>
                 @elseif($conversation->customer)
                     <small>{{ $conversation->customer->getFullName() }}</small>
                 @endif
             </td>
-            @if(\Module::isActive('kanban'))
             <td class="conv-customer" style="text-align:center">
-                <a href="{{ $ticketUrl }}">
-                    @if($conversation->status === \App\Conversation::STATUS_CLOSED)
-                        <small class="text-muted"><i class="glyphicon glyphicon-lock"></i> {{ __('orgportal::messages.ticket_closed_label') }}</small>
-                    @else
-                        <small class="text-help">{{ $knLabel ?: __('orgportal::messages.status_open') }}</small>
-                    @endif
-                </a>
+                <small class="{{ $convStatusClass }}">{{ __('orgportal::messages.' . $convStatusKey) }}</small>
+            </td>
+            @if($kanbanActive)
+            <td class="conv-customer" style="text-align:center">
+                @if($knLabel)
+                    <small class="text-help">{{ $knLabel }}</small>
+                @else
+                    <small class="text-muted">—</small>
+                @endif
             </td>
             @endif
             <td class="conv-date">

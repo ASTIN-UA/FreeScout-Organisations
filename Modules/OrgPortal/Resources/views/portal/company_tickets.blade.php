@@ -40,6 +40,7 @@
 
     @include('orgportal::partials.company_tickets_table', [
         'conversations' => $tickets,
+        'mailbox'       => $mailbox,
         'mailbox_id'    => $mailbox_id,
         'sortField'     => $sortField,
         'direction'     => $direction,

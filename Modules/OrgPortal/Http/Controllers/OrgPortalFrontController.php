@@ -93,7 +93,7 @@ class OrgPortalFrontController extends Controller
             ->when($authorId,    fn ($q) => $q->where('customer_id', $authorId))
             ->orderBy($orderField, $orderDirection);
 
-        if (!empty($status) && is_array($status)) {
+        if (!empty($status) && is_array($status) && \Module::isActive('kanban')) {
             $convIds = \Modules\Kanban\Entities\KnCard::whereIn('kn_column_id', array_values($status))
                 ->pluck('conversation_id');
             $builder->whereIn('id', $convIds);
