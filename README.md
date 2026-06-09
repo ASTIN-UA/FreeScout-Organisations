@@ -60,16 +60,207 @@
 
 ### REST API *(опціонально, потребує API and Webhooks)*
 
+Автентифікація — заголовок `X-FreeScout-API-Key` або query-параметр `api_key`.
+
 | Метод | Endpoint | Опис |
 |-------|----------|-------|
 | `GET` | `/api/organizations` | Список організацій (пагінація) |
 | `POST` | `/api/organizations` | Створити організацію |
-| `GET` | `/api/organizations/{id}` | Отримати організацію |
+| `GET` | `/api/organizations/{id}` | Отримати організацію з учасниками |
 | `PUT` | `/api/organizations/{id}` | Оновити організацію |
 | `DELETE` | `/api/organizations/{id}` | Видалити організацію |
 | `GET` | `/api/customers/{id}/organization` | Організація клієнта |
 | `PUT` | `/api/customers/{id}/organization` | Встановити організацію клієнту |
 | `DELETE` | `/api/customers/{id}/organization` | Видалити клієнта з організації |
+
+#### GET /api/organizations
+
+```bash
+curl -X GET "https://your-freescout.com/api/organizations?page=1&pageSize=25" \
+  -H "X-FreeScout-API-Key: YOUR_API_KEY"
+```
+
+**200 OK**
+```json
+{
+  "_embedded": {
+    "organizations": [
+      {
+        "id": 1,
+        "name": "Acme Corp",
+        "createdAt": "2026-06-01T10:00:00+00:00",
+        "updatedAt": "2026-06-01T10:00:00+00:00"
+      }
+    ]
+  },
+  "page": {
+    "size": 25,
+    "totalElements": 1,
+    "totalPages": 1,
+    "number": 1
+  }
+}
+```
+
+---
+
+#### POST /api/organizations
+
+```bash
+curl -X POST "https://your-freescout.com/api/organizations" \
+  -H "X-FreeScout-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Acme Corp"}'
+```
+
+**201 Created** *(заголовок `Resource-ID: 1`)*
+```json
+{
+  "id": 1,
+  "name": "Acme Corp",
+  "createdAt": "2026-06-01T10:00:00+00:00",
+  "updatedAt": "2026-06-01T10:00:00+00:00"
+}
+```
+
+**400 Bad Request** *(порожня назва або дублікат)*
+```json
+{
+  "message": "Validation failed",
+  "errorCode": "VALIDATION_FAILED",
+  "_embedded": {
+    "errors": [
+      {"path": "name", "message": "An organization with this name already exists.", "source": "JSON"}
+    ]
+  }
+}
+```
+
+---
+
+#### GET /api/organizations/{id}
+
+```bash
+curl -X GET "https://your-freescout.com/api/organizations/1" \
+  -H "X-FreeScout-API-Key: YOUR_API_KEY"
+```
+
+**200 OK**
+```json
+{
+  "id": 1,
+  "name": "Acme Corp",
+  "createdAt": "2026-06-01T10:00:00+00:00",
+  "updatedAt": "2026-06-01T10:00:00+00:00",
+  "_embedded": {
+    "members": [
+      {
+        "id": 5,
+        "organizationId": 1,
+        "customerId": 42,
+        "role": "manager",
+        "notifyOnNewTicket": true,
+        "createdAt": "2026-06-01T10:05:00+00:00",
+        "updatedAt": "2026-06-01T10:05:00+00:00"
+      }
+    ]
+  }
+}
+```
+
+**404 Not Found**
+```json
+{"message": "Organization not found.", "errorCode": "ORGANIZATION_NOT_FOUND."}
+```
+
+---
+
+#### PUT /api/organizations/{id}
+
+```bash
+curl -X PUT "https://your-freescout.com/api/organizations/1" \
+  -H "X-FreeScout-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Acme Corporation"}'
+```
+
+**204 No Content**
+
+---
+
+#### DELETE /api/organizations/{id}
+
+```bash
+curl -X DELETE "https://your-freescout.com/api/organizations/1" \
+  -H "X-FreeScout-API-Key: YOUR_API_KEY"
+```
+
+**204 No Content** *(всі учасники каскадно видаляються)*
+
+---
+
+#### GET /api/customers/{id}/organization
+
+```bash
+curl -X GET "https://your-freescout.com/api/customers/42/organization" \
+  -H "X-FreeScout-API-Key: YOUR_API_KEY"
+```
+
+**200 OK**
+```json
+{
+  "customerId": 42,
+  "organizationId": 1,
+  "organizationName": "Acme Corp",
+  "role": "manager",
+  "notifyOnNewTicket": true
+}
+```
+
+**404 Not Found** *(клієнт не є членом жодної організації)*
+```json
+{"message": "Customer is not a member of any organization.", "errorCode": "CUSTOMER_IS_NOT_A_MEMBER_OF_ANY_ORGANIZATION."}
+```
+
+---
+
+#### PUT /api/customers/{id}/organization
+
+```bash
+curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
+  -H "X-FreeScout-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"organizationId": 1, "role": "member"}'
+```
+
+Поле `role`: `"member"` (за замовчуванням) або `"manager"`.  
+Якщо клієнт вже є членом іншої організації — запис оновлюється.
+
+**204 No Content**
+
+**400 Bad Request**
+```json
+{
+  "message": "Validation failed",
+  "errorCode": "VALIDATION_FAILED",
+  "_embedded": {
+    "errors": [
+      {"path": "role", "message": "role must be \"member\" or \"manager\".", "source": "JSON"}
+    ]
+  }
+}
+```
+
+---
+
+#### DELETE /api/customers/{id}/organization
+
+```bash
+curl -X DELETE "https://your-freescout.com/api/customers/42/organization" \
+  -H "X-FreeScout-API-Key: YOUR_API_KEY"
+```
+
+**204 No Content**
 
 ---
 
