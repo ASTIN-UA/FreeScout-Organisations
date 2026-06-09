@@ -38,6 +38,7 @@
         <col class="conv-subject">
         <col class="conv-responsible">
         <col class="conv-thread-count">
+        <col class="conv-number">
         <col class="conv-customer">
         @if(\Module::isActive('kanban'))<col class="conv-customer">@endif
         <col class="conv-date">
@@ -61,6 +62,7 @@
         <th colspan="2" class="conv-responsible" style="vertical-align:middle;text-align:right">
             <span>{{ __('Відповідальний') }}</span>
         </th>
+        <th class="conv-number" style="vertical-align:middle">&nbsp;</th>
         <th class="conv-customer" style="vertical-align:middle;text-align:center">
             <span>{{ __('Автор') }}</span>
         </th>
@@ -117,6 +119,9 @@
             <td class="conv-thread-count">
                 <i class="conv-star glyphicon"></i>
                 <a href="{{ $ticketUrl }}"><span>{{ $conversation->threads_count }}</span></a>
+            </td>
+            <td class="conv-number">
+                <a href="{{ $ticketUrl }}">@if(\EndUserPortal::hasNewReplies($conversation))<span class="glyphicon glyphicon-envelope text-help"></span>@endif</a>
             </td>
             <td class="conv-customer" style="text-align:center">
                 @if($conversation->customer && $authorUrl)
