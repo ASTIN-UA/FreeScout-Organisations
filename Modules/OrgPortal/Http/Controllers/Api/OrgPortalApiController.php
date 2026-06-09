@@ -280,12 +280,23 @@ class OrgPortalApiController extends Controller
             return response()->json(['success' => true, 'message' => 'Membership created.'], 201);
         }
 
-        if ((int)$member->organization_id === (int)$orgId && $member->role === $role) {
+        // One org per customer — block silent cross-org transfer.
+        if ((int)$member->organization_id !== (int)$orgId) {
+            return $this->errorResponse('Customer already belongs to another organization.', 409, [
+                [
+                    'path'    => 'organizationId',
+                    'message' => 'Customer is already a member of organization #' . $member->organization_id
+                                 . '. Remove the existing membership first via DELETE /api/customers/' . $customerId . '/organization.',
+                    'source'  => 'JSON',
+                ],
+            ]);
+        }
+
+        if ($member->role === $role) {
             return response()->json(['success' => true, 'message' => 'No changes — customer is already a member of this organization with this role.']);
         }
 
-        $member->organization_id = $orgId;
-        $member->role            = $role;
+        $member->role = $role;
         $member->save();
 
         return response()->json(['success' => true, 'message' => 'Membership updated.']);
