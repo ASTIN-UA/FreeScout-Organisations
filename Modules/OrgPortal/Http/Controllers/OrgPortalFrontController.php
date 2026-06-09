@@ -298,10 +298,13 @@ class OrgPortalFrontController extends Controller
         $conversation = Conversation::whereIn('customer_id', $orgMemberIds)
             ->findOrFail($conversation_id);
 
-        $conversation->status = Conversation::STATUS_CLOSED;
+        $prevStatus = $conversation->status;
+        $conversation->setStatus(Conversation::STATUS_CLOSED);
+        $conversation->closed_at = now();
         $conversation->save();
 
-        \Eventy::action('conversation.status_changed_by_customer', $conversation, $customer);
+        event(new \App\Events\ConversationStatusChanged($conversation));
+        \Eventy::action('conversation.status_changed', $conversation, null, false, $prevStatus);
 
         return redirect()
             ->route('orgportal.portal.company-tickets', ['mailbox_id' => $mailbox_id])

@@ -2,6 +2,10 @@
 
 @section('title', '#' . $conversation->number . ' ' . $conversation->subject)
 
+@section('stylesheets')
+<style>.eup-thread-body img { max-width: 100%; height: auto; }</style>
+@endsection
+
 @section('content')
 <div id="eup-container">
     <div class="eup-container-padded">
@@ -82,7 +86,7 @@
                 @endif
                 &nbsp;&middot;&nbsp; {{ \EndUserPortal::dateFormat($thread->created_at) }}
             </div>
-            <div>{!! $thread->body !!}</div>
+            <div class="eup-thread-body">{!! $thread->body !!}</div>
 
             {{-- Attachments --}}
             @if($thread->has_attachments && $thread->attachments->isNotEmpty())
@@ -102,10 +106,13 @@
         </div>
         @endforeach
 
-        {{-- Reply form — only for non-closed tickets --}}
-        @if($conversation->status !== \App\Conversation::STATUS_CLOSED)
         <div style="margin-top:24px;">
             <h4>{{ __('orgportal::messages.reply') }}</h4>
+            @if($conversation->status === \App\Conversation::STATUS_CLOSED)
+            <div class="alert alert-info" style="margin-bottom:12px;">
+                {{ __('orgportal::messages.ticket_closed_reply_reopens') }}
+            </div>
+            @endif
             <form method="POST"
                   enctype="multipart/form-data"
                   action="{{ route('orgportal.portal.ticket.reply', ['mailbox_id' => $mailbox_id, 'conversation_id' => $conversation->id]) }}">
@@ -131,11 +138,6 @@
                 </button>
             </form>
         </div>
-        @else
-        <div class="alert alert-warning" style="margin-top:24px;">
-            {{ __('orgportal::messages.ticket_closed_reply_disabled') }}
-        </div>
-        @endif
 
     </div>
 </div>

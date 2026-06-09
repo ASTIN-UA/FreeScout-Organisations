@@ -118,7 +118,7 @@ return [
     'close_ticket_confirm'          => 'Are you sure you want to close this ticket?',
     'ticket_closed'                 => 'Ticket has been closed.',
     'ticket_closed_label'           => 'Closed',
-    'ticket_closed_reply_disabled'  => 'This ticket is closed. To reopen it, please contact support.',
+    'ticket_closed_reply_reopens'   => 'This ticket is closed. Sending a reply will reopen it.',
     'attach_files'                  => 'Attachments',
     'attach_files_hint'             => 'Up to :count files, max :max MB each',
 

@@ -118,7 +118,7 @@ return [
     'close_ticket_confirm'          => 'Ви впевнені, що хочете закрити цю заявку?',
     'ticket_closed'                 => 'Заявку закрито.',
     'ticket_closed_label'           => 'Закрито',
-    'ticket_closed_reply_disabled'  => 'Ця заявка закрита. Щоб відновити її, зверніться до підтримки.',
+    'ticket_closed_reply_reopens'   => 'Ця заявка закрита. Відправка відповіді повторно відкриє її.',
     'attach_files'                  => 'Вкладення',
     'attach_files_hint'             => 'До :count файлів, максимум :max МБ кожен',
 
