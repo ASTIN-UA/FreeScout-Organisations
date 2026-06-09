@@ -13,6 +13,34 @@ class OrgPortalApiController extends Controller
 {
     // ─── Helpers ─────────────────────────────────────────────────────────────
 
+    /**
+     * Parse an optional mailboxId field from the request.
+     * Returns int on success, null when field is absent/null, sets $error on invalid input.
+     */
+    private function parseMailboxId(Request $request, string $field, ?string &$error): ?int
+    {
+        $error = null;
+        $raw   = $request->input($field);
+
+        if ($raw === null || $raw === '') {
+            return null;
+        }
+
+        $id = (int) $raw;
+
+        if ($id <= 0) {
+            $error = 'mailboxId must be a positive integer or null.';
+            return null;
+        }
+
+        if (!\App\Mailbox::where('id', $id)->exists()) {
+            $error = 'Mailbox not found.';
+            return null;
+        }
+
+        return $id;
+    }
+
     private function errorResponse(string $message, int $status, array $errors = []): JsonResponse
     {
         $body = [
@@ -119,10 +147,10 @@ class OrgPortalApiController extends Controller
             ]);
         }
 
-        $mailboxId = $request->filled('mailboxId') ? (int) $request->input('mailboxId') : null;
-        if ($mailboxId && !\App\Mailbox::where('id', $mailboxId)->exists()) {
+        $mailboxId = $this->parseMailboxId($request, 'mailboxId', $mbError);
+        if ($mbError) {
             return $this->errorResponse('Validation failed', 400, [
-                ['path' => 'mailboxId', 'message' => 'Mailbox not found.', 'source' => 'JSON'],
+                ['path' => 'mailboxId', 'message' => $mbError, 'source' => 'JSON'],
             ]);
         }
 
@@ -173,14 +201,15 @@ class OrgPortalApiController extends Controller
             ]);
         }
 
-        $mailboxId = $request->has('mailboxId')
-            ? ($request->input('mailboxId') ? (int) $request->input('mailboxId') : null)
-            : $org->mailbox_id;
-
-        if ($request->has('mailboxId') && $mailboxId && !\App\Mailbox::where('id', $mailboxId)->exists()) {
-            return $this->errorResponse('Validation failed', 400, [
-                ['path' => 'mailboxId', 'message' => 'Mailbox not found.', 'source' => 'JSON'],
-            ]);
+        if ($request->has('mailboxId')) {
+            $mailboxId = $this->parseMailboxId($request, 'mailboxId', $mbError);
+            if ($mbError) {
+                return $this->errorResponse('Validation failed', 400, [
+                    ['path' => 'mailboxId', 'message' => $mbError, 'source' => 'JSON'],
+                ]);
+            }
+        } else {
+            $mailboxId = $org->mailbox_id;
         }
 
         if ($org->name === $name && $org->mailbox_id === $mailboxId) {
