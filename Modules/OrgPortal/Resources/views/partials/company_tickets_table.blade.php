@@ -59,24 +59,24 @@
 @endphp
 
 @if($conversations->count())
-<table class="table-conversations table eup-table-tickets">
+<table class="table-conversations table eup-table-tickets" style="table-layout:fixed;width:100%">
     <colgroup>
-        <col class="conv-current">
-        <col class="conv-id">
-        <col class="conv-attachment">
-        <col class="conv-subject">
-        <col class="conv-responsible">
-        <col class="conv-thread-count">
-        <col class="conv-number">
-        <col class="conv-customer">
-        <col class="conv-customer">
-        @if($kanbanActive)<col class="conv-customer">@endif
-        <col class="conv-date">
+        <col style="width:6px">
+        <col style="width:58px">
+        <col style="width:24px">
+        <col>{{-- subject: takes all remaining space --}}
+        <col style="width:120px">
+        <col style="width:36px">
+        <col style="width:26px">
+        <col style="width:110px">
+        <col style="width:76px">
+        @if($kanbanActive)<col style="width:110px">@endif
+        <col style="width:88px">
     </colgroup>
     <thead>
     <tr>
         <th class="conv-current">&nbsp;</th>
-        <th class="conv-id" style="width:60px;padding:0;vertical-align:middle">
+        <th class="conv-id" style="padding:0;vertical-align:middle">
             <a href="{{ $sortByIdUrl }}" style="display:block;text-align:center">
                 <div style="display:flex;flex-direction:row;justify-content:center;align-items:center">
                     <span>#</span>
@@ -93,14 +93,14 @@
             <span>{{ __('orgportal::messages.responsible') }}</span>
         </th>
         <th class="conv-number" style="vertical-align:middle">&nbsp;</th>
-        <th class="conv-customer" style="vertical-align:middle;text-align:center">
+        <th style="vertical-align:middle;text-align:center">
             <span>{{ __('orgportal::messages.author') }}</span>
         </th>
-        <th class="conv-customer" style="vertical-align:middle;text-align:center">
+        <th style="vertical-align:middle;text-align:center">
             <span>{{ __('orgportal::messages.conv_status') }}</span>
         </th>
         @if($kanbanActive)
-        <th class="conv-customer" style="vertical-align:middle;text-align:center">
+        <th style="vertical-align:middle;text-align:center">
             <span>{{ __('orgportal::messages.kanban_state') }}</span>
         </th>
         @endif
@@ -140,15 +140,26 @@
                     &nbsp;
                 @endif
             </td>
-            <td class="conv-subject">
-                <a href="{{ $ticketUrl }}">
+            @php
+                $subjectText  = $conversation->getSubject() ?: __('orgportal::messages.no_subject');
+                $responsibleName = $conversation->user
+                    ? trim($conversation->user->first_name . ' ' . $conversation->user->last_name)
+                    : '';
+                $authorName = $conversation->customer ? $conversation->customer->getFullName() : '';
+            @endphp
+            <td class="conv-subject" style="overflow:hidden;max-width:0;">
+                <a href="{{ $ticketUrl }}"
+                   title="{{ $subjectText }}"
+                   style="display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
                     <span class="conv-fader"></span>
-                    <p>{{ $conversation->getSubject() }}</p>
+                    {{ $subjectText }}
                 </a>
             </td>
-            <td class="responsible-person" style="text-align:right;padding-right:5px;padding-top:5px">
-                @if($conversation->user)
-                    <span>{{ $conversation->user->first_name }} {{ $conversation->user->last_name }}</span>
+            <td class="responsible-person"
+                style="text-align:right;padding-right:5px;padding-top:5px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:0;"
+                title="{{ $responsibleName }}">
+                @if($responsibleName)
+                    <span>{{ $responsibleName }}</span>
                 @endif
             </td>
             <td class="conv-thread-count">
@@ -158,20 +169,22 @@
             <td class="conv-number">
                 <a href="{{ $ticketUrl }}">@if(\EndUserPortal::hasNewReplies($conversation))<span class="glyphicon glyphicon-envelope text-help"></span>@endif</a>
             </td>
-            <td class="conv-customer" style="text-align:center">
+            <td style="text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:0;"
+                title="{{ $authorName }}">
                 @if($conversation->customer && $authorUrl)
-                    <a href="{{ $authorUrl }}" title="{{ __('orgportal::messages.filter_by_author') }}">
-                        <small>{{ $conversation->customer->getFullName() }}</small>
+                    <a href="{{ $authorUrl }}" title="{{ __('orgportal::messages.filter_by_author') }}: {{ $authorName }}">
+                        <small>{{ $authorName }}</small>
                     </a>
                 @elseif($conversation->customer)
-                    <small>{{ $conversation->customer->getFullName() }}</small>
+                    <small>{{ $authorName }}</small>
                 @endif
             </td>
-            <td class="conv-customer" style="text-align:center">
+            <td style="text-align:center;">
                 <small class="{{ $convStatusClass }}">{{ __('orgportal::messages.' . $convStatusKey) }}</small>
             </td>
             @if($kanbanActive)
-            <td class="conv-customer" style="text-align:center">
+            <td style="text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:0;"
+                title="{{ $knLabel }}">
                 @if($knLabel)
                     <small class="text-help">{{ $knLabel }}</small>
                 @else
