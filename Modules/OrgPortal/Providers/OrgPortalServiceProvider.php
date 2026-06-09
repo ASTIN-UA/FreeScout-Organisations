@@ -218,6 +218,9 @@ class OrgPortalServiceProvider extends ServiceProvider
                 return;
             }
             $mailboxId = (int) $conversation->mailbox_id;
+            if (!$mailboxId) {
+                return;
+            }
             if (!isset($enabled[$mailboxId])) {
                 $enabled[$mailboxId] = $this->badgeEnabled('show_badge_conversation', $mailboxId);
             }
@@ -264,6 +267,9 @@ class OrgPortalServiceProvider extends ServiceProvider
                 return;
             }
             $mailboxId = (int) $conversation->mailbox_id;
+            if (!$mailboxId) {
+                return;
+            }
             if (!isset($enabled[$mailboxId])) {
                 $enabled[$mailboxId] = $this->badgeEnabled('show_badge_kanban', $mailboxId);
             }

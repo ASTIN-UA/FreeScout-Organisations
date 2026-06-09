@@ -11,6 +11,8 @@ class Organization extends Model
 
     protected $fillable = ['name', 'color', 'mailbox_id'];
 
+    protected $casts = ['mailbox_id' => 'integer'];
+
     /**
      * Default badge color (matches FreeScout built-in .fs-tag gray).
      */

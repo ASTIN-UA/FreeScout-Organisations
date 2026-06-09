@@ -213,14 +213,14 @@ class OrgPortalAdminController extends Controller
             $seen = [];
             foreach ($boards as $board) {
                 foreach ((array) $board->columns as $col) {
-                    $id = (int) ($col['id'] ?? 0);
-                    if (!$id || isset($seen[$id])) {
+                    $colId = (int) ($col['id'] ?? 0);
+                    if (!$colId || isset($seen[$colId])) {
                         continue;
                     }
-                    $seen[$id] = true;
+                    $seen[$colId] = true;
                     $kanbanColumns[] = [
-                        'id'         => $id,
-                        'name'       => $col['name'] ?? "Column $id",
+                        'id'         => $colId,
+                        'name'       => $col['name'] ?? "Column $colId",
                         'board_name' => $board->name ?? '',
                     ];
                 }
