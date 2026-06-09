@@ -71,7 +71,7 @@
         <col style="width:110px">
         <col style="width:76px">
         @if($kanbanActive)<col style="width:110px">@endif
-        <col style="width:88px">
+        <col style="width:120px">
     </colgroup>
     <thead>
     <tr>
