@@ -57,6 +57,18 @@ Route::group([
         ->name('orgportal.admin.api-docs');
 });
 
+// ─── Per-mailbox admin routes ─────────────────────────────────────────────────
+Route::group([
+    'prefix'     => $subdirectory . 'mailbox/settings',
+    'middleware' => ['web', 'auth'],
+    'namespace'  => 'Modules\OrgPortal\Http\Controllers',
+], function () {
+    Route::get('{id}/orgportal', 'OrgPortalAdminController@mailboxSettings')
+        ->name('orgportal.admin.mailbox-settings');
+    Route::post('{id}/orgportal', 'OrgPortalAdminController@saveMailboxSettings')
+        ->name('orgportal.admin.mailbox-settings.save');
+});
+
 // ─── API routes — requires API and Webhooks module ────────────────────────────
 if (\Module::isActive('apiwebhooks')) {
     Route::group([

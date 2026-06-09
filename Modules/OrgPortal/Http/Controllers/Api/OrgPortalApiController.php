@@ -32,6 +32,7 @@ class OrgPortalApiController extends Controller
         $data = [
             'id'         => $org->id,
             'name'       => $org->name,
+            'mailboxId'  => $org->mailbox_id,
             'createdAt'  => $org->created_at->toIso8601String(),
             'updatedAt'  => $org->updated_at->toIso8601String(),
         ];
@@ -67,7 +68,14 @@ class OrgPortalApiController extends Controller
         $perPage = min((int) $request->input('pageSize', 25), 100);
         $page    = max((int) $request->input('page', 1), 1);
 
-        $paginator = Organization::orderBy('name')->paginate($perPage, ['*'], 'page', $page);
+        $query = Organization::orderBy('name');
+
+        if ($request->filled('mailboxId')) {
+            $mailboxId = (int) $request->input('mailboxId');
+            $query->visibleInMailbox($mailboxId);
+        }
+
+        $paginator = $query->paginate($perPage, ['*'], 'page', $page);
 
         return response()->json([
             '_embedded' => [
@@ -111,7 +119,14 @@ class OrgPortalApiController extends Controller
             ]);
         }
 
-        $org = Organization::create(['name' => $name]);
+        $mailboxId = $request->filled('mailboxId') ? (int) $request->input('mailboxId') : null;
+        if ($mailboxId && !\App\Mailbox::where('id', $mailboxId)->exists()) {
+            return $this->errorResponse('Validation failed', 400, [
+                ['path' => 'mailboxId', 'message' => 'Mailbox not found.', 'source' => 'JSON'],
+            ]);
+        }
+
+        $org = Organization::create(['name' => $name, 'mailbox_id' => $mailboxId]);
 
         return response()->json($this->orgToArray($org), 201)
             ->header('Resource-ID', $org->id);
@@ -158,11 +173,21 @@ class OrgPortalApiController extends Controller
             ]);
         }
 
-        if ($org->name === $name) {
-            return response()->json(['success' => true, 'message' => 'No changes — organization already has this name.']);
+        $mailboxId = $request->has('mailboxId')
+            ? ($request->input('mailboxId') ? (int) $request->input('mailboxId') : null)
+            : $org->mailbox_id;
+
+        if ($request->has('mailboxId') && $mailboxId && !\App\Mailbox::where('id', $mailboxId)->exists()) {
+            return $this->errorResponse('Validation failed', 400, [
+                ['path' => 'mailboxId', 'message' => 'Mailbox not found.', 'source' => 'JSON'],
+            ]);
         }
 
-        $org->update(['name' => $name]);
+        if ($org->name === $name && $org->mailbox_id === $mailboxId) {
+            return response()->json(['success' => true, 'message' => 'No changes — organization already has this name and mailbox.']);
+        }
+
+        $org->update(['name' => $name, 'mailbox_id' => $mailboxId]);
 
         return response()->json(['success' => true, 'message' => 'Organization updated.']);
     }

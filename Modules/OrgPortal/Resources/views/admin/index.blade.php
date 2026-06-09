@@ -24,6 +24,7 @@
                     <thead>
                         <tr>
                             <th>{{ __('orgportal::messages.name') }}</th>
+                            <th>{{ __('orgportal::messages.mailbox') }}</th>
                             <th>{{ __('orgportal::messages.members') }}</th>
                             <th></th>
                         </tr>
@@ -35,6 +36,13 @@
                                 <a href="{{ route('orgportal.admin.edit', $org->id) }}">
                                     {{ $org->name }}
                                 </a>
+                            </td>
+                            <td>
+                                @if($org->mailbox)
+                                    <span class="label label-default">{{ $org->mailbox->name }}</span>
+                                @else
+                                    <span class="text-muted">{{ __('orgportal::messages.global_scope') }}</span>
+                                @endif
                             </td>
                             <td>{{ $org->members_count }}</td>
                             <td class="text-right">

@@ -8,6 +8,11 @@ return [
     'no_organizations'       => 'Ще немає організацій.',
     'create_one'             => 'Створити',
 
+    // Admin — mailbox scope
+    'mailbox'                => 'Скринька',
+    'global_scope'           => 'Глобальна (всі скриньки)',
+    'mailbox_scope_hint'     => 'Залиште порожнім, щоб організація була видима в усіх скриньках.',
+
     // Admin — create / edit form
     'organization_name'      => 'Назва організації',
     'create_organization'    => 'Створити організацію',
@@ -109,10 +114,12 @@ return [
 
     // Company tickets filters (settings)
     'company_filters_heading'     => 'Фільтри статусів тікетів компанії',
-    'company_filters_hint'        => 'Вкажіть ID колонок Kanban, які відображатимуться як чекбокси-фільтри на сторінці тікетів компанії. ID колонок можна знайти в налаштуваннях дошки Kanban.',
+    'company_filters_hint'        => 'Оберіть колонки Kanban, які відображатимуться як чекбокси-фільтри на сторінці тікетів компанії. Можна налаштувати назву, що бачитимуть користувачі порталу.',
     'filter_column_id'            => 'ID колонки',
     'filter_label'                => 'Назва',
     'filter_add'                  => 'Додати фільтр',
+    'filter_board'                => 'Дошка',
+    'company_filters_no_boards'   => 'Дошок Kanban не знайдено. Спочатку створіть дошку.',
 
     // User permission
     'perm_manage_organizations' => 'Дозволено керувати організаціями',

@@ -9,7 +9,7 @@ class Organization extends Model
 {
     protected $table = 'organizations';
 
-    protected $fillable = ['name', 'color'];
+    protected $fillable = ['name', 'color', 'mailbox_id'];
 
     /**
      * Default badge color (matches FreeScout built-in .fs-tag gray).
@@ -41,6 +41,22 @@ class Organization extends Model
         $b = max(0, min(255, (int) round(hexdec(substr($hex, 4, 2)) * $factor)));
 
         return sprintf('#%02x%02x%02x', $r, $g, $b);
+    }
+
+    public function mailbox()
+    {
+        return $this->belongsTo(\App\Mailbox::class);
+    }
+
+    /**
+     * Organizations visible in a given mailbox: globally-scoped (mailbox_id IS NULL)
+     * plus those explicitly assigned to that mailbox.
+     */
+    public function scopeVisibleInMailbox($query, int $mailboxId)
+    {
+        return $query->where(function ($q) use ($mailboxId) {
+            $q->whereNull('mailbox_id')->orWhere('mailbox_id', $mailboxId);
+        });
     }
 
     public function members()

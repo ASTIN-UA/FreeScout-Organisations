@@ -117,6 +117,13 @@ class OrgPortalServiceProvider extends ServiceProvider
             echo '<li><a href="' . route('orgportal.admin.index') . '">'
                 . __('orgportal::messages.organizations') . '</a></li>';
         }, 20, 0);
+
+        // Add OrgPortal item to the mailbox settings sidebar
+        \Eventy::addAction('mailboxes.settings.menu', function ($mailbox) {
+            if (auth()->user() && auth()->user()->isAdmin()) {
+                echo \View::make('orgportal::partials.mailbox_settings_menu', ['mailbox' => $mailbox])->render();
+            }
+        }, 50);
     }
 
     protected function registerCustomerHooks()
@@ -179,10 +186,8 @@ class OrgPortalServiceProvider extends ServiceProvider
     {
         // Single ticket view — renders after the entire subject+number block
         \Eventy::addAction('conversation.after_subject_block', function ($conversation, $mailbox) {
-            if (!\Option::get('orgportal.show_badge_conversation', true)) {
-                return;
-            }
-            if (!$conversation->customer_id) {
+            $enabled = $this->badgeEnabled('show_badge_conversation', $mailbox->id);
+            if (!$enabled || !$conversation->customer_id) {
                 return;
             }
 
@@ -206,13 +211,17 @@ class OrgPortalServiceProvider extends ServiceProvider
         // Conversations list — fires before the subject text, matching tag placement
         // (before_subject does NOT fire in Kanban cards, so no route check needed)
         \Eventy::addAction('conversations_table.before_subject', function ($conversation) {
-            static $enabled = null;
+            static $enabled = [];
             static $cache   = [];
 
-            if ($enabled === null) {
-                $enabled = (bool) \Option::get('orgportal.show_badge_conversation', true);
+            if (!$conversation || !$conversation->customer_id) {
+                return;
             }
-            if (!$enabled || !$conversation || !$conversation->customer_id) {
+            $mailboxId = (int) $conversation->mailbox_id;
+            if (!isset($enabled[$mailboxId])) {
+                $enabled[$mailboxId] = $this->badgeEnabled('show_badge_conversation', $mailboxId);
+            }
+            if (!$enabled[$mailboxId]) {
                 return;
             }
 
@@ -248,16 +257,17 @@ class OrgPortalServiceProvider extends ServiceProvider
                 return;
             }
 
-            static $enabled = null;
+            static $enabled = [];
             static $cache   = [];
 
-            if ($enabled === null) {
-                $enabled = (bool) \Option::get('orgportal.show_badge_kanban', true);
-            }
-            if (!$enabled) {
+            if (!$conversation || !$conversation->customer_id) {
                 return;
             }
-            if (!$conversation || !$conversation->customer_id) {
+            $mailboxId = (int) $conversation->mailbox_id;
+            if (!isset($enabled[$mailboxId])) {
+                $enabled[$mailboxId] = $this->badgeEnabled('show_badge_kanban', $mailboxId);
+            }
+            if (!$enabled[$mailboxId]) {
                 return;
             }
 
@@ -447,6 +457,19 @@ class OrgPortalServiceProvider extends ServiceProvider
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
+
+    /**
+     * Check badge visibility for a given setting name and mailbox.
+     * Per-mailbox key takes precedence; falls back to global default (true).
+     */
+    protected function badgeEnabled(string $setting, int $mailboxId): bool
+    {
+        $perMailbox = \Option::get('orgportal.' . $setting . '_' . $mailboxId);
+        if ($perMailbox !== null) {
+            return (bool) $perMailbox;
+        }
+        return (bool) \Option::get('orgportal.' . $setting, true);
+    }
 
     protected function getCustomerEmail($customer): ?string
     {

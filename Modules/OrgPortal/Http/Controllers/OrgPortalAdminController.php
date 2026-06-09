@@ -35,7 +35,7 @@ class OrgPortalAdminController extends Controller
 
     public function index()
     {
-        $organizations = Organization::withCount('members')->orderBy('name')->paginate(20);
+        $organizations = Organization::withCount('members')->with('mailbox')->orderBy('name')->paginate(20);
 
         return view('orgportal::admin.index', [
             'organizations'           => $organizations,
@@ -46,19 +46,22 @@ class OrgPortalAdminController extends Controller
 
     public function create()
     {
-        return view('orgportal::admin.create');
+        $mailboxes = \App\Mailbox::orderBy('name')->get(['id', 'name']);
+        return view('orgportal::admin.create', compact('mailboxes'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'name'  => 'required|string|max:255|unique:organizations,name',
-            'color' => 'nullable|string|max:20|regex:/^#[0-9a-fA-F]{3,6}$/',
+            'name'       => 'required|string|max:255|unique:organizations,name',
+            'color'      => 'nullable|string|max:20|regex:/^#[0-9a-fA-F]{3,6}$/',
+            'mailbox_id' => 'nullable|integer|exists:mailboxes,id',
         ]);
 
         Organization::create([
-            'name'  => $request->input('name'),
-            'color' => $request->input('color') ?: null,
+            'name'       => $request->input('name'),
+            'color'      => $request->input('color') ?: null,
+            'mailbox_id' => $request->input('mailbox_id') ?: null,
         ]);
 
         return redirect()->route('orgportal.admin.index')
@@ -69,8 +72,9 @@ class OrgPortalAdminController extends Controller
     {
         $organization = Organization::findOrFail($id);
         $members      = $organization->members()->with(['customer.emails'])->get();
+        $mailboxes    = \App\Mailbox::orderBy('name')->get(['id', 'name']);
 
-        return view('orgportal::admin.edit', compact('organization', 'members'));
+        return view('orgportal::admin.edit', compact('organization', 'members', 'mailboxes'));
     }
 
     public function update(Request $request, int $id)
@@ -78,13 +82,15 @@ class OrgPortalAdminController extends Controller
         $organization = Organization::findOrFail($id);
 
         $request->validate([
-            'name'  => 'required|string|max:255|unique:organizations,name,' . $id,
-            'color' => 'nullable|string|max:20|regex:/^#[0-9a-fA-F]{3,6}$/',
+            'name'       => 'required|string|max:255|unique:organizations,name,' . $id,
+            'color'      => 'nullable|string|max:20|regex:/^#[0-9a-fA-F]{3,6}$/',
+            'mailbox_id' => 'nullable|integer|exists:mailboxes,id',
         ]);
 
         $organization->update([
-            'name'  => $request->input('name'),
-            'color' => $request->input('color') ?: null,
+            'name'       => $request->input('name'),
+            'color'      => $request->input('color') ?: null,
+            'mailbox_id' => $request->input('mailbox_id') ?: null,
         ]);
 
         return redirect()->route('orgportal.admin.edit', $id)
@@ -172,12 +178,9 @@ class OrgPortalAdminController extends Controller
     {
         $this->authorizeAdmin();
 
-        $companyFilters = json_decode(\Option::get('orgportal.company_filters', '[]'), true) ?: [];
-
         return view('orgportal::admin.settings', [
             'show_badge_conversation' => (bool) \Option::get('orgportal.show_badge_conversation', true),
             'show_badge_kanban'       => (bool) \Option::get('orgportal.show_badge_kanban', true),
-            'companyFilters'          => $companyFilters,
         ]);
     }
 
@@ -188,19 +191,83 @@ class OrgPortalAdminController extends Controller
         \Option::set('orgportal.show_badge_conversation', (bool) $request->input('show_badge_conversation'));
         \Option::set('orgportal.show_badge_kanban', (bool) $request->input('show_badge_kanban'));
 
-        // Save company ticket status filters
+        return redirect()->route('orgportal.admin.settings')
+            ->with('flash_success', __('orgportal::messages.settings_saved'));
+    }
+
+    public function mailboxSettings(int $id)
+    {
+        $this->authorizeAdmin();
+
+        $mailbox = \App\Mailbox::findOrFail($id);
+        $mailbox_id = $id;
+        $optionKey = 'orgportal.company_filters_' . $mailbox_id;
+        $raw = \Option::get($optionKey, '[]');
+        $companyFilters = is_array($raw) ? $raw : (json_decode($raw, true) ?: []);
+
+        $kanbanColumns = [];
+        if (\Module::isActive('kanban')) {
+            $boards = \Modules\Kanban\Entities\KnBoard::where(function ($q) use ($mailbox_id) {
+                $q->where('mailbox_id', $mailbox_id)->orWhereNull('mailbox_id');
+            })->get();
+            $seen = [];
+            foreach ($boards as $board) {
+                foreach ((array) $board->columns as $col) {
+                    $id = (int) ($col['id'] ?? 0);
+                    if (!$id || isset($seen[$id])) {
+                        continue;
+                    }
+                    $seen[$id] = true;
+                    $kanbanColumns[] = [
+                        'id'         => $id,
+                        'name'       => $col['name'] ?? "Column $id",
+                        'board_name' => $board->name ?? '',
+                    ];
+                }
+            }
+            usort($kanbanColumns, fn($a, $b) => $a['id'] <=> $b['id']);
+        }
+
+        $perConv   = \Option::get('orgportal.show_badge_conversation_' . $mailbox_id);
+        $perKanban = \Option::get('orgportal.show_badge_kanban_' . $mailbox_id);
+        $show_badge_conversation = $perConv !== null
+            ? (bool) $perConv
+            : (bool) \Option::get('orgportal.show_badge_conversation', true);
+        $show_badge_kanban = $perKanban !== null
+            ? (bool) $perKanban
+            : (bool) \Option::get('orgportal.show_badge_kanban', true);
+
+        return view('orgportal::admin.mailbox_settings', [
+            'mailbox'                 => $mailbox,
+            'companyFilters'          => $companyFilters,
+            'kanbanColumns'           => $kanbanColumns,
+            'show_badge_conversation' => $show_badge_conversation,
+            'show_badge_kanban'       => $show_badge_kanban,
+        ]);
+    }
+
+    public function saveMailboxSettings(Request $request, int $id)
+    {
+        $this->authorizeAdmin();
+
+        \App\Mailbox::findOrFail($id);
+
         $filters = [];
-        $raw = $request->input('company_filters', []);
-        foreach ($raw as $row) {
-            $id    = (int) ($row['id'] ?? 0);
-            $label = trim($row['label'] ?? '');
-            if ($id > 0 && $label !== '') {
-                $filters[] = ['id' => $id, 'label' => $label];
+        $selectedIds  = $request->input('company_filter_ids', []);
+        $columnLabels = $request->input('company_filter_labels', []);
+        foreach ($selectedIds as $sid) {
+            $sid   = (int) $sid;
+            $label = trim($columnLabels[$sid] ?? '');
+            if ($sid > 0 && $label !== '') {
+                $filters[] = ['id' => $sid, 'label' => $label];
             }
         }
-        \Option::set('orgportal.company_filters', json_encode($filters));
+        \Option::set('orgportal.company_filters_' . $id, json_encode($filters));
 
-        return redirect()->route('orgportal.admin.settings')
+        \Option::set('orgportal.show_badge_conversation_' . $id, (bool) $request->input('show_badge_conversation'));
+        \Option::set('orgportal.show_badge_kanban_' . $id, (bool) $request->input('show_badge_kanban'));
+
+        return redirect()->route('orgportal.admin.mailbox-settings', $id)
             ->with('flash_success', __('orgportal::messages.settings_saved'));
     }
 

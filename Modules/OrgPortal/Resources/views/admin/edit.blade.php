@@ -89,6 +89,23 @@
                             @endif
                         </div>
 
+                        <div class="form-group {{ $errors->has('mailbox_id') ? 'has-error' : '' }}">
+                            <label for="mailbox_id">{{ __('orgportal::messages.mailbox') }}</label>
+                            <select id="mailbox_id" name="mailbox_id" class="form-control">
+                                <option value="">{{ __('orgportal::messages.global_scope') }}</option>
+                                @foreach($mailboxes as $mb)
+                                    <option value="{{ $mb->id }}"
+                                        {{ old('mailbox_id', $organization->mailbox_id) == $mb->id ? 'selected' : '' }}>
+                                        {{ $mb->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <span class="help-block text-muted" style="font-size:12px;">{{ __('orgportal::messages.mailbox_scope_hint') }}</span>
+                            @if($errors->has('mailbox_id'))
+                                <span class="help-block">{{ $errors->first('mailbox_id') }}</span>
+                            @endif
+                        </div>
+
                         <button type="submit" class="btn btn-primary btn-sm">
                             {{ __('orgportal::messages.save') }}
                         </button>

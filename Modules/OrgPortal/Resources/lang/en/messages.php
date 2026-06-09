@@ -8,6 +8,11 @@ return [
     'no_organizations'       => 'No organizations yet.',
     'create_one'             => 'Create one',
 
+    // Admin — mailbox scope
+    'mailbox'                => 'Mailbox',
+    'global_scope'           => 'Global (all mailboxes)',
+    'mailbox_scope_hint'     => 'Leave blank to make this organization visible in all mailboxes.',
+
     // Admin — create / edit form
     'organization_name'      => 'Organization Name',
     'create_organization'    => 'Create Organization',
@@ -109,10 +114,12 @@ return [
 
     // Company tickets filters (settings)
     'company_filters_heading'     => 'Company Tickets Status Filters',
-    'company_filters_hint'        => 'Define which Kanban column IDs appear as filter checkboxes on the Company Tickets page. Column IDs can be found in your Kanban board settings.',
+    'company_filters_hint'        => 'Select which Kanban columns appear as filter checkboxes on the Company Tickets page. You can customise the label shown to portal users.',
     'filter_column_id'            => 'Column ID',
     'filter_label'                => 'Label',
     'filter_add'                  => 'Add filter',
+    'filter_board'                => 'Board',
+    'company_filters_no_boards'   => 'No Kanban boards found. Create a board first.',
 
     // User permission
     'perm_manage_organizations' => 'Allow managing organizations',

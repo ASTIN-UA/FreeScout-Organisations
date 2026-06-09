@@ -44,7 +44,8 @@
     <input type="hidden" name="order" value="{{ $direction }}" />
 
     @php
-        $companyFilters = json_decode(\Option::get('orgportal.company_filters', '[]'), true) ?: [];
+        $cfRaw = \Option::get('orgportal.company_filters_' . $mailbox->id, '[]');
+        $companyFilters = is_array($cfRaw) ? $cfRaw : (json_decode($cfRaw, true) ?: []);
     @endphp
     @if(!empty($companyFilters))
     <div style="display: flex; flex-wrap: wrap; margin-top: 5px;">
