@@ -121,6 +121,8 @@ return [
     'ticket_closed_reply_reopens'   => 'Ця заявка закрита. Відправка відповіді повторно відкриє її.',
     'attach_files'                  => 'Вкладення',
     'attach_files_hint'             => 'До :count файлів, максимум :max МБ кожен',
+    'attach_add_more'               => 'Додати ще файл',
+    'status_open'                   => 'Відкрита',
 
     // Errors
     'access_denied'          => 'Доступ заборонено. Потрібна роль менеджера.',

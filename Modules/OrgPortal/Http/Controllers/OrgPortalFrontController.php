@@ -216,7 +216,7 @@ class OrgPortalFrontController extends Controller
                     false,
                     $thread->id,
                     null,
-                    \Helper::UPLOAD_MODE_BY_CUSTOMER
+                    \Helper::UPLOAD_MODE_DEFAULT
                 );
                 if ($attachment) {
                     $hasAttachments = true;

@@ -130,8 +130,27 @@
                         {{ __('orgportal::messages.attach_files') }}
                         <span style="color:#999;">({{ __('orgportal::messages.attach_files_hint', ['max' => (int)ini_get('upload_max_filesize'), 'count' => 5]) }})</span>
                     </label>
-                    <input type="file" name="attachments[]" multiple
-                           style="display:block; margin-top:4px;">
+                    <div id="file-inputs" style="margin-top:4px;">
+                        <input type="file" name="attachments[]" style="display:block; margin-bottom:4px;">
+                    </div>
+                    <a href="#" id="add-file-btn" style="font-size:13px;">
+                        + {{ __('orgportal::messages.attach_add_more') }}
+                    </a>
+                    <script>
+                    document.getElementById('add-file-btn').addEventListener('click', function(e) {
+                        e.preventDefault();
+                        var container = document.getElementById('file-inputs');
+                        if (container.children.length >= 5) return;
+                        var input = document.createElement('input');
+                        input.type = 'file';
+                        input.name = 'attachments[]';
+                        input.style.cssText = 'display:block; margin-bottom:4px;';
+                        container.appendChild(input);
+                        if (container.children.length >= 5) {
+                            this.style.display = 'none';
+                        }
+                    });
+                    </script>
                 </div>
                 <button type="submit" class="btn btn-primary">
                     {{ __('orgportal::messages.send_reply') }}

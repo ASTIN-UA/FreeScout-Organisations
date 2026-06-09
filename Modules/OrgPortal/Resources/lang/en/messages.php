@@ -121,6 +121,8 @@ return [
     'ticket_closed_reply_reopens'   => 'This ticket is closed. Sending a reply will reopen it.',
     'attach_files'                  => 'Attachments',
     'attach_files_hint'             => 'Up to :count files, max :max MB each',
+    'attach_add_more'               => 'Add another file',
+    'status_open'                   => 'Open',
 
     // Errors
     'access_denied'          => 'Access denied. Manager role required.',

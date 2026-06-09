@@ -130,7 +130,11 @@
             @if(\Module::isActive('kanban'))
             <td class="conv-customer" style="text-align:center">
                 <a href="{{ $ticketUrl }}">
-                    <small class="text-help">{{ $knLabel ?: 'Відкрита' }}</small>
+                    @if($conversation->status === \App\Conversation::STATUS_CLOSED)
+                        <small class="text-muted"><i class="glyphicon glyphicon-lock"></i> {{ __('orgportal::messages.ticket_closed_label') }}</small>
+                    @else
+                        <small class="text-help">{{ $knLabel ?: __('orgportal::messages.status_open') }}</small>
+                    @endif
                 </a>
             </td>
             @endif
