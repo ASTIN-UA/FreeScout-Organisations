@@ -117,6 +117,10 @@ Route::group([
         \App\Http\Middleware\HttpsRedirect::class,
         \App\Http\Middleware\Localize::class,
         \App\Http\Middleware\FrameGuard::class,
+        // Must run AFTER Localize: re-applies the EUPSWLANG portal locale that
+        // Localize otherwise resets from the FreeScout user session. No-op when
+        // EUPSWLANG is not installed.
+        \Modules\OrgPortal\Http\Middleware\ReapplyEupLocale::class,
     ],
     'namespace'  => 'Modules\OrgPortal\Http\Controllers',
 ], function () {
