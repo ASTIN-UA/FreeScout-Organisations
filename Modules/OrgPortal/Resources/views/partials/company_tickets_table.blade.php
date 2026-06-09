@@ -55,6 +55,19 @@
                 }
             }
         }
+
+        // Override with custom labels configured in per-mailbox OrgPortal settings.
+        $cfRaw = \Option::get('orgportal.company_filters_' . $mailbox->id);
+        if ($cfRaw === null) {
+            $cfRaw = \Option::get('orgportal.company_filters', '[]');
+        }
+        $companyFilters = is_array($cfRaw) ? $cfRaw : (json_decode($cfRaw, true) ?: []);
+        foreach ($companyFilters as $cf) {
+            $cfId = (int) ($cf['id'] ?? 0);
+            if ($cfId && !empty($cf['label'])) {
+                $knColumnNames[$cfId] = $cf['label'];
+            }
+        }
     }
 @endphp
 

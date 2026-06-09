@@ -45,7 +45,11 @@
 
     @if(\Module::isActive('kanban'))
     @php
-        $cfRaw = \Option::get('orgportal.company_filters_' . $mailbox->id, '[]');
+        $cfRaw = \Option::get('orgportal.company_filters_' . $mailbox->id);
+        if ($cfRaw === null) {
+            // Fallback: read legacy global key used before per-mailbox settings were introduced.
+            $cfRaw = \Option::get('orgportal.company_filters', '[]');
+        }
         $companyFilters = is_array($cfRaw) ? $cfRaw : (json_decode($cfRaw, true) ?: []);
     @endphp
     @if(!empty($companyFilters))
