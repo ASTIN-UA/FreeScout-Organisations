@@ -359,8 +359,16 @@ curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
 
 ## Переклади
 
-Підтримуються мови: **English** (`en`), **Ukrainian** (`uk`).  
+Підтримуються мови: **English** (`en`), **Ukrainian** (`uk`), **Romanian** (`ro`), **Georgian** (`ka`).  
 Файли: `Modules/OrgPortal/Resources/lang/{locale}/messages.php`
+
+### Інтеграція з EUPSWLANG
+
+Модуль коректно працює з [EUP Switch Language](https://freescout.net/module/eup-sw-lang/): вибір мови в порталі застосовується і до рядків OrgPortal.
+
+Для відображення мови у списку EUPSWLANG потрібен відповідний файл `Modules/EndUserPortal/Resources/lang/{locale}.json`. Файли для **Romanian** (`ro`) включені в поставку; **Georgian** (`ka`) підтримується лише в адмін-частині (нема системної підтримки у FreeScout core).
+
+> **Технічна деталь:** `ReapplyEupLocale` middleware (реєструється останнім у portal route group) відновлює locale після `Localize` middleware FreeScout, який інакше скидав би вибір мови порталу до системного дефолту.
 
 ---
 
