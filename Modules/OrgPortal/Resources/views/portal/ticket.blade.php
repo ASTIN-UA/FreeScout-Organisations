@@ -6,6 +6,8 @@
 <style>.eup-thread-body img { max-width: 100%; height: auto; }</style>
 @endsection
 
+@section('body_attrs')@parent data-mailbox_id_encoded="{{ \EndUserPortal::encodeMailboxId($conversation->mailbox_id) }}"@endsection
+
 @section('content')
 <div id="eup-container">
     <div class="eup-container-padded">
@@ -106,58 +108,25 @@
         </div>
         @endforeach
 
-        <div style="margin-top:24px;">
-            <h4>{{ __('orgportal::messages.reply') }}</h4>
+        <div class="eup-container-padded margin-top">
             @if($conversation->status === \App\Conversation::STATUS_CLOSED)
             <div class="alert alert-info" style="margin-bottom:12px;">
                 {{ __('orgportal::messages.ticket_closed_reply_reopens') }}
             </div>
             @endif
-            <form method="POST"
-                  enctype="multipart/form-data"
-                  action="{{ route('orgportal.portal.ticket.reply', ['mailbox_id' => $mailbox_id, 'conversation_id' => $conversation->id]) }}">
-                {{ csrf_field() }}
-                <div class="form-group">
-                    <textarea name="body"
-                              class="form-control"
-                              rows="5"
-                              required
-                              placeholder="{{ __('orgportal::messages.write_reply') }}">{{ old('body') }}</textarea>
-                </div>
-                <div class="form-group">
-                    <label style="font-weight:normal; color:#666; font-size:13px;">
-                        <i class="glyphicon glyphicon-paperclip"></i>
-                        {{ __('orgportal::messages.attach_files') }}
-                        <span style="color:#999;">({{ __('orgportal::messages.attach_files_hint', ['max' => (int)ini_get('upload_max_filesize'), 'count' => 5]) }})</span>
-                    </label>
-                    <div id="file-inputs" style="margin-top:4px;">
-                        <input type="file" name="attachments[]" style="display:block; margin-bottom:4px;">
-                    </div>
-                    <a href="#" id="add-file-btn" style="font-size:13px;">
-                        + {{ __('orgportal::messages.attach_add_more') }}
-                    </a>
-                    <script>
-                    document.getElementById('add-file-btn').addEventListener('click', function(e) {
-                        e.preventDefault();
-                        var container = document.getElementById('file-inputs');
-                        if (container.children.length >= 5) return;
-                        var input = document.createElement('input');
-                        input.type = 'file';
-                        input.name = 'attachments[]';
-                        input.style.cssText = 'display:block; margin-bottom:4px;';
-                        container.appendChild(input);
-                        if (container.children.length >= 5) {
-                            this.style.display = 'none';
-                        }
-                    });
-                    </script>
-                </div>
-                <button type="submit" class="btn btn-primary">
-                    {{ __('orgportal::messages.send_reply') }}
-                </button>
-            </form>
+            @include('enduserportal::partials/submit_form', [
+                'form_action' => route('orgportal.portal.ticket.reply', [
+                    'mailbox_id'      => $mailbox_id,
+                    'conversation_id' => $conversation->id,
+                ]),
+            ])
         </div>
 
     </div>
 </div>
+@endsection
+
+@section('eup_javascript')
+    @parent
+    eupInitSubmit();
 @endsection

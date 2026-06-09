@@ -100,6 +100,27 @@ class OrgPortalFrontController extends Controller
         }
 
         $tickets = $builder->paginate(20);
+
+        // Set has_new_replies (unread agent replies) — same logic as EUP
+        $convIds = $tickets->pluck('id');
+        $latestThreads = Thread::whereIn('conversation_id', $convIds)
+            ->whereIn('type', [Thread::TYPE_CUSTOMER, Thread::TYPE_MESSAGE])
+            ->where('state', Thread::STATE_PUBLISHED)
+            ->orderByDesc('id')
+            ->get(['id', 'conversation_id', 'type', 'opened_at']);
+
+        foreach ($tickets as $ticket) {
+            $ticket->has_new_replies = false;
+            foreach ($latestThreads as $thread) {
+                if ($ticket->id === $thread->conversation_id) {
+                    if ($thread->type === Thread::TYPE_MESSAGE && !$thread->opened_at) {
+                        $ticket->has_new_replies = true;
+                    }
+                    break;
+                }
+            }
+        }
+
         $tickets->appends(array_filter([
             'order'       => $request->input('order'),
             'searchField' => $searchField  ?: null,
@@ -177,53 +198,37 @@ class OrgPortalFrontController extends Controller
         $conversation = Conversation::whereIn('customer_id', $orgMemberIds)
             ->findOrFail($conversation_id);
 
-        $maxFileSizeMb = (int) ini_get('upload_max_filesize') ?: 10;
         $request->validate([
-            'body'        => 'required|string|min:1|max:65000',
-            'attachments' => 'nullable|array|max:5',
-            'attachments.*' => "nullable|file|max:" . ($maxFileSizeMb * 1024),
+            'message' => 'required|string|min:1|max:65000',
         ]);
 
-        $body = nl2br(htmlspecialchars($request->input('body')));
+        $body = $request->input('message');
 
-        $thread              = new Thread();
-        $thread->conversation_id     = $conversation->id;
-        $thread->user_id             = null;
-        $thread->type                = Thread::TYPE_CUSTOMER;
-        $thread->status              = Thread::STATUS_ACTIVE;
-        $thread->state               = Thread::STATE_PUBLISHED;
-        $thread->body                = $body;
-        $thread->source_via          = Thread::PERSON_CUSTOMER;
-        $thread->source_type         = Thread::SOURCE_TYPE_WEB;
-        $thread->customer_id         = $customer->id;
-        $thread->created_by_customer_id = $customer->id;
-        $thread->from                = $customer->getMainEmail();
+        $thread                          = new Thread();
+        $thread->conversation_id         = $conversation->id;
+        $thread->user_id                 = null;
+        $thread->type                    = Thread::TYPE_CUSTOMER;
+        $thread->status                  = Thread::STATUS_ACTIVE;
+        $thread->state                   = Thread::STATE_PUBLISHED;
+        $thread->body                    = $body;
+        $thread->source_via              = Thread::PERSON_CUSTOMER;
+        $thread->source_type             = Thread::SOURCE_TYPE_WEB;
+        $thread->customer_id             = $customer->id;
+        $thread->created_by_customer_id  = $customer->id;
+        $thread->from                    = $customer->getMainEmail();
         $thread->save();
 
-        // Save uploaded attachments
-        $hasAttachments = false;
-        if ($request->hasFile('attachments')) {
-            foreach ($request->file('attachments') as $file) {
-                if (!$file || !$file->isValid()) {
-                    continue;
-                }
-                $attachment = Attachment::create(
-                    $file->getClientOriginalName(),
-                    $file->getMimeType(),
-                    Attachment::detectType($file->getMimeType(), $file->getClientOriginalExtension()),
-                    null,
-                    $file,
-                    false,
-                    $thread->id,
-                    null,
-                    \Helper::UPLOAD_MODE_DEFAULT
-                );
-                if ($attachment) {
-                    $hasAttachments = true;
-                }
-            }
+        // Process EUP-style pre-uploaded attachments (encrypted IDs)
+        $attachmentIds = $this->decodeAttachmentIds($request->input('attachments', []));
+        $allIds        = $this->decodeAttachmentIds($request->input('attachments_all', []));
+        $removeIds     = array_diff($allIds, $attachmentIds);
+        if ($removeIds) {
+            Attachment::deleteByIds($removeIds);
         }
-        if ($hasAttachments) {
+        if ($attachmentIds) {
+            Attachment::whereIn('id', $attachmentIds)
+                ->whereNull('thread_id')
+                ->update(['thread_id' => $thread->id]);
             $thread->has_attachments       = true;
             $thread->save();
             $conversation->has_attachments = true;
@@ -282,6 +287,20 @@ class OrgPortalFrontController extends Controller
         return redirect()
             ->route('orgportal.portal.ticket', ['mailbox_id' => $mailbox_id, 'conversation_id' => $conversation_id])
             ->with('flash_success', __('orgportal::messages.author_changed'));
+    }
+
+    // ─── Helpers ─────────────────────────────────────────────────────────────
+
+    private function decodeAttachmentIds(array $list): array
+    {
+        $ids = [];
+        foreach ($list as $encrypted) {
+            $id = \Helper::decrypt($encrypted);
+            if ($id !== $encrypted) {
+                $ids[] = (int) $id;
+            }
+        }
+        return $ids;
     }
 
     // ─── Close ticket ────────────────────────────────────────────────────────
