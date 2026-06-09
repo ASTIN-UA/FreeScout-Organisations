@@ -2,6 +2,7 @@
 
 namespace Modules\OrgPortal\Http\Controllers;
 
+use App\Attachment;
 use App\Conversation;
 use App\Customer;
 use App\Mailbox;
@@ -139,6 +140,7 @@ class OrgPortalFrontController extends Controller
             ->whereIn('type', [Thread::TYPE_CUSTOMER, Thread::TYPE_MESSAGE])
             ->where('state', Thread::STATE_PUBLISHED)
             ->orderBy('created_at')
+            ->with('attachments')
             ->get();
 
         // Mark agent threads as opened
@@ -175,8 +177,11 @@ class OrgPortalFrontController extends Controller
         $conversation = Conversation::whereIn('customer_id', $orgMemberIds)
             ->findOrFail($conversation_id);
 
+        $maxFileSizeMb = (int) ini_get('upload_max_filesize') ?: 10;
         $request->validate([
-            'body' => 'required|string|min:1|max:65000',
+            'body'        => 'required|string|min:1|max:65000',
+            'attachments' => 'nullable|array|max:5',
+            'attachments.*' => "nullable|file|max:" . ($maxFileSizeMb * 1024),
         ]);
 
         $body = nl2br(htmlspecialchars($request->input('body')));
@@ -194,6 +199,35 @@ class OrgPortalFrontController extends Controller
         $thread->created_by_customer_id = $customer->id;
         $thread->from                = $customer->getMainEmail();
         $thread->save();
+
+        // Save uploaded attachments
+        $hasAttachments = false;
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                if (!$file || !$file->isValid()) {
+                    continue;
+                }
+                $attachment = Attachment::create(
+                    $file->getClientOriginalName(),
+                    $file->getMimeType(),
+                    Attachment::detectType($file->getMimeType(), $file->getClientOriginalExtension()),
+                    null,
+                    $file,
+                    false,
+                    $thread->id,
+                    null,
+                    \Helper::UPLOAD_MODE_BY_CUSTOMER
+                );
+                if ($attachment) {
+                    $hasAttachments = true;
+                }
+            }
+        }
+        if ($hasAttachments) {
+            $thread->has_attachments       = true;
+            $thread->save();
+            $conversation->has_attachments = true;
+        }
 
         $conversation->status          = Conversation::STATUS_ACTIVE;
         $conversation->last_reply_at   = now();
@@ -248,6 +282,30 @@ class OrgPortalFrontController extends Controller
         return redirect()
             ->route('orgportal.portal.ticket', ['mailbox_id' => $mailbox_id, 'conversation_id' => $conversation_id])
             ->with('flash_success', __('orgportal::messages.author_changed'));
+    }
+
+    // ─── Close ticket ────────────────────────────────────────────────────────
+
+    public function closeTicket(Request $request, string $mailbox_id, int $conversation_id)
+    {
+        $this->getMailbox($mailbox_id);
+        $customer = $this->authCustomer();
+        $member   = $this->requireManager($customer);
+
+        $orgMemberIds = OrganizationMember::where('organization_id', $member->organization_id)
+            ->pluck('customer_id');
+
+        $conversation = Conversation::whereIn('customer_id', $orgMemberIds)
+            ->findOrFail($conversation_id);
+
+        $conversation->status = Conversation::STATUS_CLOSED;
+        $conversation->save();
+
+        \Eventy::action('conversation.status_changed_by_customer', $conversation, $customer);
+
+        return redirect()
+            ->route('orgportal.portal.company-tickets', ['mailbox_id' => $mailbox_id])
+            ->with('flash_success', __('orgportal::messages.ticket_closed'));
     }
 
     // ─── Settings ────────────────────────────────────────────────────────────

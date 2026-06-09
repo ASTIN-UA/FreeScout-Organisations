@@ -113,6 +113,15 @@ return [
     // ApiWebhooks settings page
     'api_docs_link'          => 'Документація API OrgPortal',
 
+    // Ticket actions
+    'close_ticket'                  => 'Закрити заявку',
+    'close_ticket_confirm'          => 'Ви впевнені, що хочете закрити цю заявку?',
+    'ticket_closed'                 => 'Заявку закрито.',
+    'ticket_closed_label'           => 'Закрито',
+    'ticket_closed_reply_disabled'  => 'Ця заявка закрита. Щоб відновити її, зверніться до підтримки.',
+    'attach_files'                  => 'Вкладення',
+    'attach_files_hint'             => 'До :count файлів, максимум :max МБ кожен',
+
     // Errors
     'access_denied'          => 'Доступ заборонено. Потрібна роль менеджера.',
 

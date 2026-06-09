@@ -113,6 +113,15 @@ return [
     // ApiWebhooks settings page
     'api_docs_link'          => 'OrgPortal API Docs',
 
+    // Ticket actions
+    'close_ticket'                  => 'Close Ticket',
+    'close_ticket_confirm'          => 'Are you sure you want to close this ticket?',
+    'ticket_closed'                 => 'Ticket has been closed.',
+    'ticket_closed_label'           => 'Closed',
+    'ticket_closed_reply_disabled'  => 'This ticket is closed. To reopen it, please contact support.',
+    'attach_files'                  => 'Attachments',
+    'attach_files_hint'             => 'Up to :count files, max :max MB each',
+
     // Errors
     'access_denied'          => 'Access denied. Manager role required.',
 
