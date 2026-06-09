@@ -180,7 +180,15 @@
                 @endif
             </td>
             <td style="text-align:center;">
-                <small class="{{ $convStatusClass }}">{{ __('orgportal::messages.' . $convStatusKey) }}</small>
+                @if($conversation->status === \App\Conversation::STATUS_CLOSED)
+                    <small class="text-muted"><i class="glyphicon glyphicon-lock"></i> {{ __('orgportal::messages.status_closed') }}</small>
+                @elseif($conversation->status === \App\Conversation::STATUS_PENDING)
+                    <small class="{{ $convStatusClass }}"><i class="glyphicon glyphicon-time"></i> {{ __('orgportal::messages.status_pending') }}</small>
+                @elseif($conversation->status === \App\Conversation::STATUS_SPAM)
+                    <small class="{{ $convStatusClass }}"><i class="glyphicon glyphicon-ban-circle"></i> {{ __('orgportal::messages.status_spam') }}</small>
+                @else
+                    <small class="{{ $convStatusClass }}">{{ __('orgportal::messages.status_active') }}</small>
+                @endif
             </td>
             @if($kanbanActive)
             <td style="text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:0;"
