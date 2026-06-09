@@ -201,7 +201,7 @@
             </td>
             @endif
             <td class="conv-date">
-                <a href="{{ $ticketUrl }}">{{ \EndUserPortal::dateFormat($conversation->last_reply_at, 'M j, Y') }}</a>
+                <a href="{{ $ticketUrl }}">{{ \EndUserPortal::dateFormat($conversation->last_reply_at, 'M j, Y') }}<br><small class="text-muted">{{ \EndUserPortal::dateFormat($conversation->last_reply_at, 'H:i') }}</small></a>
             </td>
         </tr>
         @endforeach
