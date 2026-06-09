@@ -75,6 +75,13 @@
 
 #### GET /api/organizations
 
+**Query parameters**
+
+| Параметр | Тип | За замовч. | Опис |
+|----------|-----|:---:|------|
+| `page` | integer | `1` | Номер сторінки |
+| `pageSize` | integer | `25` | Кількість записів (макс. 100) |
+
 ```bash
 curl -X GET "https://your-freescout.com/api/organizations?page=1&pageSize=25" \
   -H "X-FreeScout-API-Key: YOUR_API_KEY"
@@ -105,6 +112,12 @@ curl -X GET "https://your-freescout.com/api/organizations?page=1&pageSize=25" \
 ---
 
 #### POST /api/organizations
+
+**Request body**
+
+| Поле | Тип | Обов'язковий | Опис |
+|------|-----|:---:|------|
+| `name` | string | ✅ | Назва організації (макс. 255 символів, унікальна) |
 
 ```bash
 curl -X POST "https://your-freescout.com/api/organizations" \
@@ -177,6 +190,12 @@ curl -X GET "https://your-freescout.com/api/organizations/1" \
 
 #### PUT /api/organizations/{id}
 
+**Request body**
+
+| Поле | Тип | Обов'язковий | Опис |
+|------|-----|:---:|------|
+| `name` | string | ✅ | Нова назва організації (макс. 255 символів, унікальна) |
+
 ```bash
 curl -X PUT "https://your-freescout.com/api/organizations/1" \
   -H "X-FreeScout-API-Key: YOUR_API_KEY" \
@@ -226,15 +245,21 @@ curl -X GET "https://your-freescout.com/api/customers/42/organization" \
 
 #### PUT /api/customers/{id}/organization
 
+**Request body**
+
+| Поле | Тип | Обов'язковий | Опис |
+|------|-----|:---:|------|
+| `organizationId` | integer | ✅ | ID організації |
+| `role` | string | — | `"member"` (за замовчуванням) або `"manager"` |
+
+Якщо клієнт вже є членом іншої організації — запис оновлюється.
+
 ```bash
 curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
   -H "X-FreeScout-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"organizationId": 1, "role": "member"}'
 ```
-
-Поле `role`: `"member"` (за замовчуванням) або `"manager"`.  
-Якщо клієнт вже є членом іншої організації — запис оновлюється.
 
 **204 No Content**
 
