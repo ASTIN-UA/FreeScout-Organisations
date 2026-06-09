@@ -158,6 +158,10 @@ class OrgPortalApiController extends Controller
             ]);
         }
 
+        if ($org->name === $name) {
+            return response()->json(['success' => true, 'message' => 'No changes — organization already has this name.']);
+        }
+
         $org->update(['name' => $name]);
 
         return response()->json(['success' => true, 'message' => 'Organization updated.']);
@@ -242,19 +246,24 @@ class OrgPortalApiController extends Controller
 
         $member = OrganizationMember::where('customer_id', $customerId)->first();
 
-        if ($member) {
-            $member->organization_id = $orgId;
-            $member->role            = $role;
-            $member->save();
-        } else {
+        if (!$member) {
             OrganizationMember::create([
                 'organization_id' => $orgId,
                 'customer_id'     => $customerId,
                 'role'            => $role,
             ]);
+            return response()->json(['success' => true, 'message' => 'Membership created.'], 201);
         }
 
-        return response()->json(['success' => true, 'message' => 'Membership saved.']);
+        if ((int)$member->organization_id === (int)$orgId && $member->role === $role) {
+            return response()->json(['success' => true, 'message' => 'No changes — customer is already a member of this organization with this role.']);
+        }
+
+        $member->organization_id = $orgId;
+        $member->role            = $role;
+        $member->save();
+
+        return response()->json(['success' => true, 'message' => 'Membership updated.']);
     }
 
     /**
