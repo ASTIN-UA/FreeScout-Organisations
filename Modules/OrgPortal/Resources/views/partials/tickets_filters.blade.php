@@ -43,32 +43,34 @@
     <input type="hidden" name="sort"  value="{{ $sortField }}" />
     <input type="hidden" name="order" value="{{ $direction }}" />
 
-    @if(\Module::isActive('kanban'))
     @php
-        $cfRaw = \Option::get('orgportal.company_filters_' . $mailbox->id);
-        if ($cfRaw === null) {
-            // Fallback: read legacy global key used before per-mailbox settings were introduced.
-            $cfRaw = \Option::get('orgportal.company_filters', '[]');
+        $companyFilters = [];
+        if (\Module::isActive('kanban')) {
+            $cfRaw = \Option::get('orgportal.company_filters_' . $mailbox->id);
+            if ($cfRaw === null) {
+                $cfRaw = \Option::get('orgportal.company_filters', '[]');
+            }
+            $companyFilters = is_array($cfRaw) ? $cfRaw : (json_decode($cfRaw, true) ?: []);
         }
-        $companyFilters = is_array($cfRaw) ? $cfRaw : (json_decode($cfRaw, true) ?: []);
+        $closed = $closed ?? false;
     @endphp
-    @if(!empty($companyFilters))
-    <div style="display: flex; flex-wrap: wrap; margin-top: 5px;">
+    <div style="display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center; margin-top:5px; gap:4px;">
         @foreach($companyFilters as $filter)
         @php $fid = (int)$filter['id']; @endphp
-        <div @if(!$loop->first) style="margin-left: 5px;" @endif>
-            <label class="checkbox" for="ct-f{{ $fid }}">
-                <input @if(isset($status[$fid])) checked @endif
-                       type="checkbox" value="{{ $fid }}"
-                       id="ct-f{{ $fid }}" name="status[{{ $fid }}]" />
-                {{ $filter['label'] }}
-            </label>
-        </div>
+        <label class="checkbox" style="margin:0;" for="ct-f{{ $fid }}">
+            <input @if(isset($status[$fid])) checked @endif
+                   type="checkbox" value="{{ $fid }}"
+                   id="ct-f{{ $fid }}" name="status[{{ $fid }}]" />
+            {{ $filter['label'] }}
+        </label>
         @endforeach
-        <button type="submit" class="btn" style="margin-left: 5px; background-color: transparent">
+        <label class="checkbox" style="margin:0;" for="ct-closed">
+            <input type="checkbox" value="1" id="ct-closed" name="closed"
+                   @if($closed) checked @endif />
+            {{ __('orgportal::messages.status_closed') }}
+        </label>
+        <button type="submit" class="btn" style="background-color:transparent; padding:2px 6px;">
             <small class="glyphicon glyphicon-refresh"></small>
         </button>
     </div>
-    @endif
-    @endif {{-- kanban --}}
 </form>

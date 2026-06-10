@@ -79,6 +79,7 @@ class OrgPortalFrontController extends Controller
         $orderDirection = $request->input('order', 'desc');
         $searchField    = $request->input('searchField', '');
         $status         = $request->input('status', []);
+        $closed         = (bool) $request->input('closed', false);
         $direction      = $orderDirection === 'asc' ? 'desc' : 'asc';
 
         $authorId   = (int) $request->input('author_id', 0) ?: null;
@@ -93,11 +94,12 @@ class OrgPortalFrontController extends Controller
 
         $builder = Conversation::whereIn('customer_id', $orgMemberIds)
             ->where('mailbox_id', $mailbox->id)
-            ->where('status', '!=', Conversation::STATUS_SPAM)
             ->where('state', '!=', Conversation::STATE_DELETED)
             ->with(['customer', 'user'])
             ->when($searchField, fn ($q) => $q->where('subject', 'like', "%{$searchField}%"))
             ->when($authorId,    fn ($q) => $q->where('customer_id', $authorId))
+            ->when($closed,      fn ($q) => $q->where('status', Conversation::STATUS_CLOSED),
+                                 fn ($q) => $q->where('status', '!=', Conversation::STATUS_SPAM))
             ->orderBy($orderField, $orderDirection);
 
         if (!empty($status) && is_array($status)) {
@@ -139,6 +141,7 @@ class OrgPortalFrontController extends Controller
             'searchField' => $searchField  ?: null,
             'status'      => $status       ?: null,
             'author_id'   => $authorId     ?: null,
+            'closed'      => $closed       ?: null,
         ]));
 
         return view('orgportal::portal.company_tickets', [
@@ -151,6 +154,7 @@ class OrgPortalFrontController extends Controller
             'direction'    => $direction,
             'searchField'  => $searchField,
             'status'       => $status,
+            'closed'       => $closed,
             'authorId'     => $authorId,
             'authorName'   => $authorName,
         ]);

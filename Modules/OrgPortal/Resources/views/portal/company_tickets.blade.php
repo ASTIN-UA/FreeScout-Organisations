@@ -31,6 +31,7 @@
                 'direction'         => $direction,
                 'searchField'       => $searchField,
                 'status'            => $status,
+                'closed'            => $closed,
                 'showSubmitButton'  => false,
                 'formAction'        => route('orgportal.portal.company-tickets', ['mailbox_id' => $mailbox_id]),
                 'resetUrl'          => route('orgportal.portal.company-tickets', ['mailbox_id' => $mailbox_id]),
