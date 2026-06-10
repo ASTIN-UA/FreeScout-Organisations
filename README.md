@@ -454,4 +454,4 @@ For a language to appear in the EUPSWLANG list, the corresponding `Modules/EndUs
 
 ## License
 
-Proprietary — ASTIN UA.
+[MIT](LICENSE) — © 2026 ASTIN UA
