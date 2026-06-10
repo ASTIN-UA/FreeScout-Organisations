@@ -110,6 +110,16 @@
               "updatedAt": { "type": "string", "format": "date-time" }
             }
           },
+          "Mailbox": {
+            "type": "object",
+            "properties": {
+              "id":        { "type": "integer", "example": 1 },
+              "name":      { "type": "string",  "example": "Support" },
+              "email":     { "type": "string",  "example": "support@example.com" },
+              "createdAt": { "type": "string", "format": "date-time" },
+              "updatedAt": { "type": "string", "format": "date-time" }
+            }
+          },
           "PaginationPage": {
             "type": "object",
             "properties": {
@@ -184,7 +194,8 @@
       "tags": [
         { "name": "Organizations",         "description": "Create and manage organizations" },
         { "name": "Customer Membership",   "description": "Assign customers to organizations and manage their roles" },
-        { "name": "Customers (FreeScout)", "description": "Standard FreeScout endpoints for looking up customers. Use these to obtain a `customerId` before membership operations." }
+        { "name": "Customers (FreeScout)", "description": "Standard FreeScout endpoints for looking up customers. Use these to obtain a `customerId` before membership operations." },
+        { "name": "Mailboxes (FreeScout)", "description": "Standard FreeScout endpoints for listing mailboxes. Use these to obtain a `mailboxId` for scoping organizations or filtering results." }
       ],
       "paths": {
 
@@ -467,6 +478,69 @@
                   }
                 }
               }
+            }
+          }
+        },
+
+        "/api/mailboxes": {
+          "get": {
+            "tags": ["Mailboxes (FreeScout)"],
+            "summary": "List mailboxes",
+            "description": "Standard FreeScout endpoint. Returns all mailboxes accessible with your API key. Use the returned `id` values as `mailboxId` when creating or filtering organizations.",
+            "operationId": "listMailboxes",
+            "parameters": [
+              { "name": "api_key", "in": "query", "schema": { "type": "string" }, "description": "API key (alternative to header)" }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "_embedded": {
+                          "type": "object",
+                          "properties": {
+                            "mailboxes": {
+                              "type": "array",
+                              "items": { "$ref": "#/components/schemas/Mailbox" }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "example": {
+                      "_embedded": {
+                        "mailboxes": [
+                          { "id": 1, "name": "Support", "email": "support@example.com", "createdAt": "2024-01-01T00:00:00+00:00", "updatedAt": "2024-01-01T00:00:00+00:00" },
+                          { "id": 2, "name": "Sales",   "email": "sales@example.com",   "createdAt": "2024-01-01T00:00:00+00:00", "updatedAt": "2024-01-01T00:00:00+00:00" }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+
+        "/api/mailboxes/{id}": {
+          "get": {
+            "tags": ["Mailboxes (FreeScout)"],
+            "summary": "Get mailbox by ID",
+            "description": "Standard FreeScout endpoint.",
+            "operationId": "getMailbox",
+            "parameters": [
+              { "name": "id",      "in": "path",  "required": true, "schema": { "type": "integer" }, "description": "Mailbox ID" },
+              { "name": "api_key", "in": "query", "schema": { "type": "string" }, "description": "API key (alternative to header)" }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Mailbox" } } }
+              },
+              "404": { "description": "Mailbox not found" }
             }
           }
         },
