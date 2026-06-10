@@ -88,7 +88,13 @@
                 @endif
                 &nbsp;&middot;&nbsp; {{ \EndUserPortal::dateFormat($thread->created_at) }}
             </div>
-            <div class="eup-thread-body">{!! $thread->body !!}</div>
+            <div class="eup-thread-body">
+                @if($isCustomer)
+                    {!! nl2br(e($thread->body)) !!}
+                @else
+                    {!! $thread->body !!}
+                @endif
+            </div>
 
             {{-- Attachments --}}
             @if($thread->has_attachments && $thread->attachments->isNotEmpty())
