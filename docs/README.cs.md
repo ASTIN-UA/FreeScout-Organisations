@@ -271,6 +271,16 @@ Přiřadí zákazníka organizaci nebo aktualizuje jeho roli. **Jeden zákazník
 
 ---
 
+## Aktualizace
+
+OrgPortal podporuje **automatické aktualizace** prostřednictvím integrovaného mechanismu aktualizace modulů FreeScout.
+
+Když je dostupná nová verze, na stránce **Správa → Moduly** se zobrazí banner. Kliknutím na **Aktualizovat nyní** — FreeScout automaticky stáhne a nainstaluje nejnovější verzi.
+
+Není vyžadováno ruční kopírování souborů.
+
+---
+
 ## Kompatibilita modulů
 
 | Modul | Stav |

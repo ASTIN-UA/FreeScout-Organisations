@@ -400,6 +400,14 @@ curl -X GET "https://your-freescout.com/api/customers?email=john@acme.com" \
    php artisan cache:clear && php artisan config:clear
    ```
 
+## Updates
+
+OrgPortal supports **automatic updates** via FreeScout's built-in module update mechanism.
+
+When a new version is available, a banner will appear on the **Manage → Modules** page. Click **Update now** — FreeScout will download and install the latest version automatically.
+
+No manual file copying required.
+
 ---
 
 ## Module compatibility

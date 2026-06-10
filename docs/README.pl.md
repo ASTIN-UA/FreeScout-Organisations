@@ -271,6 +271,16 @@ Przypisz klienta do organizacji lub aktualizuj jego rolę. **Jeden klient — je
 
 ---
 
+## Aktualizacje
+
+OrgPortal obsługuje **automatyczne aktualizacje** poprzez wbudowany mechanizm aktualizacji modułów FreeScout.
+
+Gdy dostępna jest nowa wersja, banner pojawia się na stronie **Zarządzanie → Moduły**. Kliknij **Zaktualizuj teraz** — FreeScout automatycznie pobierze i zainstaluje najnowszą wersję.
+
+Nie jest wymagane ręczne kopiowanie plików.
+
+---
+
 ## Kompatybilność modułów
 
 | Moduł | Status |

@@ -325,6 +325,16 @@ curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
 
 ---
 
+## Actualizări
+
+OrgPortal suportă **actualizări automate** prin mecanismul de actualizare a modulelor integrat al FreeScout.
+
+Când este disponibilă o versiune nouă, un banner va apărea pe pagina **Gestionare → Module**. Faceți clic pe **Actualizare acum** — FreeScout va descărca și instala automat cea mai nouă versiune.
+
+Nicio copiere manuală de fișiere necesară.
+
+---
+
 ## Compatibilitate module
 
 | Modul | Stare |

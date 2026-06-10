@@ -325,6 +325,16 @@ curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
 
 ---
 
+## 更新
+
+OrgPortal 通过 FreeScout 内置的模块更新机制支持**自动更新**。
+
+当有新版本可用时，**管理 → 模块**页面上将出现一个横幅。单击**立即更新** — FreeScout 将自动下载并安装最新版本。
+
+无需手动复制文件。
+
+---
+
 ## 模块兼容性
 
 | 模块 | 状态 |

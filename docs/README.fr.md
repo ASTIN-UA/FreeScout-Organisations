@@ -271,6 +271,16 @@ Assigne un client à une organisation ou met à jour son rôle. **Un client — 
 
 ---
 
+## Mises à jour
+
+OrgPortal prend en charge les **mises à jour automatiques** via le mécanisme de mise à jour des modules intégré de FreeScout.
+
+Lorsqu'une nouvelle version est disponible, une bannière apparaît sur la page **Gérer → Modules**. Cliquez sur **Mettre à jour maintenant** — FreeScout téléchargera et installera la dernière version automatiquement.
+
+Aucune copie de fichier manuelle requise.
+
+---
+
 ## Compatibilité des modules
 
 | Module | Statut |
