@@ -2,6 +2,12 @@
 
 All notable changes to OrgPortal are documented here.
 
+## [1.0.2] — 2026-06-10
+
+### Fixed
+- Auto-update now installs correctly: release ZIP contains only the `OrgPortal` module folder (previously the full repository archive was used, causing the update to fail silently)
+- `detailsUrl` now points directly to CHANGELOG.md
+
 ## [1.0.1] — 2026-06-10
 
 ### Added
