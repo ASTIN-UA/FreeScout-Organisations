@@ -16,7 +16,6 @@ A FreeScout module that adds the concept of **Organizations** (companies/teams) 
 [Français](docs/README.fr.md) ·
 [Español](docs/README.es.md) ·
 [Italiano](docs/README.it.md) ·
-[Русский](docs/README.ru.md) ·
 [Polski](docs/README.pl.md) ·
 [Čeština](docs/README.cs.md) ·
 [Slovenčina](docs/README.sk.md) ·
