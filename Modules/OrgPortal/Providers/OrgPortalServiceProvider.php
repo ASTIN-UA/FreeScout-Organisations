@@ -466,15 +466,12 @@ class OrgPortalServiceProvider extends ServiceProvider
 
     /**
      * Check badge visibility for a given setting name and mailbox.
-     * Per-mailbox key takes precedence; falls back to global default (true).
+     * Per-mailbox key takes precedence; defaults to true when not set.
      */
     protected function badgeEnabled(string $setting, int $mailboxId): bool
     {
         $perMailbox = \Option::get('orgportal.' . $setting . '_' . $mailboxId);
-        if ($perMailbox !== null) {
-            return (bool) $perMailbox;
-        }
-        return (bool) \Option::get('orgportal.' . $setting, true);
+        return $perMailbox !== null ? (bool) $perMailbox : true;
     }
 
     protected function getCustomerEmail($customer): ?string

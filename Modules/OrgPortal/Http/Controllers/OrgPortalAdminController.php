@@ -38,9 +38,7 @@ class OrgPortalAdminController extends Controller
         $organizations = Organization::withCount('members')->with('mailbox')->orderBy('name')->paginate(20);
 
         return view('orgportal::admin.index', [
-            'organizations'           => $organizations,
-            'show_badge_conversation' => (bool) \Option::get('orgportal.show_badge_conversation', true),
-            'show_badge_kanban'       => (bool) \Option::get('orgportal.show_badge_kanban', true),
+            'organizations' => $organizations,
         ]);
     }
 
@@ -174,27 +172,6 @@ class OrgPortalAdminController extends Controller
             ->with('flash_success', __('orgportal::messages.member_removed'));
     }
 
-    public function settings()
-    {
-        $this->authorizeAdmin();
-
-        return view('orgportal::admin.settings', [
-            'show_badge_conversation' => (bool) \Option::get('orgportal.show_badge_conversation', true),
-            'show_badge_kanban'       => (bool) \Option::get('orgportal.show_badge_kanban', true),
-        ]);
-    }
-
-    public function saveSettings(Request $request)
-    {
-        $this->authorizeAdmin();
-
-        \Option::set('orgportal.show_badge_conversation', (bool) $request->input('show_badge_conversation'));
-        \Option::set('orgportal.show_badge_kanban', (bool) $request->input('show_badge_kanban'));
-
-        return redirect()->route('orgportal.admin.settings')
-            ->with('flash_success', __('orgportal::messages.settings_saved'));
-    }
-
     public function mailboxSettings(int $id)
     {
         $this->authorizeAdmin();
@@ -230,12 +207,8 @@ class OrgPortalAdminController extends Controller
 
         $perConv   = \Option::get('orgportal.show_badge_conversation_' . $mailbox_id);
         $perKanban = \Option::get('orgportal.show_badge_kanban_' . $mailbox_id);
-        $show_badge_conversation = $perConv !== null
-            ? (bool) $perConv
-            : (bool) \Option::get('orgportal.show_badge_conversation', true);
-        $show_badge_kanban = $perKanban !== null
-            ? (bool) $perKanban
-            : (bool) \Option::get('orgportal.show_badge_kanban', true);
+        $show_badge_conversation = $perConv !== null ? (bool) $perConv : true;
+        $show_badge_kanban       = $perKanban !== null ? (bool) $perKanban : true;
 
         return view('orgportal::admin.mailbox_settings', [
             'mailbox'                 => $mailbox,

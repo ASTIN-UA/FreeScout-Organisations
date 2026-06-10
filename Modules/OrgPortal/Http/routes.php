@@ -44,12 +44,6 @@ Route::group([
     Route::get('customers/search', 'OrgPortalAdminController@searchCustomers')
         ->name('orgportal.admin.customers.search');
 
-    Route::get('settings', 'OrgPortalAdminController@settings')
-        ->name('orgportal.admin.settings');
-
-    Route::post('settings', 'OrgPortalAdminController@saveSettings')
-        ->name('orgportal.admin.settings.save');
-
     Route::get('impersonate/{customer_id}/{mailbox_id}', 'OrgPortalAdminController@impersonatePortalLink')
         ->name('orgportal.admin.impersonate');
 
