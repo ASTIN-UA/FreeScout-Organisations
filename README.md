@@ -2,114 +2,136 @@
 
 <img src="Modules/OrgPortal/logo.png" alt="OrgPortal" width="140" align="right">
 
-Модуль для FreeScout, що додає поняття **Організації** (компанії/команди) до клієнтів, розширює End-User Portal для менеджерів і відображає плашку організації на тікетах та картках Kanban.
+A FreeScout module that adds the concept of **Organizations** (companies/teams) to customers, extends the End-User Portal for managers, and displays an organization badge on tickets and Kanban cards.
 
-**Мінімальна версія FreeScout:** 1.8.147  
-**Залежності:** немає обов'язкових  
-**Опціональні:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
-
----
-
-## Можливості
-
-### Управління організаціями (адмін)
-- **Manage → Organizations** — повний CRUD: створення, редагування, видалення організацій
-- **Прив'язка до поштової скриньки** — організація може бути **глобальною** (видима в усіх скриньках) або **прив'язаною до конкретної скриньки**; у списку організацій відображається відповідна мітка
-- Прив'язка клієнтів до організацій з вибором ролі: `member` або `manager`
-- **Зміна ролі** учасника прямо в таблиці (без видалення та повторного додавання)
-- Автодоповнення пошуку клієнтів за іменем або email; вже доданих учасників (з будь-якої організації) виключено з результатів
-- Email учасника відображається під іменем у таблиці учасників
-- Один клієнт — одна організація (обмеження на рівні БД і API)
-- **Колір плашки** — візуальна палітра з 12 кольорів у формі редагування організації; за замовчуванням сірий
-
-### Права доступу користувача
-- Нове право **"Дозволено керувати організаціями"** — не-адміни з цим правом отримують доступ до списку, створення та редагування організацій
-- Видалення організацій залишається виключно для адмінів
-
-### Картка клієнта
-- Поле **Organization** у формі редагування клієнта — вибір організації та ролі
-- Кнопка **Заявки організації** — відкриває пошук по всіх тікетах організації
-
-### Плашка організації на тікетах
-- Відображається під темою на сторінці тікета та перед назвою у списку розмов
-- Клікабельна — відкриває пошук по всіх тікетах цієї організації
-- Колір плашки визначається налаштуванням організації (за замовчуванням сірий)
-- Увімкнення/вимкнення **окремо для кожної поштової скриньки** через **Mailbox Settings → OrgPortal**; глобальне значення використовується як fallback
-
-### Плашка організації на картках Kanban
-- Відображається після лічильника повідомлень на кожній картці
-- Клікабельна — веде до пошуку по організації
-- Колір відповідає налаштуванню організації
-- Фільтр **Організація** вбудований у стандартний dropdown фільтрів Kanban: модальне вікно з чекбоксами, аналогічне фільтру по тегах; стан зберігається між переходами
-- Увімкнення/вимкнення **окремо для кожної поштової скриньки** через **Mailbox Settings → OrgPortal**
-
-### Фільтр пошуку по організації
-- Розширює стандартний пошук FreeScout фільтром **Organization**
-- Показує всі тікети клієнтів вибраної організації
-
-### End-User Portal — доступ менеджерів *(опціонально)*
-
-Менеджер організації отримує розширений доступ через EUP:
-
-- Пункт **Тікети компанії** у навігації порталу
-- Таблиця тікетів компанії з колонками:
-  - **#** і **Тема** з ellipsis-скороченням і tooltip при наведенні
-  - **Відповідальний** — призначений агент
-  - **Автор** — клієнт, що відкрив тікет; клік фільтрує тікети за автором у межах організації
-  - **Статус** — Active / Pending / Closed / Spam з іконками
-  - **Стан** — назва колонки Kanban (з кастомною міткою, якщо налаштована); відображається лише якщо модуль Kanban активний
-  - **Оновлено** — дата та час останньої відповіді
-- Пошук за темою тікета
-- Фільтри по Kanban-статусах (налаштовуються через **Mailbox Settings → OrgPortal**)
-- Відповідь на тікет з підтримкою **вкладень** (drag & drop, multi-file)
-- **Закриття тікета** — менеджер може закрити заявку; нова відповідь автоматично її відкриває
-- Зміна автора тікета — переприсвоєння заявки іншому учаснику організації
-- Сторінка **Org Settings** для налаштування email-сповіщень
-- Доступ до тікетів **строго обмежений поточною скринькою** (організація скопована до іншої скриньки — portal 403)
-
-### Email-сповіщення *(опціонально)*
-- Менеджери з увімкненою опцією отримують email при створенні нового тікета будь-яким членом організації
-- Використовує поштовий драйвер відповідного mailbox
-
-### Налаштування поштової скриньки
-
-**Mailbox Settings → OrgPortal** (окремо для кожної скриньки):
-
-| Опція | Опис |
-|-------|------|
-| Показувати плашку на сторінці тікета | Увімкнення/вимкнення badge у межах цієї скриньки |
-| Показувати плашку на картках Kanban | Увімкнення/вимкнення badge у межах цієї скриньки |
-| Фільтри статусів тікетів компанії | Вибір колонок Kanban, що відображаються як чекбокси на сторінці тікетів; кастомна мітка для кожного фільтра |
+**Minimum FreeScout version:** 1.8.147  
+**Dependencies:** none required  
+**Optional:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
 
 ---
 
-### REST API *(опціонально, потребує API and Webhooks)*
+🌐 **Also available in:**
+[Українська](docs/README.uk.md) ·
+[Deutsch](docs/README.de.md) ·
+[Français](docs/README.fr.md) ·
+[Español](docs/README.es.md) ·
+[Italiano](docs/README.it.md) ·
+[Русский](docs/README.ru.md) ·
+[Polski](docs/README.pl.md) ·
+[Čeština](docs/README.cs.md) ·
+[Slovenčina](docs/README.sk.md) ·
+[Nederlands](docs/README.nl.md) ·
+[Norsk](docs/README.no.md) ·
+[Dansk](docs/README.da.md) ·
+[Svenska](docs/README.sv.md) ·
+[Suomi](docs/README.fi.md) ·
+[Português (BR)](docs/README.pt-BR.md) ·
+[Português (PT)](docs/README.pt-PT.md) ·
+[Română](docs/README.ro.md) ·
+[中文 (简体)](docs/README.zh-CN.md)
 
-Автентифікація — заголовок `X-FreeScout-API-Key` або query-параметр `api_key`.
+---
 
-> **Інтерактивна документація** (ReDoc) доступна на сторінці **Manage → API & Webhooks** (посилання «OrgPortal API Docs») або напряму за адресою `/orgportal/admin/api-docs`.
+## Features
 
-| Метод | Endpoint | Опис |
-|-------|----------|-------|
-| `GET` | `/api/organizations` | Список організацій (пагінація, фільтр по скриньці) |
-| `POST` | `/api/organizations` | Створити організацію |
-| `GET` | `/api/organizations/{id}` | Отримати організацію з учасниками |
-| `PUT` | `/api/organizations/{id}` | Оновити організацію |
-| `DELETE` | `/api/organizations/{id}` | Видалити організацію |
-| `GET` | `/api/customers/{id}/organization` | Організація клієнта |
-| `PUT` | `/api/customers/{id}/organization` | Встановити/оновити членство клієнта |
-| `DELETE` | `/api/customers/{id}/organization` | Видалити клієнта з організації |
+### Organization management (admin)
+- **Manage → Organizations** — full CRUD: create, edit, delete organizations
+- **Mailbox binding** — an organization can be **global** (visible in all mailboxes) or **bound to a specific mailbox**; the corresponding label is shown in the organization list
+- Assign customers to organizations with role selection: `member` or `manager`
+- **Change member role** directly in the table (without removing and re-adding)
+- Customer search autocomplete by name or email; customers already in any organization are excluded from results
+- Member email is displayed below the name in the members table
+- One customer — one organization (enforced at DB and API level)
+- **Badge color** — visual palette with 12 colors in the organization edit form; default is gray
 
-#### Коди відповідей
+### User permissions
+- New permission **"Allow managing organizations"** — non-admins with this permission get access to the list, create, and edit organization pages
+- Deleting organizations remains exclusive to admins
 
-| Код | Значення |
-|-----|----------|
-| `200` | Успіх або no-op (нічого не змінилось) |
-| `201` | Ресурс створено; заголовок `Resource-ID` містить ID |
-| `400` | Помилка валідації — деталі у `_embedded.errors` |
-| `401` | Невірний або відсутній API ключ |
-| `404` | Ресурс не знайдено |
-| `409` | Конфлікт — клієнт вже є членом іншої організації |
+### Customer card
+- **Organization** field in the customer edit form — select organization and role
+- **Organization Tickets** button — opens a search for all tickets of the organization
+
+### Organization badge on tickets
+- Displayed below the subject on the ticket page and before the name in the conversation list
+- Clickable — opens a search for all tickets of this organization
+- Badge color is determined by the organization setting (default gray)
+- Enable/disable **per mailbox** via **Mailbox Settings → OrgPortal**; global value is used as fallback
+
+### Organization badge on Kanban cards
+- Displayed after the message counter on each card
+- Clickable — leads to organization search
+- Color matches the organization setting
+- **Organization** filter built into the standard Kanban filter dropdown: modal with checkboxes, similar to the tags filter; state is preserved between navigations
+- Enable/disable **per mailbox** via **Mailbox Settings → OrgPortal**
+
+### Organization search filter
+- Extends the standard FreeScout search with an **Organization** filter
+- Shows all tickets of customers belonging to the selected organization
+
+### End-User Portal — manager access *(optional)*
+
+An organization manager gets extended access through EUP:
+
+- **Company Tickets** item in the portal navigation
+- Company tickets table with columns:
+  - **#** and **Subject** with ellipsis truncation and tooltip on hover
+  - **Responsible** — assigned agent
+  - **Author** — the customer who opened the ticket; click filters tickets by author within the organization
+  - **Status** — Active / Pending / Closed / Spam with icons
+  - **State** — Kanban column name (with custom label if configured); shown only if the Kanban module is active
+  - **Updated** — date and time of the last reply
+- Search by ticket subject
+- Filters by Kanban statuses (configurable via **Mailbox Settings → OrgPortal**)
+- Reply to ticket with **attachment** support (drag & drop, multi-file)
+- **Close ticket** — manager can close a ticket; a new reply automatically reopens it
+- Change ticket author — reassign a ticket to another organization member
+- **Org Settings** page for configuring email notifications
+- Ticket access is **strictly limited to the current mailbox** (organization copied to another mailbox — portal 403)
+
+### Email notifications *(optional)*
+- Managers with the option enabled receive an email when a new ticket is created by any member of the organization
+- Uses the mail driver of the corresponding mailbox
+
+### Mailbox settings
+
+**Mailbox Settings → OrgPortal** (per mailbox):
+
+| Option | Description |
+|--------|-------------|
+| Show badge on ticket page | Enable/disable badge within this mailbox |
+| Show badge on Kanban cards | Enable/disable badge within this mailbox |
+| Company ticket status filters | Select Kanban columns displayed as checkboxes on the tickets page; custom label for each filter |
+
+---
+
+### REST API *(optional, requires API and Webhooks)*
+
+Authentication — `X-FreeScout-API-Key` header or `api_key` query parameter.
+
+> **Interactive documentation** (ReDoc) is available on the **Manage → API & Webhooks** page (link "OrgPortal API Docs") or directly at `/orgportal/admin/api-docs`.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/organizations` | List organizations (pagination, mailbox filter) |
+| `POST` | `/api/organizations` | Create an organization |
+| `GET` | `/api/organizations/{id}` | Get organization with members |
+| `PUT` | `/api/organizations/{id}` | Update organization |
+| `DELETE` | `/api/organizations/{id}` | Delete organization |
+| `GET` | `/api/customers/{id}/organization` | Customer's organization |
+| `PUT` | `/api/customers/{id}/organization` | Set/update customer membership |
+| `DELETE` | `/api/customers/{id}/organization` | Remove customer from organization |
+
+#### Response codes
+
+| Code | Meaning |
+|------|---------|
+| `200` | Success or no-op (nothing changed) |
+| `201` | Resource created; `Resource-ID` header contains the ID |
+| `400` | Validation error — details in `_embedded.errors` |
+| `401` | Invalid or missing API key |
+| `404` | Resource not found |
+| `409` | Conflict — customer already belongs to another organization |
 
 ---
 
@@ -117,11 +139,11 @@
 
 **Query parameters**
 
-| Параметр | Тип | За замовч. | Опис |
-|----------|-----|:---:|------|
-| `page` | integer | `1` | Номер сторінки |
-| `pageSize` | integer | `25` | Кількість записів (макс. 100) |
-| `mailboxId` | integer | — | Фільтр по скриньці: повертає глобальні організації + прив'язані до цієї скриньки |
+| Parameter | Type | Default | Description |
+|-----------|------|:-------:|-------------|
+| `page` | integer | `1` | Page number |
+| `pageSize` | integer | `25` | Records per page (max 100) |
+| `mailboxId` | integer | — | Mailbox filter: returns global organizations + those bound to this mailbox |
 
 ```bash
 curl -X GET "https://your-freescout.com/api/organizations?mailboxId=3" \
@@ -152,10 +174,10 @@ curl -X GET "https://your-freescout.com/api/organizations?mailboxId=3" \
 
 **Request body**
 
-| Поле | Тип | Обов'язковий | Опис |
-|------|-----|:---:|------|
-| `name` | string | ✅ | Назва організації (макс. 255 символів, унікальна) |
-| `mailboxId` | integer\|null | — | ID скриньки або `null` / не передавати для глобальної організації |
+| Field | Type | Required | Description |
+|-------|------|:--------:|-------------|
+| `name` | string | ✅ | Organization name (max 255 chars, unique) |
+| `mailboxId` | integer\|null | — | Mailbox ID or `null` / omit for global organization |
 
 ```bash
 curl -X POST "https://your-freescout.com/api/organizations" \
@@ -164,7 +186,7 @@ curl -X POST "https://your-freescout.com/api/organizations" \
   -d '{"name": "Acme Corp", "mailboxId": 3}'
 ```
 
-**201 Created** *(заголовок `Resource-ID: 1`)*
+**201 Created** *(header `Resource-ID: 1`)*
 ```json
 {
   "id": 1,
@@ -209,10 +231,10 @@ curl -X POST "https://your-freescout.com/api/organizations" \
 
 **Request body**
 
-| Поле | Тип | Обов'язковий | Опис |
-|------|-----|:---:|------|
-| `name` | string | ✅ | Нова назва організації (макс. 255 символів, унікальна) |
-| `mailboxId` | integer\|null | — | Нова скринька; `null` — зробити глобальною; не передавати — залишити без змін |
+| Field | Type | Required | Description |
+|-------|------|:--------:|-------------|
+| `name` | string | ✅ | New organization name (max 255 chars, unique) |
+| `mailboxId` | integer\|null | — | New mailbox; `null` — make global; omit — leave unchanged |
 
 ```bash
 curl -X PUT "https://your-freescout.com/api/organizations/1" \
@@ -230,7 +252,7 @@ curl -X PUT "https://your-freescout.com/api/organizations/1" \
 
 #### DELETE /api/organizations/{id}
 
-**200 OK** *(всі учасники каскадно видаляються)*
+**200 OK** *(all members are cascaded deleted)*
 ```json
 {"success": true, "message": "Organization deleted."}
 ```
@@ -254,14 +276,14 @@ curl -X PUT "https://your-freescout.com/api/organizations/1" \
 
 #### PUT /api/customers/{id}/organization
 
-Призначає клієнта до організації або оновлює його роль. **Один клієнт — одна організація**: якщо клієнт вже є членом *іншої* організації, запит відхиляється з `409 Conflict`. Для переведення — спочатку видаліть поточне членство через `DELETE`.
+Assigns a customer to an organization or updates their role. **One customer — one organization**: if the customer is already a member of *another* organization, the request is rejected with `409 Conflict`. To transfer — first remove the current membership via `DELETE`.
 
 **Request body**
 
-| Поле | Тип | Обов'язковий | Опис |
-|------|-----|:---:|------|
-| `organizationId` | integer | ✅ | ID організації |
-| `role` | string | — | `"member"` (за замовчуванням) або `"manager"` |
+| Field | Type | Required | Description |
+|-------|------|:--------:|-------------|
+| `organizationId` | integer | ✅ | Organization ID |
+| `role` | string | — | `"member"` (default) or `"manager"` |
 
 ```bash
 curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
@@ -270,17 +292,17 @@ curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
   -d '{"organizationId": 1, "role": "manager"}'
 ```
 
-**201 Created** *(нове членство)*
+**201 Created** *(new membership)*
 ```json
 {"success": true, "message": "Membership created."}
 ```
 
-**200 OK** *(роль оновлено або no-op)*
+**200 OK** *(role updated or no-op)*
 ```json
 {"success": true, "message": "Membership updated."}
 ```
 
-**409 Conflict** *(клієнт уже в іншій організації)*
+**409 Conflict** *(customer already in another organization)*
 ```json
 {
   "message": "Customer already belongs to another organization.",
@@ -308,70 +330,71 @@ curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
 
 ---
 
-## Встановлення
+## Installation
 
-1. Скопіюйте папку `OrgPortal` у `Modules/` вашого FreeScout
-2. У адмін-панелі: **Manage → Modules → OrgPortal → Activate**
-3. Запустіть міграції:
+1. Copy the `OrgPortal` folder into `Modules/` of your FreeScout
+2. In the admin panel: **Manage → Modules → OrgPortal → Activate**
+3. Run migrations:
    ```bash
    php artisan module:migrate OrgPortal
    ```
-4. Очистіть кеш:
+4. Clear cache:
    ```bash
    php artisan cache:clear && php artisan config:clear
    ```
 
 ---
 
-## Сумісність з модулями
+## Module compatibility
 
-| Модуль | Статус |
+| Module | Status |
 |--------|--------|
-| End-User Portal ≥ 1.0.85 | Опціональний — портальні функції для менеджерів |
-| API and Webhooks ≥ 1.0.80 | Опціональний — REST API endpoints |
-| Kanban ≥ 1.0.23 | Опціональний — плашка, фільтр, колонка «Стан» у тікетах компанії |
-| Custom Fields | Сумісний |
-| Workflows | Сумісний |
-| Tags | Сумісний |
+| End-User Portal ≥ 1.0.85 | Optional — portal features for managers |
+| API and Webhooks ≥ 1.0.80 | Optional — REST API endpoints |
+| Kanban ≥ 1.0.23 | Optional — badge, filter, "State" column in company tickets |
+| Custom Fields | Compatible |
+| Workflows | Compatible |
+| Tags | Compatible |
 
 ---
 
-## Налаштування
+## Configuration
 
-### Глобальні (**Manage → OrgPortal Settings**)
+### Global (**Manage → OrgPortal Settings**)
 
-| Опція | За замовчуванням |
-|-------|-----------------|
-| Показувати плашку на сторінці тікета | ✅ |
-| Показувати плашку на картках Kanban | ✅ |
+| Option | Default |
+|--------|---------|
+| Show badge on ticket page | ✅ |
+| Show badge on Kanban cards | ✅ |
 
 ### Per-mailbox (**Mailbox Settings → OrgPortal**)
 
-Перекривають глобальні значення для конкретної скриньки.
+Overrides global values for the specific mailbox.
 
-| Опція | Опис |
-|-------|------|
-| Показувати плашку на сторінці тікета | Badge у списку розмов та на сторінці тікета |
-| Показувати плашку на картках Kanban | Badge на картках Kanban |
-| Фільтри статусів тікетів компанії | Колонки Kanban як чекбокси на сторінці тікетів компанії; для кожного фільтра задається кастомна мітка, яку бачать користувачі порталу |
-
----
-
-## Переклади
-
-Підтримуються мови: **English** (`en`), **Ukrainian** (`uk`), **Romanian** (`ro`), **Georgian** (`ka`).  
-Файли: `Modules/OrgPortal/Resources/lang/{locale}/messages.php`
-
-### Інтеграція з EUPSWLANG
-
-Модуль коректно працює з [EUP Switch Language](https://freescout.net/module/eup-sw-lang/): вибір мови в порталі застосовується і до рядків OrgPortal.
-
-Для відображення мови у списку EUPSWLANG потрібен відповідний файл `Modules/EndUserPortal/Resources/lang/{locale}.json`. Файли для **Romanian** (`ro`) включені в поставку; **Georgian** (`ka`) підтримується лише в адмін-частині (нема системної підтримки у FreeScout core).
-
-> **Технічна деталь:** `ReapplyEupLocale` middleware (реєструється останнім у portal route group) відновлює locale після `Localize` middleware FreeScout, який інакше скидав би вибір мови порталу до системного дефолту.
+| Option | Description |
+|--------|-------------|
+| Show badge on ticket page | Badge in conversation list and on ticket page |
+| Show badge on Kanban cards | Badge on Kanban cards |
+| Company ticket status filters | Kanban columns as checkboxes on the company tickets page; each filter has a custom label visible to portal users |
 
 ---
 
-## Ліцензія
+## Translations
+
+Supported languages: **English** (`en`), **Ukrainian** (`uk`), **Romanian** (`ro`), **Georgian** (`ka`), **German** (`de`), **French** (`fr`), **Spanish** (`es`), **Italian** (`it`), **Czech** (`cs`), **Slovak** (`sk`), **Polish** (`pl`), **Dutch** (`nl`), **Norwegian** (`no`), **Danish** (`da`), **Swedish** (`sv`), **Finnish** (`fi`), **Portuguese BR** (`pt-BR`), **Portuguese PT** (`pt-PT`), **Chinese Simplified** (`zh-CN`).
+
+Files: `Modules/OrgPortal/Resources/lang/{locale}/messages.php`
+
+### EUPSWLANG integration
+
+The module works correctly with [EUP Switch Language](https://freescout.net/module/eup-sw-lang/): the language selected in the portal also applies to OrgPortal strings.
+
+For a language to appear in the EUPSWLANG list, the corresponding `Modules/EndUserPortal/Resources/lang/{locale}.json` file must exist. Files for **Romanian** (`ro`) are included in the package; **Georgian** (`ka`) is only supported in the admin section (no system support in FreeScout core).
+
+> **Technical detail:** `ReapplyEupLocale` middleware (registered last in the portal route group) restores the locale after FreeScout's `Localize` middleware, which would otherwise reset the portal language selection to the system default.
+
+---
+
+## License
 
 Proprietary — ASTIN UA.
