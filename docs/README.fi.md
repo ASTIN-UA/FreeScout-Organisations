@@ -331,6 +331,8 @@ curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
 
 OrgPortal tukee **automaattisia päivityksiä** FreeScout-ohjelmiston sisäänrakennetun moduulin päivitysmekanismin kautta.
 
+> **Requires FreeScout 1.8.170 or later.** On older versions the update banner will not appear — update the module manually by replacing the `OrgPortal` folder with the latest release ZIP.
+
 Kun uusi versio on saatavilla, banderolli ilmestyy sivulle **Hallinta → Moduulit**. Napsauta **Päivitä nyt** — FreeScout lataa ja asentaa uusimman version automaattisesti.
 
 Manuaalista tiedostojen kopiointia ei tarvita.

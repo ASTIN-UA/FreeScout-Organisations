@@ -275,6 +275,8 @@ Přiřadí zákazníka organizaci nebo aktualizuje jeho roli. **Jeden zákazník
 
 OrgPortal podporuje **automatické aktualizace** prostřednictvím integrovaného mechanismu aktualizace modulů FreeScout.
 
+> **Requires FreeScout 1.8.170 or later.** On older versions the update banner will not appear — update the module manually by replacing the `OrgPortal` folder with the latest release ZIP.
+
 Když je dostupná nová verze, na stránce **Správa → Moduly** se zobrazí banner. Kliknutím na **Aktualizovat nyní** — FreeScout automaticky stáhne a nainstaluje nejnovější verzi.
 
 Není vyžadováno ruční kopírování souborů.

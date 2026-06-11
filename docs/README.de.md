@@ -275,6 +275,8 @@ Weist einen Kunden einer Organisation zu oder aktualisiert seine Rolle. **Ein Ku
 
 OrgPortal unterstützt **automatische Updates** über den integrierten Modul-Update-Mechanismus von FreeScout.
 
+> **Requires FreeScout 1.8.170 or later.** On older versions the update banner will not appear — update the module manually by replacing the `OrgPortal` folder with the latest release ZIP.
+
 Wenn eine neue Version verfügbar ist, erscheint ein Banner auf der Seite **Verwalten → Module**. Klicken Sie auf **Jetzt aktualisieren** — FreeScout lädt und installiert die neueste Version automatisch herunter.
 
 Keine manuelle Dateikopie erforderlich.

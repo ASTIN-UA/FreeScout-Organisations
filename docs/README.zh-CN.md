@@ -329,6 +329,8 @@ curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
 
 OrgPortal 通过 FreeScout 内置的模块更新机制支持**自动更新**。
 
+> **Requires FreeScout 1.8.170 or later.** On older versions the update banner will not appear — update the module manually by replacing the `OrgPortal` folder with the latest release ZIP.
+
 当有新版本可用时，**管理 → 模块**页面上将出现一个横幅。单击**立即更新** — FreeScout 将自动下载并安装最新版本。
 
 无需手动复制文件。
