@@ -182,4 +182,4 @@
 
 ## Ліцензія
 
-Proprietary — ASTIN UA.
+[MIT](../../LICENSE) — © 2026 ASTIN-UA

@@ -389,4 +389,4 @@ For at et sprog skal vises på EUPSWLANG-listen, skal den tilsvarende `Modules/E
 
 ## Licens
 
-Proprietær — ASTIN UA.
+[MIT](../LICENSE) — © 2026 ASTIN-UA

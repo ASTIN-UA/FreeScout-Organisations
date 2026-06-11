@@ -4,7 +4,7 @@
     "description": "Organization Portal — organization management with End-User Portal integration for FreeScout",
     "version": "1.0.2",
     "detailsUrl": "https://github.com/ASTIN-UA/FreeScout-Organisations/blob/main/CHANGELOG.md",
-    "author": "ASTIN UA",
+    "author": "ASTIN-UA",
     "authorUrl": "https://github.com/ASTIN-UA",
     "latestVersionUrl": "https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/Modules/OrgPortal/module.json",
     "latestVersionZipUrl": "https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest/download/OrgPortal.zip",

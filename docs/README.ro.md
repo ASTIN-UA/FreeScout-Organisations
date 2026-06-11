@@ -387,4 +387,4 @@ Pentru ca o limbă să apară în lista EUPSWLANG, fișierul `Modules/EndUserPor
 
 ## Licență
 
-Proprietary — ASTIN UA.
+[MIT](../LICENSE) — © 2026 ASTIN-UA

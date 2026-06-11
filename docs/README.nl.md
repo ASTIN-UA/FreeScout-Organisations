@@ -389,4 +389,4 @@ Opdat een taal in de EUPSWLANG-lijst verschijnt, moet het overeenkomstige bestan
 
 ## Licentie
 
-Eigendom — ASTIN UA.
+[MIT](../LICENSE) — © 2026 ASTIN-UA

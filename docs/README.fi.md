@@ -389,4 +389,4 @@ Jotta kieli ilmestyy EUPSWLANG-luetteloon, vastaava `Modules/EndUserPortal/Resou
 
 ## Lisenssi
 
-Omaisuusperäinen — ASTIN UA.
+[MIT](../LICENSE) — © 2026 ASTIN-UA

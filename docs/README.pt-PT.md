@@ -387,4 +387,4 @@ Para um idioma aparecer na lista EUPSWLANG, o ficheiro `Modules/EndUserPortal/Re
 
 ## Licença
 
-Proprietary — ASTIN UA.
+[MIT](../LICENSE) — © 2026 ASTIN-UA

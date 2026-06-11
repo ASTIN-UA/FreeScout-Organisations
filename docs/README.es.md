@@ -389,4 +389,4 @@ Para que un idioma aparezca en la lista EUPSWLANG, el archivo correspondiente `M
 
 ## Licencia
 
-Propietaria — ASTIN UA.
+[MIT](../LICENSE) — © 2026 ASTIN-UA

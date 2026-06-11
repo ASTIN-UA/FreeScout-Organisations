@@ -333,4 +333,4 @@ Aby język pojawił się na liście EUPSWLANG, musi istnieć plik `Modules/EndUs
 
 ## Licencja
 
-Własnościowa — ASTIN UA.
+[MIT](../LICENSE) — © 2026 ASTIN-UA

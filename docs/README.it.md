@@ -389,4 +389,4 @@ Affinché una lingua appaia nell'elenco EUPSWLANG, il file corrispondente `Modul
 
 ## Licenza
 
-Proprietaria — ASTIN UA.
+[MIT](../LICENSE) — © 2026 ASTIN-UA

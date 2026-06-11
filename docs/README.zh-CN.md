@@ -387,4 +387,4 @@ OrgPortal 通过 FreeScout 内置的模块更新机制支持**自动更新**。
 
 ## 许可证
 
-Proprietary — ASTIN UA.
+[MIT](../LICENSE) — © 2026 ASTIN-UA

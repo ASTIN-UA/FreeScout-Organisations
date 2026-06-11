@@ -333,4 +333,4 @@ Pour qu'une langue apparaisse dans la liste EUPSWLANG, le fichier correspondant 
 
 ## Licence
 
-Propriétaire — ASTIN UA.
+[MIT](../LICENSE) — © 2026 ASTIN-UA

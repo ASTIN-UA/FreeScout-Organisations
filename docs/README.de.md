@@ -333,4 +333,4 @@ Damit eine Sprache in der EUPSWLANG-Liste angezeigt wird, muss die entsprechende
 
 ## Lizenz
 
-Proprietär — ASTIN UA.
+[MIT](../LICENSE) — © 2026 ASTIN-UA

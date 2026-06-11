@@ -333,4 +333,4 @@ Aby sa jazyk objavil v zozname EUPSWLANG, musí existovať zodpovedajúci súbor
 
 ## Licencia
 
-Proprietária — ASTIN UA.
+[MIT](../LICENSE) — © 2026 ASTIN-UA
