@@ -2,6 +2,12 @@
 
 All notable changes to OrgPortal are documented here.
 
+## [1.0.3] — 2026-06-11
+
+### Changed
+- Cosmetic: licence corrected to MIT across all localised READMEs
+- Cosmetic: author name standardised to ASTIN-UA throughout documentation
+
 ## [1.0.2] — 2026-06-10
 
 ### Fixed
