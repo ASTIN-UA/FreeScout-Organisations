@@ -120,10 +120,6 @@ Authentication — `X-FreeScout-API-Key` header or `api_key` query parameter.
 | `GET` | `/api/customers/{id}/organization` | Customer's organization |
 | `PUT` | `/api/customers/{id}/organization` | Set/update customer membership |
 | `DELETE` | `/api/customers/{id}/organization` | Remove customer from organization |
-| `GET` | `/api/mailboxes` | List mailboxes *(FreeScout base)* |
-| `GET` | `/api/mailboxes/{id}` | Get mailbox by ID *(FreeScout base)* |
-| `GET` | `/api/customers` | List customers *(FreeScout base)* |
-| `GET` | `/api/customers/{id}` | Get customer by ID *(FreeScout base)* |
 
 #### Response codes
 
@@ -331,61 +327,6 @@ curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
 {"success": true, "message": "Membership removed."}
 ```
 
----
-
----
-
-#### GET /api/mailboxes *(FreeScout base)*
-
-Returns all mailboxes. Use the returned `id` as `mailboxId` when creating or filtering organizations.
-
-```bash
-curl -X GET "https://your-freescout.com/api/mailboxes" \
-  -H "X-FreeScout-API-Key: YOUR_API_KEY"
-```
-
-**200 OK**
-```json
-{
-  "_embedded": {
-    "mailboxes": [
-      { "id": 1, "name": "Support", "email": "support@example.com", "createdAt": "...", "updatedAt": "..." },
-      { "id": 2, "name": "Sales",   "email": "sales@example.com",   "createdAt": "...", "updatedAt": "..." }
-    ]
-  }
-}
-```
-
----
-
-#### GET /api/customers *(FreeScout base)*
-
-**Query parameters**
-
-| Parameter | Type | Default | Description |
-|-----------|------|:-------:|-------------|
-| `email` | string | — | Filter by email address |
-| `page` | integer | `1` | Page number |
-| `pageSize` | integer | `25` | Records per page (max 100) |
-
-```bash
-curl -X GET "https://your-freescout.com/api/customers?email=john@acme.com" \
-  -H "X-FreeScout-API-Key: YOUR_API_KEY"
-```
-
-**200 OK**
-```json
-{
-  "_embedded": {
-    "customers": [
-      { "id": 42, "firstName": "John", "lastName": "Doe", "email": "john@acme.com", "createdAt": "...", "updatedAt": "..." }
-    ]
-  },
-  "page": { "size": 25, "totalElements": 1, "totalPages": 1, "number": 1 }
-}
-```
-
----
 
 ## Installation
 
