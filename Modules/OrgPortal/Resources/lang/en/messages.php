@@ -98,12 +98,12 @@ return [
 
     // Portal — settings tabs
     'tab_notifications'      => 'Notifications',
-    'tab_units'              => 'Units',
+    'tab_units'              => 'Structural Units',
 
     // Portal — structural units
-    'unit_name'              => 'Unit name',
+    'unit_name'              => 'Structural unit name',
     'unit_name_placeholder'  => 'e.g. Sales department',
-    'add_unit'               => 'Add unit',
+    'add_unit'               => 'Add structural unit',
     'rename'                 => 'Rename',
     'no_units'               => 'No units yet.',
     'unit_created'           => 'Unit created.',
@@ -113,7 +113,7 @@ return [
     'confirm_delete_unit'    => 'Delete this unit? Its members will be unassigned and unit managers demoted to members.',
 
     // Portal — member management
-    'member_unit'            => 'Unit',
+    'member_unit'            => 'Structural unit',
     'no_unit'                => 'Entire organization',
     'apply'                  => 'Apply',
     'role_member'            => 'Member',

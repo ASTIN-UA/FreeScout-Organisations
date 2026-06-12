@@ -110,7 +110,8 @@ class OrgPortalFrontController extends Controller
         $customer = $this->authCustomer();
         $member   = $this->requireManager($customer, $mailbox);
 
-        $orgMemberIds   = $this->visibleCustomerIds($member);
+        $org          = $member->organization;
+        $orgMemberIds = $this->visibleCustomerIds($member);
 
         $orderField     = 'last_reply_at';
         $orderDirection = $request->input('order', 'desc');
@@ -119,21 +120,58 @@ class OrgPortalFrontController extends Controller
         $closed         = (bool) $request->input('closed', false);
         $direction      = $orderDirection === 'asc' ? 'desc' : 'asc';
 
+        // Unit filter — only global managers can filter by unit
+        $unitId = null;
+        $units  = collect();
+        if ($member->isGlobalManager()) {
+            $units  = $org->units()->orderBy('name')->get();
+            $unitId = (int) $request->input('unit_id', 0) ?: null;
+            if ($unitId && !$units->contains('id', $unitId)) {
+                $unitId = null;
+            }
+        }
+
+        // If filtering by unit, narrow member IDs to that unit only
+        $filteredMemberIds = $orgMemberIds;
+        if ($unitId) {
+            $filteredMemberIds = OrganizationMember::where('organization_id', $org->id)
+                ->where('unit_id', $unitId)
+                ->pluck('customer_id');
+        }
+
         $authorId   = (int) $request->input('author_id', 0) ?: null;
         $authorName = null;
         if ($authorId) {
             $author     = Customer::find($authorId);
             $authorName = $author ? trim($author->getFullName()) : null;
             if (!$authorName || !$orgMemberIds->contains($authorId)) {
-                $authorId = null; // ignore invalid / out-of-org author filter
+                $authorId = null;
             }
         }
 
-        $builder = Conversation::whereIn('customer_id', $orgMemberIds)
+        $builder = Conversation::whereIn('customer_id', $filteredMemberIds)
             ->where('mailbox_id', $mailbox->id)
             ->where('state', '!=', Conversation::STATE_DELETED)
             ->with(['customer', 'user'])
-            ->when($searchField, fn ($q) => $q->where('subject', 'like', "%{$searchField}%"))
+            ->when($searchField, function ($q) use ($searchField, $orgMemberIds) {
+                // Search by subject, ticket number, or author name
+                $num = preg_replace('/\D/', '', $searchField);
+                $matchingCustomerIds = Customer::whereIn('id', $orgMemberIds)
+                    ->where(function ($cq) use ($searchField) {
+                        $cq->where(\DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%{$searchField}%")
+                           ->orWhere('first_name', 'like', "%{$searchField}%")
+                           ->orWhere('last_name',  'like', "%{$searchField}%");
+                    })->pluck('id');
+                $q->where(function ($sq) use ($searchField, $num, $matchingCustomerIds) {
+                    $sq->where('subject', 'like', "%{$searchField}%");
+                    if ($num !== '') {
+                        $sq->orWhere('number', (int) $num);
+                    }
+                    if ($matchingCustomerIds->isNotEmpty()) {
+                        $sq->orWhereIn('customer_id', $matchingCustomerIds);
+                    }
+                });
+            })
             ->when($authorId,    fn ($q) => $q->where('customer_id', $authorId))
             ->when($closed,      fn ($q) => $q->where('status', Conversation::STATUS_CLOSED),
                                  fn ($q) => $q->where('status', '!=', Conversation::STATUS_SPAM))
@@ -179,13 +217,14 @@ class OrgPortalFrontController extends Controller
             'status'      => $status       ?: null,
             'author_id'   => $authorId     ?: null,
             'closed'      => $closed       ?: null,
+            'unit_id'     => $unitId       ?: null,
         ]));
 
         return view('orgportal::portal.company_tickets', [
             'mailbox'      => $mailbox,
             'mailbox_id'   => $mailbox_id,
             'customer'     => $customer,
-            'organization' => $member->organization,
+            'organization' => $org,
             'tickets'      => $tickets,
             'sortField'    => $orderField,
             'direction'    => $direction,
@@ -194,6 +233,8 @@ class OrgPortalFrontController extends Controller
             'closed'       => $closed,
             'authorId'     => $authorId,
             'authorName'   => $authorName,
+            'units'        => $units,
+            'unitId'       => $unitId,
         ]);
     }
 
