@@ -34,12 +34,50 @@ class OrgPortalAdminController extends Controller
         }
     }
 
+    protected function authorizeManage()
+    {
+        if (!auth()->user() || !\Modules\OrgPortal\Providers\OrgPortalServiceProvider::userCanManageOrganizations(auth()->user())) {
+            abort(403);
+        }
+    }
+
+    protected function authorizeTemplates()
+    {
+        if (!auth()->user() || !\Modules\OrgPortal\Providers\OrgPortalServiceProvider::userCanManageTemplates(auth()->user())) {
+            abort(403);
+        }
+    }
+
     public function index()
     {
+        $this->authorizeManage();
+
         $organizations = Organization::withCount('members')->with('mailbox')->orderBy('name')->paginate(20);
 
+        $SP = \Modules\OrgPortal\Providers\OrgPortalServiceProvider::class;
+        $canManageTemplates = $SP::userCanManageTemplates(auth()->user());
+
+        $tplEvents    = [];
+        $tplTemplates = [];
+        if ($canManageTemplates) {
+            $tplEvents = [
+                'new_ticket'     => __('orgportal::messages.notif_event_new_ticket'),
+                'reply_agent'    => __('orgportal::messages.notif_event_reply_agent'),
+                'reply_customer' => __('orgportal::messages.notif_event_reply_customer'),
+            ];
+            foreach (array_keys($tplEvents) as $event) {
+                $tplTemplates[$event] = [
+                    'subject' => \Option::get('orgportal.tpl_' . $event . '_subject', ''),
+                    'body'    => \Option::get('orgportal.tpl_' . $event . '_body', ''),
+                ];
+            }
+        }
+
         return view('orgportal::admin.index', [
-            'organizations' => $organizations,
+            'organizations'      => $organizations,
+            'tplEvents'          => $tplEvents,
+            'tplTemplates'       => $tplTemplates,
+            'canManageTemplates' => $canManageTemplates,
         ]);
     }
 
@@ -345,6 +383,38 @@ class OrgPortalAdminController extends Controller
 
         return redirect()->route('orgportal.admin.mailbox-settings', $id)
             ->with('flash_success', __('orgportal::messages.settings_saved'));
+    }
+
+    public function globalSettings()
+    {
+        $this->authorizeTemplates();
+        return redirect()->route('orgportal.admin.index', ['tab' => 'templates']);
+    }
+
+    public function saveGlobalSettings(Request $request)
+    {
+        $this->authorizeTemplates();
+
+        foreach (['new_ticket', 'reply_agent', 'reply_customer'] as $event) {
+            \Option::set('orgportal.tpl_' . $event . '_subject',
+                strip_tags((string) $request->input('tpl_' . $event . '_subject', '')));
+            \Option::set('orgportal.tpl_' . $event . '_body',
+                self::sanitizeHtml((string) $request->input('tpl_' . $event . '_body', '')));
+        }
+
+        return redirect()->route('orgportal.admin.index', ['tab' => 'templates'])
+            ->with('flash_success', __('orgportal::messages.settings_saved'));
+    }
+
+    protected static function sanitizeHtml(string $html): string
+    {
+        $html = preg_replace('/<\s*script\b[^>]*>.*?<\s*\/\s*script\s*>/is', '', $html);
+        $html = preg_replace('/<\s*script\b[^>]*>/is', '', $html);
+        $html = preg_replace('/\bon\w+\s*=\s*["\'][^"\']*["\']/i', '', $html);
+        $html = preg_replace('/\bon\w+\s*=\s*\S+/i', '', $html);
+        $html = preg_replace('/href\s*=\s*["\']?\s*javascript\s*:/i', 'href="', $html);
+        $html = preg_replace('/src\s*=\s*["\']?\s*javascript\s*:/i', 'src="', $html);
+        return $html;
     }
 
     /**

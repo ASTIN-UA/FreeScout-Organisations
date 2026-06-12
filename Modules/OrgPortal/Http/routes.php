@@ -61,6 +61,12 @@ Route::group([
 
     Route::get('api-docs', 'OrgPortalAdminController@apiDocs')
         ->name('orgportal.admin.api-docs');
+
+    Route::get('settings', 'OrgPortalAdminController@globalSettings')
+        ->name('orgportal.admin.settings');
+
+    Route::post('settings', 'OrgPortalAdminController@saveGlobalSettings')
+        ->name('orgportal.admin.settings.save');
 });
 
 // ─── Per-mailbox admin routes ─────────────────────────────────────────────────

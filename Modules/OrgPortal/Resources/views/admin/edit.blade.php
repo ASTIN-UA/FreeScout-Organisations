@@ -180,13 +180,22 @@
                             <thead>
                                 <tr>
                                     <th>{{ __('orgportal::messages.name') }}</th>
-                                    <th>{{ __('orgportal::messages.member_unit') }} / {{ __('orgportal::messages.role') }}</th>
-                                    <th>{{ __('orgportal::messages.member_status') }}</th>
+                                    <th style="width:160px">{{ __('orgportal::messages.member_unit') }}</th>
+                                    <th style="width:120px">{{ __('orgportal::messages.role') }}</th>
+                                    <th style="width:1px;white-space:nowrap">{{ __('orgportal::messages.can_manage_org') }}</th>
+                                    <th style="width:80px">{{ __('orgportal::messages.member_status') }}</th>
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($members as $member)
+                                {{-- hidden form for role/unit update; inputs below use form="mf-{id}" --}}
+                                <form id="mf-{{ $member->id }}"
+                                      method="POST"
+                                      action="{{ route('orgportal.admin.members.role', [$organization->id, $member->id]) }}"
+                                      style="display:none">
+                                    {{ csrf_field() }}
+                                </form>
                                 <tr class="{{ $member->is_active ? '' : 'text-muted' }}">
                                     <td>
                                         @if($member->customer)
@@ -200,26 +209,24 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <form method="POST"
-                                              action="{{ route('orgportal.admin.members.role', [$organization->id, $member->id]) }}"
-                                              style="display:inline-flex;gap:4px;align-items:center;flex-wrap:wrap">
-                                            {{ csrf_field() }}
-                                            <select name="unit_id" class="form-control input-sm" style="width:auto">
-                                                <option value="">{{ __('orgportal::messages.no_unit') }}</option>
-                                                @foreach($units as $unit)
-                                                    <option value="{{ $unit->id }}" {{ $member->unit_id === $unit->id ? 'selected' : '' }}>{{ $unit->name }}</option>
-                                                @endforeach
-                                            </select>
-                                            <select name="role" class="form-control input-sm" style="width:auto">
-                                                <option value="member"  {{ $member->role === 'member'  ? 'selected' : '' }}>{{ __('orgportal::messages.member') }}</option>
-                                                <option value="manager" {{ $member->role === 'manager' ? 'selected' : '' }}>{{ __('orgportal::messages.manager') }}</option>
-                                            </select>
-                                            <label style="font-weight:normal;font-size:12px;margin:0;" title="{{ __('orgportal::messages.can_manage_org_hint') }}">
-                                                <input type="checkbox" name="can_manage_org" value="1" {{ $member->can_manage_org ? 'checked' : '' }}>
-                                                {{ __('orgportal::messages.can_manage_org') }}
-                                            </label>
-                                            <button type="submit" class="btn btn-xs btn-primary" title="{{ __('orgportal::messages.save') }}">✓</button>
-                                        </form>
+                                        <select name="unit_id" form="mf-{{ $member->id }}" class="form-control input-sm" style="width:100%">
+                                            <option value="">{{ __('orgportal::messages.no_unit') }}</option>
+                                            @foreach($units as $unit)
+                                                <option value="{{ $unit->id }}" {{ $member->unit_id === $unit->id ? 'selected' : '' }}>{{ $unit->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="role" form="mf-{{ $member->id }}" class="form-control input-sm" style="width:100%">
+                                            <option value="member"  {{ $member->role === 'member'  ? 'selected' : '' }}>{{ __('orgportal::messages.member') }}</option>
+                                            <option value="manager" {{ $member->role === 'manager' ? 'selected' : '' }}>{{ __('orgportal::messages.manager') }}</option>
+                                        </select>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" name="can_manage_org" value="1"
+                                               form="mf-{{ $member->id }}"
+                                               {{ $member->can_manage_org ? 'checked' : '' }}
+                                               title="{{ __('orgportal::messages.can_manage_org_hint') }}">
                                     </td>
                                     <td>
                                         @if($member->is_active)
@@ -229,6 +236,7 @@
                                         @endif
                                     </td>
                                     <td class="text-right" style="white-space:nowrap">
+                                        <button type="submit" form="mf-{{ $member->id }}" class="btn btn-xs btn-primary" title="{{ __('orgportal::messages.save') }}">✓</button>
                                         <form method="POST"
                                               action="{{ route('orgportal.admin.members.toggle', [$organization->id, $member->id]) }}"
                                               style="display:inline">
