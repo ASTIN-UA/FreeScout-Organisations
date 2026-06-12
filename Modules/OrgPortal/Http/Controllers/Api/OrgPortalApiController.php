@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\OrgPortal\Models\Organization;
 use Modules\OrgPortal\Models\OrganizationMember;
+use Modules\OrgPortal\Models\OrganizationUnit;
 
 class OrgPortalApiController extends Controller
 {
@@ -67,9 +68,21 @@ class OrgPortalApiController extends Controller
 
         if ($withMembers) {
             $data['_embedded']['members'] = $org->members->map(fn ($m) => $this->memberToArray($m))->values()->all();
+            $data['_embedded']['units']   = $org->units->map(fn ($u) => $this->unitToArray($u))->values()->all();
         }
 
         return $data;
+    }
+
+    private function unitToArray(OrganizationUnit $u): array
+    {
+        return [
+            'id'             => $u->id,
+            'organizationId' => $u->organization_id,
+            'name'           => $u->name,
+            'createdAt'      => $u->created_at->toIso8601String(),
+            'updatedAt'      => $u->updated_at->toIso8601String(),
+        ];
     }
 
     private function memberToArray(OrganizationMember $m): array
@@ -77,8 +90,11 @@ class OrgPortalApiController extends Controller
         return [
             'id'                 => $m->id,
             'organizationId'     => $m->organization_id,
+            'unitId'             => $m->unit_id,
             'customerId'         => $m->customer_id,
             'role'               => $m->role,
+            'canManageOrg'       => (bool) $m->can_manage_org,
+            'isActive'           => (bool) $m->is_active,
             'notifyOnNewTicket'  => (bool) $m->notify_on_new_ticket,
             'createdAt'          => $m->created_at->toIso8601String(),
             'updatedAt'          => $m->updated_at->toIso8601String(),
@@ -166,7 +182,7 @@ class OrgPortalApiController extends Controller
      */
     public function getOrganization(int $id): JsonResponse
     {
-        $org = Organization::with('members')->find($id);
+        $org = Organization::with('members', 'units')->find($id);
 
         if (!$org) {
             return $this->errorResponse('Organization not found.', 404);
@@ -262,7 +278,11 @@ class OrgPortalApiController extends Controller
             'customerId'         => $member->customer_id,
             'organizationId'     => $member->organization_id,
             'organizationName'   => optional($member->organization)->name,
+            'unitId'             => $member->unit_id,
+            'unitName'           => optional($member->unit)->name,
             'role'               => $member->role,
+            'canManageOrg'       => (bool) $member->can_manage_org,
+            'isActive'           => (bool) $member->is_active,
             'notifyOnNewTicket'  => (bool) $member->notify_on_new_ticket,
         ]);
     }
@@ -271,7 +291,8 @@ class OrgPortalApiController extends Controller
      * PUT /api/customers/{customerId}/organization
      * Assign or update a customer's organization membership.
      *
-     * Body: { "organizationId": 1, "role": "member"|"manager" }
+     * Body: { "organizationId": 1, "role": "member"|"manager", "unitId": 2|null,
+     *         "canManageOrg": false }
      */
     public function setCustomerOrganization(Request $request, int $customerId): JsonResponse
     {
@@ -279,8 +300,10 @@ class OrgPortalApiController extends Controller
             return $this->errorResponse('Customer not found.', 404);
         }
 
-        $orgId = $request->input('organizationId');
-        $role  = $request->input('role', 'member');
+        $orgId        = $request->input('organizationId');
+        $role         = $request->input('role', 'member');
+        $unitId       = $request->input('unitId') ?: null;
+        $canManageOrg = (bool) $request->input('canManageOrg', false);
 
         if (!$orgId) {
             return $this->errorResponse('Validation failed', 400, [
@@ -298,37 +321,158 @@ class OrgPortalApiController extends Controller
             return $this->errorResponse('Organization not found.', 404);
         }
 
-        $member = OrganizationMember::where('customer_id', $customerId)->first();
+        // Unit (if provided) must belong to the target organization.
+        if ($unitId && !OrganizationUnit::where('organization_id', $orgId)->where('id', $unitId)->exists()) {
+            return $this->errorResponse('Validation failed', 400, [
+                ['path' => 'unitId', 'message' => 'Unit does not belong to organization #' . $orgId . '.', 'source' => 'JSON'],
+            ]);
+        }
+
+        $member = OrganizationMember::where('customer_id', $customerId)
+            ->where('organization_id', $orgId)
+            ->first();
 
         if (!$member) {
+            // One ACTIVE membership per customer — block if active elsewhere.
+            $activeElsewhere = OrganizationMember::where('customer_id', $customerId)
+                ->where('is_active', true)->first();
+
+            if ($activeElsewhere) {
+                return $this->errorResponse('Customer already has an active membership in another organization.', 409, [
+                    [
+                        'path'    => 'organizationId',
+                        'message' => 'Customer is an active member of organization #' . $activeElsewhere->organization_id
+                                     . '. Deactivate or remove it first via DELETE /api/customers/' . $customerId . '/organization.',
+                        'source'  => 'JSON',
+                    ],
+                ]);
+            }
+
             OrganizationMember::create([
                 'organization_id' => $orgId,
                 'customer_id'     => $customerId,
+                'unit_id'         => $unitId,
                 'role'            => $role,
+                'can_manage_org'  => $canManageOrg,
             ]);
             return response()->json(['success' => true, 'message' => 'Membership created.'], 201);
         }
 
-        // One org per customer — block silent cross-org transfer.
-        if ((int)$member->organization_id !== (int)$orgId) {
-            return $this->errorResponse('Customer already belongs to another organization.', 409, [
-                [
-                    'path'    => 'organizationId',
-                    'message' => 'Customer is already a member of organization #' . $member->organization_id
-                                 . '. Remove the existing membership first via DELETE /api/customers/' . $customerId . '/organization.',
-                    'source'  => 'JSON',
-                ],
+        $member->update([
+            'unit_id'        => $unitId,
+            'role'           => $role,
+            'can_manage_org' => $canManageOrg,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Membership updated.']);
+    }
+
+    // ─── Units ───────────────────────────────────────────────────────────────
+
+    /**
+     * GET /api/organizations/{id}/units
+     */
+    public function listUnits(int $id): JsonResponse
+    {
+        $org = Organization::find($id);
+
+        if (!$org) {
+            return $this->errorResponse('Organization not found.', 404);
+        }
+
+        return response()->json([
+            '_embedded' => [
+                'units' => $org->units()->orderBy('name')->get()
+                    ->map(fn ($u) => $this->unitToArray($u))->values()->all(),
+            ],
+        ]);
+    }
+
+    /**
+     * POST /api/organizations/{id}/units
+     * Body: { "name": "Sales department" }
+     */
+    public function createUnit(Request $request, int $id): JsonResponse
+    {
+        $org = Organization::find($id);
+
+        if (!$org) {
+            return $this->errorResponse('Organization not found.', 404);
+        }
+
+        $name = trim((string) $request->input('name', ''));
+
+        if ($name === '') {
+            return $this->errorResponse('Validation failed', 400, [
+                ['path' => 'name', 'message' => 'Name is required.', 'source' => 'JSON'],
             ]);
         }
 
-        if ($member->role === $role) {
-            return response()->json(['success' => true, 'message' => 'No changes — customer is already a member of this organization with this role.']);
+        if (OrganizationUnit::where('organization_id', $id)->where('name', $name)->exists()) {
+            return $this->errorResponse('Validation failed', 400, [
+                ['path' => 'name', 'message' => 'A unit with this name already exists in this organization.', 'source' => 'JSON'],
+            ]);
         }
 
-        $member->role = $role;
-        $member->save();
+        $unit = OrganizationUnit::create(['organization_id' => $id, 'name' => $name]);
 
-        return response()->json(['success' => true, 'message' => 'Membership updated.']);
+        return response()->json($this->unitToArray($unit), 201)
+            ->header('Resource-ID', $unit->id);
+    }
+
+    /**
+     * PUT /api/units/{unitId}
+     * Body: { "name": "New name" }
+     */
+    public function updateUnit(Request $request, int $unitId): JsonResponse
+    {
+        $unit = OrganizationUnit::find($unitId);
+
+        if (!$unit) {
+            return $this->errorResponse('Unit not found.', 404);
+        }
+
+        $name = trim((string) $request->input('name', ''));
+
+        if ($name === '') {
+            return $this->errorResponse('Validation failed', 400, [
+                ['path' => 'name', 'message' => 'Name is required.', 'source' => 'JSON'],
+            ]);
+        }
+
+        if (OrganizationUnit::where('organization_id', $unit->organization_id)
+            ->where('name', $name)->where('id', '!=', $unit->id)->exists()
+        ) {
+            return $this->errorResponse('Validation failed', 400, [
+                ['path' => 'name', 'message' => 'A unit with this name already exists in this organization.', 'source' => 'JSON'],
+            ]);
+        }
+
+        $unit->update(['name' => $name]);
+
+        return response()->json(['success' => true, 'message' => 'Unit updated.']);
+    }
+
+    /**
+     * DELETE /api/units/{unitId}
+     * Demotes the unit's managers to members, then deletes (members are
+     * unassigned via the FK).
+     */
+    public function deleteUnit(int $unitId): JsonResponse
+    {
+        $unit = OrganizationUnit::find($unitId);
+
+        if (!$unit) {
+            return $this->errorResponse('Unit not found.', 404);
+        }
+
+        OrganizationMember::where('unit_id', $unit->id)
+            ->where('role', 'manager')
+            ->update(['role' => 'member']);
+
+        $unit->delete();
+
+        return response()->json(['success' => true, 'message' => 'Unit deleted.']);
     }
 
     /**

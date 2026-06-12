@@ -117,6 +117,10 @@ Authentication — `X-FreeScout-API-Key` header or `api_key` query parameter.
 | `GET` | `/api/organizations/{id}` | Get organization with members |
 | `PUT` | `/api/organizations/{id}` | Update organization |
 | `DELETE` | `/api/organizations/{id}` | Delete organization |
+| `GET` | `/api/organizations/{id}/units` | List structural units |
+| `POST` | `/api/organizations/{id}/units` | Create a structural unit |
+| `PUT` | `/api/units/{unitId}` | Rename a unit |
+| `DELETE` | `/api/units/{unitId}` | Delete a unit (members unassigned, unit managers demoted) |
 | `GET` | `/api/customers/{id}/organization` | Customer's organization |
 | `PUT` | `/api/customers/{id}/organization` | Set/update customer membership |
 | `DELETE` | `/api/customers/{id}/organization` | Remove customer from organization |
