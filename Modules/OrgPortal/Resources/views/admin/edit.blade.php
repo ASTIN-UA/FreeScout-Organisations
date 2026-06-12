@@ -115,6 +115,58 @@
                     </form>
                 </div>
             </div>
+
+            {{-- Structural units --}}
+            <div class="panel panel-default">
+                <div class="panel-heading"><strong>{{ __('orgportal::messages.tab_units') }}</strong></div>
+                <div class="panel-body">
+                    @if($units->count())
+                        <table class="table table-condensed table-striped">
+                            <tbody>
+                                @foreach($units as $unit)
+                                <tr>
+                                    <td>
+                                        <form method="POST"
+                                              action="{{ route('orgportal.admin.units.rename', [$organization->id, $unit->id]) }}"
+                                              style="display:inline-flex;gap:4px;align-items:center">
+                                            {{ csrf_field() }}
+                                            {{ method_field('PUT') }}
+                                            <input type="text" name="name" class="form-control input-sm"
+                                                   value="{{ $unit->name }}" maxlength="255" required>
+                                            <button type="submit" class="btn btn-xs btn-primary" title="{{ __('orgportal::messages.save') }}">✓</button>
+                                        </form>
+                                    </td>
+                                    <td class="text-right">
+                                        <form method="POST"
+                                              action="{{ route('orgportal.admin.units.delete', [$organization->id, $unit->id]) }}"
+                                              onsubmit="return confirm('{{ __('orgportal::messages.confirm_delete_unit') }}')">
+                                            {{ csrf_field() }}
+                                            {{ method_field('DELETE') }}
+                                            <button type="submit" class="btn btn-xs btn-danger">
+                                                {{ __('orgportal::messages.delete') }}
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @else
+                        <p class="text-muted">{{ __('orgportal::messages.no_units') }}</p>
+                    @endif
+
+                    <form method="POST" action="{{ route('orgportal.admin.units.add', $organization->id) }}"
+                          style="display:flex;gap:4px;align-items:center;margin-top:8px;">
+                        {{ csrf_field() }}
+                        <input type="text" name="name" class="form-control input-sm"
+                               placeholder="{{ __('orgportal::messages.unit_name_placeholder') }}"
+                               maxlength="255" required>
+                        <button type="submit" class="btn btn-success btn-sm">
+                            {{ __('orgportal::messages.add_unit') }}
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
 
         {{-- Members --}}
@@ -128,13 +180,14 @@
                             <thead>
                                 <tr>
                                     <th>{{ __('orgportal::messages.name') }}</th>
-                                    <th>{{ __('orgportal::messages.role') }}</th>
+                                    <th>{{ __('orgportal::messages.member_unit') }} / {{ __('orgportal::messages.role') }}</th>
+                                    <th>{{ __('orgportal::messages.member_status') }}</th>
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($members as $member)
-                                <tr>
+                                <tr class="{{ $member->is_active ? '' : 'text-muted' }}">
                                     <td>
                                         @if($member->customer)
                                             {{ $member->customer->getFullName() }}
@@ -149,19 +202,45 @@
                                     <td>
                                         <form method="POST"
                                               action="{{ route('orgportal.admin.members.role', [$organization->id, $member->id]) }}"
-                                              style="display:inline-flex;gap:4px;align-items:center">
+                                              style="display:inline-flex;gap:4px;align-items:center;flex-wrap:wrap">
                                             {{ csrf_field() }}
+                                            <select name="unit_id" class="form-control input-sm" style="width:auto">
+                                                <option value="">{{ __('orgportal::messages.no_unit') }}</option>
+                                                @foreach($units as $unit)
+                                                    <option value="{{ $unit->id }}" {{ $member->unit_id === $unit->id ? 'selected' : '' }}>{{ $unit->name }}</option>
+                                                @endforeach
+                                            </select>
                                             <select name="role" class="form-control input-sm" style="width:auto">
                                                 <option value="member"  {{ $member->role === 'member'  ? 'selected' : '' }}>{{ __('orgportal::messages.member') }}</option>
                                                 <option value="manager" {{ $member->role === 'manager' ? 'selected' : '' }}>{{ __('orgportal::messages.manager') }}</option>
                                             </select>
+                                            <label style="font-weight:normal;font-size:12px;margin:0;" title="{{ __('orgportal::messages.can_manage_org_hint') }}">
+                                                <input type="checkbox" name="can_manage_org" value="1" {{ $member->can_manage_org ? 'checked' : '' }}>
+                                                {{ __('orgportal::messages.can_manage_org') }}
+                                            </label>
                                             <button type="submit" class="btn btn-xs btn-primary" title="{{ __('orgportal::messages.save') }}">✓</button>
                                         </form>
                                     </td>
-                                    <td class="text-right">
+                                    <td>
+                                        @if($member->is_active)
+                                            <span class="label label-success">{{ __('orgportal::messages.status_member_active') }}</span>
+                                        @else
+                                            <span class="label label-default">{{ __('orgportal::messages.status_member_inactive') }}</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-right" style="white-space:nowrap">
+                                        <form method="POST"
+                                              action="{{ route('orgportal.admin.members.toggle', [$organization->id, $member->id]) }}"
+                                              style="display:inline">
+                                            {{ csrf_field() }}
+                                            <button type="submit" class="btn btn-xs btn-default">
+                                                {{ $member->is_active ? __('orgportal::messages.deactivate') : __('orgportal::messages.activate') }}
+                                            </button>
+                                        </form>
                                         <form method="POST"
                                               action="{{ route('orgportal.admin.members.remove', [$organization->id, $member->id]) }}"
-                                              onsubmit="return confirm('{{ __('orgportal::messages.confirm_remove_member') }}')">
+                                              onsubmit="return confirm('{{ __('orgportal::messages.confirm_remove_member') }}')"
+                                              style="display:inline">
                                             {{ csrf_field() }}
                                             {{ method_field('DELETE') }}
                                             <button type="submit" class="btn btn-xs btn-danger">
@@ -196,11 +275,26 @@
                             </div>
                         </div>
                         <div class="form-group">
+                            <label>{{ __('orgportal::messages.member_unit') }}</label>
+                            <select name="unit_id" class="form-control">
+                                <option value="">{{ __('orgportal::messages.no_unit') }}</option>
+                                @foreach($units as $unit)
+                                    <option value="{{ $unit->id }}">{{ $unit->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label>{{ __('orgportal::messages.role') }}</label>
                             <select name="role" class="form-control">
                                 <option value="member">{{ __('orgportal::messages.member') }}</option>
                                 <option value="manager">{{ __('orgportal::messages.manager') }}</option>
                             </select>
+                        </div>
+                        <div class="checkbox">
+                            <label title="{{ __('orgportal::messages.can_manage_org_hint') }}">
+                                <input type="checkbox" name="can_manage_org" value="1">
+                                {{ __('orgportal::messages.can_manage_org') }}
+                            </label>
                         </div>
                         <button type="submit" class="btn btn-success btn-sm" id="add_member_btn" disabled>
                             {{ __('orgportal::messages.add_member') }}

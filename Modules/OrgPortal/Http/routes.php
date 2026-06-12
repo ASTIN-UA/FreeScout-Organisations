@@ -41,6 +41,18 @@ Route::group([
     Route::post('organizations/{id}/members/{memberId}/role', 'OrgPortalAdminController@updateMemberRole')
         ->name('orgportal.admin.members.role');
 
+    Route::post('organizations/{id}/members/{memberId}/toggle-active', 'OrgPortalAdminController@toggleMemberActive')
+        ->name('orgportal.admin.members.toggle');
+
+    Route::post('organizations/{id}/units', 'OrgPortalAdminController@addUnit')
+        ->name('orgportal.admin.units.add');
+
+    Route::put('organizations/{id}/units/{unitId}', 'OrgPortalAdminController@renameUnit')
+        ->name('orgportal.admin.units.rename');
+
+    Route::delete('organizations/{id}/units/{unitId}', 'OrgPortalAdminController@deleteUnit')
+        ->name('orgportal.admin.units.delete');
+
     Route::get('customers/search', 'OrgPortalAdminController@searchCustomers')
         ->name('orgportal.admin.customers.search');
 

@@ -123,6 +123,8 @@ return [
     'global_grant_hint'      => 'Set a unit to make a unit manager. Promoting to global manager requires admin permission.',
     'member_updated'         => 'Member updated.',
     'cannot_grant_global'    => 'You are not allowed to assign global managers.',
+    'can_manage_org'         => 'Can manage org structure',
+    'can_manage_org_hint'    => 'Allows this global manager to promote other members to global manager from the portal.',
     'member_status'          => 'Status',
     'status_member_active'   => 'Active',
     'status_member_inactive' => 'Deactivated',

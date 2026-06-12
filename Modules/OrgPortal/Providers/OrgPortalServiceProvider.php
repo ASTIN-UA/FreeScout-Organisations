@@ -131,7 +131,8 @@ class OrgPortalServiceProvider extends ServiceProvider
         // Inject organization selector into the customer edit form
         \Eventy::addAction('customer.edit.after_fields', function ($customer, $errors) {
             $organizations   = \Modules\OrgPortal\Models\Organization::orderBy('name')->get();
-            $currentMember   = \Modules\OrgPortal\Models\OrganizationMember::where('customer_id', $customer->id)->first();
+            $currentMember   = \Modules\OrgPortal\Models\OrganizationMember::where('customer_id', $customer->id)
+                ->where('is_active', true)->first();
             $currentOrgId    = $currentMember ? $currentMember->organization_id : null;
             $currentRole     = $currentMember ? $currentMember->role : 'member';
 
@@ -152,7 +153,10 @@ class OrgPortalServiceProvider extends ServiceProvider
                 $role = 'member';
             }
 
-            $existing = \Modules\OrgPortal\Models\OrganizationMember::where('customer_id', $customer->id)->first();
+            // Operate on the customer's active membership (a customer may have
+            // historical inactive memberships in other organizations).
+            $existing = \Modules\OrgPortal\Models\OrganizationMember::where('customer_id', $customer->id)
+                ->where('is_active', true)->first();
 
             // "— None —" selected: remove from any org
             if (!$orgId) {
@@ -168,7 +172,11 @@ class OrgPortalServiceProvider extends ServiceProvider
             }
 
             if ($existing) {
-                // Update org / role
+                // Moving to a different org invalidates the unit (units belong
+                // to a single organization).
+                if ((int) $existing->organization_id !== (int) $orgId) {
+                    $existing->unit_id = null;
+                }
                 $existing->organization_id = $orgId;
                 $existing->role            = $role;
                 $existing->save();

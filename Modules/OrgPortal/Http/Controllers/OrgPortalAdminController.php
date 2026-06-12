@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Customer;
 use Modules\OrgPortal\Models\Organization;
 use Modules\OrgPortal\Models\OrganizationMember;
+use Modules\OrgPortal\Models\OrganizationUnit;
 use Modules\OrgPortal\Providers\OrgPortalServiceProvider;
 
 class OrgPortalAdminController extends Controller
@@ -69,10 +70,11 @@ class OrgPortalAdminController extends Controller
     public function edit(int $id)
     {
         $organization = Organization::findOrFail($id);
-        $members      = $organization->members()->with(['customer.emails'])->get();
+        $members      = $organization->members()->with(['customer.emails', 'unit'])->get();
+        $units        = $organization->units()->orderBy('name')->get();
         $mailboxes    = \App\Mailbox::orderBy('name')->get(['id', 'name']);
 
-        return view('orgportal::admin.edit', compact('organization', 'members', 'mailboxes'));
+        return view('orgportal::admin.edit', compact('organization', 'members', 'units', 'mailboxes'));
     }
 
     public function update(Request $request, int $id)
@@ -111,11 +113,14 @@ class OrgPortalAdminController extends Controller
         $organization = Organization::findOrFail($id);
 
         $request->validate([
-            'customer_id' => 'required|integer|exists:customers,id',
-            'role'        => 'required|in:member,manager',
+            'customer_id'    => 'required|integer|exists:customers,id',
+            'role'           => 'required|in:member,manager',
+            'unit_id'        => 'nullable|integer',
+            'can_manage_org' => 'nullable|boolean',
         ]);
 
         $customerId = (int) $request->input('customer_id');
+        $unitId     = (int) $request->input('unit_id') ?: null;
 
         // Prevent duplicate membership
         if (OrganizationMember::where('organization_id', $id)
@@ -125,17 +130,26 @@ class OrgPortalAdminController extends Controller
                 ->with('flash_error', __('orgportal::messages.already_member'));
         }
 
-        // One org per customer — check they're not in another org
-        if (OrganizationMember::where('customer_id', $customerId)->exists()) {
+        // One ACTIVE membership per customer — block only if they are an active
+        // member elsewhere. Inactive (historical) memberships are allowed.
+        if (OrganizationMember::where('customer_id', $customerId)->where('is_active', true)->exists()) {
             return redirect()->route('orgportal.admin.edit', $id)
                 ->with('flash_error', __('orgportal::messages.already_in_org'));
+        }
+
+        // Unit (if any) must belong to this organization.
+        if ($unitId && !OrganizationUnit::where('organization_id', $id)->where('id', $unitId)->exists()) {
+            return redirect()->route('orgportal.admin.edit', $id)
+                ->with('flash_error', __('orgportal::messages.unit_exists'));
         }
 
         try {
             OrganizationMember::create([
                 'organization_id' => $id,
                 'customer_id'     => $customerId,
+                'unit_id'         => $unitId,
                 'role'            => $request->input('role'),
+                'can_manage_org'  => (bool) $request->input('can_manage_org', false),
             ]);
         } catch (\Illuminate\Database\QueryException $e) {
             // Unique constraint: concurrent request already added this customer
@@ -149,15 +163,47 @@ class OrgPortalAdminController extends Controller
 
     public function updateMemberRole(Request $request, int $id, int $memberId)
     {
-        $request->validate(['role' => 'required|in:member,manager']);
+        $request->validate([
+            'role'           => 'required|in:member,manager',
+            'unit_id'        => 'nullable|integer',
+            'can_manage_org' => 'nullable|boolean',
+        ]);
 
-        OrganizationMember::where('id', $memberId)
+        $member = OrganizationMember::where('id', $memberId)
             ->where('organization_id', $id)
-            ->firstOrFail()
-            ->update(['role' => $request->input('role')]);
+            ->firstOrFail();
+
+        $unitId = (int) $request->input('unit_id') ?: null;
+
+        if ($unitId && !OrganizationUnit::where('organization_id', $id)->where('id', $unitId)->exists()) {
+            return redirect()->route('orgportal.admin.edit', $id)
+                ->with('flash_error', __('orgportal::messages.unit_exists'));
+        }
+
+        $member->update([
+            'role'           => $request->input('role'),
+            'unit_id'        => $unitId,
+            'can_manage_org' => (bool) $request->input('can_manage_org', false),
+        ]);
 
         return redirect()->route('orgportal.admin.edit', $id)
             ->with('flash_success', __('orgportal::messages.role_updated'));
+    }
+
+    public function toggleMemberActive(int $id, int $memberId)
+    {
+        $member = OrganizationMember::where('id', $memberId)
+            ->where('organization_id', $id)
+            ->firstOrFail();
+
+        $member->is_active      = !$member->is_active;
+        $member->deactivated_at = $member->is_active ? null : now();
+        $member->save();
+
+        return redirect()->route('orgportal.admin.edit', $id)
+            ->with('flash_success', $member->is_active
+                ? __('orgportal::messages.member_activated')
+                : __('orgportal::messages.member_deactivated'));
     }
 
     public function removeMember(int $id, int $memberId)
@@ -170,6 +216,63 @@ class OrgPortalAdminController extends Controller
 
         return redirect()->route('orgportal.admin.edit', $id)
             ->with('flash_success', __('orgportal::messages.member_removed'));
+    }
+
+    // ─── Structural units ────────────────────────────────────────────────────
+
+    public function addUnit(Request $request, int $id)
+    {
+        $organization = Organization::findOrFail($id);
+
+        $request->validate(['name' => 'required|string|max:255']);
+        $name = trim($request->input('name'));
+
+        if (OrganizationUnit::where('organization_id', $id)->where('name', $name)->exists()) {
+            return redirect()->route('orgportal.admin.edit', $id)
+                ->with('flash_error', __('orgportal::messages.unit_exists'));
+        }
+
+        OrganizationUnit::create(['organization_id' => $id, 'name' => $name]);
+
+        return redirect()->route('orgportal.admin.edit', $id)
+            ->with('flash_success', __('orgportal::messages.unit_created'));
+    }
+
+    public function renameUnit(Request $request, int $id, int $unitId)
+    {
+        $request->validate(['name' => 'required|string|max:255']);
+        $name = trim($request->input('name'));
+
+        $unit = OrganizationUnit::where('organization_id', $id)->findOrFail($unitId);
+
+        if (OrganizationUnit::where('organization_id', $id)
+            ->where('name', $name)->where('id', '!=', $unit->id)->exists()
+        ) {
+            return redirect()->route('orgportal.admin.edit', $id)
+                ->with('flash_error', __('orgportal::messages.unit_exists'));
+        }
+
+        $unit->name = $name;
+        $unit->save();
+
+        return redirect()->route('orgportal.admin.edit', $id)
+            ->with('flash_success', __('orgportal::messages.unit_updated'));
+    }
+
+    public function deleteUnit(int $id, int $unitId)
+    {
+        $unit = OrganizationUnit::where('organization_id', $id)->findOrFail($unitId);
+
+        // Demote unit managers before delete so the FK set-null doesn't promote
+        // them to global managers.
+        OrganizationMember::where('unit_id', $unit->id)
+            ->where('role', 'manager')
+            ->update(['role' => 'member']);
+
+        $unit->delete();
+
+        return redirect()->route('orgportal.admin.edit', $id)
+            ->with('flash_success', __('orgportal::messages.unit_deleted'));
     }
 
     public function mailboxSettings(int $id)
@@ -286,7 +389,7 @@ class OrgPortalAdminController extends Controller
                     $q2->where('email', 'like', "%{$query}%");
                 });
             })
-            ->whereNotIn('id', OrganizationMember::select('customer_id'))
+            ->whereNotIn('id', OrganizationMember::where('is_active', true)->select('customer_id'))
             ->with('emails')
             ->orderBy('last_name')
             ->limit(25)
