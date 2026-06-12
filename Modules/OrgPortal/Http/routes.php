@@ -139,5 +139,21 @@ Route::group([
 
     Route::post('settings', 'OrgPortalFrontController@saveSettings')
         ->name('orgportal.portal.settings.save');
+
+    // Structure management (global manager only — enforced in controller)
+    Route::post('units', 'OrgPortalFrontController@createUnit')
+        ->name('orgportal.portal.units.create');
+
+    Route::put('units/{unit_id}', 'OrgPortalFrontController@renameUnit')
+        ->name('orgportal.portal.units.rename');
+
+    Route::delete('units/{unit_id}', 'OrgPortalFrontController@deleteUnit')
+        ->name('orgportal.portal.units.delete');
+
+    Route::post('members/{member_id}', 'OrgPortalFrontController@updateMember')
+        ->name('orgportal.portal.members.update');
+
+    Route::post('members/{member_id}/toggle-active', 'OrgPortalFrontController@toggleMemberActive')
+        ->name('orgportal.portal.members.toggle');
 });
 endif;

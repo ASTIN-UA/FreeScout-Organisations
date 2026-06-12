@@ -91,12 +91,50 @@ return [
 
     // Portal — settings
     'org_notification_settings' => 'Organization Notification Settings',
+    'org_settings_title'     => 'Organization Settings',
     'organization'           => 'Organization',
     'notify_new_ticket_label'=> 'Receive email notification when a member of my organization opens a new ticket',
     'settings_saved'         => 'Settings saved.',
 
+    // Portal — settings tabs
+    'tab_notifications'      => 'Notifications',
+    'tab_units'              => 'Units',
+
+    // Portal — structural units
+    'unit_name'              => 'Unit name',
+    'unit_name_placeholder'  => 'e.g. Sales department',
+    'add_unit'               => 'Add unit',
+    'rename'                 => 'Rename',
+    'no_units'               => 'No units yet.',
+    'unit_created'           => 'Unit created.',
+    'unit_updated'           => 'Unit updated.',
+    'unit_deleted'           => 'Unit deleted.',
+    'unit_exists'            => 'A unit with this name already exists.',
+    'confirm_delete_unit'    => 'Delete this unit? Its members will be unassigned and unit managers demoted to members.',
+
+    // Portal — member management
+    'member_unit'            => 'Unit',
+    'no_unit'                => '— No unit —',
+    'apply'                  => 'Apply',
+    'role_member'            => 'Member',
+    'role_manager_scoped'    => 'Manager',
+    'role_unit_manager'      => 'Unit manager',
+    'role_global_manager'    => 'Global manager',
+    'global_grant_hint'      => 'Set a unit to make a unit manager. Promoting to global manager requires admin permission.',
+    'member_updated'         => 'Member updated.',
+    'cannot_grant_global'    => 'You are not allowed to assign global managers.',
+    'member_status'          => 'Status',
+    'status_member_active'   => 'Active',
+    'status_member_inactive' => 'Deactivated',
+    'deactivate'             => 'Deactivate',
+    'activate'               => 'Activate',
+    'member_deactivated'     => 'Member deactivated.',
+    'member_activated'       => 'Member reactivated.',
+    'confirm_deactivate'     => 'Deactivate this member? They will no longer receive ticket assignments.',
+    'cannot_deactivate_self' => 'You cannot deactivate yourself.',
+
     // EUP nav
-    'org_settings_nav'       => 'Org Settings',
+    'org_settings_nav'       => 'Organization Settings',
 
     // Conversation badge & search
     'filter_by_org'          => 'Show all tickets from this organization',

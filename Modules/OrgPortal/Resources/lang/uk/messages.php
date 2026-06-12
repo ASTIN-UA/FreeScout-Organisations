@@ -91,12 +91,50 @@ return [
 
     // Portal — settings
     'org_notification_settings' => 'Налаштування сповіщень організації',
+    'org_settings_title'     => 'Налаштування організації',
     'organization'           => 'Організація',
     'notify_new_ticket_label'=> 'Отримувати email-сповіщення, коли учасник моєї організації відкриває новий тікет',
     'settings_saved'         => 'Налаштування збережено.',
 
+    // Portal — settings tabs
+    'tab_notifications'      => 'Сповіщення',
+    'tab_units'              => 'Підрозділи',
+
+    // Portal — structural units
+    'unit_name'              => 'Назва підрозділу',
+    'unit_name_placeholder'  => 'напр. Відділ продажів',
+    'add_unit'               => 'Додати підрозділ',
+    'rename'                 => 'Перейменувати',
+    'no_units'               => 'Ще немає підрозділів.',
+    'unit_created'           => 'Підрозділ створено.',
+    'unit_updated'           => 'Підрозділ оновлено.',
+    'unit_deleted'           => 'Підрозділ видалено.',
+    'unit_exists'            => 'Підрозділ з такою назвою вже існує.',
+    'confirm_delete_unit'    => 'Видалити цей підрозділ? Його учасники стануть без підрозділу, а менеджери підрозділу — звичайними учасниками.',
+
+    // Portal — member management
+    'member_unit'            => 'Підрозділ',
+    'no_unit'                => '— Без підрозділу —',
+    'apply'                  => 'Застосувати',
+    'role_member'            => 'Учасник',
+    'role_manager_scoped'    => 'Менеджер',
+    'role_unit_manager'      => 'Менеджер підрозділу',
+    'role_global_manager'    => 'Глобальний менеджер',
+    'global_grant_hint'      => 'Оберіть підрозділ, щоб призначити менеджера підрозділу. Підвищення до глобального менеджера потребує дозволу адміністратора.',
+    'member_updated'         => 'Учасника оновлено.',
+    'cannot_grant_global'    => 'Вам не дозволено призначати глобальних менеджерів.',
+    'member_status'          => 'Статус',
+    'status_member_active'   => 'Активний',
+    'status_member_inactive' => 'Звільнений',
+    'deactivate'             => 'Звільнити',
+    'activate'               => 'Відновити',
+    'member_deactivated'     => 'Учасника звільнено.',
+    'member_activated'       => 'Учасника відновлено.',
+    'confirm_deactivate'     => 'Звільнити цього учасника? Нові заявки на нього не призначатимуться.',
+    'cannot_deactivate_self' => 'Ви не можете звільнити самого себе.',
+
     // EUP nav
-    'org_settings_nav'       => 'Налаштування орг.',
+    'org_settings_nav'       => 'Налаштування організації',
 
     // Conversation badge & search
     'filter_by_org'          => 'Показати всі тікети цієї організації',

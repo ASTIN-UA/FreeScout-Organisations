@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\OrgPortal\Models\Organization;
 use Modules\OrgPortal\Models\OrganizationMember;
+use Modules\OrgPortal\Models\OrganizationUnit;
 
 class OrgPortalFrontController extends Controller
 {
@@ -64,6 +65,43 @@ class OrgPortalFrontController extends Controller
         return $member;
     }
 
+    /**
+     * Customer IDs whose tickets this manager may see.
+     *
+     * Global manager (unit_id IS NULL) → every member of the organization.
+     * Unit manager → members of that unit only.
+     *
+     * Includes inactive (deactivated) members so a fired person's existing
+     * tickets stay visible. Assignment is restricted separately, see
+     * {@see assignableCustomerIds()}.
+     */
+    protected function visibleCustomerIds(OrganizationMember $member)
+    {
+        $query = OrganizationMember::where('organization_id', $member->organization_id);
+
+        if ($member->isUnitManager()) {
+            $query->where('unit_id', $member->unit_id);
+        }
+
+        return $query->pluck('customer_id');
+    }
+
+    /**
+     * Customer IDs this manager may assign as a ticket author — active members
+     * only (deactivated members cannot receive new ticket assignments).
+     */
+    protected function assignableCustomerIds(OrganizationMember $member)
+    {
+        $query = OrganizationMember::where('organization_id', $member->organization_id)
+            ->where('is_active', true);
+
+        if ($member->isUnitManager()) {
+            $query->where('unit_id', $member->unit_id);
+        }
+
+        return $query->pluck('customer_id');
+    }
+
     // ─── Company Tickets ─────────────────────────────────────────────────────
 
     public function companyTickets(Request $request, string $mailbox_id)
@@ -72,8 +110,7 @@ class OrgPortalFrontController extends Controller
         $customer = $this->authCustomer();
         $member   = $this->requireManager($customer, $mailbox);
 
-        $orgMemberIds   = OrganizationMember::where('organization_id', $member->organization_id)
-            ->pluck('customer_id');
+        $orgMemberIds   = $this->visibleCustomerIds($member);
 
         $orderField     = 'last_reply_at';
         $orderDirection = $request->input('order', 'desc');
@@ -168,8 +205,7 @@ class OrgPortalFrontController extends Controller
         $customer = $this->authCustomer();
         $member   = $this->requireManager($customer, $mailbox);
 
-        $orgMemberIds = OrganizationMember::where('organization_id', $member->organization_id)
-            ->pluck('customer_id');
+        $orgMemberIds = $this->visibleCustomerIds($member);
 
         $conversation = Conversation::whereIn('customer_id', $orgMemberIds)
             ->where('mailbox_id', $mailbox->id)
@@ -190,7 +226,8 @@ class OrgPortalFrontController extends Controller
             }
         }
 
-        $orgMembers = Customer::whereIn('id', $orgMemberIds)->get();
+        // Author dropdown — only members who can still be assigned (active).
+        $orgMembers = Customer::whereIn('id', $this->assignableCustomerIds($member))->get();
 
         return view('orgportal::portal.ticket', [
             'mailbox'       => $mailbox,
@@ -210,8 +247,7 @@ class OrgPortalFrontController extends Controller
         $customer = $this->authCustomer();
         $member   = $this->requireManager($customer, $mailbox);
 
-        $orgMemberIds = OrganizationMember::where('organization_id', $member->organization_id)
-            ->pluck('customer_id');
+        $orgMemberIds = $this->visibleCustomerIds($member);
 
         $conversation = Conversation::whereIn('customer_id', $orgMemberIds)
             ->where('mailbox_id', $mailbox->id)
@@ -279,8 +315,7 @@ class OrgPortalFrontController extends Controller
         $customer = $this->authCustomer();
         $member   = $this->requireManager($customer, $mailbox);
 
-        $orgMemberIds = OrganizationMember::where('organization_id', $member->organization_id)
-            ->pluck('customer_id');
+        $orgMemberIds = $this->visibleCustomerIds($member);
 
         $conversation = Conversation::whereIn('customer_id', $orgMemberIds)
             ->where('mailbox_id', $mailbox->id)
@@ -292,7 +327,8 @@ class OrgPortalFrontController extends Controller
 
         $newCustomerId = (int) $request->input('new_customer_id');
 
-        if (!$orgMemberIds->contains($newCustomerId)) {
+        // New author must be an active, assignable member in the manager's scope.
+        if (!$this->assignableCustomerIds($member)->contains($newCustomerId)) {
             abort(422, __('orgportal::messages.access_denied'));
         }
 
@@ -331,8 +367,7 @@ class OrgPortalFrontController extends Controller
         $customer = $this->authCustomer();
         $member   = $this->requireManager($customer, $mailbox);
 
-        $orgMemberIds = OrganizationMember::where('organization_id', $member->organization_id)
-            ->pluck('customer_id');
+        $orgMemberIds = $this->visibleCustomerIds($member);
 
         $conversation = Conversation::whereIn('customer_id', $orgMemberIds)
             ->where('mailbox_id', $mailbox->id)
@@ -357,35 +392,39 @@ class OrgPortalFrontController extends Controller
     {
         $mailbox  = $this->getMailbox($mailbox_id);
         $customer = $this->authCustomer();
+        $member   = $this->requireManager($customer, $mailbox);
 
-        $member = OrganizationMember::where('customer_id', $customer->id)
-            ->where('role', 'manager')
-            ->first();
+        $org   = $member->organization;
+        $units = $org->units()->orderBy('name')->get();
 
-        if (!$member) {
-            abort(403, __('orgportal::messages.access_denied'));
+        // Global manager sees every member; a unit manager only their unit.
+        $membersQuery = OrganizationMember::where('organization_id', $org->id)
+            ->with(['customer', 'unit']);
+        if ($member->isUnitManager()) {
+            $membersQuery->where('unit_id', $member->unit_id);
         }
+        $members = $membersQuery->get()
+            ->sortBy(fn ($m) => mb_strtolower(optional($m->customer)->getFullName() ?: ''))
+            ->values();
 
         return view('orgportal::portal.settings', [
-            'mailbox'    => $mailbox,
-            'mailbox_id' => $mailbox_id,
-            'customer'   => $customer,
-            'member'     => $member,
+            'mailbox'            => $mailbox,
+            'mailbox_id'         => $mailbox_id,
+            'customer'           => $customer,
+            'member'             => $member,
+            'organization'       => $org,
+            'units'              => $units,
+            'members'            => $members,
+            'canManageStructure' => $member->isGlobalManager(),
+            'canGrantGlobal'     => (bool) $member->can_manage_org,
         ]);
     }
 
     public function saveSettings(Request $request, string $mailbox_id)
     {
-        $this->getMailbox($mailbox_id);
+        $mailbox  = $this->getMailbox($mailbox_id);
         $customer = $this->authCustomer();
-
-        $member = OrganizationMember::where('customer_id', $customer->id)
-            ->where('role', 'manager')
-            ->first();
-
-        if (!$member) {
-            abort(403, __('orgportal::messages.access_denied'));
-        }
+        $member   = $this->requireManager($customer, $mailbox);
 
         $member->notify_on_new_ticket = (bool) $request->input('notify_on_new_ticket', false);
         $member->save();
@@ -393,5 +432,171 @@ class OrgPortalFrontController extends Controller
         return redirect()
             ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id])
             ->with('flash_success', __('orgportal::messages.settings_saved'));
+    }
+
+    // ─── Structure management (global manager only) ──────────────────────────
+
+    /**
+     * Only a global manager (manager with no unit) may manage org structure.
+     */
+    protected function requireGlobalManager(Customer $customer, Mailbox $mailbox): OrganizationMember
+    {
+        $member = $this->requireManager($customer, $mailbox);
+
+        if (!$member->isGlobalManager()) {
+            abort(403, __('orgportal::messages.access_denied'));
+        }
+
+        return $member;
+    }
+
+    public function createUnit(Request $request, string $mailbox_id)
+    {
+        $mailbox  = $this->getMailbox($mailbox_id);
+        $customer = $this->authCustomer();
+        $member   = $this->requireGlobalManager($customer, $mailbox);
+
+        $request->validate(['name' => 'required|string|max:255']);
+        $name = trim($request->input('name'));
+
+        $exists = OrganizationUnit::where('organization_id', $member->organization_id)
+            ->where('name', $name)->exists();
+
+        if ($exists) {
+            return back()->with('flash_error', __('orgportal::messages.unit_exists'));
+        }
+
+        OrganizationUnit::create([
+            'organization_id' => $member->organization_id,
+            'name'            => $name,
+        ]);
+
+        return redirect()
+            ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id])
+            ->with('flash_success', __('orgportal::messages.unit_created'));
+    }
+
+    public function renameUnit(Request $request, string $mailbox_id, int $unit_id)
+    {
+        $mailbox  = $this->getMailbox($mailbox_id);
+        $customer = $this->authCustomer();
+        $member   = $this->requireGlobalManager($customer, $mailbox);
+
+        $request->validate(['name' => 'required|string|max:255']);
+        $name = trim($request->input('name'));
+
+        $unit = OrganizationUnit::where('organization_id', $member->organization_id)
+            ->findOrFail($unit_id);
+
+        $exists = OrganizationUnit::where('organization_id', $member->organization_id)
+            ->where('name', $name)
+            ->where('id', '!=', $unit->id)
+            ->exists();
+
+        if ($exists) {
+            return back()->with('flash_error', __('orgportal::messages.unit_exists'));
+        }
+
+        $unit->name = $name;
+        $unit->save();
+
+        return redirect()
+            ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id])
+            ->with('flash_success', __('orgportal::messages.unit_updated'));
+    }
+
+    public function deleteUnit(Request $request, string $mailbox_id, int $unit_id)
+    {
+        $mailbox  = $this->getMailbox($mailbox_id);
+        $customer = $this->authCustomer();
+        $member   = $this->requireGlobalManager($customer, $mailbox);
+
+        $unit = OrganizationUnit::where('organization_id', $member->organization_id)
+            ->findOrFail($unit_id);
+
+        // Demote this unit's managers to plain members first — otherwise the
+        // FK set-null would silently turn them into GLOBAL managers.
+        OrganizationMember::where('unit_id', $unit->id)
+            ->where('role', 'manager')
+            ->update(['role' => 'member']);
+
+        // Remaining members get unit_id = NULL via the FK on delete.
+        $unit->delete();
+
+        return redirect()
+            ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id])
+            ->with('flash_success', __('orgportal::messages.unit_deleted'));
+    }
+
+    /**
+     * Update a member's unit and role.
+     * role=manager + unit  => unit manager.
+     * role=manager + no unit => global manager (requires can_manage_org).
+     */
+    public function updateMember(Request $request, string $mailbox_id, int $member_id)
+    {
+        $mailbox  = $this->getMailbox($mailbox_id);
+        $customer = $this->authCustomer();
+        $manager  = $this->requireGlobalManager($customer, $mailbox);
+
+        $request->validate([
+            'unit_id' => 'nullable|integer',
+            'role'    => 'required|in:member,manager',
+        ]);
+
+        $target = OrganizationMember::where('organization_id', $manager->organization_id)
+            ->findOrFail($member_id);
+
+        $unitId = (int) $request->input('unit_id') ?: null;
+        $role   = $request->input('role');
+
+        if ($unitId) {
+            $unitOk = OrganizationUnit::where('organization_id', $manager->organization_id)
+                ->where('id', $unitId)->exists();
+            if (!$unitOk) {
+                abort(422, __('orgportal::messages.access_denied'));
+            }
+        }
+
+        // Promoting to global manager requires the explicit admin-granted right.
+        if ($role === 'manager' && $unitId === null && !$manager->can_manage_org) {
+            return back()->with('flash_error', __('orgportal::messages.cannot_grant_global'));
+        }
+
+        $target->unit_id = $unitId;
+        $target->role    = $role;
+        $target->save();
+
+        return redirect()
+            ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id])
+            ->with('flash_success', __('orgportal::messages.member_updated'));
+    }
+
+    /**
+     * Deactivate ("fire") or reactivate a member. Deactivated members keep
+     * their history but can no longer be assigned as a ticket author.
+     */
+    public function toggleMemberActive(Request $request, string $mailbox_id, int $member_id)
+    {
+        $mailbox  = $this->getMailbox($mailbox_id);
+        $customer = $this->authCustomer();
+        $manager  = $this->requireGlobalManager($customer, $mailbox);
+
+        $target = OrganizationMember::where('organization_id', $manager->organization_id)
+            ->findOrFail($member_id);
+
+        if ($target->customer_id === $customer->id) {
+            return back()->with('flash_error', __('orgportal::messages.cannot_deactivate_self'));
+        }
+
+        $target->is_active      = !$target->is_active;
+        $target->deactivated_at = $target->is_active ? null : now();
+        $target->save();
+
+        return redirect()
+            ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id])
+            ->with('flash_success', $target->is_active
+                ? __('orgportal::messages.member_activated')
+                : __('orgportal::messages.member_deactivated'));
     }
 }

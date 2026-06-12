@@ -11,13 +11,20 @@ class OrganizationMember extends Model
 
     protected $fillable = [
         'organization_id',
+        'unit_id',
         'customer_id',
         'role',
+        'can_manage_org',
         'notify_on_new_ticket',
+        'is_active',
+        'deactivated_at',
     ];
 
     protected $casts = [
         'notify_on_new_ticket' => 'boolean',
+        'can_manage_org'       => 'boolean',
+        'is_active'            => 'boolean',
+        'deactivated_at'       => 'datetime',
     ];
 
     public function organization()
@@ -25,9 +32,22 @@ class OrganizationMember extends Model
         return $this->belongsTo(Organization::class);
     }
 
+    public function unit()
+    {
+        return $this->belongsTo(OrganizationUnit::class, 'unit_id');
+    }
+
     public function customer()
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    /**
+     * Only active memberships.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 
     public function isManager(): bool
@@ -38,5 +58,22 @@ class OrganizationMember extends Model
     public function isMember(): bool
     {
         return $this->role === 'member';
+    }
+
+    /**
+     * Global manager: a manager not scoped to any structural unit — sees the
+     * whole organization.
+     */
+    public function isGlobalManager(): bool
+    {
+        return $this->role === 'manager' && $this->unit_id === null;
+    }
+
+    /**
+     * Unit manager: a manager scoped to a single structural unit.
+     */
+    public function isUnitManager(): bool
+    {
+        return $this->role === 'manager' && $this->unit_id !== null;
     }
 }
