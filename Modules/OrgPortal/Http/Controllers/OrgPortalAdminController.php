@@ -77,6 +77,7 @@ class OrgPortalAdminController extends Controller
             'organizations'      => $organizations,
             'tplEvents'          => $tplEvents,
             'tplTemplates'       => $tplTemplates,
+            'tplDefaults'        => $canManageTemplates ? self::defaultTemplates() : [],
             'canManageTemplates' => $canManageTemplates,
         ]);
     }
@@ -404,6 +405,128 @@ class OrgPortalAdminController extends Controller
 
         return redirect()->route('orgportal.admin.index', ['tab' => 'templates'])
             ->with('flash_success', __('orgportal::messages.settings_saved'));
+    }
+
+    public static function defaultTemplates(?string $locale = null): array
+    {
+        $locale = $locale ?? app()->getLocale();
+        $isUk   = ($locale === 'uk');
+
+        $wrap = function (string $content) use ($isUk): string {
+            $footer = $isUk
+                ? 'Ви отримали цей лист, оскільки увімкнули сповіщення для вашої організації в Клієнтському порталі.'
+                : 'You received this email because you enabled notifications for your organization in the Customer Portal.';
+            return '<div style="font-family:Arial,sans-serif;font-size:14px;color:#333;max-width:600px;">'
+                . $content
+                . '<p style="margin-top:32px;font-size:12px;color:#999;">' . $footer . '</p>'
+                . '</div>';
+        };
+
+        $btn = '<p><a href="{ticket_url}" style="display:inline-block;padding:10px 22px;background:#3b82f6;color:#fff;text-decoration:none;border-radius:4px;font-weight:bold;">'
+            . ($isUk ? 'Переглянути заявку' : 'View Ticket')
+            . '</a></p>';
+
+        $authorCell = '<strong>{author_name}</strong> <span style="color:#999;font-size:12px;">({unit_name})</span>';
+
+        $row = fn (string $l, string $v) =>
+            '<tr><td style="color:#666;width:140px;padding:6px 0;">' . $l . ':</td>'
+            . '<td style="padding:6px 0;">' . $v . '</td></tr>';
+
+        $table = fn (array $rows) =>
+            '<table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;">'
+            . implode('', $rows) . '</table>';
+
+        if ($isUk) {
+            return [
+                'new_ticket' => [
+                    'subject' => 'Нова заявка {ticket_number} від {author_name}',
+                    'body'    => $wrap(
+                        '<p>Доброго дня, <strong>{manager_name}</strong>!</p>'
+                        . '<p>Учасник вашої організації <strong>{org_name}</strong> відкрив нову заявку:</p>'
+                        . $table([
+                            $row('Від', $authorCell),
+                            $row('Тема', '<strong>{subject}</strong>'),
+                            $row('Заявка №', '{ticket_number}'),
+                            $row('Дата', '{created_datetime}'),
+                        ])
+                        . $btn
+                    ),
+                ],
+                'reply_agent' => [
+                    'subject' => 'Re: {ticket_number} — {subject}',
+                    'body'    => $wrap(
+                        '<p>Доброго дня, <strong>{manager_name}</strong>!</p>'
+                        . '<p>Агент підтримки відповів на заявку у вашій організації <strong>{org_name}</strong>:</p>'
+                        . $table([
+                            $row('Клієнт', $authorCell),
+                            $row('Тема', '<strong>{subject}</strong>'),
+                            $row('Заявка №', '{ticket_number}'),
+                            $row('Час відповіді', '{reply_datetime}'),
+                        ])
+                        . $btn
+                    ),
+                ],
+                'reply_customer' => [
+                    'subject' => 'Re: {ticket_number} — {subject}',
+                    'body'    => $wrap(
+                        '<p>Доброго дня, <strong>{manager_name}</strong>!</p>'
+                        . '<p>Клієнт відповів на заявку у вашій організації <strong>{org_name}</strong>:</p>'
+                        . $table([
+                            $row('Від', $authorCell),
+                            $row('Тема', '<strong>{subject}</strong>'),
+                            $row('Заявка №', '{ticket_number}'),
+                            $row('Час відповіді', '{reply_datetime}'),
+                        ])
+                        . $btn
+                    ),
+                ],
+            ];
+        }
+
+        return [
+            'new_ticket' => [
+                'subject' => 'New ticket {ticket_number} from {author_name}',
+                'body'    => $wrap(
+                    '<p>Hello, <strong>{manager_name}</strong>!</p>'
+                    . '<p>A new support ticket has been submitted by a member of your organization <strong>{org_name}</strong>:</p>'
+                    . $table([
+                        $row('From', $authorCell),
+                        $row('Subject', '<strong>{subject}</strong>'),
+                        $row('Ticket #', '{ticket_number}'),
+                        $row('Date', '{created_datetime}'),
+                    ])
+                    . $btn
+                ),
+            ],
+            'reply_agent' => [
+                'subject' => 'Re: {ticket_number} — {subject}',
+                'body'    => $wrap(
+                    '<p>Hello, <strong>{manager_name}</strong>!</p>'
+                    . '<p>A support agent has replied to a ticket in your organization <strong>{org_name}</strong>:</p>'
+                    . $table([
+                        $row('Customer', $authorCell),
+                        $row('Subject', '<strong>{subject}</strong>'),
+                        $row('Ticket #', '{ticket_number}'),
+                        $row('Replied at', '{reply_datetime}'),
+                    ])
+                    . $btn
+                ),
+            ],
+            'reply_customer' => [
+                'subject' => 'Re: {ticket_number} — {subject}',
+                'body'    => $wrap(
+                    '<p>Hello, <strong>{manager_name}</strong>!</p>'
+                    . '<p>A customer has replied to a ticket in your organization <strong>{org_name}</strong>:</p>'
+                    . $table([
+                        $row('From', $authorCell),
+                        $row('Subject', '<strong>{subject}</strong>'),
+                        $row('Ticket #', '{ticket_number}'),
+                        $row('Replied at', '{reply_datetime}'),
+                    ])
+                    . $btn
+                ),
+            ],
+        ];
     }
 
     protected static function sanitizeHtml(string $html): string
