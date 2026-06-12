@@ -45,6 +45,7 @@ A FreeScout module that adds the concept of **Organizations** (companies/teams) 
 
 ### User permissions
 - New permission **"Allow managing organizations"** — non-admins with this permission get access to the list, create, and edit organization pages
+- New permission **"Allow managing notification templates"** — separate from organization management, allows editing email notification templates
 - Deleting organizations remains exclusive to admins
 
 ### Customer card
@@ -88,9 +89,50 @@ An organization manager gets extended access through EUP:
 - **Org Settings** page for configuring email notifications
 - Ticket access is **strictly limited to the current mailbox** (organization copied to another mailbox — portal 403)
 
+### Notification Subscriptions *(optional)*
+
+Portal managers can customize which events and scopes trigger email notifications:
+
+- **Subscription matrix** on the "Notifications" tab in portal Organization Settings
+- **Events:** New ticket, Agent reply, Customer reply
+- **Scopes:** Entire organization (global managers only) or specific structural units
+- **Cascading behavior:** Checking "Entire organization" automatically checks all unit rows; unchecking any unit unchecks "Entire organization"
+- Notifications use the mail driver of the corresponding mailbox
+
 ### Email notifications *(optional)*
-- Managers with the option enabled receive an email when a new ticket is created by any member of the organization
 - Uses the mail driver of the corresponding mailbox
+- Notification email templates can be customized by admins (see section below)
+
+### Notification Email Templates *(optional, requires "Allow managing notification templates" permission)*
+
+Admins can customize email templates sent to managers on the **Notification Templates** tab of the **Manage → Organizations** page.
+
+**Template types:**
+- New ticket notification
+- Agent reply notification
+- Customer reply notification
+
+**Features:**
+- Summernote WYSIWYG editor for each template
+- Macro variable picker for inserting available placeholders
+- Leave template empty to fall back to the built-in default
+
+**Available macro variables:**
+| Variable | Description |
+|----------|-------------|
+| `{manager_name}` | Name of the manager receiving the notification |
+| `{author_name}` | Name of the ticket author (customer who created/replied) |
+| `{org_name}` | Organization name |
+| `{unit_name}` | Structural unit name (if applicable) |
+| `{subject}` | Ticket subject |
+| `{ticket_number}` | Ticket ID |
+| `{ticket_url}` | Link to the ticket in the portal |
+| `{created_date}` | Ticket creation date (format: YYYY-MM-DD) |
+| `{created_time}` | Ticket creation time (format: HH:MM:SS) |
+| `{created_datetime}` | Ticket creation date and time (ISO 8601) |
+| `{reply_date}` | Reply date (format: YYYY-MM-DD) |
+| `{reply_time}` | Reply time (format: HH:MM:SS) |
+| `{reply_datetime}` | Reply date and time (ISO 8601) |
 
 ### Mailbox settings
 

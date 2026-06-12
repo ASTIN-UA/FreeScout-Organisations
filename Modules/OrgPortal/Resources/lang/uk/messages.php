@@ -35,7 +35,7 @@ return [
     'preview'                => 'Перегляд',
 
     // Admin — members table
-    'name'                   => 'Назва',
+    'name'                   => 'Ім\'я',
     'email'                  => 'Email',
     'members'                => 'Учасники',
     'role'                   => 'Роль',
@@ -114,7 +114,7 @@ return [
 
     // Portal — member management
     'member_unit'            => 'Підрозділ',
-    'no_unit'                => '— Без підрозділу —',
+    'no_unit'                => 'Вся організація',
     'apply'                  => 'Застосувати',
     'role_member'            => 'Учасник',
     'role_manager_scoped'    => 'Менеджер',
@@ -123,7 +123,7 @@ return [
     'global_grant_hint'      => 'Оберіть підрозділ, щоб призначити менеджера підрозділу. Підвищення до глобального менеджера потребує дозволу адміністратора.',
     'member_updated'         => 'Учасника оновлено.',
     'cannot_grant_global'    => 'Вам не дозволено призначати глобальних менеджерів.',
-    'can_manage_org'         => 'Може керувати структурою',
+    'can_manage_org'         => 'Керує всією організацією',
     'can_manage_org_hint'    => 'Дозволяє цьому глобальному менеджеру підвищувати інших учасників до глобальних менеджерів через портал.',
     'member_status'          => 'Статус',
     'status_member_active'   => 'Активний',
@@ -134,6 +134,47 @@ return [
     'member_activated'       => 'Учасника відновлено.',
     'confirm_deactivate'     => 'Звільнити цього учасника? Нові заявки на нього не призначатимуться.',
     'cannot_deactivate_self' => 'Ви не можете звільнити самого себе.',
+
+    // Notification subscriptions (portal)
+    'notif_scope'                => 'Область',
+    'notif_scope_org'            => 'Вся організація',
+    'notif_event_new_ticket'     => 'Нова заявка',
+    'notif_event_reply_agent'    => 'Відповідь агента',
+    'notif_event_reply_customer' => 'Відповідь клієнта',
+    'notif_hint'                 => 'Встановіть прапорець, щоб отримувати email-сповіщення про заявки з вибраної області.',
+
+    // Notification template settings (admin)
+    'notif_reply_triggers'       => 'Тригери сповіщень про відповіді',
+    'notif_trigger_agent'        => 'Сповіщати про відповіді агентів',
+    'notif_trigger_customer'     => 'Сповіщати про відповіді клієнтів',
+    'notif_trigger_hint'         => 'Ці налаштування діють глобально. Менеджери підписуються на конкретні області на сторінці налаштувань порталу.',
+    'tpl_tab_title'              => 'Шаблони сповіщень',
+    'tpl_heading'                => 'Шаблон листа',
+    'tpl_fallback_hint'          => '(залиште порожнім для використання вбудованого шаблону)',
+    'tpl_subject'                => 'Тема',
+    'tpl_subject_placeholder'    => 'Залиште порожнім для значення за замовчуванням',
+    'tpl_body'                   => 'Тіло повідомлення',
+    'tpl_insert_macro'           => 'Вставити змінну…',
+
+    // Macros
+    'macro_manager_name'     => 'Ім\'я отримувача',
+    'macro_author_name'      => 'Ім\'я автора заявки',
+    'macro_org_name'         => 'Назва організації',
+    'macro_unit_name'        => 'Назва підрозділу',
+    'macro_subject'          => 'Тема заявки',
+    'macro_ticket_number'    => 'Номер заявки',
+    'macro_ticket_url'       => 'Посилання на заявку',
+    'macro_created_date'     => 'Дата створення',
+    'macro_created_time'     => 'Час створення',
+    'macro_created_datetime' => 'Дата та час створення',
+    'macro_reply_date'       => 'Дата відповіді',
+    'macro_reply_time'       => 'Час відповіді',
+    'macro_reply_datetime'   => 'Дата та час відповіді',
+
+    // Notification email fallback strings
+    'email_reply_agent_intro'    => 'Агент додав нову відповідь до заявки вашої організації:',
+    'email_reply_customer_intro' => 'Клієнт відповів на заявку вашої організації:',
+    'email_reply_subject'        => 'Re: :number — :subject',
 
     // EUP nav
     'org_settings_nav'       => 'Налаштування організації',
@@ -170,6 +211,7 @@ return [
 
     // User permission
     'perm_manage_organizations' => 'Дозволено керувати організаціями',
+    'perm_manage_templates'     => 'Дозволено керувати шаблонами сповіщень організацій',
 
     // ApiWebhooks settings page
     'api_docs_link'          => 'Документація API OrgPortal',

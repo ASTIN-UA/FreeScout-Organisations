@@ -114,7 +114,7 @@ return [
 
     // Portal — member management
     'member_unit'            => 'Unit',
-    'no_unit'                => '— No unit —',
+    'no_unit'                => 'Entire organization',
     'apply'                  => 'Apply',
     'role_member'            => 'Member',
     'role_manager_scoped'    => 'Manager',
@@ -123,7 +123,7 @@ return [
     'global_grant_hint'      => 'Set a unit to make a unit manager. Promoting to global manager requires admin permission.',
     'member_updated'         => 'Member updated.',
     'cannot_grant_global'    => 'You are not allowed to assign global managers.',
-    'can_manage_org'         => 'Can manage org structure',
+    'can_manage_org'         => 'Manages entire organization',
     'can_manage_org_hint'    => 'Allows this global manager to promote other members to global manager from the portal.',
     'member_status'          => 'Status',
     'status_member_active'   => 'Active',
@@ -134,6 +134,47 @@ return [
     'member_activated'       => 'Member reactivated.',
     'confirm_deactivate'     => 'Deactivate this member? They will no longer receive ticket assignments.',
     'cannot_deactivate_self' => 'You cannot deactivate yourself.',
+
+    // Notification subscriptions (portal)
+    'notif_scope'                => 'Scope',
+    'notif_scope_org'            => 'Entire organization',
+    'notif_event_new_ticket'     => 'New ticket',
+    'notif_event_reply_agent'    => 'Agent reply',
+    'notif_event_reply_customer' => 'Customer reply',
+    'notif_hint'                 => 'Check the box to receive email notifications for tickets from the selected scope.',
+
+    // Notification template settings (admin)
+    'notif_reply_triggers'       => 'Reply notification triggers',
+    'notif_trigger_agent'        => 'Notify on agent replies',
+    'notif_trigger_customer'     => 'Notify on customer replies',
+    'notif_trigger_hint'         => 'These settings apply globally. Managers subscribe to specific scopes on the portal settings page.',
+    'tpl_tab_title'              => 'Notification Templates',
+    'tpl_heading'                => 'Email template',
+    'tpl_fallback_hint'          => '(leave empty to use the built-in template)',
+    'tpl_subject'                => 'Subject',
+    'tpl_subject_placeholder'    => 'Leave empty to use default',
+    'tpl_body'                   => 'Message body',
+    'tpl_insert_macro'           => 'Insert variable…',
+
+    // Macros
+    'macro_manager_name'     => 'Recipient name',
+    'macro_author_name'      => 'Ticket author name',
+    'macro_org_name'         => 'Organization name',
+    'macro_unit_name'        => 'Unit name',
+    'macro_subject'          => 'Ticket subject',
+    'macro_ticket_number'    => 'Ticket number',
+    'macro_ticket_url'       => 'Ticket URL',
+    'macro_created_date'     => 'Creation date',
+    'macro_created_time'     => 'Creation time',
+    'macro_created_datetime' => 'Creation date & time',
+    'macro_reply_date'       => 'Reply date',
+    'macro_reply_time'       => 'Reply time',
+    'macro_reply_datetime'   => 'Reply date & time',
+
+    // Notification email fallback strings
+    'email_reply_agent_intro'    => 'A new agent reply was added to a ticket in your organization:',
+    'email_reply_customer_intro' => 'A customer replied to a ticket in your organization:',
+    'email_reply_subject'        => 'Re: :number — :subject',
 
     // EUP nav
     'org_settings_nav'       => 'Organization Settings',
@@ -170,6 +211,7 @@ return [
 
     // User permission
     'perm_manage_organizations' => 'Allow managing organizations',
+    'perm_manage_templates'     => 'Allow managing notification templates',
 
     // ApiWebhooks settings page
     'api_docs_link'          => 'OrgPortal API Docs',
