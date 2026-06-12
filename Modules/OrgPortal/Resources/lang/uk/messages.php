@@ -155,6 +155,7 @@ return [
     'tpl_subject_placeholder'    => 'Залиште порожнім для значення за замовчуванням',
     'tpl_body'                   => 'Тіло повідомлення',
     'tpl_insert_macro'           => 'Вставити змінну…',
+    'tpl_load_default'           => 'Завантажити стандартний шаблон',
 
     // Macros
     'macro_manager_name'     => 'Ім\'я отримувача',

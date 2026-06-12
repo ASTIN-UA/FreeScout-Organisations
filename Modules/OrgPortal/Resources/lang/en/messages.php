@@ -155,6 +155,7 @@ return [
     'tpl_subject_placeholder'    => 'Leave empty to use default',
     'tpl_body'                   => 'Message body',
     'tpl_insert_macro'           => 'Insert variable…',
+    'tpl_load_default'           => 'Load default template',
 
     // Macros
     'macro_manager_name'     => 'Recipient name',

@@ -165,6 +165,16 @@
                                         </div>
                                     </div>
 
+                                    {{-- Load default --}}
+                                    <div class="form-group">
+                                        <button type="button"
+                                                class="btn btn-default btn-xs orgportal-load-default"
+                                                data-event="{{ $eKey }}">
+                                            <i class="glyphicon glyphicon-refresh"></i>
+                                            {{ __('orgportal::messages.tpl_load_default') }}
+                                        </button>
+                                    </div>
+
                                     {{-- Body --}}
                                     <div class="form-group">
                                         <label>{{ __('orgportal::messages.tpl_body') }}</label>
@@ -206,7 +216,10 @@
     </div>
 </div>
 
+<div id="orgportal-defaults-data" data-defaults='{!! json_encode($tplDefaults ?? [], JSON_HEX_QUOT | JSON_HEX_TAG | JSON_UNESCAPED_SLASHES) !!}'></div>
+
 <script {!! \Helper::cspNonceAttr() !!}>
+window.orgportalDefaults = JSON.parse(document.getElementById('orgportal-defaults-data').getAttribute('data-defaults') || '{}');
 (function () {
     document.addEventListener('DOMContentLoaded', function () {
         if (typeof $ === 'undefined' || typeof $.fn.summernote === 'undefined') return;
@@ -272,6 +285,22 @@
             input.selectionStart = input.selectionEnd = pos + macro.length;
             input.focus();
             $(this).val('');
+        });
+
+        // Load default template
+        $(document).on('click', '.orgportal-load-default', function () {
+            var eKey    = $(this).data('event');
+            var defs    = window.orgportalDefaults || {};
+            var tpl     = defs[eKey];
+            if (!tpl) return;
+            var $subjectInput = $('#tpl_' + eKey + '_subject');
+            var $bodyTa       = $('#tpl_' + eKey + '_body');
+            $subjectInput.val(tpl.subject || '');
+            if ($bodyTa.data('summernote-inited')) {
+                $bodyTa.summernote('code', tpl.body || '');
+            } else {
+                $bodyTa.val(tpl.body || '');
+            }
         });
 
         // Sync Summernote → textarea on form submit
