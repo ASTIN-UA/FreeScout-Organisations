@@ -105,15 +105,18 @@ class SeedDefaultNotificationTemplates extends Migration
 
     public function up()
     {
-        foreach ($this->defaultTemplates() as $event => $tpl) {
+        $templates = \Modules\OrgPortal\Http\Controllers\OrgPortalAdminController::defaultTemplates(
+            config('app.locale', 'en')
+        );
+
+        foreach ($templates as $event => $tpl) {
             $subjectKey = 'orgportal.tpl_' . $event . '_subject';
             $bodyKey    = 'orgportal.tpl_' . $event . '_body';
 
-            // Only seed if not already set (don't overwrite admin customizations)
-            if (\Option::get($subjectKey, '') === '') {
+            if (empty(\Option::get($subjectKey))) {
                 \Option::set($subjectKey, $tpl['subject']);
             }
-            if (\Option::get($bodyKey, '') === '') {
+            if (empty(\Option::get($bodyKey))) {
                 \Option::set($bodyKey, $tpl['body']);
             }
         }
