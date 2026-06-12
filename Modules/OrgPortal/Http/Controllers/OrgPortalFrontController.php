@@ -407,6 +407,14 @@ class OrgPortalFrontController extends Controller
             ->sortBy(fn ($m) => mb_strtolower(optional($m->customer)->getFullName() ?: ''))
             ->values();
 
+        // Build subscription lookup: "event:scope_type:scope_id" => true
+        $rawSubs = \Modules\OrgPortal\Models\OrgNotificationSubscription::where('member_id', $member->id)->get();
+        $subsMap = [];
+        foreach ($rawSubs as $s) {
+            $key = $s->event . ':' . $s->scope_type . ':' . ($s->scope_id ?? '');
+            $subsMap[$key] = true;
+        }
+
         return view('orgportal::portal.settings', [
             'mailbox'            => $mailbox,
             'mailbox_id'         => $mailbox_id,
@@ -417,6 +425,7 @@ class OrgPortalFrontController extends Controller
             'members'            => $members,
             'canManageStructure' => $member->isGlobalManager(),
             'canGrantGlobal'     => (bool) $member->can_manage_org,
+            'subsMap'            => $subsMap,
         ]);
     }
 
@@ -426,8 +435,44 @@ class OrgPortalFrontController extends Controller
         $customer = $this->authCustomer();
         $member   = $this->requireManager($customer, $mailbox);
 
-        $member->notify_on_new_ticket = (bool) $request->input('notify_on_new_ticket', false);
-        $member->save();
+        // Delete all existing subscriptions and re-insert from form.
+        \Modules\OrgPortal\Models\OrgNotificationSubscription::where('member_id', $member->id)->delete();
+
+        $events = [
+            \Modules\OrgPortal\Models\OrgNotificationSubscription::EVENT_NEW_TICKET,
+            \Modules\OrgPortal\Models\OrgNotificationSubscription::EVENT_REPLY_AGENT,
+            \Modules\OrgPortal\Models\OrgNotificationSubscription::EVENT_REPLY_CUSTOMER,
+        ];
+
+        $subs = $request->input('subs', []);
+        $org  = $member->organization;
+        $org->load('units');
+
+        foreach ($events as $event) {
+            if (empty($subs[$event])) continue;
+            foreach ($subs[$event] as $scopeKey => $val) {
+                if ($member->isGlobalManager() && $scopeKey === 'org') {
+                    \Modules\OrgPortal\Models\OrgNotificationSubscription::create([
+                        'member_id'  => $member->id,
+                        'event'      => $event,
+                        'scope_type' => 'org',
+                        'scope_id'   => null,
+                    ]);
+                } elseif (str_starts_with($scopeKey, 'unit_')) {
+                    $unitId = (int) substr($scopeKey, 5);
+                    // Verify unit belongs to this org and manager can access it.
+                    $unitOk = $org->units->contains('id', $unitId);
+                    if ($unitOk && ($member->isGlobalManager() || $member->unit_id === $unitId)) {
+                        \Modules\OrgPortal\Models\OrgNotificationSubscription::create([
+                            'member_id'  => $member->id,
+                            'event'      => $event,
+                            'scope_type' => 'unit',
+                            'scope_id'   => $unitId,
+                        ]);
+                    }
+                }
+            }
+        }
 
         return redirect()
             ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id])
@@ -463,7 +508,9 @@ class OrgPortalFrontController extends Controller
             ->where('name', $name)->exists();
 
         if ($exists) {
-            return back()->with('flash_error', __('orgportal::messages.unit_exists'));
+            return redirect()
+                ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id, 'tab' => 'units'])
+                ->with('flash_error', __('orgportal::messages.unit_exists'));
         }
 
         OrganizationUnit::create([
@@ -472,7 +519,7 @@ class OrgPortalFrontController extends Controller
         ]);
 
         return redirect()
-            ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id])
+            ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id, 'tab' => 'units'])
             ->with('flash_success', __('orgportal::messages.unit_created'));
     }
 
@@ -494,14 +541,16 @@ class OrgPortalFrontController extends Controller
             ->exists();
 
         if ($exists) {
-            return back()->with('flash_error', __('orgportal::messages.unit_exists'));
+            return redirect()
+                ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id, 'tab' => 'units'])
+                ->with('flash_error', __('orgportal::messages.unit_exists'));
         }
 
         $unit->name = $name;
         $unit->save();
 
         return redirect()
-            ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id])
+            ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id, 'tab' => 'units'])
             ->with('flash_success', __('orgportal::messages.unit_updated'));
     }
 
@@ -524,7 +573,7 @@ class OrgPortalFrontController extends Controller
         $unit->delete();
 
         return redirect()
-            ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id])
+            ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id, 'tab' => 'units'])
             ->with('flash_success', __('orgportal::messages.unit_deleted'));
     }
 
@@ -560,7 +609,9 @@ class OrgPortalFrontController extends Controller
 
         // Promoting to global manager requires the explicit admin-granted right.
         if ($role === 'manager' && $unitId === null && !$manager->can_manage_org) {
-            return back()->with('flash_error', __('orgportal::messages.cannot_grant_global'));
+            return redirect()
+                ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id, 'tab' => 'members'])
+                ->with('flash_error', __('orgportal::messages.cannot_grant_global'));
         }
 
         $target->unit_id = $unitId;
@@ -568,7 +619,7 @@ class OrgPortalFrontController extends Controller
         $target->save();
 
         return redirect()
-            ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id])
+            ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id, 'tab' => 'members'])
             ->with('flash_success', __('orgportal::messages.member_updated'));
     }
 
@@ -586,7 +637,9 @@ class OrgPortalFrontController extends Controller
             ->findOrFail($member_id);
 
         if ($target->customer_id === $customer->id) {
-            return back()->with('flash_error', __('orgportal::messages.cannot_deactivate_self'));
+            return redirect()
+                ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id, 'tab' => 'members'])
+                ->with('flash_error', __('orgportal::messages.cannot_deactivate_self'));
         }
 
         $target->is_active      = !$target->is_active;
@@ -594,7 +647,7 @@ class OrgPortalFrontController extends Controller
         $target->save();
 
         return redirect()
-            ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id])
+            ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id, 'tab' => 'members'])
             ->with('flash_success', $target->is_active
                 ? __('orgportal::messages.member_activated')
                 : __('orgportal::messages.member_deactivated'));

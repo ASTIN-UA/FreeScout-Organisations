@@ -3,6 +3,12 @@
 @section('title', __('orgportal::messages.org_settings_title'))
 
 @section('content')
+@php
+    $activeTab = request()->input('tab', 'notifications');
+    if (!in_array($activeTab, ['notifications', 'units', 'members'])) {
+        $activeTab = 'notifications';
+    }
+@endphp
 <div id="eup-container">
     <div class="eup-container-padded">
 
@@ -17,30 +23,30 @@
             <div class="alert alert-danger">{{ session('flash_error') }}</div>
         @endif
 
-        <ul class="nav nav-tabs" role="tablist" style="margin-bottom:18px;">
-            <li role="presentation" class="active">
+        <ul class="nav nav-tabs" role="tablist" style="margin-bottom:0;">
+            <li role="presentation" class="{{ $activeTab === 'notifications' ? 'active' : '' }}">
                 <a href="#tab-notifications" aria-controls="tab-notifications" role="tab" data-toggle="tab">
                     {{ __('orgportal::messages.tab_notifications') }}
                 </a>
             </li>
             @if($canManageStructure)
-                <li role="presentation">
+                <li role="presentation" class="{{ $activeTab === 'units' ? 'active' : '' }}">
                     <a href="#tab-units" aria-controls="tab-units" role="tab" data-toggle="tab">
                         {{ __('orgportal::messages.tab_units') }}
                     </a>
                 </li>
             @endif
-            <li role="presentation">
+            <li role="presentation" class="{{ $activeTab === 'members' ? 'active' : '' }}">
                 <a href="#tab-members" aria-controls="tab-members" role="tab" data-toggle="tab">
                     {{ __('orgportal::messages.members') }}
                 </a>
             </li>
         </ul>
 
-        <div class="tab-content">
+        <div class="tab-content" style="padding-top:12px;">
 
             {{-- ─── Notifications ─────────────────────────────────────── --}}
-            <div role="tabpanel" class="tab-pane active" id="tab-notifications">
+            <div role="tabpanel" class="tab-pane {{ $activeTab === 'notifications' ? 'active' : '' }}" id="tab-notifications">
                 @include('orgportal::portal.settings_inline', [
                     'member'     => $member,
                     'mailbox_id' => $mailbox_id,
@@ -49,7 +55,7 @@
 
             {{-- ─── Units (global manager only) ───────────────────────── --}}
             @if($canManageStructure)
-            <div role="tabpanel" class="tab-pane" id="tab-units">
+            <div role="tabpanel" class="tab-pane {{ $activeTab === 'units' ? 'active' : '' }}" id="tab-units">
 
                 <form method="POST"
                       action="{{ route('orgportal.portal.units.create', ['mailbox_id' => $mailbox_id]) }}"
@@ -112,7 +118,7 @@
             @endif
 
             {{-- ─── Members ───────────────────────────────────────────── --}}
-            <div role="tabpanel" class="tab-pane" id="tab-members">
+            <div role="tabpanel" class="tab-pane {{ $activeTab === 'members' ? 'active' : '' }}" id="tab-members">
                 @if($members->isEmpty())
                     <p class="text-muted">{{ __('orgportal::messages.no_members') }}</p>
                 @else
