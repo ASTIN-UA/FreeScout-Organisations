@@ -5,6 +5,7 @@ namespace Modules\OrgPortal\Providers;
 use Illuminate\Support\ServiceProvider;
 use Modules\OrgPortal\Models\Organization;
 use Modules\OrgPortal\Models\OrganizationMember;
+use Modules\OrgPortal\Models\OrgNotificationSubscription;
 
 define('ORGPORTAL_MODULE', 'orgportal');
 
@@ -19,6 +20,7 @@ class OrgPortalServiceProvider extends ServiceProvider
      * `user_permissions.list` and `user_permissions.name` Eventy filters.
      */
     const PERM_MANAGE_ORGANIZATIONS = 100;
+    const PERM_MANAGE_TEMPLATES     = 101;
 
     public function boot()
     {
@@ -68,13 +70,17 @@ class OrgPortalServiceProvider extends ServiceProvider
         // permissions form and when saving it, so no save hook is needed.
         \Eventy::addFilter('user_permissions.list', function ($permissions) {
             $permissions[] = self::PERM_MANAGE_ORGANIZATIONS;
+            $permissions[] = self::PERM_MANAGE_TEMPLATES;
             return $permissions;
         });
 
-        // Provide the localized label for our permission ID.
+        // Provide the localized label for our permission IDs.
         \Eventy::addFilter('user_permissions.name', function ($name, $permission) {
             if ($permission == self::PERM_MANAGE_ORGANIZATIONS) {
                 return __('orgportal::messages.perm_manage_organizations');
+            }
+            if ($permission == self::PERM_MANAGE_TEMPLATES) {
+                return __('orgportal::messages.perm_manage_templates');
             }
             return $name;
         }, 20, 2);
@@ -93,6 +99,17 @@ class OrgPortalServiceProvider extends ServiceProvider
             return true;
         }
         return $user->hasPermission(self::PERM_MANAGE_ORGANIZATIONS);
+    }
+
+    public static function userCanManageTemplates($user)
+    {
+        if (!$user) {
+            return false;
+        }
+        if ($user->isAdmin()) {
+            return true;
+        }
+        return $user->hasPermission(self::PERM_MANAGE_TEMPLATES);
     }
 
     protected function registerMenuHooks()
@@ -416,56 +433,185 @@ class OrgPortalServiceProvider extends ServiceProvider
 
     protected function registerNotificationHooks()
     {
-        // Fire email notifications to org managers when a customer creates a new conversation.
-        // Hook: conversation.created_by_customer fires with ($conversation, $thread, $customer).
+        // New ticket created by a customer.
         \Eventy::addAction('conversation.created_by_customer', function ($conversation, $thread, $customer) {
-            if (!$customer || !$customer->id) {
-                return;
+            if (!$customer || !$customer->id) return;
+            $this->fireOrgNotification(
+                OrgNotificationSubscription::EVENT_NEW_TICKET,
+                $conversation,
+                $customer->id,
+                null
+            );
+        }, 20, 3);
+
+        // Agent reply on a ticket.
+        \Eventy::addAction('conversation.reply_created', function ($conversation, $thread) {
+            if (!\Option::get('orgportal.notify_agent_reply', true)) return;
+            $this->fireOrgNotification(
+                OrgNotificationSubscription::EVENT_REPLY_AGENT,
+                $conversation,
+                optional($conversation->customer)->id,
+                $thread
+            );
+        }, 20, 2);
+
+        // Customer reply on an existing ticket.
+        \Eventy::addAction('conversation.customer_replied', function ($conversation, $thread, $customer) {
+            if (!\Option::get('orgportal.notify_customer_reply', false)) return;
+            if (!$customer || !$customer->id) return;
+            $this->fireOrgNotification(
+                OrgNotificationSubscription::EVENT_REPLY_CUSTOMER,
+                $conversation,
+                $customer->id,
+                $thread
+            );
+        }, 20, 3);
+    }
+
+    /**
+     * Find subscribed managers for an org event and send notification emails.
+     */
+    protected function fireOrgNotification(string $event, $conversation, ?int $authorCustomerId, $thread): void
+    {
+        if (!$authorCustomerId) return;
+
+        $authorMember = OrganizationMember::where('customer_id', $authorCustomerId)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$authorMember) return;
+
+        // All active managers in the same org (excluding the author themselves).
+        $managers = OrganizationMember::where('organization_id', $authorMember->organization_id)
+            ->where('role', 'manager')
+            ->where('is_active', true)
+            ->where('customer_id', '!=', $authorCustomerId)
+            ->with('customer')
+            ->get();
+
+        if ($managers->isEmpty()) return;
+
+        try {
+            $mailbox = \App\Mailbox::find($conversation->mailbox_id);
+            if ($mailbox) \MailHelper::setMailDriver($mailbox);
+        } catch (\Exception $e) {
+            \Helper::logException($e);
+        }
+
+        foreach ($managers as $manager) {
+            if (!$manager->customer) continue;
+
+            if (!OrgNotificationSubscription::memberIsSubscribed($manager->id, $event, $authorMember->unit_id)) {
+                continue;
             }
 
-            $authorMember = OrganizationMember::where('customer_id', $customer->id)->first();
+            $email = $this->getCustomerEmail($manager->customer);
+            if (!$email) continue;
 
-            if (!$authorMember) {
-                return;
-            }
+            [$subject, $body] = $this->renderNotificationTemplate($event, $manager, $authorMember, $conversation, $thread);
 
-            $managers = OrganizationMember::where('organization_id', $authorMember->organization_id)
-                ->where('role', 'manager')
-                ->where('notify_on_new_ticket', true)
-                ->where('customer_id', '!=', $customer->id)
-                ->with('customer')
-                ->get();
-
-            // Set the mailbox mail driver so the correct SMTP is used.
             try {
-                $mailbox = \App\Mailbox::find($conversation->mailbox_id);
-                if ($mailbox) {
-                    \MailHelper::setMailDriver($mailbox);
-                }
+                \Mail::to($email)->send(
+                    new \Modules\OrgPortal\Mail\OrgNotificationMail($subject, $body)
+                );
             } catch (\Exception $e) {
                 \Helper::logException($e);
             }
+        }
+    }
 
-            foreach ($managers as $manager) {
-                if (!$manager->customer) {
-                    continue;
-                }
-                $email = $this->getCustomerEmail($manager->customer);
-                if ($email) {
-                    try {
-                        \Mail::to($email)->send(
-                            new \Modules\OrgPortal\Mail\OrgNewTicketMail(
-                                $manager->customer,
-                                $customer,
-                                $conversation
-                            )
-                        );
-                    } catch (\Exception $e) {
-                        \Helper::logException($e);
-                    }
-                }
-            }
-        }, 20, 3);
+    /**
+     * Render subject + HTML body from stored template, replacing macros.
+     * Falls back to a simple built-in template when no custom template is saved.
+     */
+    protected function renderNotificationTemplate(string $event, $manager, $authorMember, $conversation, $thread): array
+    {
+        $subjectKey = 'orgportal.tpl_' . $event . '_subject';
+        $bodyKey    = 'orgportal.tpl_' . $event . '_body';
+
+        $subject = \Option::get($subjectKey, '');
+        $body    = \Option::get($bodyKey, '');
+
+        // Build ticket URL once.
+        $ticketUrl = null;
+        if (\Module::isActive('enduserportal')) {
+            try {
+                $encoded   = \EndUserPortal::encodeMailboxId($conversation->mailbox_id);
+                $ticketUrl = route('orgportal.portal.ticket', [
+                    'mailbox_id'      => $encoded,
+                    'conversation_id' => $conversation->id,
+                ]);
+            } catch (\Exception $e) {}
+        }
+
+        $authorCustomer = $authorMember->customer;
+        $org            = $authorMember->organization;
+        $unit           = $authorMember->unit;
+
+        $now = $thread ? \Carbon\Carbon::parse($thread->created_at) : \Carbon\Carbon::parse($conversation->created_at);
+
+        $macros = [
+            '{manager_name}'    => e($manager->customer ? $manager->customer->getFullName() : ''),
+            '{author_name}'     => e($authorCustomer ? $authorCustomer->getFullName() : ''),
+            '{org_name}'        => e($org ? $org->name : ''),
+            '{unit_name}'       => e($unit ? $unit->name : ''),
+            '{subject}'         => e($conversation->subject ?? ''),
+            '{ticket_number}'   => '#' . ($conversation->number ?? ''),
+            '{ticket_url}'      => e($ticketUrl ?? ''),
+            '{created_date}'    => \Carbon\Carbon::parse($conversation->created_at)->format('d.m.Y'),
+            '{created_time}'    => \Carbon\Carbon::parse($conversation->created_at)->format('H:i'),
+            '{created_datetime}'=> \Carbon\Carbon::parse($conversation->created_at)->format('d.m.Y H:i'),
+            '{reply_date}'      => $now->format('d.m.Y'),
+            '{reply_time}'      => $now->format('H:i'),
+            '{reply_datetime}'  => $now->format('d.m.Y H:i'),
+        ];
+
+        if ($subject === '' || $body === '') {
+            // Built-in fallback template.
+            return $this->builtinNotificationTemplate($event, $macros, $ticketUrl);
+        }
+
+        $subject = str_replace(array_keys($macros), array_values($macros), $subject);
+        $body    = str_replace(array_keys($macros), array_values($macros), $body);
+
+        return [$subject, $body];
+    }
+
+    protected function builtinNotificationTemplate(string $event, array $macros, ?string $ticketUrl): array
+    {
+        if ($event === OrgNotificationSubscription::EVENT_NEW_TICKET) {
+            $subject = __('orgportal::messages.new_ticket_from', ['name' => $macros['{author_name}']]);
+            $body = '<p>' . __('orgportal::messages.email_hello') . ', ' . e($macros['{manager_name}']) . '</p>'
+                  . '<p>' . __('orgportal::messages.email_new_ticket_intro') . '</p>'
+                  . '<table style="width:100%;border-collapse:collapse;margin:16px 0">'
+                  . '<tr><td style="color:#666;width:130px">' . __('orgportal::messages.email_from') . ':</td><td><strong>' . e($macros['{author_name}']) . '</strong></td></tr>'
+                  . '<tr><td style="color:#666">' . __('orgportal::messages.email_subject') . ':</td><td><strong>' . e($macros['{subject}']) . '</strong></td></tr>'
+                  . '<tr><td style="color:#666">' . __('orgportal::messages.email_ticket_number') . ':</td><td>' . e($macros['{ticket_number}']) . '</td></tr>'
+                  . '</table>';
+        } else {
+            $labelKey = $event === OrgNotificationSubscription::EVENT_REPLY_AGENT
+                ? 'email_reply_agent_intro' : 'email_reply_customer_intro';
+            $subject = __('orgportal::messages.email_reply_subject', [
+                'number' => $macros['{ticket_number}'],
+                'subject' => $macros['{subject}'],
+            ]);
+            $body = '<p>' . __('orgportal::messages.email_hello') . ', ' . e($macros['{manager_name}']) . '</p>'
+                  . '<p>' . __('orgportal::messages.' . $labelKey) . '</p>'
+                  . '<table style="width:100%;border-collapse:collapse;margin:16px 0">'
+                  . '<tr><td style="color:#666;width:130px">' . __('orgportal::messages.email_from') . ':</td><td><strong>' . e($macros['{author_name}']) . '</strong></td></tr>'
+                  . '<tr><td style="color:#666">' . __('orgportal::messages.email_subject') . ':</td><td><strong>' . e($macros['{subject}']) . '</strong></td></tr>'
+                  . '<tr><td style="color:#666">' . __('orgportal::messages.email_ticket_number') . ':</td><td>' . e($macros['{ticket_number}']) . '</td></tr>'
+                  . '</table>';
+        }
+
+        if ($ticketUrl) {
+            $body .= '<p><a href="' . e($ticketUrl) . '" style="display:inline-block;padding:10px 22px;background:#3b82f6;color:#fff;text-decoration:none;border-radius:4px;font-weight:bold;">'
+                   . __('orgportal::messages.view_ticket') . '</a></p>';
+        }
+
+        $body .= '<p style="margin-top:32px;font-size:12px;color:#999">' . __('orgportal::messages.email_new_ticket_footer') . '</p>';
+
+        return [$subject, $body];
     }
 
     // -------------------------------------------------------------------------
