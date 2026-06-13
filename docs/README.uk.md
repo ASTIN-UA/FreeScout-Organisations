@@ -142,6 +142,10 @@
 | `GET` | `/api/organizations/{id}` | Отримання організації з членами |
 | `PUT` | `/api/organizations/{id}` | Оновлення організації |
 | `DELETE` | `/api/organizations/{id}` | Видалення організації |
+| `GET` | `/api/organizations/{id}/units` | Список структурних підрозділів |
+| `POST` | `/api/organizations/{id}/units` | Створення структурного підрозділу |
+| `PUT` | `/api/units/{unitId}` | Перейменування підрозділу |
+| `DELETE` | `/api/units/{unitId}` | Видалення підрозділу (члени від'єднуються, менеджери підрозділу знижуються) |
 | `GET` | `/api/customers/{id}/organization` | Організація клієнта |
 | `PUT` | `/api/customers/{id}/organization` | Встановлення/оновлення членства клієнта |
 | `DELETE` | `/api/customers/{id}/organization` | Видалення клієнта з організації |
@@ -372,8 +376,6 @@ curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
 ## Оновлення
 
 OrgPortal підтримує **автоматичні оновлення** через вбудований механізм оновлення модулів FreeScout.
-
-> **Requires FreeScout 1.8.170 or later.** On older versions the update banner will not appear — update the module manually by replacing the `OrgPortal` folder with the latest release ZIP.
 
 > **Потребує FreeScout 1.8.170 або новіше.** На старіших версіях банер оновлення не з'явиться — оновіть модуль вручну, замінивши папку `OrgPortal` з останнього релізного ZIP.
 
