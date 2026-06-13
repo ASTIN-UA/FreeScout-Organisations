@@ -43,6 +43,7 @@ return [
     'manager'                => 'Manager',
     'deleted_customer'       => 'Deleted customer',
     'no_members'             => 'No members yet.',
+    'select_member'          => 'Select member',
     'remove'                 => 'Remove',
     'confirm_remove_member'  => 'Remove this member?',
 

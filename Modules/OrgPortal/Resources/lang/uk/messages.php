@@ -43,6 +43,7 @@ return [
     'manager'                => 'Менеджер',
     'deleted_customer'       => 'Видалений клієнт',
     'no_members'             => 'Ще немає учасників.',
+    'select_member'          => 'Виберіть учасника',
     'remove'                 => 'Видалити',
     'confirm_remove_member'  => 'Видалити цього учасника?',
 
