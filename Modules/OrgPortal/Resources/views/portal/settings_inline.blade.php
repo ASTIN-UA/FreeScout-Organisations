@@ -71,20 +71,15 @@
             {{-- Unit row --}}
             <tr>
                 <td style="{{ $isGlobal ? 'padding-left:24px;' : '' }}">
-                    <span>{{ $unit->name }}</span>
                     @if($hasMembers)
-                        <br>
-                        <select class="form-control input-sm orgp-unit-select"
-                                style="max-width:220px;margin-top:4px;"
-                                data-unit="{{ $unit->id }}">
-                            <option value="">— {{ __('orgportal::messages.select_member') }} —</option>
-                            @foreach($unitMembersMap[$unit->id] as $um)
-                                <option value="{{ $um->id }}">
-                                    {{ optional($um->customer)->getFullName() ?: __('orgportal::messages.deleted_customer') }}
-                                    @if($um->role === 'manager') ({{ __('orgportal::messages.role_manager_scoped') }}) @endif
-                                </option>
-                            @endforeach
-                        </select>
+                        <a href="#" class="orgp-unit-toggle" data-unit="{{ $unit->id }}"
+                           style="text-decoration:none;color:inherit;cursor:pointer;">
+                            <i class="glyphicon glyphicon-triangle-right orgp-unit-caret" style="font-size:0.8em;"></i>
+                            <span style="font-weight:bold;">{{ $unit->name }}</span>
+                            <span class="text-muted" style="font-weight:normal;font-size:0.9em;">({{ $unitMembersMap[$unit->id]->count() }})</span>
+                        </a>
+                    @else
+                        <span style="font-weight:bold;">{{ $unit->name }}</span>
                     @endif
                 </td>
                 @foreach($events as $eKey => $eLabel)
@@ -154,14 +149,19 @@
     });
     @endif
 
-    // Per-unit member dropdown → show selected member row, hide others in same unit
-    document.querySelectorAll('.orgp-unit-select').forEach(function (sel) {
-        sel.addEventListener('change', function () {
-            var unitId   = this.dataset.unit;
-            var memberId = this.value;
-            document.querySelectorAll('.orgp-member-row[data-unit="' + unitId + '"]').forEach(function (row) {
-                row.style.display = (memberId && row.dataset.member === memberId) ? '' : 'none';
-            });
+    // Unit toggle → expand/collapse all member rows of that unit at once
+    document.querySelectorAll('.orgp-unit-toggle').forEach(function (toggle) {
+        toggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            var unitId = this.dataset.unit;
+            var caret  = this.querySelector('.orgp-unit-caret');
+            var rows   = document.querySelectorAll('.orgp-member-row[data-unit="' + unitId + '"]');
+            var expand = rows.length && rows[0].style.display === 'none';
+            rows.forEach(function (row) { row.style.display = expand ? '' : 'none'; });
+            if (caret) {
+                caret.classList.toggle('glyphicon-triangle-right', !expand);
+                caret.classList.toggle('glyphicon-triangle-bottom', expand);
+            }
         });
     });
 })();
