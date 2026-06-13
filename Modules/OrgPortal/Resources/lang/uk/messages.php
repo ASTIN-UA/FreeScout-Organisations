@@ -243,4 +243,14 @@ return [
     'email_subject'          => 'Тема',
     'email_ticket_number'    => 'Тікет №',
     'view_ticket'            => 'Переглянути тікет',
+
+    // Портальні сповіщення
+    'notifications'          => 'Сповіщення',
+    'no_notifications'       => 'Немає нових сповіщень',
+    'notif_new_ticket'       => 'відкрив(ла) заявку',
+    'notif_new_reply'        => 'відповів(ла) на розмову',
+    'notif_customer_reply'   => 'відповів(ла) на розмову',
+    'notif_mark_all_read'    => 'Позначити все як прочитане',
+    'notif_today'            => 'Сьогодні',
+    'notif_yesterday'        => 'Вчора',
 ];

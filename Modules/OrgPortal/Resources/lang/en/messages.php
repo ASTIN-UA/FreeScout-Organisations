@@ -243,4 +243,14 @@ return [
     'email_subject'          => 'Subject',
     'email_ticket_number'    => 'Ticket #',
     'view_ticket'            => 'View Ticket',
+
+    // Portal in-app notifications
+    'notifications'          => 'Notifications',
+    'no_notifications'       => 'No new notifications',
+    'notif_new_ticket'       => 'created a ticket',
+    'notif_new_reply'        => 'replied to conversation',
+    'notif_customer_reply'   => 'replied to conversation',
+    'notif_mark_all_read'    => 'Mark all as read',
+    'notif_today'            => 'Today',
+    'notif_yesterday'        => 'Yesterday',
 ];

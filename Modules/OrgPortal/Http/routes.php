@@ -185,5 +185,14 @@ Route::group([
 
     Route::post('members/{member_id}/toggle-active', 'OrgPortalFrontController@toggleMemberActive')
         ->name('orgportal.portal.members.toggle');
+
+    // In-portal notifications
+    Route::get('notifications', 'OrgPortalNotificationController@index')
+        ->name('orgportal.portal.notifications.index');
+    Route::post('notifications/read-all', 'OrgPortalNotificationController@markAllRead')
+        ->name('orgportal.portal.notifications.read-all');
+    Route::post('notifications/{conversation_id}/read', 'OrgPortalNotificationController@markRead')
+        ->name('orgportal.portal.notifications.read')
+        ->where('conversation_id', '[0-9]+');
 });
 endif;

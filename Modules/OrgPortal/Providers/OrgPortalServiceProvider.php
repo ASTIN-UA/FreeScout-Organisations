@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Modules\OrgPortal\Models\Organization;
 use Modules\OrgPortal\Models\OrganizationMember;
 use Modules\OrgPortal\Models\OrgNotificationSubscription;
+use Modules\OrgPortal\Models\OrgPortalNotification;
 
 define('ORGPORTAL_MODULE', 'orgportal');
 
@@ -413,7 +414,8 @@ class OrgPortalServiceProvider extends ServiceProvider
             }
 
             $member = OrganizationMember::where('customer_id', $customer->id)
-                ->where('role', 'manager')
+                ->whereIn('role', ['manager', 'unit_manager', 'global_manager'])
+                ->where('is_active', true)
                 ->first();
 
             if (!$member) {
@@ -429,6 +431,27 @@ class OrgPortalServiceProvider extends ServiceProvider
                 'mailbox_id' => $mailboxId,
             ])->render();
         }, 20, 0);
+
+        // Notification bell — for ALL authenticated portal customers (managers + regular users).
+        \Eventy::addAction('layout.body_bottom', function () {
+            if (!\EndUserPortal::isEup()) {
+                return;
+            }
+
+            $customer = \EndUserPortal::authCustomer();
+            if (!$customer) {
+                return;
+            }
+
+            $mailboxId = request()->route('mailbox_id');
+            if (!$mailboxId) {
+                return;
+            }
+
+            echo view('orgportal::partials.eup_notifications', [
+                'mailbox_id' => $mailboxId,
+            ])->render();
+        }, 21, 0);
     }
 
     protected function registerNotificationHooks()
@@ -442,15 +465,38 @@ class OrgPortalServiceProvider extends ServiceProvider
                 $customer->id,
                 $thread
             );
+            $this->createPortalNotificationsForManagers(
+                $conversation,
+                $thread,
+                $customer->id,
+                OrgPortalNotification::TYPE_NEW_TICKET
+            );
         }, 20, 3);
 
         // Agent reply on a ticket.
         \Eventy::addAction('conversation.user_replied', function ($conversation, $thread) {
+            $customerId = optional($conversation->customer)->id;
             $this->fireOrgNotification(
                 OrgNotificationSubscription::EVENT_REPLY_AGENT,
                 $conversation,
-                optional($conversation->customer)->id,
+                $customerId,
                 $thread
+            );
+            // Notify the ticket author (regular portal user).
+            if ($customerId) {
+                OrgPortalNotification::createIfNotDuplicate(
+                    $customerId,
+                    $conversation->id,
+                    $thread->id ?? null,
+                    OrgPortalNotification::TYPE_NEW_REPLY
+                );
+            }
+            // Notify org managers.
+            $this->createPortalNotificationsForManagers(
+                $conversation,
+                $thread,
+                $customerId,
+                OrgPortalNotification::TYPE_NEW_REPLY
             );
         }, 20, 2);
 
@@ -463,7 +509,47 @@ class OrgPortalServiceProvider extends ServiceProvider
                 $customer->id,
                 $thread
             );
+            $this->createPortalNotificationsForManagers(
+                $conversation,
+                $thread,
+                $customer->id,
+                OrgPortalNotification::TYPE_CUSTOMER_REPLY
+            );
         }, 20, 3);
+    }
+
+    /**
+     * Create portal (in-app) notifications for all active managers in the org,
+     * excluding the author themselves.
+     */
+    protected function createPortalNotificationsForManagers(
+        $conversation,
+        $thread,
+        ?int $authorCustomerId,
+        string $type
+    ): void {
+        if (!$authorCustomerId) return;
+
+        $authorMember = OrganizationMember::where('customer_id', $authorCustomerId)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$authorMember) return;
+
+        $managers = OrganizationMember::where('organization_id', $authorMember->organization_id)
+            ->where('role', 'manager')
+            ->where('is_active', true)
+            ->where('customer_id', '!=', $authorCustomerId)
+            ->get();
+
+        foreach ($managers as $manager) {
+            OrgPortalNotification::createIfNotDuplicate(
+                $manager->customer_id,
+                $conversation->id,
+                $thread->id ?? null,
+                $type
+            );
+        }
     }
 
     /**
