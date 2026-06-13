@@ -1,4 +1,4 @@
-{{-- Notification subscriptions tree. Requires: $member, $mailbox_id, $units, $subsMap --}}
+{{-- Notification subscriptions tree. Requires: $member, $mailbox_id, $units, $subsMap, $memberSubsMap --}}
 @php
     use Modules\OrgPortal\Models\OrgNotificationSubscription as Sub;
 
@@ -9,6 +9,7 @@
     ];
 
     $isGlobal = $member->isGlobalManager();
+    $memberSubsMap = $memberSubsMap ?? [];
 
     // Build tree rows: each row has 'label', 'scope_type', 'scope_id_key' (org | unit_X)
     $rows = [];
@@ -36,6 +37,16 @@
         $id    = $parts[1] ?? '';
         return !empty($subsMap[$event . ':' . $type . ':' . $id]);
     };
+
+    // Build per-unit member list (excluding the current manager).
+    $unitMembersMap = [];
+    foreach ($units as $unit) {
+        if (!$isGlobal && $member->unit_id !== $unit->id) continue;
+        $others = $unit->members->filter(fn($m) => $m->id !== $member->id)->values();
+        if ($others->isNotEmpty()) {
+            $unitMembersMap[$unit->id] = $others;
+        }
+    }
 @endphp
 
 <form method="POST"
@@ -67,6 +78,30 @@
                             </td>
                         @endforeach
                     </tr>
+                    @php
+                        // Extract unit ID from scope key like "unit_5"
+                        $rowUnitId = str_starts_with($row['scope'], 'unit_') ? (int) substr($row['scope'], 5) : null;
+                    @endphp
+                    @if($rowUnitId && isset($unitMembersMap[$rowUnitId]))
+                        @foreach($unitMembersMap[$rowUnitId] as $um)
+                            <tr style="background:#f9f9f9;">
+                                <td style="padding-left:{{ $row['indent'] ? '48px' : '32px' }};color:#555;font-size:0.93em;">
+                                    {{ optional($um->customer)->getFullName() ?: __('orgportal::messages.deleted_customer') }}
+                                    @if($um->role === 'manager')
+                                        <span class="label label-default" style="font-size:0.8em;">{{ __('orgportal::messages.role_manager_scoped') }}</span>
+                                    @endif
+                                </td>
+                                @foreach($events as $eKey => $eLabel)
+                                    <td class="text-center">
+                                        <input type="checkbox"
+                                               name="member_subs[{{ $um->id }}][{{ $eKey }}][unit_{{ $rowUnitId }}]"
+                                               value="1"
+                                               {{ $subsChecked($memberSubsMap[$um->id] ?? [], $eKey, 'unit_' . $rowUnitId) ? 'checked' : '' }}>
+                                    </td>
+                                @endforeach
+                            </tr>
+                        @endforeach
+                    @endif
                 @endforeach
             </tbody>
         </table>

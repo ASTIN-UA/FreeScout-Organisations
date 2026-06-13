@@ -436,7 +436,12 @@ class OrgPortalFrontController extends Controller
         $member   = $this->requireManager($customer, $mailbox);
 
         $org   = $member->organization;
-        $units = $org->units()->orderBy('name')->get();
+        $units = $org->units()
+            ->with(['members' => function ($q) {
+                $q->with('customer')->where('is_active', true)->orderBy('id');
+            }])
+            ->orderBy('name')
+            ->get();
 
         // Global manager sees every member; a unit manager only their unit.
         $membersQuery = OrganizationMember::where('organization_id', $org->id)
@@ -448,12 +453,23 @@ class OrgPortalFrontController extends Controller
             ->sortBy(fn ($m) => mb_strtolower(optional($m->customer)->getFullName() ?: ''))
             ->values();
 
-        // Build subscription lookup: "event:scope_type:scope_id" => true
+        // Build subscription lookup for current manager: "event:scope_type:scope_id" => true
         $rawSubs = \Modules\OrgPortal\Models\OrgNotificationSubscription::where('member_id', $member->id)->get();
         $subsMap = [];
         foreach ($rawSubs as $s) {
             $key = $s->event . ':' . $s->scope_type . ':' . ($s->scope_id ?? '');
             $subsMap[$key] = true;
+        }
+
+        // Build per-member subscription map for members in manager's scope (excluding self).
+        $scopedMemberIds = $members->where('id', '!=', $member->id)->pluck('id')->toArray();
+        $memberSubsMap   = [];
+        if (!empty($scopedMemberIds)) {
+            $rawMemberSubs = \Modules\OrgPortal\Models\OrgNotificationSubscription::whereIn('member_id', $scopedMemberIds)->get();
+            foreach ($rawMemberSubs as $s) {
+                $key = $s->event . ':' . $s->scope_type . ':' . ($s->scope_id ?? '');
+                $memberSubsMap[$s->member_id][$key] = true;
+            }
         }
 
         return view('orgportal::portal.settings', [
@@ -467,6 +483,7 @@ class OrgPortalFrontController extends Controller
             'canManageStructure' => $member->isGlobalManager(),
             'canGrantGlobal'     => (bool) $member->can_manage_org,
             'subsMap'            => $subsMap,
+            'memberSubsMap'      => $memberSubsMap,
         ]);
     }
 
@@ -510,6 +527,46 @@ class OrgPortalFrontController extends Controller
                             'scope_type' => 'unit',
                             'scope_id'   => $unitId,
                         ]);
+                    }
+                }
+            }
+        }
+
+        // Per-member subscriptions managed on behalf of other members.
+        $memberSubs = $request->input('member_subs', []);
+        if (!empty($memberSubs)) {
+            $org->loadMissing('units');
+            $allUnitIds = $org->units->pluck('id')->toArray();
+
+            foreach ($memberSubs as $targetMemberId => $eventsData) {
+                $targetMemberId = (int) $targetMemberId;
+
+                // Verify target member belongs to this org.
+                $targetMember = OrganizationMember::where('id', $targetMemberId)
+                    ->where('organization_id', $org->id)
+                    ->where('is_active', true)
+                    ->first();
+                if (!$targetMember) continue;
+
+                // Current manager must have scope access: global sees all, unit manager only their unit.
+                if ($member->isUnitManager() && $member->unit_id !== $targetMember->unit_id) continue;
+
+                \Modules\OrgPortal\Models\OrgNotificationSubscription::where('member_id', $targetMemberId)->delete();
+
+                foreach ($events as $event) {
+                    if (empty($eventsData[$event])) continue;
+                    foreach ($eventsData[$event] as $scopeKey => $val) {
+                        if (str_starts_with($scopeKey, 'unit_')) {
+                            $unitId = (int) substr($scopeKey, 5);
+                            if (in_array($unitId, $allUnitIds) && $unitId === $targetMember->unit_id) {
+                                \Modules\OrgPortal\Models\OrgNotificationSubscription::create([
+                                    'member_id'  => $targetMemberId,
+                                    'event'      => $event,
+                                    'scope_type' => 'unit',
+                                    'scope_id'   => $unitId,
+                                ]);
+                            }
+                        }
                     }
                 }
             }
