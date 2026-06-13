@@ -51,12 +51,11 @@
     .orgp-row-org td { background:#fbfcfe; }
     .orgp-scope-org { font-weight:700; color:#2c3e50; }
 
-    .orgp-unit-toggle { display:inline-flex; align-items:center; gap:8px; cursor:pointer; color:#2c3e50; font-weight:600; text-decoration:none; user-select:none; }
-    .orgp-unit-toggle:hover { color:#2168d3; text-decoration:none; }
-    .orgp-unit-toggle:focus { outline:none; text-decoration:none; color:#2168d3; }
-    .orgp-row-unit:hover td { background:#f7f9fc; }
+    .orgp-row-unit.expandable { cursor:pointer; }
+    .orgp-row-unit.expandable:hover td { background:#f7f9fc; }
+    .orgp-unit-label { display:inline-flex; align-items:center; gap:8px; color:#2c3e50; font-weight:600; user-select:none; }
     .orgp-chevron { width:0; height:0; border-top:4.5px solid transparent; border-bottom:4.5px solid transparent; border-left:6px solid #9aa5b4; transition:transform .15s ease; flex:0 0 auto; }
-    .orgp-unit-toggle.is-open .orgp-chevron { transform:rotate(90deg); }
+    .orgp-row-unit.is-open .orgp-chevron { transform:rotate(90deg); }
     .orgp-unit-count { color:#9aa5b4; font-weight:500; font-size:13px; }
     .orgp-unit-name-plain { font-weight:600; color:#2c3e50; }
 
@@ -110,14 +109,14 @@
             @endphp
 
             {{-- Unit row --}}
-            <tr class="orgp-row-unit">
+            <tr class="orgp-row-unit {{ $hasMembers ? 'expandable' : '' }}" data-unit="{{ $unit->id }}">
                 <td style="{{ $unitPad }}">
                     @if($hasMembers)
-                        <a href="#" class="orgp-unit-toggle" data-unit="{{ $unit->id }}">
+                        <span class="orgp-unit-label">
                             <span class="orgp-chevron"></span>
                             <span>{{ $unit->name }}</span>
                             <span class="orgp-unit-count">{{ $unitMembersMap[$unit->id]->count() }}</span>
-                        </a>
+                        </span>
                     @else
                         <span class="orgp-unit-name-plain">{{ $unit->name }}</span>
                     @endif
@@ -159,6 +158,7 @@
                             <input type="checkbox"
                                    name="member_subs[{{ $um->id }}][{{ $eKey }}][unit_{{ $unit->id }}]"
                                    value="1"
+                                   class="orgp-member-cb" data-event="{{ $eKey }}" data-unit="{{ $unit->id }}"
                                    {{ $subsChecked($memberSubsMap[$um->id] ?? [], $eKey, 'unit_' . $unit->id) ? 'checked' : '' }}>
                         </td>
                     @endforeach
@@ -182,32 +182,75 @@
 
 <script {!! \Helper::cspNonceAttr() !!}>
 (function () {
-    @if($isGlobal)
-    // "Вся організація" → cascade to all unit checkboxes
+    var $$ = function (sel, root) {
+        return Array.prototype.slice.call((root || document).querySelectorAll(sel));
+    };
+
+    // ── Fully transitive cascade per event column ────────────────────────────
     var eventKeys = @json(array_keys($events));
     eventKeys.forEach(function (eKey) {
-        var orgCb   = document.querySelector('.orgp-org-cb[data-event="' + eKey + '"]');
-        var unitCbs = document.querySelectorAll('.orgp-unit-cb[data-event="' + eKey + '"]');
-        if (!orgCb) return;
-        orgCb.addEventListener('change', function () {
-            unitCbs.forEach(function (cb) { cb.checked = orgCb.checked; });
+        var orgCb    = document.querySelector('.orgp-org-cb[data-event="' + eKey + '"]');
+        var unitCbs  = $$('.orgp-unit-cb[data-event="' + eKey + '"]');
+
+        var membersOf = function (unitId) {
+            return $$('.orgp-member-cb[data-event="' + eKey + '"][data-unit="' + unitId + '"]');
+        };
+        var unitCbOf = function (unitId) {
+            return document.querySelector('.orgp-unit-cb[data-event="' + eKey + '"][data-unit="' + unitId + '"]');
+        };
+
+        // Recompute org from units (org checked ⇔ every unit checked).
+        var reconcileOrg = function () {
+            if (!orgCb) return;
+            orgCb.checked = unitCbs.length > 0 && unitCbs.every(function (c) { return c.checked; });
+        };
+        // Recompute a unit from its members (unit checked ⇔ every member checked).
+        var reconcileUnit = function (unitId) {
+            var unitCb = unitCbOf(unitId);
+            var mem    = membersOf(unitId);
+            if (unitCb && mem.length > 0) {
+                unitCb.checked = mem.every(function (c) { return c.checked; });
+            }
+        };
+
+        // Org → every unit + every member.
+        if (orgCb) {
+            orgCb.addEventListener('change', function () {
+                var s = orgCb.checked;
+                unitCbs.forEach(function (u) {
+                    u.checked = s;
+                    membersOf(u.dataset.unit).forEach(function (m) { m.checked = s; });
+                });
+            });
+        }
+
+        // Unit → its members; then bubble up to org.
+        unitCbs.forEach(function (u) {
+            u.addEventListener('change', function () {
+                var s = u.checked;
+                membersOf(u.dataset.unit).forEach(function (m) { m.checked = s; });
+                reconcileOrg();
+            });
         });
-        unitCbs.forEach(function (cb) {
-            cb.addEventListener('change', function () {
-                if (!this.checked) orgCb.checked = false;
+
+        // Member → its unit → org.
+        $$('.orgp-member-cb[data-event="' + eKey + '"]').forEach(function (m) {
+            m.addEventListener('change', function () {
+                reconcileUnit(m.dataset.unit);
+                reconcileOrg();
             });
         });
     });
-    @endif
 
-    // Unit toggle → expand/collapse all member rows of that unit at once
-    document.querySelectorAll('.orgp-unit-toggle').forEach(function (toggle) {
-        toggle.addEventListener('click', function (e) {
-            e.preventDefault();
-            var unitId = this.dataset.unit;
-            var rows   = document.querySelectorAll('.orgp-member-row[data-unit="' + unitId + '"]');
-            var expand = rows.length && rows[0].style.display === 'none';
-            rows.forEach(function (row) { row.style.display = expand ? '' : 'none'; });
+    // ── Expand / collapse: whole unit row is clickable ───────────────────────
+    $$('.orgp-row-unit.expandable').forEach(function (row) {
+        row.addEventListener('click', function (e) {
+            // Don't toggle when interacting with the checkbox columns.
+            if (e.target.closest('.ev')) return;
+            var unitId   = this.dataset.unit;
+            var memRows  = $$('.orgp-member-row[data-unit="' + unitId + '"]');
+            var expand   = memRows.length && memRows[0].style.display === 'none';
+            memRows.forEach(function (r) { r.style.display = expand ? '' : 'none'; });
             this.classList.toggle('is-open', expand);
         });
     });
