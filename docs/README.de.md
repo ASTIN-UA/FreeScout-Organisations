@@ -69,6 +69,17 @@ Ein Organisations-Manager erhält erweiterten Zugriff über EUP:
 - **Org-Einstellungen** Seite für die Konfiguration von E-Mail-Benachrichtigungen
 - Ticket-Zugriff ist **streng auf das aktuelle Postfach beschränkt** (Organisation in ein anderes Postfach kopiert — Portal 403)
 
+### Benachrichtigungsabonnements *(optional)*
+
+Portal-Manager können konfigurieren, welche Ereignisse und Bereiche E-Mail-Benachrichtigungen auslösen:
+
+- **Abonnement-Matrix** auf dem Tab "Benachrichtigungen" in den Portal-Organisationseinstellungen
+- **Ereignisse:** Neues Ticket, Antwort von Agent, Antwort von Kunde
+- **Bereiche:** Gesamte Organisation (nur für globale Manager) oder spezifische Struktureinheiten
+- **Abonnements pro Mitglied:** Jede Einheitszeile ist erweiterbar — klicken Sie darauf, um alle Mitglieder dieser Einheit anzuzeigen und ihre einzelnen Abonnements inline umzuschalten. Ein globaler Manager verwaltet Mitglieder aller Einheiten; ein Einheitsmanager nur seiner eigenen Einheit.
+- **Vollständig transitives Kaskadenverhalten:** „Gesamte Organisation" steuert jede Einheit und jedes Mitglied; ein Einheit-Kontrollkästchen steuert alle ihre Mitglieder; das Deaktivieren eines Mitglieds gleicht automatisch seine Einheit (und die Organisation) ab — in beide Richtungen für jede Ereignisspalte.
+- Benachrichtigungen verwenden den Mail-Treiber des entsprechenden Postfachs
+
 ### E-Mail-Benachrichtigungen *(optional)*
 - Manager mit aktivierter Option erhalten eine E-Mail, wenn ein neues Ticket von einem Organisations-Mitglied erstellt wird
 - Verwendet den Mail-Treiber des entsprechenden Postfachs

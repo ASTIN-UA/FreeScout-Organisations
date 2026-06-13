@@ -69,6 +69,17 @@ Manažer organizace má rozšířený přístup přes EUP:
 - Stránka **Nastavení org.** pro konfiguraci e-mailových oznámení
 - Přístup k lístků je **přísně omezen na aktuální poštovní schránku** (organizace zkopírovaná do jiné schránky — portál 403)
 
+### Oznámení o odběrech *(volitelné)*
+
+Manažeři portálu mohou upravit, které události a obory spouštějí e-mailová oznámení:
+
+- **Matice odběrů** na kartě "Oznámení" v nastavení organizace portálu
+- **Události:** Nový lístek, Odpověď agenta, Odpověď zákazníka
+- **Obory:** Celá organizace (pouze globální manažeři) nebo konkrétní strukturální jednotky
+- **Individuální odběry na jednotlivé členy:** každý řádek jednotky je rozbalovací — kliknutím jej rozbalíte a odhalíte všechny členy dané jednotky a přepínajte jejich individuální odběry inline. Globální manažer spravuje členy všech jednotek; manažer jednotky pouze své jednotky.
+- **Plně tranzitivní kaskáda:** "Celá organizace" řídí všechny jednotky a všechny členy; zaškrtnutí jednotky řídí všechny její členy; zrušením zaškrtnutí člena se automaticky sjednotí jeho jednotka (a organizace) — v obou směrech, na sloupec Events.
+- Používá poštovní driver odpovídající poštovní schránky
+
 ### E-mailová oznámení *(volitelné)*
 - Manažeři s aktivovanou možností obdrží e-mail, když člen organizace vytvoří nový lístek
 - Používá poštovní driver odpovídající poštovní schránky

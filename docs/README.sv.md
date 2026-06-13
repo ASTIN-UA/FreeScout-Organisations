@@ -73,6 +73,8 @@ En organisationschef får utökad åtkomst genom EUP:
 
 ### E-postmeddelanden *(valfritt)*
 - Chefer med alternativet aktiverat får ett e-postmeddelande när en ny biljett skapas av någon medlem av organisationen
+- **Prenumerationer per medlem:** varje enhetsrad kan expanderas — klicka för att visa alla medlemmar i enheten och växla deras enskilda prenumerationer inline. En global chef hanterar medlemmar från alla enheter; en enhetschef hanterar bara sin egen enhet.
+- **Helt transitiv kaskad:** "Hela organisationen" styr alla enheter och alla medlemmar; en enhetskryssruta styr alla dess medlemmar; om du avmarkerar en medlem avstäms dess enhet (och organisationen) automatiskt — i båda riktningarna, per händelsekolumn.
 - Använder postdrivrutinen för motsvarande brevlåda
 
 ### Brevlådeinställningar

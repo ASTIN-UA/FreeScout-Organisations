@@ -73,6 +73,8 @@ Un manager di organizzazione ottiene accesso esteso attraverso EUP:
 
 ### Notifiche email *(opzionale)*
 - I manager con l'opzione abilitata ricevono un'email quando viene creato un nuovo ticket da qualsiasi membro dell'organizzazione
+- **Sottoscrizioni per membro:** ogni riga di unità è espandibile — clicca per rivelare ogni membro dell'unità e attiva/disattiva le loro sottoscrizioni individuali inline. Un gestore globale gestisce i membri di tutte le unità; un gestore di unità solo la propria unità.
+- **Cascata completamente transitiva:** "Intera organizzazione" determina ogni unità e ogni membro; una casella di controllo dell'unità determina tutti i suoi membri; deselezionare un membro riconcilia la sua unità (e l'organizzazione) automaticamente — in entrambe le direzioni, per colonna di evento.
 - Utilizza il driver di posta della cassetta postale corrispondente
 
 ### Impostazioni cassetta postale

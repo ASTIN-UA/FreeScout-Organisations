@@ -71,6 +71,17 @@ En organisationsleder får udvidet adgang gennem EUP:
 - **Organisationsindstillinger**-side til konfiguration af mailnotifikationer
 - Billadadgang er **strengt begrænset til den aktuelle postkasse** (organisation kopieret til anden postkasse — portal 403)
 
+### Notifikationsabonnementer *(valgfrit)*
+
+Portalledere kan tilpasse, hvilke begivenheder og omfang, der udløser mailnotifikationer:
+
+- **Abonnementsmatrix** på fanen "Notifikationer" i portalorganisationsindstillinger
+- **Begivenheder:** Ny billet, Agentsvar, Kundesvar
+- **Omfang:** Hele organisationen (kun globale ledere) eller bestemte strukturelle enheder
+- **Abonnementer pr. medlem:** hver enhedsrække kan udvides — klik på den for at se alle medlemmer af denne enhed og vælg deres individuelle abonnementer direkte. En global manager styrer medlemmer af alle enheder; en enhedsleder kun sin egen enhed.
+- **Fuldstændig transitiv kaskade:** "Hele organisationen" styrer alle enheder og alle medlemmer; et enhedstjek kontrollerer alle dets medlemmer; hvis du fjerner en medlemsmarkering, afstemmer medlemmet sin enhed (og organisationen) automatisk — i begge retninger, pr. kolonne for begivenheder.
+- Bruger maildriver'en for den tilsvarende postkasse
+
 ### Mailnotifikationer *(valgfrit)*
 - Ledere med muligheden aktiveret modtager en email, når der oprettes en ny billet af et medlem af organisationen
 - Bruger maildriver'en for den tilsvarende postkasse

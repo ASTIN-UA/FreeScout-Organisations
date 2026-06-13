@@ -69,6 +69,17 @@ Un gestionnaire d'organisation obtient un accès étendu via EUP :
 - Page **Paramètres org** pour configurer les notifications par e-mail
 - L'accès aux tickets est **strictement limité à la boîte aux lettres actuelle** (organisation copiée à une autre boîte — portail 403)
 
+### Abonnements aux notifications *(optionnel)*
+
+Les gestionnaires de portail peuvent personnaliser quels événements et périmètres déclenchent des notifications par e-mail :
+
+- **Matrice d'abonnement** dans l'onglet « Notifications » des paramètres d'organisation du portail
+- **Événements :** Nouveau ticket, Réponse d'agent, Réponse de client
+- **Périmètres :** Toute l'organisation (gestionnaires globaux uniquement) ou unités structurelles spécifiques
+- **Abonnements par membre :** chaque ligne d'unité est dépliable — cliquez pour afficher chaque membre de cette unité et basculer leurs abonnements individuels en ligne. Un gestionnaire global gère les membres de toutes les unités ; un gestionnaire d'unité gère uniquement la sienne.
+- **Cascade entièrement transitive :** « Toute l'organisation » contrôle chaque unité et chaque membre ; une case d'unité contrôle tous ses membres ; décocher un membre réconcilie son unité (et l'organisation) automatiquement — dans les deux directions, par colonne d'événement.
+- Utilise le pilote de courrier de la boîte aux lettres correspondante
+
 ### Notifications par e-mail *(optionnel)*
 - Les gestionnaires avec l'option activée reçoivent un e-mail lorsqu'un nouveau ticket est créé par un membre de l'organisation
 - Utilise le pilote de courrier de la boîte aux lettres correspondante

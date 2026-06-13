@@ -73,6 +73,8 @@ Organisaation johtaja saa laajennettua pääsyä EUP:n kautta:
 
 ### Sähköpostilmoitukset *(valinnainen)*
 - Johtajat, joilla on vaihtoehto käytössä, saavat sähköpostiviestin, kun organisaation jäsen luo uuden lipun
+- **Jäsenkohtaiset tilaukset:** jokainen yksikön rivi on laajennettavissa — napsauta sitä paljastaaksesi kyseisen yksikön jokaisen jäsenen ja vaihda heidän yksittäisiä tilauksia suoraan. Yleinen johtaja hallinnoi kaikkien yksiköiden jäseniä; yksikköjohtaja vain omansa.
+- **Täysin transitiivinen kaskadi:** "Koko organisaatio" ohjaa jokaista yksikköä ja jokaista jäsentä; yksikön valintaruutu ohjaa kaikkia sen jäseniä; jäsenen valitsemisen poistaminen sovittaa sen yksikön (ja organisaation) automaattisesti — molempiin suuntiin, tapahtumastakkeittain.
 - Käyttää vastaavan postilaatikon postin ohjaimia
 
 ### Postilaatikon asetukset

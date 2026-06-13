@@ -69,6 +69,16 @@ Un manager de organizație obține acces extins prin EUP:
 - Pagina **Setări Org** pentru configurarea notificărilor prin e-mail
 - Accesul la tichet este **strict limitat la căsuța curentă** (organizație copiată în altă căsuță — portal 403)
 
+### Abonări la Notificări *(opțional)*
+
+Managerii portalului pot personaliza care evenimente și domenii declanșează notificări prin e-mail:
+
+- **Matricea abonărilor** pe fila "Notificări" în Setările Organizației portalului
+- **Evenimente:** Tichet nou, Răspuns agent, Răspuns client
+- **Domenii:** Întreaga organizație (doar manageri globali) sau unități structurale specifice
+- **Abonări per-membru:** fiecare rând de unitate se poate extinde — clic pentru a dezvălui fiecare membru al unității și activați/dezactivați abonările individuale inline. Un manager global gestionează membri din toate unitățile; un manager de unitate doar ai săi.
+- **Cascadă complet tranzitivă:** "Întreaga organizație" conduce fiecare unitate și fiecare membru; o casetă de bifat a unității conduce toți membrii săi; debifarea unui membru reconciliază unitatea acestuia (și organizația) automat — în ambele direcții, per coloană de eveniment.
+
 ### Notificări prin e-mail *(opțional)*
 - Managerii cu opțiunea activată primesc e-mail atunci când un nou tichet este creat de orice membru al organizației
 - Folosește driver-ul de e-mail al căsuței corespunzătoare

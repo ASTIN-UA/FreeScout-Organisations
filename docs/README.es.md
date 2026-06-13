@@ -73,6 +73,8 @@ Un gestor de organización obtiene acceso extendido a través de EUP:
 
 ### Notificaciones por correo electrónico *(opcional)*
 - Los gestores con la opción habilitada reciben un correo electrónico cuando se crea un nuevo ticket de cualquier miembro de la organización
+- **Suscripciones por miembro:** cada fila de unidad es expandible — haz clic para revelar cada miembro de esa unidad y cambiar sus suscripciones individuales en línea. Un gestor global gestiona miembros de todas las unidades; un gestor de unidad solo de su propia unidad.
+- **Cascada completamente transitiva:** "Organización completa" impulsa cada unidad y cada miembro; una casilla de verificación de unidad impulsa todos sus miembros; desactivar un miembro reconcilia su unidad (y la organización) automáticamente — en ambas direcciones, por columna de evento.
 - Utiliza el controlador de correo del buzón correspondiente
 
 ### Configuración de buzón

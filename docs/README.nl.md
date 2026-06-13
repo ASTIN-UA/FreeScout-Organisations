@@ -71,6 +71,17 @@ Een organisatiemanager krijgt uitgebreide toegang via EUP:
 - **Org-instellingen** pagina voor het configureren van e-mailmeldingen
 - Tickettoegang is **strikt beperkt tot huidig postvak** (organisatie gekopieerd naar ander postvak — portaal 403)
 
+### Meldingsabonnementen *(optioneel)*
+
+Portalbeheerders kunnen aanpassen welke gebeurtenissen en bereiken e-mailmeldingen activeren:
+
+- **Abonnementmatrix** op het tabblad "Meldingen" in portalorganisatie-instellingen
+- **Gebeurtenissen:** Nieuw ticket, Antwoord agent, Antwoord klant
+- **Bereiken:** Hele organisatie (alleen globale managers) of specifieke structurele eenheden
+- **Abonnementen per lid:** elke eenheidsrij is uitvouwbaar — klik erop om alle leden van die eenheid weer te geven en hun individuele abonnementen inline in- en uit te schakelen. Een globale manager beheert leden van alle eenheden; een eenheidsmanager alleen die van hun eigen eenheid.
+- **Volledig transitieve cascade:** "Hele organisatie" bepaalt elke eenheid en elk lid; een selectievakje van een eenheid bepaalt al haar leden; het uitschakelen van een lid stelt zijn eenheid (en de organisatie) automatisch bij — in beide richtingen, per gebeurteniskolom.
+- Meldingen gebruiken de mail-driver van het overeenkomstige postvak
+
 ### E-mailmeldingen *(optioneel)*
 - Managers met de optie ingeschakeld ontvangen een e-mail wanneer een nieuw ticket wordt gemaakt door een organisatielid
 - Gebruikt de mail-driver van het overeenkomstige postvak

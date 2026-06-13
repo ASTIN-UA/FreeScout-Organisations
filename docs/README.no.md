@@ -71,6 +71,17 @@ En organisasjonsleder får utvidet tilgang gjennom EUP:
 - **Organisasjonsinnstillinger**-side for konfigurering av e-postmeldinger
 - Billettilgang er **strengt begrenset til gjeldende postkasse** (organisasjon kopiert til annen postkasse — portal 403)
 
+### Abonnementer på meldinger *(valgfritt)*
+
+Portalledere kan tilpasse hvilke hendelser og omfang som utløser e-postmeldinger:
+
+- **Abonnementmatrise** på fanen "Meldinger" i portalorganisasjonsinnstillinger
+- **Hendelser:** Ny billett, Svar fra agent, Svar fra kunde
+- **Omfang:** Hele organisasjonen (bare globale ledere) eller spesifikke strukturelle enheter
+- **Abonnementer per medlem:** hver enhetsrad kan utvides — klikk på den for å vise alle medlemmer av denne enheten og bytte deres individuelle abonnementer direkte. En global leder administrerer medlemmer av alle enheter; en enhetsleder administrerer bare sin egen enhet.
+- **Fullt transitivt kaskade:** «Hele organisasjonen» styrer hver enhet og hvert medlem; en enhetsavmerkingsboks styrer alle medlemmene; fjerning av merket fra et medlem avstemmer automatisk enheten (og organisasjonen) — i begge retninger, per hendelseskolonne.
+- Meldinger bruker poststyreren for den tilsvarende postkassen
+
 ### E-postmeldinger *(valgfritt)*
 - Ledere med alternativet aktivert mottar en e-post når en ny billett opprettes av et medlem av organisasjonen
 - Bruker poststyrer for den tilsvarende postkassen

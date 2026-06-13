@@ -69,9 +69,16 @@ Manažér organizácie má rozšírený prístup cez EUP:
 - Stránka **Nastavenia org.** pre konfiguráciu e-mailových upozornení
 - Prístup k lístkom je **prísne obmedzený na aktuálnu poštovú schránku** (organizácia skopírovaná do inej schránky — portál 403)
 
-### E-mailové upozornenia *(voliteľné)*
-- Manažéri s aktivovanou možnosťou obdržia e-mail, keď člen organizácie vytvorí nový lístek
-- Používa poštový ovládač zodpovedajúcej poštovej schránky
+### Prihlásenie na upozornenia *(voliteľné)*
+
+Manažéri portálu si môžu prispôsobiť, ktoré udalosti a rozsahy spúšťajú e-mailové upozornenia:
+
+- **Matica prihlásení** na karte "Upozornenia" v nastaveniach organizácie portálu
+- **Udalosti:** Nový lístek, Odpoveď agenta, Odpoveď zákazníka
+- **Rozsahy:** Celá organizácia (len globálni manažéri) alebo konkrétne štrukturálne jednotky
+- **Prihlásenie na jednotlivých členov:** každý riadok jednotky je rozbaliteľný — kliknite naň, aby ste odhalili všetkých členov tejto jednotky a prepínali ich individuálne prihlásenia priamo. Globálny manažér spravuje členov všetkých jednotiek; manažér jednotky len svoju vlastnú jednotku.
+- **Plne tranzitívny kaskádový efekt:** "Celá organizácia" ovplyvňuje každú jednotku a každého člena; začiarkavacie pole jednotky ovplyvňuje všetkých jej členov; odškrtnutie člena automaticky zosúladí jeho jednotku (a organizáciu) — v oboch smeroch, podľa stĺpca udalostí.
+- Upozornenia používajú poštový ovládač zodpovedajúcej poštovej schránky
 
 ### Nastavenia poštovej schránky
 

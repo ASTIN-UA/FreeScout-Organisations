@@ -71,6 +71,8 @@ Um gerenciador de organização obtém acesso estendido através do EUP:
 
 ### Notificações por email *(opcional)*
 - Gerenciadores com a opção ativada recebem um email quando um novo tíquete é criado por qualquer membro da organização
+- **Inscrições por membro:** cada linha de unidade é expansível — clique nela para revelar cada membro dessa unidade e alterne suas inscrições individuais inline. Um gerenciador global gerencia membros de todas as unidades; um gerenciador de unidade apenas de sua própria unidade.
+- **Cascata totalmente transitiva:** "Organização inteira" determina cada unidade e cada membro; uma caixa de seleção de unidade determina todos os seus membros; desmarcar um membro reconcilia sua unidade (e a organização) automaticamente — em ambas as direções, por coluna de evento.
 - Usa o driver de email da caixa de correio correspondente
 
 ### Configurações da caixa de correio

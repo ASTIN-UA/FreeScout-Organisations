@@ -69,8 +69,15 @@ Um gestor de organização obtém acesso estendido através do EUP:
 - Página **Configurações da Org** para configurar notificações por e-mail
 - O acesso ao bilhete é **estritamente limitado à caixa de correio actual** (organização copiada para outra caixa — portal 403)
 
-### Notificações por e-mail *(opcional)*
-- Gestores com a opção activada recebem um e-mail quando um novo bilhete é criado por qualquer membro da organização
+### Subscrições de Notificações *(opcional)*
+
+Gestores de portal podem personalizar quais os eventos e âmbitos que acionam notificações por e-mail:
+
+- **Matriz de subscrição** no separador "Notificações" nas Configurações da Org do portal
+- **Eventos:** Novo bilhete, Resposta do agente, Resposta do cliente
+- **Âmbitos:** Toda a organização (apenas gestores globais) ou unidades estruturais específicas
+- **Subscrições por membro:** cada linha de unidade é expansível — clique para revelar todos os membros dessa unidade e altere as suas subscrições individuais em linha. Um gestor global gere os membros de todas as unidades; um gestor de unidade apenas o seu próprio.
+- **Cascata totalmente transitiva:** «Toda a organização» comanda cada unidade e cada membro; uma caixa de selecção de unidade comanda todos os seus membros; desmarcar um membro concilia a sua unidade (e a organização) automaticamente — em ambas as direcções, por coluna de evento.
 - Usa o controlador de e-mail da caixa de correio correspondente
 
 ### Configurações da caixa de correio

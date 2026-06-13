@@ -71,7 +71,17 @@ Menedżer organizacji ma rozszerzony dostęp poprzez EUP:
 
 ### Powiadomienia e-mail *(opcjonalne)*
 - Menedżerowie z włączoną opcją otrzymują e-mail, gdy członek organizacji utworzy nowe zgłoszenie
-- Używa sterownika poczty odpowiadającej skrzynce
+
+### Subskrypcje powiadomień *(opcjonalne)*
+
+Menedżerowie portalu mogą dostosować, które zdarzenia i zakresy wyzwalają powiadomienia e-mail:
+
+- **Macierz subskrypcji** na karcie "Powiadomienia" w Ustawieniach organizacji portalu
+- **Zdarzenia:** Nowe zgłoszenie, Odpowiedź agenta, Odpowiedź klienta
+- **Zakresy:** Cała organizacja (tylko menedżerowie globalni) lub konkretne jednostki strukturalne
+- **Subskrypcje na członka:** każdy wiersz jednostki można rozwinąć — kliknij, aby wyświetlić wszystkich członków tej jednostki i przełączać ich indywidualne subskrypcje na miejscu. Menedżer globalny zarządza członkami wszystkich jednostek; menedżer jednostki tylko swoją jednostką.
+- **W pełni przechodni kaskada:** „Cała organizacja" steruje każdą jednostką i każdym członkiem; pole jednostki steruje wszystkimi jej członkami; odznaczenie członka automatycznie uzgadnia jego jednostkę (i organizację) — w obu kierunkach, w kolumnie każdego zdarzenia.
+- Powiadomienia używają sterownika poczty odpowiadającej skrzynce
 
 ### Ustawienia skrzynki
 
