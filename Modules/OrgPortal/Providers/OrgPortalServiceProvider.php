@@ -440,13 +440,12 @@ class OrgPortalServiceProvider extends ServiceProvider
                 OrgNotificationSubscription::EVENT_NEW_TICKET,
                 $conversation,
                 $customer->id,
-                null
+                $thread
             );
         }, 20, 3);
 
         // Agent reply on a ticket.
-        \Eventy::addAction('conversation.reply_created', function ($conversation, $thread) {
-            if (!\Option::get('orgportal.notify_agent_reply', true)) return;
+        \Eventy::addAction('conversation.user_replied', function ($conversation, $thread) {
             $this->fireOrgNotification(
                 OrgNotificationSubscription::EVENT_REPLY_AGENT,
                 $conversation,
@@ -457,7 +456,6 @@ class OrgPortalServiceProvider extends ServiceProvider
 
         // Customer reply on an existing ticket.
         \Eventy::addAction('conversation.customer_replied', function ($conversation, $thread, $customer) {
-            if (!\Option::get('orgportal.notify_customer_reply', false)) return;
             if (!$customer || !$customer->id) return;
             $this->fireOrgNotification(
                 OrgNotificationSubscription::EVENT_REPLY_CUSTOMER,
@@ -491,13 +489,6 @@ class OrgPortalServiceProvider extends ServiceProvider
 
         if ($managers->isEmpty()) return;
 
-        try {
-            $mailbox = \App\Mailbox::find($conversation->mailbox_id);
-            if ($mailbox) \MailHelper::setMailDriver($mailbox);
-        } catch (\Exception $e) {
-            \Helper::logException($e);
-        }
-
         foreach ($managers as $manager) {
             if (!$manager->customer) continue;
 
@@ -510,13 +501,12 @@ class OrgPortalServiceProvider extends ServiceProvider
 
             [$subject, $body] = $this->renderNotificationTemplate($event, $manager, $authorMember, $conversation, $thread);
 
-            try {
-                \Mail::to($email)->send(
-                    new \Modules\OrgPortal\Mail\OrgNotificationMail($subject, $body)
-                );
-            } catch (\Exception $e) {
-                \Helper::logException($e);
-            }
+            \Modules\OrgPortal\Jobs\SendOrgNotification::dispatch(
+                (int) $conversation->mailbox_id,
+                $email,
+                $subject,
+                $body
+            )->onQueue('emails');
         }
     }
 
@@ -550,29 +540,37 @@ class OrgPortalServiceProvider extends ServiceProvider
 
         $now = $thread ? \Carbon\Carbon::parse($thread->created_at) : \Carbon\Carbon::parse($conversation->created_at);
 
-        $macros = [
-            '{manager_name}'    => e($manager->customer ? $manager->customer->getFullName() : ''),
-            '{author_name}'     => e($authorCustomer ? $authorCustomer->getFullName() : ''),
-            '{org_name}'        => e($org ? $org->name : ''),
-            '{unit_name}'       => e($unit ? $unit->name : ''),
-            '{subject}'         => e($conversation->subject ?? ''),
+        $rawMacros = [
+            '{manager_name}'    => $manager->customer ? $manager->customer->getFullName() : '',
+            '{author_name}'     => $authorCustomer ? $authorCustomer->getFullName() : '',
+            '{org_name}'        => $org ? $org->name : '',
+            '{unit_name}'       => $unit ? $unit->name : '',
+            '{subject}'         => $conversation->subject ?? '',
             '{ticket_number}'   => '#' . ($conversation->number ?? ''),
-            '{ticket_url}'      => e($ticketUrl ?? ''),
+            '{ticket_url}'      => $ticketUrl ?? '',
             '{created_date}'    => \Carbon\Carbon::parse($conversation->created_at)->format('d.m.Y'),
             '{created_time}'    => \Carbon\Carbon::parse($conversation->created_at)->format('H:i'),
             '{created_datetime}'=> \Carbon\Carbon::parse($conversation->created_at)->format('d.m.Y H:i'),
             '{reply_date}'      => $now->format('d.m.Y'),
             '{reply_time}'      => $now->format('H:i'),
             '{reply_datetime}'  => $now->format('d.m.Y H:i'),
+            '{reply_text}'      => $thread ? ($thread->body ?? '') : '',
+            '{ticket_text}'     => $thread ? ($thread->body ?? '') : '',
         ];
+
+        $htmlMacros = array_map(function ($v, $k) {
+            // reply_text/ticket_text вже HTML — не екрануємо повторно
+            return in_array($k, ['{reply_text}', '{ticket_text}', '{ticket_url}']) ? $v : e($v);
+        }, $rawMacros, array_keys($rawMacros));
+        $htmlMacros = array_combine(array_keys($rawMacros), $htmlMacros);
 
         if ($subject === '' || $body === '') {
             // Built-in fallback template.
-            return $this->builtinNotificationTemplate($event, $macros, $ticketUrl);
+            return $this->builtinNotificationTemplate($event, $htmlMacros, $ticketUrl);
         }
 
-        $subject = str_replace(array_keys($macros), array_values($macros), $subject);
-        $body    = str_replace(array_keys($macros), array_values($macros), $body);
+        $subject = str_replace(array_keys($rawMacros), array_values($rawMacros), $subject);
+        $body    = str_replace(array_keys($htmlMacros), array_values($htmlMacros), $body);
 
         return [$subject, $body];
     }
@@ -587,7 +585,8 @@ class OrgPortalServiceProvider extends ServiceProvider
                   . '<tr><td style="color:#666;width:130px">' . __('orgportal::messages.email_from') . ':</td><td><strong>' . e($macros['{author_name}']) . '</strong></td></tr>'
                   . '<tr><td style="color:#666">' . __('orgportal::messages.email_subject') . ':</td><td><strong>' . e($macros['{subject}']) . '</strong></td></tr>'
                   . '<tr><td style="color:#666">' . __('orgportal::messages.email_ticket_number') . ':</td><td>' . e($macros['{ticket_number}']) . '</td></tr>'
-                  . '</table>';
+                  . '</table>'
+                  . ($macros['{reply_text}'] ? '<div style="border-left:3px solid #d1d5db;padding:8px 16px;margin:16px 0;color:#374151;">' . $macros['{reply_text}'] . '</div>' : '');
         } else {
             $labelKey = $event === OrgNotificationSubscription::EVENT_REPLY_AGENT
                 ? 'email_reply_agent_intro' : 'email_reply_customer_intro';
@@ -601,7 +600,8 @@ class OrgPortalServiceProvider extends ServiceProvider
                   . '<tr><td style="color:#666;width:130px">' . __('orgportal::messages.email_from') . ':</td><td><strong>' . e($macros['{author_name}']) . '</strong></td></tr>'
                   . '<tr><td style="color:#666">' . __('orgportal::messages.email_subject') . ':</td><td><strong>' . e($macros['{subject}']) . '</strong></td></tr>'
                   . '<tr><td style="color:#666">' . __('orgportal::messages.email_ticket_number') . ':</td><td>' . e($macros['{ticket_number}']) . '</td></tr>'
-                  . '</table>';
+                  . '</table>'
+                  . ($macros['{reply_text}'] ? '<div style="border-left:3px solid #d1d5db;padding:8px 16px;margin:16px 0;color:#374151;">' . $macros['{reply_text}'] . '</div>' : '');
         }
 
         if ($ticketUrl) {

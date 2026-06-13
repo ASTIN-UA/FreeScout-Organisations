@@ -181,6 +181,8 @@ return [
     'macro_org_name'         => 'Organisaation nimi',
     'macro_reply_date'       => 'Vastauksen päivä',
     'macro_reply_datetime'   => 'Vastauksen päivä ja -aika',
+    'macro_reply_text'       => 'Vastauksen teksti',
+    'macro_ticket_text'      => 'Tiketin teksti',
     'macro_reply_time'       => 'Vastauksen aika',
     'macro_subject'          => 'Lipun aihe',
     'macro_ticket_number'    => 'Lipun numero',

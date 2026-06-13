@@ -449,6 +449,7 @@ class OrgPortalAdminController extends Controller
                             $row('Заявка №', '{ticket_number}'),
                             $row('Дата', '{created_datetime}'),
                         ])
+                        . '<div style="border-left:3px solid #d1d5db;padding:8px 16px;margin:16px 0;color:#374151;">{ticket_text}</div>'
                         . $btn
                     ),
                 ],
@@ -463,6 +464,7 @@ class OrgPortalAdminController extends Controller
                             $row('Заявка №', '{ticket_number}'),
                             $row('Час відповіді', '{reply_datetime}'),
                         ])
+                        . '<div style="border-left:3px solid #d1d5db;padding:8px 16px;margin:16px 0;color:#374151;">{reply_text}</div>'
                         . $btn
                     ),
                 ],
@@ -477,6 +479,7 @@ class OrgPortalAdminController extends Controller
                             $row('Заявка №', '{ticket_number}'),
                             $row('Час відповіді', '{reply_datetime}'),
                         ])
+                        . '<div style="border-left:3px solid #d1d5db;padding:8px 16px;margin:16px 0;color:#374151;">{reply_text}</div>'
                         . $btn
                     ),
                 ],
@@ -495,6 +498,7 @@ class OrgPortalAdminController extends Controller
                         $row('Ticket #', '{ticket_number}'),
                         $row('Date', '{created_datetime}'),
                     ])
+                    . '<div style="border-left:3px solid #d1d5db;padding:8px 16px;margin:16px 0;color:#374151;">{ticket_text}</div>'
                     . $btn
                 ),
             ],
@@ -509,6 +513,7 @@ class OrgPortalAdminController extends Controller
                         $row('Ticket #', '{ticket_number}'),
                         $row('Replied at', '{reply_datetime}'),
                     ])
+                    . '<div style="border-left:3px solid #d1d5db;padding:8px 16px;margin:16px 0;color:#374151;">{reply_text}</div>'
                     . $btn
                 ),
             ],
@@ -523,6 +528,7 @@ class OrgPortalAdminController extends Controller
                         $row('Ticket #', '{ticket_number}'),
                         $row('Replied at', '{reply_datetime}'),
                     ])
+                    . '<div style="border-left:3px solid #d1d5db;padding:8px 16px;margin:16px 0;color:#374151;">{reply_text}</div>'
                     . $btn
                 ),
             ],

@@ -181,6 +181,8 @@ return [
     'macro_org_name'         => 'Názov organizácie',
     'macro_reply_date'       => 'Dátum odpovede',
     'macro_reply_datetime'   => 'Dátum a čas odpovede',
+    'macro_reply_text'       => 'Text odpovede',
+    'macro_ticket_text'      => 'Text žiadosti',
     'macro_reply_time'       => 'Čas odpovede',
     'macro_subject'          => 'Predmet lístku',
     'macro_ticket_number'    => 'Číslo lístku',

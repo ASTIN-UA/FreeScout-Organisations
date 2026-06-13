@@ -181,6 +181,8 @@ return [
     'macro_org_name'         => '组织名称',
     'macro_reply_date'       => '回复日期',
     'macro_reply_datetime'   => '回复日期和时间',
+    'macro_reply_text'       => '回复内容',
+    'macro_ticket_text'      => '工单内容',
     'macro_reply_time'       => '回复时间',
     'macro_subject'          => '工单主题',
     'macro_ticket_number'    => '工单编号',

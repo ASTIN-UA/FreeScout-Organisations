@@ -181,6 +181,8 @@ return [
     'macro_org_name'         => 'ორგანიზაციის სახელი',
     'macro_reply_date'       => 'პასუხის თარიღი',
     'macro_reply_datetime'   => 'პასუხის თარიღი და დრო',
+    'macro_reply_text'       => 'პასუხის ტექსტი',
+    'macro_ticket_text'      => 'ტიკეტის ტექსტი',
     'macro_reply_time'       => 'პასუხის დრო',
     'macro_subject'          => 'ტიკეტის საგნագახსნელი',
     'macro_ticket_number'    => 'ტიკეტის ნომერი',

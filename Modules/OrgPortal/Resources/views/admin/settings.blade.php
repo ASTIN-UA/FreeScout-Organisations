@@ -41,34 +41,6 @@
                     </div>
                 </div>
 
-                {{-- ── Reply notification triggers ──────────────────────────── --}}
-                <div class="panel panel-default">
-                    <div class="panel-heading">{{ __('orgportal::messages.notif_reply_triggers') }}</div>
-                    <div class="panel-body">
-                        <div class="form-group">
-                            <div class="checkbox">
-                                <label>
-                                    <input type="checkbox" name="notify_agent_reply" value="1"
-                                        {{ $notify_agent_reply ? 'checked' : '' }}>
-                                    {{ __('orgportal::messages.notif_trigger_agent') }}
-                                </label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="checkbox">
-                                <label>
-                                    <input type="checkbox" name="notify_customer_reply" value="1"
-                                        {{ $notify_customer_reply ? 'checked' : '' }}>
-                                    {{ __('orgportal::messages.notif_trigger_customer') }}
-                                </label>
-                            </div>
-                        </div>
-                        <p class="text-muted" style="font-size:12px;margin-top:4px;">
-                            {{ __('orgportal::messages.notif_trigger_hint') }}
-                        </p>
-                    </div>
-                </div>
-
                 {{-- ── Email templates ──────────────────────────────────────── --}}
                 @php
                     $macros = [

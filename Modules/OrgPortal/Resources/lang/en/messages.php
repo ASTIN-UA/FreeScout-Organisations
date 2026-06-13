@@ -172,6 +172,8 @@ return [
     'macro_reply_date'       => 'Reply date',
     'macro_reply_time'       => 'Reply time',
     'macro_reply_datetime'   => 'Reply date & time',
+    'macro_reply_text'       => 'Reply text',
+    'macro_ticket_text'      => 'Ticket text',
 
     // Notification email fallback strings
     'email_reply_agent_intro'    => 'A new agent reply was added to a ticket in your organization:',

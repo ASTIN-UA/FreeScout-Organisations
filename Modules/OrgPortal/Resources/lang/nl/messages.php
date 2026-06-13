@@ -181,6 +181,8 @@ return [
     'macro_org_name'         => 'Organisatienaam',
     'macro_reply_date'       => 'Antwoorddatum',
     'macro_reply_datetime'   => 'Antwoorddatum & -tijd',
+    'macro_reply_text'       => 'Antwoordtekst',
+    'macro_ticket_text'      => 'Tickettekst',
     'macro_reply_time'       => 'Antwoordtijd',
     'macro_subject'          => 'Ticketonderwerp',
     'macro_ticket_number'    => 'Ticketnummer',

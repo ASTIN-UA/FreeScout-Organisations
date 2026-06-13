@@ -181,6 +181,8 @@ return [
     'macro_org_name'         => 'Organisationsnavn',
     'macro_reply_date'       => 'Svardato',
     'macro_reply_datetime'   => 'Svardato & tidspunkt',
+    'macro_reply_text'       => 'Svartekst',
+    'macro_ticket_text'      => 'Tekst i anmodning',
     'macro_reply_time'       => 'Svartidspunkt',
     'macro_subject'          => 'Billetemne',
     'macro_ticket_number'    => 'Billetnummer',

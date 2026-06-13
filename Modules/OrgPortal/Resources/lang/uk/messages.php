@@ -172,6 +172,8 @@ return [
     'macro_reply_date'       => 'Дата відповіді',
     'macro_reply_time'       => 'Час відповіді',
     'macro_reply_datetime'   => 'Дата та час відповіді',
+    'macro_reply_text'       => 'Текст відповіді',
+    'macro_ticket_text'      => 'Текст заявки',
 
     // Notification email fallback strings
     'email_reply_agent_intro'    => 'Агент додав нову відповідь до заявки вашої організації:',

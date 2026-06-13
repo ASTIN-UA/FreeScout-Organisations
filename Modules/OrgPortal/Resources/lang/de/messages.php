@@ -136,6 +136,8 @@ return [
     'macro_org_name'         => 'Organisationsname',
     'macro_reply_date'       => 'Antwortdatum',
     'macro_reply_datetime'   => 'Antwortdatum und -uhrzeit',
+    'macro_reply_text'       => 'Antworttext',
+    'macro_ticket_text'      => 'Tickettext',
     'macro_reply_time'       => 'Antwortzeit',
     'macro_subject'          => 'Ticket-Betreff',
     'macro_ticket_number'    => 'Ticketnummer',

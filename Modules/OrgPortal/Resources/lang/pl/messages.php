@@ -181,6 +181,8 @@ return [
     'macro_org_name'         => 'Nazwa organizacji',
     'macro_reply_date'       => 'Data odpowiedzi',
     'macro_reply_datetime'   => 'Data i godzina odpowiedzi',
+    'macro_reply_text'       => 'Treść odpowiedzi',
+    'macro_ticket_text'      => 'Treść zgłoszenia',
     'macro_reply_time'       => 'Godzina odpowiedzi',
     'macro_subject'          => 'Temat zgłoszenia',
     'macro_ticket_number'    => 'Numer zgłoszenia',

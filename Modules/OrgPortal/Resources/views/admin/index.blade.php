@@ -123,6 +123,8 @@
                             '{reply_date}'       => __('orgportal::messages.macro_reply_date'),
                             '{reply_time}'       => __('orgportal::messages.macro_reply_time'),
                             '{reply_datetime}'   => __('orgportal::messages.macro_reply_datetime'),
+                            '{reply_text}'       => __('orgportal::messages.macro_reply_text'),
+                            '{ticket_text}'      => __('orgportal::messages.macro_ticket_text'),
                         ];
                     @endphp
 

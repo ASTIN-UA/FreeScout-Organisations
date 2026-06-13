@@ -181,6 +181,8 @@ return [
     'macro_org_name'         => 'Numele organizației',
     'macro_reply_date'       => 'Data răspunsului',
     'macro_reply_datetime'   => 'Data & ora răspunsului',
+    'macro_reply_text'       => 'Textul răspunsului',
+    'macro_ticket_text'      => 'Textul tichetului',
     'macro_reply_time'       => 'Ora răspunsului',
     'macro_subject'          => 'Subiectul tichetului',
     'macro_ticket_number'    => 'Numărul tichetului',
