@@ -96,7 +96,8 @@ Portal managers can customize which events and scopes trigger email notification
 - **Subscription matrix** on the "Notifications" tab in portal Organization Settings
 - **Events:** New ticket, Agent reply, Customer reply
 - **Scopes:** Entire organization (global managers only) or specific structural units
-- **Cascading behavior:** Checking "Entire organization" automatically checks all unit rows; unchecking any unit unchecks "Entire organization"
+- **Per-member subscriptions:** each unit row is expandable — click it to reveal every member of that unit and toggle their individual subscriptions inline. A global manager manages members of all units; a unit manager only their own unit.
+- **Fully transitive cascade:** "Entire organization" drives every unit and every member; a unit checkbox drives all its members; unchecking a member reconciles its unit (and the organization) automatically — in both directions, per event column.
 - Notifications use the mail driver of the corresponding mailbox
 
 ### Email notifications *(optional)*
