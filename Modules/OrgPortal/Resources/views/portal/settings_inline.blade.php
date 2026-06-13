@@ -31,18 +31,56 @@
             $unitMembersMap[$unit->id] = $others;
         }
     }
+
+    // Deterministic avatar colour from a string.
+    $avatarColor = function(string $seed): string {
+        $palette = ['#5b8def','#7c5cef','#ef5c8a','#ef8a5c','#27ae8f','#e0a30b','#3aa3c9','#9b59b6'];
+        return $palette[crc32($seed) % count($palette)];
+    };
 @endphp
+
+<style {!! \Helper::cspNonceAttr() !!}>
+    .orgp-subs { border:1px solid #e4e8ee; border-radius:8px; overflow:hidden; width:100%; border-collapse:separate; border-spacing:0; margin-bottom:18px; font-size:14px; }
+    .orgp-subs th, .orgp-subs td { padding:11px 14px; vertical-align:middle; }
+    .orgp-subs thead th { background:#f7f9fc; color:#5a6573; font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.03em; border-bottom:1px solid #e4e8ee; }
+    .orgp-subs thead th.ev { text-align:center; width:120px; white-space:nowrap; }
+    .orgp-subs tbody tr { border-bottom:1px solid #eef1f5; }
+    .orgp-subs tbody tr:last-child { border-bottom:0; }
+    .orgp-subs td.ev { text-align:center; }
+
+    .orgp-row-org td { background:#fbfcfe; }
+    .orgp-scope-org { font-weight:700; color:#2c3e50; }
+
+    .orgp-unit-toggle { display:inline-flex; align-items:center; gap:8px; cursor:pointer; color:#2c3e50; font-weight:600; text-decoration:none; user-select:none; }
+    .orgp-unit-toggle:hover { color:#2168d3; text-decoration:none; }
+    .orgp-unit-toggle:focus { outline:none; text-decoration:none; color:#2168d3; }
+    .orgp-row-unit:hover td { background:#f7f9fc; }
+    .orgp-chevron { width:0; height:0; border-top:4.5px solid transparent; border-bottom:4.5px solid transparent; border-left:6px solid #9aa5b4; transition:transform .15s ease; flex:0 0 auto; }
+    .orgp-unit-toggle.is-open .orgp-chevron { transform:rotate(90deg); }
+    .orgp-unit-count { color:#9aa5b4; font-weight:500; font-size:13px; }
+    .orgp-unit-name-plain { font-weight:600; color:#2c3e50; }
+
+    .orgp-row-member td { background:#fafbfd; }
+    .orgp-row-member:hover td { background:#f3f6fb; }
+    .orgp-member-cell { display:flex; align-items:center; gap:9px; }
+    .orgp-avatar { flex:0 0 auto; width:26px; height:26px; border-radius:50%; color:#fff; font-size:11px; font-weight:600; display:inline-flex; align-items:center; justify-content:center; text-transform:uppercase; }
+    .orgp-member-name { color:#46505e; font-size:13.5px; }
+    .orgp-member-tag { display:inline-block; margin-left:6px; padding:1px 7px; border-radius:10px; background:#e8edf4; color:#6a7686; font-size:11px; font-weight:600; vertical-align:middle; }
+
+    .orgp-subs input[type=checkbox] { width:16px; height:16px; cursor:pointer; accent-color:#2168d3; margin:0; }
+    .orgp-hint { color:#9aa5b4; font-size:13px; }
+</style>
 
 <form method="POST"
       action="{{ route('orgportal.portal.settings.save', ['mailbox_id' => $mailbox_id]) }}">
     {{ csrf_field() }}
 
-    <table class="table table-bordered" style="margin-bottom:16px;">
+    <table class="orgp-subs">
         <thead>
             <tr>
-                <th style="min-width:180px;">{{ __('orgportal::messages.notif_scope') }}</th>
+                <th>{{ __('orgportal::messages.notif_scope') }}</th>
                 @foreach($events as $eKey => $eLabel)
-                    <th class="text-center" style="white-space:nowrap;width:110px;">{{ $eLabel }}</th>
+                    <th class="ev">{{ $eLabel }}</th>
                 @endforeach
             </tr>
         </thead>
@@ -50,10 +88,10 @@
 
             {{-- "Вся організація" row (global manager only) --}}
             @if($isGlobal)
-            <tr>
-                <td style="font-weight:bold;">{{ __('orgportal::messages.notif_scope_org') }}</td>
+            <tr class="orgp-row-org">
+                <td><span class="orgp-scope-org">{{ __('orgportal::messages.notif_scope_org') }}</span></td>
                 @foreach($events as $eKey => $eLabel)
-                    <td class="text-center">
+                    <td class="ev">
                         <input type="checkbox"
                                name="subs[{{ $eKey }}][org]"
                                value="1"
@@ -66,24 +104,26 @@
 
             {{-- Unit rows --}}
             @foreach($visibleUnits as $unit)
-            @php $hasMembers = isset($unitMembersMap[$unit->id]); @endphp
+            @php
+                $hasMembers = isset($unitMembersMap[$unit->id]);
+                $unitPad    = $isGlobal ? 'padding-left:30px;' : '';
+            @endphp
 
             {{-- Unit row --}}
-            <tr>
-                <td style="{{ $isGlobal ? 'padding-left:24px;' : '' }}">
+            <tr class="orgp-row-unit">
+                <td style="{{ $unitPad }}">
                     @if($hasMembers)
-                        <a href="#" class="orgp-unit-toggle" data-unit="{{ $unit->id }}"
-                           style="text-decoration:none;color:inherit;cursor:pointer;">
-                            <i class="glyphicon glyphicon-triangle-right orgp-unit-caret" style="font-size:0.8em;"></i>
-                            <span style="font-weight:bold;">{{ $unit->name }}</span>
-                            <span class="text-muted" style="font-weight:normal;font-size:0.9em;">({{ $unitMembersMap[$unit->id]->count() }})</span>
+                        <a href="#" class="orgp-unit-toggle" data-unit="{{ $unit->id }}">
+                            <span class="orgp-chevron"></span>
+                            <span>{{ $unit->name }}</span>
+                            <span class="orgp-unit-count">{{ $unitMembersMap[$unit->id]->count() }}</span>
                         </a>
                     @else
-                        <span style="font-weight:bold;">{{ $unit->name }}</span>
+                        <span class="orgp-unit-name-plain">{{ $unit->name }}</span>
                     @endif
                 </td>
                 @foreach($events as $eKey => $eLabel)
-                    <td class="text-center">
+                    <td class="ev">
                         <input type="checkbox"
                                name="subs[{{ $eKey }}][unit_{{ $unit->id }}]"
                                value="1"
@@ -96,15 +136,26 @@
             {{-- Hidden member rows for this unit --}}
             @if($hasMembers)
                 @foreach($unitMembersMap[$unit->id] as $um)
-                <tr class="orgp-member-row"
+                @php
+                    $fullName = optional($um->customer)->getFullName() ?: __('orgportal::messages.deleted_customer');
+                    $initials = mb_substr(trim($fullName), 0, 1);
+                    $memPad   = $isGlobal ? 'padding-left:54px;' : 'padding-left:28px;';
+                @endphp
+                <tr class="orgp-row-member orgp-member-row"
                     data-unit="{{ $unit->id }}"
                     data-member="{{ $um->id }}"
-                    style="display:none;background:#f9f9f9;">
-                    <td style="padding-left:{{ $isGlobal ? '48px' : '32px' }};color:#555;font-size:0.93em;">
-                        {{ optional($um->customer)->getFullName() ?: __('orgportal::messages.deleted_customer') }}
+                    style="display:none;">
+                    <td style="{{ $memPad }}">
+                        <span class="orgp-member-cell">
+                            <span class="orgp-avatar" style="background:{{ $avatarColor($fullName) }};">{{ $initials }}</span>
+                            <span class="orgp-member-name">{{ $fullName }}</span>
+                            @if($um->role === 'manager')
+                                <span class="orgp-member-tag">{{ __('orgportal::messages.role_manager_scoped') }}</span>
+                            @endif
+                        </span>
                     </td>
                     @foreach($events as $eKey => $eLabel)
-                        <td class="text-center">
+                        <td class="ev">
                             <input type="checkbox"
                                    name="member_subs[{{ $um->id }}][{{ $eKey }}][unit_{{ $unit->id }}]"
                                    value="1"
@@ -120,9 +171,9 @@
         </tbody>
     </table>
 
-    <small class="text-muted">{{ __('orgportal::messages.notif_hint') }}</small>
+    <small class="orgp-hint">{{ __('orgportal::messages.notif_hint') }}</small>
 
-    <div style="margin-top:12px;">
+    <div style="margin-top:14px;">
         <button type="submit" class="btn btn-primary">
             {{ __('orgportal::messages.save') }}
         </button>
@@ -154,14 +205,10 @@
         toggle.addEventListener('click', function (e) {
             e.preventDefault();
             var unitId = this.dataset.unit;
-            var caret  = this.querySelector('.orgp-unit-caret');
             var rows   = document.querySelectorAll('.orgp-member-row[data-unit="' + unitId + '"]');
             var expand = rows.length && rows[0].style.display === 'none';
             rows.forEach(function (row) { row.style.display = expand ? '' : 'none'; });
-            if (caret) {
-                caret.classList.toggle('glyphicon-triangle-right', !expand);
-                caret.classList.toggle('glyphicon-triangle-bottom', expand);
-            }
+            this.classList.toggle('is-open', expand);
         });
     });
 })();
