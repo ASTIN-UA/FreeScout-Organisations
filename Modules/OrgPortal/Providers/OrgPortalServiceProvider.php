@@ -8,6 +8,7 @@ use Modules\OrgPortal\Models\OrganizationMember;
 use Modules\OrgPortal\Models\OrgNotificationSubscription;
 use Modules\OrgPortal\Models\OrgPortalNotification;
 use Modules\OrgPortal\Models\OrgPortalThreadView;
+use Modules\OrgPortal\Services\OrgAttribution;
 
 define('ORGPORTAL_MODULE', 'orgportal');
 
@@ -50,6 +51,7 @@ class OrgPortalServiceProvider extends ServiceProvider
             $this->registerEupHooks();
         }
         $this->registerNotificationHooks();
+        $this->registerAttributionHooks();
         $this->registerPermissionHooks();
         if (\Module::isActive('apiwebhooks')) {
             $this->registerApiWebhooksHooks();
@@ -589,6 +591,26 @@ class OrgPortalServiceProvider extends ServiceProvider
             OrgPortalNotification::whereIn('conversation_id', $conversationIds)->delete();
             OrgPortalThreadView::whereIn('conversation_id', $conversationIds)->delete();
         }, 20, 1);
+    }
+
+    protected function registerAttributionHooks(): void
+    {
+        // Stamp org snapshot on new conversations created via EUP or by a customer.
+        \Eventy::addAction('conversation.created_by_customer', function ($conversation, $thread, $customer) {
+            if ($conversation && $conversation->id) {
+                OrgAttribution::attribute($conversation);
+            }
+        }, 30, 3);
+
+        // Register the backfill command and schedule it to run every 5 minutes.
+        $this->commands([\Modules\OrgPortal\Console\BackfillOrgAttribution::class]);
+
+        \Eventy::addFilter('schedule', function ($schedule) {
+            $schedule->command('orgportal:backfill-attribution --limit=1000')
+                     ->everyFiveMinutes()
+                     ->withoutOverlapping();
+            return $schedule;
+        });
     }
 
     /**

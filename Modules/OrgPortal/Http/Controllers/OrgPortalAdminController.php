@@ -9,6 +9,7 @@ use Modules\OrgPortal\Models\Organization;
 use Modules\OrgPortal\Models\OrganizationMember;
 use Modules\OrgPortal\Models\OrganizationUnit;
 use Modules\OrgPortal\Providers\OrgPortalServiceProvider;
+use Modules\OrgPortal\Services\OrgAttribution;
 
 class OrgPortalAdminController extends Controller
 {
@@ -195,6 +196,9 @@ class OrgPortalAdminController extends Controller
             return redirect()->route('orgportal.admin.edit', $id)
                 ->with('flash_error', __('orgportal::messages.already_member'));
         }
+
+        // Back-fill snapshot on existing un-attributed conversations for this customer.
+        OrgAttribution::reattributeForCustomer($customerId, $id, $unitId);
 
         return redirect()->route('orgportal.admin.edit', $id)
             ->with('flash_success', __('orgportal::messages.member_added'));
