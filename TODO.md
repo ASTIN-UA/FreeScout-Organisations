@@ -89,12 +89,18 @@
 - Відправці email-сповіщень (`SendOrgNotification` — рендерити шаблон мовою клієнта)
 - Системних повідомленнях у bell-нотифікаціях
 
+**Контекст:** EupSwLang зберігає мову лише в cookie браузера — серверний job (`SendOrgNotification`)
+не має до неї доступу. Отже, потрібне власне поле в БД.
+
 **Технічно:**
-- Зберігати `locale` в `organization_members` або в `customers` (є поле?)
-- При `SendOrgNotification::handle()` — `App::setLocale($managerLocale)` перед рендером шаблону
+- Додати `locale` (varchar 8, nullable) до `organization_members`
+- Перемикач мови на порталі → POST → зберігати в `member->locale` + дублювати в cookie (для UI)
+- При `SendOrgNotification::handle()` — завантажити `$manager->member->locale`,
+  викликати `App::setLocale($locale)` перед рендером шаблону
+- Fallback: якщо locale null — використовувати `config('app.locale')`
 - Вже є TODO-коментар у міграції seed: `// TODO: render through App::setLocale($managerLocale)`
 
-**Залежить від:** інтеграції EupSwLang (потрібно знати як locale зберігається зараз).
+**Залежить від:** інтеграції EupSwLang або власного перемикача (п. вище).
 
 ---
 
