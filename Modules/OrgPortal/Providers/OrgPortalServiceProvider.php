@@ -7,6 +7,7 @@ use Modules\OrgPortal\Models\Organization;
 use Modules\OrgPortal\Models\OrganizationMember;
 use Modules\OrgPortal\Models\OrgNotificationSubscription;
 use Modules\OrgPortal\Models\OrgPortalNotification;
+use Modules\OrgPortal\Models\OrgPortalThreadView;
 
 define('ORGPORTAL_MODULE', 'orgportal');
 
@@ -575,6 +576,19 @@ class OrgPortalServiceProvider extends ServiceProvider
                 OrgPortalNotification::TYPE_CUSTOMER_REPLY
             );
         }, 20, 3);
+
+        // Clean up orphan records when a conversation is soft-deleted (moved to trash).
+        \Eventy::addAction('conversation.deleted', function ($conversation) {
+            OrgPortalNotification::where('conversation_id', $conversation->id)->delete();
+            OrgPortalThreadView::where('conversation_id', $conversation->id)->delete();
+        }, 20, 2);
+
+        // Clean up orphan records when conversations are permanently deleted.
+        \Eventy::addAction('conversations.before_delete_forever', function ($conversationIds) {
+            if (empty($conversationIds)) return;
+            OrgPortalNotification::whereIn('conversation_id', $conversationIds)->delete();
+            OrgPortalThreadView::whereIn('conversation_id', $conversationIds)->delete();
+        }, 20, 1);
     }
 
     /**

@@ -537,13 +537,7 @@ class OrgPortalAdminController extends Controller
 
     protected static function sanitizeHtml(string $html): string
     {
-        $html = preg_replace('/<\s*script\b[^>]*>.*?<\s*\/\s*script\s*>/is', '', $html);
-        $html = preg_replace('/<\s*script\b[^>]*>/is', '', $html);
-        $html = preg_replace('/\bon\w+\s*=\s*["\'][^"\']*["\']/i', '', $html);
-        $html = preg_replace('/\bon\w+\s*=\s*\S+/i', '', $html);
-        $html = preg_replace('/href\s*=\s*["\']?\s*javascript\s*:/i', 'href="', $html);
-        $html = preg_replace('/src\s*=\s*["\']?\s*javascript\s*:/i', 'src="', $html);
-        return $html;
+        return \Purifier::clean($html);
     }
 
     /**

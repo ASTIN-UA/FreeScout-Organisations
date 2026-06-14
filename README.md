@@ -36,12 +36,25 @@ A FreeScout module that adds the concept of **Organizations** (companies/teams) 
 ### Organization management (admin)
 - **Manage → Organizations** — full CRUD: create, edit, delete organizations
 - **Mailbox binding** — an organization can be **global** (visible in all mailboxes) or **bound to a specific mailbox**; the corresponding label is shown in the organization list
-- Assign customers to organizations with role selection: `member` or `manager`
+- Assign customers to organizations with role selection: `member`, `manager`, or `unit_manager`
 - **Change member role** directly in the table (without removing and re-adding)
 - Customer search autocomplete by name or email; customers already in any organization are excluded from results
 - Member email is displayed below the name in the members table
 - One customer — one organization (enforced at DB and API level)
 - **Badge color** — visual palette with 12 colors in the organization edit form; default is gray
+
+### Structural units (subdivisions)
+
+Organizations can be divided into **structural units** (departments, branches, teams):
+
+- **Create / rename / delete** units directly in the organization edit form
+- **Assign members to units** — each member can belong to one unit within the organization
+- **Three roles:**
+  - `member` — regular portal customer, can submit and view their own tickets
+  - `manager` (global manager) — sees and manages tickets of **all** organization members across all units
+  - `unit_manager` — sees and manages tickets only within **their own unit**
+- Unit managers have access to the same portal features as global managers, but scoped to their unit
+- Ticket access and notification subscriptions are enforced at the unit boundary
 
 ### User permissions
 - New permission **"Allow managing organizations"** — non-admins with this permission get access to the list, create, and edit organization pages
@@ -51,6 +64,7 @@ A FreeScout module that adds the concept of **Organizations** (companies/teams) 
 ### Customer card
 - **Organization** field in the customer edit form — select organization and role
 - **Organization Tickets** button — opens a search for all tickets of the organization
+- **Organization info block** in the admin ticket sidebar — shows the customer's organization, unit, and role directly on the ticket page
 
 ### Organization badge on tickets
 - Displayed below the subject on the ticket page and before the name in the conversation list
@@ -69,6 +83,14 @@ A FreeScout module that adds the concept of **Organizations** (companies/teams) 
 - Extends the standard FreeScout search with an **Organization** filter
 - Shows all tickets of customers belonging to the selected organization
 
+### Manager viewed tracking (admin)
+
+When an organization or unit manager opens a ticket in the portal, it is recorded:
+
+- A **"viewed"** note appears under the corresponding agent reply in the admin ticket view — similar to FreeScout's native "Customer viewed" feature
+- Shows the manager's name, role (Organization manager / Unit manager), and how long ago they viewed it
+- Global manager and unit manager views are tracked and displayed independently
+
 ### End-User Portal — manager access *(optional)*
 
 An organization manager gets extended access through EUP:
@@ -81,13 +103,30 @@ An organization manager gets extended access through EUP:
   - **Status** — Active / Pending / Closed / Spam with icons
   - **State** — Kanban column name (with custom label if configured); shown only if the Kanban module is active
   - **Updated** — date and time of the last reply
+- **Two independent read indicators** per row:
+  - **Bold row** — the manager has unread notifications for this conversation (new ticket, new reply, or customer reply not yet viewed)
+  - **Eye icon** — the ticket author has not yet opened the latest agent reply
 - Search by ticket subject
+- Filter by unit (global managers only)
 - Filters by Kanban statuses (configurable via **Mailbox Settings → OrgPortal**)
 - Reply to ticket with **attachment** support (drag & drop, multi-file)
 - **Close ticket** — manager can close a ticket; a new reply automatically reopens it
 - Change ticket author — reassign a ticket to another organization member
 - **Org Settings** page for configuring email notifications
 - Ticket access is **strictly limited to the current mailbox** (organization copied to another mailbox — portal 403)
+
+### In-app notification bell *(optional, requires End-User Portal)*
+
+Managers receive **real-time in-app notifications** directly in the portal navigation bar:
+
+- Bell icon with an **unread count badge** appears in the EUP navbar for all authenticated managers
+- Notifications are created for: new ticket, agent reply, customer reply — for all manager roles (`manager`, `unit_manager`, `global_manager`)
+- Clicking the bell opens a dropdown panel with a list of unread notifications grouped by date
+- Each notification shows the actor name, event type, ticket number, message preview, and time
+- **Mark as read** on ticket open — all notifications for the conversation are marked as read server-side when the manager navigates to the ticket; the badge updates immediately
+- **Mark individual** notification as read via the × button on each item
+- **Mark all as read** link in the panel header
+- Notifications poll every 15 seconds and re-fetch on browser back/forward navigation (bfcache)
 
 ### Notification Subscriptions *(optional)*
 
@@ -128,6 +167,8 @@ Admins can customize email templates sent to managers on the **Notification Temp
 | `{subject}` | Ticket subject |
 | `{ticket_number}` | Ticket ID |
 | `{ticket_url}` | Link to the ticket in the portal |
+| `{ticket_text}` | Full text of the initial ticket message (HTML) |
+| `{reply_text}` | Full text of the latest reply (HTML) |
 | `{created_date}` | Ticket creation date (format: YYYY-MM-DD) |
 | `{created_time}` | Ticket creation time (format: HH:MM:SS) |
 | `{created_datetime}` | Ticket creation date and time (ISO 8601) |

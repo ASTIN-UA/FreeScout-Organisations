@@ -31,18 +31,21 @@ class OrgPortalThreadView extends Model
             ->pluck('thread_id')
             ->all();
 
-        $threads = \App\Thread::where('conversation_id', $conversationId)
+        $threadIds = \App\Thread::where('conversation_id', $conversationId)
+            ->whereIn('type', [\App\Thread::TYPE_CUSTOMER, \App\Thread::TYPE_MESSAGE])
             ->whereNotIn('id', $alreadyViewed)
             ->pluck('id');
 
-        foreach ($threads as $threadId) {
-            static::insert([
-                'thread_id'       => $threadId,
-                'conversation_id' => $conversationId,
-                'customer_id'     => $customerId,
-                'viewed_at'       => $now,
-            ]);
-        }
+        if ($threadIds->isEmpty()) return;
+
+        $rows = $threadIds->map(fn($id) => [
+            'thread_id'       => $id,
+            'conversation_id' => $conversationId,
+            'customer_id'     => $customerId,
+            'viewed_at'       => $now,
+        ])->all();
+
+        static::insert($rows);
     }
 
     public function member()
