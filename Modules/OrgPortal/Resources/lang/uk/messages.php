@@ -139,6 +139,7 @@ return [
     // Notification subscriptions (portal)
     'notif_scope'                => 'Область',
     'notif_scope_org'            => 'Вся організація',
+    'notif_scope_no_unit'        => 'Без підрозділу',
     'notif_event_new_ticket'     => 'Нова заявка',
     'notif_event_reply_agent'    => 'Відповідь агента',
     'notif_event_reply_customer' => 'Відповідь клієнта',

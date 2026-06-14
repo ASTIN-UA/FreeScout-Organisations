@@ -139,6 +139,7 @@ return [
     // Notification subscriptions (portal)
     'notif_scope'                => 'Scope',
     'notif_scope_org'            => 'Entire organization',
+    'notif_scope_no_unit'        => 'No unit',
     'notif_event_new_ticket'     => 'New ticket',
     'notif_event_reply_agent'    => 'Agent reply',
     'notif_event_reply_customer' => 'Customer reply',

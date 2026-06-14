@@ -528,6 +528,14 @@ class OrgPortalFrontController extends Controller
                         'scope_type' => 'org',
                         'scope_id'   => null,
                     ]);
+                } elseif ($scopeKey === 'unit_nounit' && $member->isGlobalManager()) {
+                    // Subscribe to members without any unit (scope_type='unit', scope_id=NULL).
+                    \Modules\OrgPortal\Models\OrgNotificationSubscription::create([
+                        'member_id'  => $member->id,
+                        'event'      => $event,
+                        'scope_type' => 'unit',
+                        'scope_id'   => null,
+                    ]);
                 } elseif (str_starts_with($scopeKey, 'unit_')) {
                     $unitId = (int) substr($scopeKey, 5);
                     // Verify unit belongs to this org and manager can access it.
@@ -568,7 +576,17 @@ class OrgPortalFrontController extends Controller
                 foreach ($events as $event) {
                     if (empty($eventsData[$event])) continue;
                     foreach ($eventsData[$event] as $scopeKey => $val) {
-                        if (str_starts_with($scopeKey, 'unit_')) {
+                        if ($scopeKey === 'unit_nounit') {
+                            // Per-member subscription for a no-unit member.
+                            if (is_null($targetMember->unit_id) && $member->isGlobalManager()) {
+                                \Modules\OrgPortal\Models\OrgNotificationSubscription::create([
+                                    'member_id'  => $targetMemberId,
+                                    'event'      => $event,
+                                    'scope_type' => 'unit',
+                                    'scope_id'   => null,
+                                ]);
+                            }
+                        } elseif (str_starts_with($scopeKey, 'unit_')) {
                             $unitId = (int) substr($scopeKey, 5);
                             if (in_array($unitId, $allUnitIds) && $unitId === $targetMember->unit_id) {
                                 \Modules\OrgPortal\Models\OrgNotificationSubscription::create([

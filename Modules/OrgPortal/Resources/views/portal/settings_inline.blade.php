@@ -15,6 +15,8 @@
         $parts = explode('_', $scope, 2);
         $type  = $parts[0];
         $id    = $parts[1] ?? '';
+        // 'unit_nounit' maps to scope_type='unit', scope_id=NULL → stored key 'event:unit:'
+        if ($id === 'nounit') $id = '';
         return !empty($subsMap[$event . ':' . $type . ':' . $id]);
     };
 
@@ -31,6 +33,11 @@
             $unitMembersMap[$unit->id] = $others;
         }
     }
+
+    // Members without any unit (global manager sees them; unit manager never has such members).
+    $noUnitMembers = $isGlobal
+        ? ($members ?? collect())->filter(fn($m) => is_null($m->unit_id) && $m->id !== $member->id)->values()
+        : collect();
 
     // Deterministic avatar colour from a string.
     $avatarColor = function(string $seed): string {
@@ -167,6 +174,63 @@
             @endif
 
             @endforeach
+
+            {{-- "Без підрозділу" virtual group — members with unit_id = NULL (global manager only) --}}
+            @if($isGlobal && $noUnitMembers->isNotEmpty())
+            @php $noUnitPad = 'padding-left:30px;'; @endphp
+            <tr class="orgp-row-unit {{ $noUnitMembers->count() > 1 ? 'expandable' : '' }}" data-unit="nounit">
+                <td style="{{ $noUnitPad }}">
+                    @if($noUnitMembers->count() > 1)
+                        <span class="orgp-unit-label">
+                            <span class="orgp-chevron"></span>
+                            <span>{{ __('orgportal::messages.notif_scope_no_unit') }}</span>
+                            <span class="orgp-unit-count">{{ $noUnitMembers->count() }}</span>
+                        </span>
+                    @else
+                        <span class="orgp-unit-name-plain">{{ __('orgportal::messages.notif_scope_no_unit') }}</span>
+                    @endif
+                </td>
+                @foreach($events as $eKey => $eLabel)
+                    <td class="ev">
+                        <input type="checkbox"
+                               name="subs[{{ $eKey }}][unit_nounit]"
+                               value="1"
+                               class="orgp-unit-cb" data-event="{{ $eKey }}" data-unit="nounit"
+                               {{ $subsChecked($subsMap, $eKey, 'unit_nounit') ? 'checked' : '' }}>
+                    </td>
+                @endforeach
+            </tr>
+
+            @foreach($noUnitMembers as $um)
+            @php
+                $fullName = optional($um->customer)->getFullName() ?: __('orgportal::messages.deleted_customer');
+                $initials = mb_substr(trim($fullName), 0, 1);
+            @endphp
+            <tr class="orgp-row-member orgp-member-row"
+                data-unit="nounit"
+                data-member="{{ $um->id }}"
+                style="{{ $noUnitMembers->count() > 1 ? 'display:none;' : '' }}">
+                <td style="padding-left:54px;">
+                    <span class="orgp-member-cell">
+                        <span class="orgp-avatar" style="background:{{ $avatarColor($fullName) }};">{{ $initials }}</span>
+                        <span class="orgp-member-name">{{ $fullName }}</span>
+                        @if($um->role === 'manager')
+                            <span class="orgp-member-tag">{{ __('orgportal::messages.role_manager_scoped') }}</span>
+                        @endif
+                    </span>
+                </td>
+                @foreach($events as $eKey => $eLabel)
+                    <td class="ev">
+                        <input type="checkbox"
+                               name="member_subs[{{ $um->id }}][{{ $eKey }}][unit_nounit]"
+                               value="1"
+                               class="orgp-member-cb" data-event="{{ $eKey }}" data-unit="nounit"
+                               {{ $subsChecked($memberSubsMap[$um->id] ?? [], $eKey, 'unit_nounit') ? 'checked' : '' }}>
+                    </td>
+                @endforeach
+            </tr>
+            @endforeach
+            @endif
 
         </tbody>
     </table>
