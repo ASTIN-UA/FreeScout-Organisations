@@ -63,6 +63,24 @@ a.orgportal-org-badge:focus {
     top: 1px;
 }
 
+/* ── Mobile responsive fixes (admin panel) ──────────────────────────────── */
+.orgportal-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 992px) {
+    /* Admin settings: template panel heading — hint moves to own line */
+    .panel-heading .text-muted {
+        display: block !important;
+        margin-left: 0 !important;
+        margin-top: 3px;
+        font-size: 11px !important;
+        font-weight: normal;
+        line-height: 1.4;
+    }
+}
+
 /* ── Kanban org filter dropdown ─────────────────────────────────────────── */
 .orgportal-kn-filter-wrap {
     display: inline-block;

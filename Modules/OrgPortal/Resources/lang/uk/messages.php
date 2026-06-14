@@ -244,6 +244,10 @@ return [
     'email_ticket_number'    => 'Тікет №',
     'view_ticket'            => 'Переглянути тікет',
 
+    // Manager viewed (admin thread meta)
+    'manager_org_label'    => 'Менеджер організації',
+    'manager_viewed_when'  => 'переглянув(ла) :when',
+
     // Портальні сповіщення
     'notifications'          => 'Сповіщення',
     'no_notifications'       => 'Немає нових сповіщень',

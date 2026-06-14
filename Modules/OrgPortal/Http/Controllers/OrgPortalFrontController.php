@@ -13,6 +13,7 @@ use Illuminate\Routing\Controller;
 use Modules\OrgPortal\Models\Organization;
 use Modules\OrgPortal\Models\OrganizationMember;
 use Modules\OrgPortal\Models\OrganizationUnit;
+use Modules\OrgPortal\Models\OrgPortalThreadView;
 
 class OrgPortalFrontController extends Controller
 {
@@ -48,7 +49,7 @@ class OrgPortalFrontController extends Controller
     protected function requireManager(Customer $customer, Mailbox $mailbox): OrganizationMember
     {
         $member = OrganizationMember::where('customer_id', $customer->id)
-            ->where('role', 'manager')
+            ->whereIn('role', ['manager', 'unit_manager', 'global_manager'])
             ->with('organization')
             ->first();
 
@@ -259,13 +260,16 @@ class OrgPortalFrontController extends Controller
             ->with('attachments')
             ->get();
 
-        // Mark agent threads as opened
+        // Mark agent threads as opened (FreeScout "Customer viewed" tracker)
         foreach ($threads as $thread) {
             if ($thread->type === Thread::TYPE_MESSAGE && !$thread->opened_at) {
                 $thread->opened_at = now();
                 $thread->save();
             }
         }
+
+        // Record that this manager viewed all threads in the conversation
+        OrgPortalThreadView::markConversationViewed($conversation->id, $customer->id);
 
         // Author dropdown — only members who can still be assigned (active).
         $orgMembers = Customer::whereIn('id', $this->assignableCustomerIds($member))->get();

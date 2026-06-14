@@ -206,6 +206,31 @@ class OrgPortalServiceProvider extends ServiceProvider
                 ]);
             }
         }, 20, 1);
+
+        // Show org / unit / role info in the customer sidebar (conversation view)
+        \Eventy::addAction('customer.profile_data', function ($customer, $conversation) {
+            $member = OrganizationMember::where('customer_id', $customer->id)
+                ->where('is_active', true)
+                ->with('organization', 'unit')
+                ->first();
+
+            if (!$member || !$member->organization) {
+                return;
+            }
+
+            $roleLabels = [
+                'member'         => __('orgportal::messages.role_member'),
+                'manager'        => __('orgportal::messages.role_manager_scoped'),
+                'unit_manager'   => __('orgportal::messages.role_unit_manager'),
+                'global_manager' => __('orgportal::messages.role_global_manager'),
+            ];
+            $roleLabel = $roleLabels[$member->role] ?? $member->role;
+
+            echo view('orgportal::admin.partials.customer_profile_org', [
+                'member'    => $member,
+                'roleLabel' => $roleLabel,
+            ])->render();
+        }, 20, 2);
     }
 
     protected function registerConversationHooks()
@@ -275,6 +300,37 @@ class OrgPortalServiceProvider extends ServiceProvider
                 'asLink'       => false,
             ])->render();
         }, 20, 1);
+
+        // Show "Manager viewed" info under each thread (like FreeScout's "Customer viewed")
+        \Eventy::addAction('thread.meta', function ($thread, $loop, $threads, $conversation, $mailbox) {
+            // Only show for agent/support threads
+            if ($thread->type !== \App\Thread::TYPE_MESSAGE) {
+                return;
+            }
+
+            $views = \Modules\OrgPortal\Models\OrgPortalThreadView::forThread($thread->id);
+            if ($views->isEmpty()) {
+                return;
+            }
+
+            foreach ($views as $view) {
+                if (!$view->customer) {
+                    continue;
+                }
+                $name = $view->customer->getFullName();
+                $when = \App\User::dateDiffForHumansWithHours($view->viewed_at);
+                $role = $view->member ? $view->member->role : null;
+                $roleLabel = match ($role) {
+                    'global_manager' => __('orgportal::messages.manager_org_label'),
+                    'unit_manager'   => __('orgportal::messages.role_unit_manager'),
+                    default          => __('orgportal::messages.manager'),
+                };
+                echo '<div class="thread-meta"><i class="glyphicon glyphicon-eye-open"></i> '
+                    . e($roleLabel) . ' ' . e($name) . ' '
+                    . __('orgportal::messages.manager_viewed_when', ['when' => $when])
+                    . '</div>';
+            }
+        }, 20, 5);
     }
 
     protected function registerKanbanHooks()
@@ -431,6 +487,14 @@ class OrgPortalServiceProvider extends ServiceProvider
                 'mailbox_id' => $mailboxId,
             ])->render();
         }, 20, 0);
+
+        // Mobile CSS for EUP portal pages (portal does not load admin module.css)
+        \Eventy::addAction('layout.body_bottom', function () {
+            if (!\EndUserPortal::isEup()) {
+                return;
+            }
+            echo '<style>@media(max-width:768px){#tab-members .table,#tab-units .table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}#tab-units .form-inline{display:flex;flex-wrap:wrap;gap:6px;}#tab-units .form-inline .form-control{flex:1 1 auto;min-width:0;}}</style>';
+        }, 5, 0);
 
         // Notification bell — for ALL authenticated portal customers (managers + regular users).
         \Eventy::addAction('layout.body_bottom', function () {

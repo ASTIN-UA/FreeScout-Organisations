@@ -121,6 +121,7 @@
                 <div class="panel-heading"><strong>{{ __('orgportal::messages.tab_units') }}</strong></div>
                 <div class="panel-body">
                     @if($units->count())
+                        <div class="orgportal-table-wrap">
                         <table class="table table-condensed table-striped">
                             <tbody>
                                 @foreach($units as $unit)
@@ -151,6 +152,7 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        </div>{{-- orgportal-table-wrap --}}
                     @else
                         <p class="text-muted">{{ __('orgportal::messages.no_units') }}</p>
                     @endif
@@ -176,6 +178,7 @@
                 <div class="panel-body">
 
                     @if($members->count())
+                        <div class="orgportal-table-wrap">
                         <table class="table table-condensed table-striped">
                             <thead>
                                 <tr>
@@ -260,6 +263,7 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        </div>{{-- orgportal-table-wrap --}}
                     @else
                         <p class="text-muted">{{ __('orgportal::messages.no_members') }}</p>
                     @endif

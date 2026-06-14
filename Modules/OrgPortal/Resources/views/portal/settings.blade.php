@@ -122,7 +122,8 @@
                 @if($members->isEmpty())
                     <p class="text-muted">{{ __('orgportal::messages.no_members') }}</p>
                 @else
-                    <table class="table">
+                    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+                    <table class="table" style="min-width:520px;">
                         <thead>
                             <tr>
                                 <th>{{ __('orgportal::messages.name') }}</th>
@@ -207,6 +208,7 @@
                         @endforeach
                         </tbody>
                     </table>
+                    </div>{{-- overflow wrapper --}}
                 @endif
             </div>
 

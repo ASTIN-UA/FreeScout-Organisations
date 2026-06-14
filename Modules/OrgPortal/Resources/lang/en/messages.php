@@ -244,6 +244,10 @@ return [
     'email_ticket_number'    => 'Ticket #',
     'view_ticket'            => 'View Ticket',
 
+    // Manager viewed (admin thread meta)
+    'manager_org_label'    => 'Organization manager',
+    'manager_viewed_when'  => 'viewed :when',
+
     // Portal in-app notifications
     'notifications'          => 'Notifications',
     'no_notifications'       => 'No new notifications',

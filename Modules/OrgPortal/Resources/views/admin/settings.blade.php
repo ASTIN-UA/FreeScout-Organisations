@@ -64,11 +64,11 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <strong>{{ __('orgportal::messages.tpl_heading') }}: {{ $eLabel }}</strong>
-                        <span class="text-muted" style="font-size:12px;margin-left:8px;">
-                            {{ __('orgportal::messages.tpl_fallback_hint') }}
-                        </span>
                     </div>
                     <div class="panel-body">
+                        <p class="text-muted" style="font-size:12px;margin-top:0;margin-bottom:12px;">
+                            {{ __('orgportal::messages.tpl_fallback_hint') }}
+                        </p>
 
                         {{-- Subject --}}
                         <div class="form-group">
