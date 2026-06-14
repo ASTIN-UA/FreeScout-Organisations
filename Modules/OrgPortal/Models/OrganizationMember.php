@@ -18,6 +18,7 @@ class OrganizationMember extends Model
         'notify_on_new_ticket',
         'is_active',
         'deactivated_at',
+        'locale',
     ];
 
     protected $casts = [

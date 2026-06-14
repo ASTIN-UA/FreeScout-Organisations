@@ -42,6 +42,10 @@ class OrgPortalServiceProvider extends ServiceProvider
             return $styles;
         });
 
+        // Register global locale middleware (handles ?eup_locale=xx before route middleware).
+        $this->app->make(\Illuminate\Contracts\Http\Kernel::class)
+            ->pushMiddleware(\Modules\OrgPortal\Http\Middleware\OrgPortalSetLocale::class);
+
         $this->registerMenuHooks();
         $this->registerCustomerHooks();
         $this->registerConversationHooks();
@@ -94,6 +98,51 @@ class OrgPortalServiceProvider extends ServiceProvider
      * Whether the given user may access the OrgPortal admin pages.
      * Admins always can; non-admins need the PERM_MANAGE_ORGANIZATIONS permission.
      */
+    /**
+     * Returns all locales available in the EndUserPortal (same logic as EupSwLang).
+     * 'en' is always included as the baseline.
+     */
+    public static function getAvailablePortalLocales(): array
+    {
+        static $cache = null;
+        if ($cache !== null) return $cache;
+
+        $cache = ['en' => 'English'];
+
+        $langPath = base_path('Modules/EndUserPortal/Resources/lang');
+        if (!is_dir($langPath)) {
+            $langPath = base_path('modules/enduserportal/Resources/lang');
+        }
+
+        if (is_dir($langPath)) {
+            foreach (glob($langPath . '/*.json') as $file) {
+                $code = basename($file, '.json');
+                $cache[$code] = self::getLocaleName($code);
+            }
+        }
+
+        return $cache;
+    }
+
+    public static function getLocaleName(string $code): string
+    {
+        if (method_exists(\Helper::class, 'getLocaleData')) {
+            try {
+                $data = \Helper::getLocaleData($code);
+                if (!empty($data['name'])) return $data['name'];
+            } catch (\Throwable $e) {}
+        }
+        $names = [
+            'en' => 'English', 'cs' => 'Čeština', 'da' => 'Dansk',
+            'de' => 'Deutsch', 'es' => 'Español', 'fi' => 'Suomi',
+            'fr' => 'Français', 'it' => 'Italiano', 'nl' => 'Nederlands',
+            'no' => 'Norsk', 'pl' => 'Polski', 'pt-BR' => 'Português (BR)',
+            'pt-PT' => 'Português (PT)', 'ru' => 'Русский', 'sk' => 'Slovenčina',
+            'sv' => 'Svenska', 'uk' => 'Українська', 'zh-CN' => '中文(简体)',
+        ];
+        return $names[$code] ?? strtoupper($code);
+    }
+
     public static function userCanManageOrganizations($user)
     {
         if (!$user) {
@@ -463,6 +512,21 @@ class OrgPortalServiceProvider extends ServiceProvider
 
     protected function registerEupHooks()
     {
+        // Re-apply the chosen portal locale right before every EUP view renders.
+        // Something in FreeScout's pipeline resets the locale after middleware runs;
+        // a View composer is the only reliable place to override it last.
+        \View::composer('enduserportal::*', function ($view) {
+            if (!preg_match('#/help/#', request()->getRequestUri())) return;
+
+            // Both EupSwLang and OrgPortalSetLocale write eup_locale as plain text
+            // from the global middleware stack (before EncryptCookies runs).
+            $locale = $_COOKIE['eup_locale'] ?? session('enduserportal.locale');
+
+            if ($locale && preg_match('/^[A-Za-z_-]+$/', $locale)) {
+                app()->setLocale($locale);
+            }
+        });
+
         // EUP has no tab/settings hooks — inject nav links via JS on layout.body_bottom.
         // Fires on every EUP page; skipped for non-EUP pages and non-managers.
         \Eventy::addAction('layout.body_bottom', function () {
@@ -493,6 +557,33 @@ class OrgPortalServiceProvider extends ServiceProvider
                 'mailbox_id' => $mailboxId,
             ])->render();
         }, 20, 0);
+
+        // Language switcher — only when OrgPortal's own switcher is enabled AND EupSwLang is not active.
+        \Eventy::addAction('layout.body_bottom', function () {
+            if (!\EndUserPortal::isEup()) return;
+            if (\Module::isActive('eupswlang')) return;
+            if (!\Option::get('orgportal.lang_switcher_enabled', false)) return;
+
+            $mailboxId = request()->route('mailbox_id');
+            if (!$mailboxId) return;
+
+            $raw            = \Option::get('orgportal.lang_switcher_locales', []);
+            $allowedLocales = is_array($raw) ? $raw : (json_decode($raw, true) ?: []);
+            $allLocales     = self::getAvailablePortalLocales();
+            $locales        = $allowedLocales
+                ? array_intersect_key($allLocales, array_flip($allowedLocales))
+                : $allLocales;
+
+            if (empty($locales)) return;
+
+            $currentLocale  = app()->getLocale();
+            $baseUrl        = request()->url();
+            $existingParams = request()->except('eup_locale');
+
+            echo view('orgportal::partials.eup_lang_switcher', compact(
+                'locales', 'currentLocale', 'baseUrl', 'existingParams'
+            ))->render();
+        }, 19, 0);
 
         // Notification bell — for ALL authenticated portal customers (managers + regular users).
         \Eventy::addAction('layout.body_bottom', function () {
@@ -680,7 +771,14 @@ class OrgPortalServiceProvider extends ServiceProvider
             $email = $this->getCustomerEmail($manager->customer);
             if (!$email) continue;
 
+            $prevLocale = app()->getLocale();
+            if ($manager->locale) {
+                app()->setLocale($manager->locale);
+            }
+
             [$subject, $body] = $this->renderNotificationTemplate($event, $manager, $authorMember, $conversation, $thread);
+
+            app()->setLocale($prevLocale);
 
             \Modules\OrgPortal\Jobs\SendOrgNotification::dispatch(
                 (int) $conversation->mailbox_id,

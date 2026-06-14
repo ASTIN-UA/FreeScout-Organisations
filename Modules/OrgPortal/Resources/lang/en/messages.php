@@ -218,6 +218,29 @@ return [
     'perm_manage_organizations' => 'Allow managing organizations',
     'perm_manage_templates'     => 'Allow managing notification templates',
 
+    // Admin — system tab (Phase 7 attribution)
+    'system_tab_title'          => 'System',
+    'system_attribution_heading'=> 'Ticket Attribution',
+    'system_attribution_more'   => 'details',
+    'system_attribution_desc'   => 'By default the portal decides which tickets a manager can see by looking at the current member list of the organisation — if a customer is in the org, their tickets are visible. This works well until customers move between organisations or leave: a customer transferred to another org would suddenly lose all their old tickets, and a customer who left would pull their tickets out of the portal entirely. Ticket Attribution solves this by storing a snapshot of the organisation and unit directly on each ticket at the moment it is created. The ticket stays visible in the original org even after the customer moves. Example: John submitted 10 tickets while in "Acme Corp". He was later moved to "Beta LLC". With attribution enabled, all 10 tickets remain visible in "Acme Corp" portal — and future tickets appear in "Beta LLC". Without attribution, all 10 tickets would disappear from "Acme Corp" the moment John is moved. The background job runs every 5 minutes and processes up to 1 000 tickets per pass to attribute the existing history.',
+    'system_tickets_attributed' => 'tickets attributed',
+    'system_tickets_pending'    => ':count tickets still pending attribution',
+    'system_backfill_complete'  => 'All tickets attributed — ready to enable snapshot visibility.',
+    'system_run_backfill'       => 'Run backfill now',
+    'system_cron_hint'          => 'Processes up to 2 000 tickets immediately (cron runs every 5 min automatically).',
+    'system_backfill_done'      => 'Backfill complete: :count tickets processed.',
+    'system_snapshot_warning'   => 'There are still unattributed tickets. We recommend enabling snapshot visibility only after the counter reaches 0 — otherwise those tickets may temporarily disappear from the portal.',
+    'system_snapshot_label'     => 'Enable snapshot-based ticket visibility',
+    'system_snapshot_hint'      => 'When enabled, the portal shows tickets by stored org_id snapshot instead of the live member list. A safe fallback for un-attributed tickets remains active at all times.',
+
+    // Admin — system tab: language switcher
+    'system_lang_heading'       => 'Portal Language Switcher',
+    'system_lang_desc'          => 'Adds a language switcher dropdown to the customer portal navbar. The chosen language is saved to the customer\'s profile and used when sending email notifications. Has no effect when the EupSwLang module is active (use EupSwLang settings instead).',
+    'system_lang_enable'        => 'Enable language switcher on portal',
+    'system_lang_enable_hint'   => 'Shows a globe icon in the portal navbar that lets customers switch the portal language.',
+    'system_lang_locales'       => 'Available languages',
+    'system_lang_locales_hint'  => 'Only the checked languages appear in the switcher. Leave all checked to show every available language.',
+
     // ApiWebhooks settings page
     'api_docs_link'          => 'OrgPortal API Docs',
 

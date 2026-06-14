@@ -14,6 +14,7 @@ use Modules\OrgPortal\Models\Organization;
 use Modules\OrgPortal\Models\OrganizationMember;
 use Modules\OrgPortal\Models\OrganizationUnit;
 use Modules\OrgPortal\Models\OrgPortalThreadView;
+use Modules\OrgPortal\Services\OrgAttribution;
 
 class OrgPortalFrontController extends Controller
 {
@@ -150,7 +151,7 @@ class OrgPortalFrontController extends Controller
             }
         }
 
-        $builder = Conversation::whereIn('customer_id', $filteredMemberIds)
+        $builder = OrgAttribution::orgConversationQuery($org->id, $filteredMemberIds, $unitId)
             ->where('mailbox_id', $mailbox->id)
             ->where('state', '!=', Conversation::STATE_DELETED)
             ->with(['customer', 'user'])
@@ -262,7 +263,7 @@ class OrgPortalFrontController extends Controller
 
         $orgMemberIds = $this->visibleCustomerIds($member);
 
-        $conversation = Conversation::whereIn('customer_id', $orgMemberIds)
+        $conversation = OrgAttribution::orgConversationQuery($member->organization_id, $orgMemberIds)
             ->where('mailbox_id', $mailbox->id)
             ->findOrFail($conversation_id);
 
@@ -302,7 +303,7 @@ class OrgPortalFrontController extends Controller
 
         $orgMemberIds = $this->visibleCustomerIds($member);
 
-        $conversation = Conversation::whereIn('customer_id', $orgMemberIds)
+        $conversation = OrgAttribution::orgConversationQuery($member->organization_id, $orgMemberIds)
             ->where('mailbox_id', $mailbox->id)
             ->findOrFail($conversation_id);
 
@@ -370,7 +371,7 @@ class OrgPortalFrontController extends Controller
 
         $orgMemberIds = $this->visibleCustomerIds($member);
 
-        $conversation = Conversation::whereIn('customer_id', $orgMemberIds)
+        $conversation = OrgAttribution::orgConversationQuery($member->organization_id, $orgMemberIds)
             ->where('mailbox_id', $mailbox->id)
             ->findOrFail($conversation_id);
 
@@ -422,7 +423,7 @@ class OrgPortalFrontController extends Controller
 
         $orgMemberIds = $this->visibleCustomerIds($member);
 
-        $conversation = Conversation::whereIn('customer_id', $orgMemberIds)
+        $conversation = OrgAttribution::orgConversationQuery($member->organization_id, $orgMemberIds)
             ->where('mailbox_id', $mailbox->id)
             ->findOrFail($conversation_id);
 

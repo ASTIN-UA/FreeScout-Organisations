@@ -67,6 +67,12 @@ Route::group([
 
     Route::post('settings', 'OrgPortalAdminController@saveGlobalSettings')
         ->name('orgportal.admin.settings.save');
+
+    Route::post('system/backfill', 'OrgPortalAdminController@runBackfill')
+        ->name('orgportal.admin.system.backfill');
+
+    Route::post('system', 'OrgPortalAdminController@saveSystemSettings')
+        ->name('orgportal.admin.system.save');
 });
 
 // ─── Per-mailbox admin routes ─────────────────────────────────────────────────

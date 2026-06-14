@@ -8,10 +8,10 @@
 </div>
 
 @php
+    $validTabs = ['organizations', 'templates'];
+    if ($isAdmin) $validTabs[] = 'system';
     $activeTab = request()->input('tab', 'organizations');
-    if (!in_array($activeTab, ['organizations', 'templates'])) {
-        $activeTab = 'organizations';
-    }
+    if (!in_array($activeTab, $validTabs)) $activeTab = 'organizations';
 @endphp
 
 <div class="container">
@@ -20,7 +20,7 @@
 
             @include('partials/flash_messages')
 
-            <ul class="nav nav-tabs" role="tablist" style="margin-bottom:0;">
+            <ul class="nav nav-tabs" role="tablist" style="margin-bottom:0;display:flex;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap;">
                 <li role="presentation" class="{{ $activeTab === 'organizations' ? 'active' : '' }}">
                     <a href="#tab-organizations" role="tab" data-toggle="tab">
                         {{ __('orgportal::messages.organizations') }}
@@ -30,6 +30,13 @@
                 <li role="presentation" class="{{ $activeTab === 'templates' ? 'active' : '' }}">
                     <a href="#tab-templates" role="tab" data-toggle="tab">
                         {{ __('orgportal::messages.tpl_tab_title') }}
+                    </a>
+                </li>
+                @endif
+                @if($isAdmin)
+                <li role="presentation" class="{{ $activeTab === 'system' ? 'active' : '' }}">
+                    <a href="#tab-system" role="tab" data-toggle="tab">
+                        {{ __('orgportal::messages.system_tab_title') }}
                     </a>
                 </li>
                 @endif
@@ -214,6 +221,155 @@
                 </div>
                 @endif
 
+                {{-- ── System ─────────────────────────────────────────────── --}}
+                @if($isAdmin)
+                <div role="tabpanel" class="tab-pane {{ $activeTab === 'system' ? 'active' : '' }}" id="tab-system">
+
+                    <div style="margin-bottom:16px;">
+                        <span style="cursor:pointer;user-select:none;"
+                              data-toggle="collapse"
+                              data-target="#system-attribution-desc">
+                            <h4 style="display:inline-block;margin:0 6px 0 0;">{{ __('orgportal::messages.system_attribution_heading') }}</h4>
+                            <span class="text-muted" style="font-size:13px;">({{ __('orgportal::messages.system_attribution_more') }})</span>
+                            <span class="glyphicon glyphicon-chevron-right orgportal-sys-chevron"
+                                  style="font-size:11px;transition:transform .15s ease;vertical-align:middle;color:#999;margin-left:4px;"></span>
+                        </span>
+                        <div id="system-attribution-desc" class="collapse" style="margin-top:8px;">
+                            <p class="text-muted">{{ __('orgportal::messages.system_attribution_desc') }}</p>
+                        </div>
+                    </div>
+
+                    {{-- Progress --}}
+                    @php
+                        $pct = $systemStats['total'] > 0
+                            ? round($systemStats['attributed'] / $systemStats['total'] * 100)
+                            : 100;
+                    @endphp
+                    <div class="margin-bottom">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                            <span>
+                                <strong>{{ number_format($systemStats['attributed']) }}</strong>
+                                /
+                                {{ number_format($systemStats['total']) }}
+                                {{ __('orgportal::messages.system_tickets_attributed') }}
+                            </span>
+                            <span class="text-muted">{{ $pct }}%</span>
+                        </div>
+                        <div class="progress" style="margin-bottom:4px;">
+                            <div class="progress-bar {{ $pct >= 100 ? 'progress-bar-success' : 'progress-bar-info' }}"
+                                 role="progressbar"
+                                 style="width:{{ $pct }}%;min-width:2em;">
+                            </div>
+                        </div>
+                        @if($systemStats['pending'] > 0)
+                        <p class="text-muted" style="font-size:12px;">
+                            {{ __('orgportal::messages.system_tickets_pending', ['count' => number_format($systemStats['pending'])]) }}
+                        </p>
+                        @else
+                        <p class="text-success" style="font-size:12px;">
+                            <i class="glyphicon glyphicon-ok"></i>
+                            {{ __('orgportal::messages.system_backfill_complete') }}
+                        </p>
+                        @endif
+                    </div>
+
+                    {{-- Manual backfill trigger --}}
+                    <form method="POST" action="{{ route('orgportal.admin.system.backfill') }}" style="margin-bottom:20px;">
+                        {{ csrf_field() }}
+                        <button type="submit" class="btn btn-default btn-sm">
+                            <i class="glyphicon glyphicon-refresh"></i>
+                            {{ __('orgportal::messages.system_run_backfill') }}
+                        </button>
+                        <span class="text-muted" style="font-size:12px;margin-left:8px;">
+                            {{ __('orgportal::messages.system_cron_hint') }}
+                        </span>
+                    </form>
+
+                    <hr>
+
+                    {{-- Language switcher --}}
+                    <h4>{{ __('orgportal::messages.system_lang_heading') }}</h4>
+                    <p class="text-muted" style="font-size:13px;">{{ __('orgportal::messages.system_lang_desc') }}</p>
+
+                    <form method="POST" action="{{ route('orgportal.admin.system.save') }}" style="margin-bottom:28px;">
+                        {{ csrf_field() }}
+                        {{-- hidden fields to carry snapshot setting through this form too --}}
+                        <input type="hidden" name="snapshot_visibility" value="{{ $snapshotEnabled ? '1' : '0' }}">
+
+                        <div class="checkbox" style="margin-bottom:12px;">
+                            <label>
+                                <input type="checkbox"
+                                       name="lang_switcher_enabled"
+                                       value="1"
+                                       id="lang_switcher_enabled"
+                                       {{ $langSwitcherEnabled ? 'checked' : '' }}>
+                                <strong>{{ __('orgportal::messages.system_lang_enable') }}</strong>
+                            </label>
+                            <p class="text-muted" style="margin-left:20px;font-size:12px;">
+                                {{ __('orgportal::messages.system_lang_enable_hint') }}
+                            </p>
+                        </div>
+
+                        <div id="lang-locales-block" style="{{ $langSwitcherEnabled ? '' : 'display:none;' }}">
+                            <label>{{ __('orgportal::messages.system_lang_locales') }}</label>
+                            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+                                @foreach($availableLocales as $code => $name)
+                                <label style="font-weight:normal;background:#f5f5f5;border:1px solid #ddd;border-radius:4px;padding:4px 10px;cursor:pointer;margin:0;">
+                                    <input type="checkbox"
+                                           name="lang_switcher_locales[]"
+                                           value="{{ $code }}"
+                                           {{ in_array($code, $langSwitcherLocales) || empty($langSwitcherLocales) ? 'checked' : '' }}>
+                                    {{ $name }}
+                                </label>
+                                @endforeach
+                            </div>
+                            <p class="text-muted" style="font-size:12px;">{{ __('orgportal::messages.system_lang_locales_hint') }}</p>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            {{ __('orgportal::messages.save') }}
+                        </button>
+                    </form>
+
+                    <hr>
+
+                    {{-- Snapshot visibility toggle --}}
+                    @if($systemStats['pending'] > 0)
+                    <div class="alert alert-warning">
+                        <i class="glyphicon glyphicon-warning-sign"></i>
+                        {{ __('orgportal::messages.system_snapshot_warning') }}
+                    </div>
+                    @endif
+
+                    <form method="POST" action="{{ route('orgportal.admin.system.save') }}">
+                        {{ csrf_field() }}
+                        {{-- carry lang settings through this form --}}
+                        @if($langSwitcherEnabled)
+                            <input type="hidden" name="lang_switcher_enabled" value="1">
+                        @endif
+                        @foreach($langSwitcherLocales as $lc)
+                            <input type="hidden" name="lang_switcher_locales[]" value="{{ $lc }}">
+                        @endforeach
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox"
+                                       name="snapshot_visibility"
+                                       value="1"
+                                       {{ $snapshotEnabled ? 'checked' : '' }}>
+                                <strong>{{ __('orgportal::messages.system_snapshot_label') }}</strong>
+                            </label>
+                            <p class="text-muted" style="margin-left:20px;font-size:12px;">
+                                {{ __('orgportal::messages.system_snapshot_hint') }}
+                            </p>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            {{ __('orgportal::messages.save') }}
+                        </button>
+                    </form>
+
+                </div>
+                @endif
+
             </div>{{-- /.tab-content --}}
 
         </div>
@@ -227,6 +383,20 @@ window.orgportalDefaults = JSON.parse(document.getElementById('orgportal-default
 (function () {
     document.addEventListener('DOMContentLoaded', function () {
         if (typeof $ === 'undefined' || typeof $.fn.summernote === 'undefined') return;
+
+        // System tab — show/hide locale checkboxes based on lang switcher toggle
+        $('#lang_switcher_enabled').on('change', function () {
+            $('#lang-locales-block').toggle(this.checked);
+        });
+
+        // System tab — attribution description spoiler chevron
+        $('#system-attribution-desc')
+            .on('show.bs.collapse', function () {
+                $('.orgportal-sys-chevron').css('transform', 'rotate(90deg)');
+            })
+            .on('hide.bs.collapse', function () {
+                $('.orgportal-sys-chevron').css('transform', 'rotate(0deg)');
+            });
 
         // Rotate chevron on collapse
         $('[data-toggle="collapse"]').each(function () {

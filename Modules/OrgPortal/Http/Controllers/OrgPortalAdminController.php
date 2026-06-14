@@ -74,13 +74,52 @@ class OrgPortalAdminController extends Controller
             }
         }
 
+        $isAdmin     = auth()->user() && auth()->user()->isAdmin();
+        $systemStats = $isAdmin ? OrgAttribution::stats() : null;
+
+        $SP = \Modules\OrgPortal\Providers\OrgPortalServiceProvider::class;
+        $availableLocales     = $isAdmin ? $SP::getAvailablePortalLocales() : [];
+        $langSwitcherEnabled  = (bool) \Option::get('orgportal.lang_switcher_enabled', false);
+        $rawLocales           = \Option::get('orgportal.lang_switcher_locales', []);
+        $langSwitcherLocales  = is_array($rawLocales) ? $rawLocales : (json_decode($rawLocales, true) ?: []);
+
         return view('orgportal::admin.index', [
-            'organizations'      => $organizations,
-            'tplEvents'          => $tplEvents,
-            'tplTemplates'       => $tplTemplates,
-            'tplDefaults'        => $canManageTemplates ? self::defaultTemplates() : [],
-            'canManageTemplates' => $canManageTemplates,
+            'organizations'       => $organizations,
+            'tplEvents'           => $tplEvents,
+            'tplTemplates'        => $tplTemplates,
+            'tplDefaults'         => $canManageTemplates ? self::defaultTemplates() : [],
+            'canManageTemplates'  => $canManageTemplates,
+            'isAdmin'             => $isAdmin,
+            'systemStats'         => $systemStats,
+            'snapshotEnabled'     => $isAdmin ? OrgAttribution::snapshotEnabled() : false,
+            'availableLocales'    => $availableLocales,
+            'langSwitcherEnabled' => $langSwitcherEnabled,
+            'langSwitcherLocales' => $langSwitcherLocales,
         ]);
+    }
+
+    public function runBackfill()
+    {
+        $this->authorizeAdmin();
+        $processed = OrgAttribution::backfillBatch(2000);
+        return redirect()->route('orgportal.admin.index', ['tab' => 'system'])
+            ->with('success', __('orgportal::messages.system_backfill_done', ['count' => $processed]));
+    }
+
+    public function saveSystemSettings(Request $request)
+    {
+        $this->authorizeAdmin();
+
+        \Option::set('orgportal.snapshot_visibility', $request->input('snapshot_visibility') == '1' ? '1' : '0');
+
+        \Option::set('orgportal.lang_switcher_enabled', $request->input('lang_switcher_enabled') == '1' ? '1' : '0');
+
+        $locales = $request->input('lang_switcher_locales', []);
+        if (!is_array($locales)) $locales = [];
+        \Option::set('orgportal.lang_switcher_locales', array_values($locales));
+
+        return redirect()->route('orgportal.admin.index', ['tab' => 'system'])
+            ->with('success', __('orgportal::messages.settings_saved'));
     }
 
     public function create()

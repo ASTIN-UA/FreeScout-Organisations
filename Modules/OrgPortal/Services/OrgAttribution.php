@@ -87,4 +87,58 @@ class OrgAttribution
             ->whereNotNull('customer_id')
             ->count();
     }
+
+    /**
+     * Attribution progress stats for the admin system panel.
+     */
+    public static function stats(): array
+    {
+        $total      = Conversation::whereNotNull('customer_id')->count();
+        $attributed = Conversation::whereNotNull('customer_id')->whereNotNull('org_attributed_at')->count();
+        return [
+            'total'      => $total,
+            'attributed' => $attributed,
+            'pending'    => $total - $attributed,
+        ];
+    }
+
+    public static function snapshotEnabled(): bool
+    {
+        return (bool) \Option::get('orgportal.snapshot_visibility', false);
+    }
+
+    /**
+     * Base conversation query scoped to an organisation.
+     *
+     * Snapshot mode (enabled via admin toggle):
+     *   org_id = $orgId  (authoritative snapshot)
+     *   OR (org_attributed_at IS NULL AND customer_id IN $memberIds)  — fallback for backlog tail
+     *   When $unitId is provided the first branch narrows to org_unit_id = $unitId.
+     *
+     * Legacy mode: whereIn('customer_id', $memberIds) — original behaviour.
+     *
+     * In legacy mode $unitId is ignored because $memberIds is already pre-filtered by the caller.
+     */
+    public static function orgConversationQuery(int $orgId, $memberIds, ?int $unitId = null): \Illuminate\Database\Eloquent\Builder
+    {
+        $memberArr = $memberIds instanceof \Illuminate\Support\Collection
+            ? $memberIds->toArray()
+            : (array) $memberIds;
+
+        if (!static::snapshotEnabled()) {
+            return Conversation::whereIn('customer_id', $memberArr);
+        }
+
+        return Conversation::where(function ($q) use ($orgId, $unitId, $memberArr) {
+            if ($unitId) {
+                $q->where('org_unit_id', $unitId);
+            } else {
+                $q->where('org_id', $orgId);
+            }
+            $q->orWhere(function ($sq) use ($memberArr) {
+                $sq->whereNull('org_attributed_at')
+                   ->whereIn('customer_id', $memberArr);
+            });
+        });
+    }
 }
