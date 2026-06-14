@@ -303,32 +303,35 @@ class OrgPortalServiceProvider extends ServiceProvider
 
         // Show "Manager viewed" info under each thread (like FreeScout's "Customer viewed")
         \Eventy::addAction('thread.meta', function ($thread, $loop, $threads, $conversation, $mailbox) {
-            // Only show for agent/support threads
             if ($thread->type !== \App\Thread::TYPE_MESSAGE) {
                 return;
             }
 
-            $views = \Modules\OrgPortal\Models\OrgPortalThreadView::forThread($thread->id);
-            if ($views->isEmpty()) {
-                return;
-            }
-
-            foreach ($views as $view) {
-                if (!$view->customer) {
-                    continue;
+            try {
+                $views = \Modules\OrgPortal\Models\OrgPortalThreadView::forThread($thread->id);
+                if ($views->isEmpty()) {
+                    return;
                 }
-                $name = $view->customer->getFullName();
-                $when = \App\User::dateDiffForHumansWithHours($view->viewed_at);
-                $role = $view->member ? $view->member->role : null;
-                $roleLabel = match ($role) {
-                    'global_manager' => __('orgportal::messages.manager_org_label'),
-                    'unit_manager'   => __('orgportal::messages.role_unit_manager'),
-                    default          => __('orgportal::messages.manager'),
-                };
-                echo '<div class="thread-meta"><i class="glyphicon glyphicon-eye-open"></i> '
-                    . e($roleLabel) . ' ' . e($name) . ' '
-                    . __('orgportal::messages.manager_viewed_when', ['when' => $when])
-                    . '</div>';
+
+                foreach ($views as $view) {
+                    if (!$view->customer) {
+                        continue;
+                    }
+                    $name = $view->customer->getFullName();
+                    $when = \App\User::dateDiffForHumansWithHours($view->viewed_at);
+                    $role = $view->member ? $view->member->role : null;
+                    $roleLabel = match ($role) {
+                        'global_manager' => __('orgportal::messages.manager_org_label'),
+                        'unit_manager'   => __('orgportal::messages.role_unit_manager'),
+                        default          => __('orgportal::messages.manager'),
+                    };
+                    echo '<div class="thread-meta"><i class="glyphicon glyphicon-eye-open"></i> '
+                        . e($roleLabel) . ' ' . e($name) . ' '
+                        . __('orgportal::messages.manager_viewed_when', ['when' => $when])
+                        . '</div>';
+                }
+            } catch (\Throwable $e) {
+                \Log::error('[OrgPortal] thread.meta hook failed', ['error' => $e->getMessage(), 'thread' => $thread->id]);
             }
         }, 20, 5);
     }
@@ -488,14 +491,6 @@ class OrgPortalServiceProvider extends ServiceProvider
             ])->render();
         }, 20, 0);
 
-        // Mobile CSS for EUP portal pages (portal does not load admin module.css)
-        \Eventy::addAction('layout.body_bottom', function () {
-            if (!\EndUserPortal::isEup()) {
-                return;
-            }
-            echo '<style>@media(max-width:768px){#tab-members .table,#tab-units .table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;}#tab-units .form-inline{display:flex;flex-wrap:wrap;gap:6px;}#tab-units .form-inline .form-control{flex:1 1 auto;min-width:0;}}</style>';
-        }, 5, 0);
-
         // Notification bell — for ALL authenticated portal customers (managers + regular users).
         \Eventy::addAction('layout.body_bottom', function () {
             if (!\EndUserPortal::isEup()) {
@@ -601,7 +596,7 @@ class OrgPortalServiceProvider extends ServiceProvider
         if (!$authorMember) return;
 
         $managers = OrganizationMember::where('organization_id', $authorMember->organization_id)
-            ->where('role', 'manager')
+            ->whereIn('role', ['manager', 'unit_manager', 'global_manager'])
             ->where('is_active', true)
             ->where('customer_id', '!=', $authorCustomerId)
             ->get();

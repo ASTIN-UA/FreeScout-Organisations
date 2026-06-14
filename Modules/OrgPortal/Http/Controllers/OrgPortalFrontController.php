@@ -192,24 +192,37 @@ class OrgPortalFrontController extends Controller
 
         $tickets = $builder->paginate(20);
 
-        // Set has_new_replies (unread agent replies) — same logic as EUP
+        // Compute per-ticket read indicators — two independent signals:
+        // 1. manager_has_unread: has unread OrgPortalNotification for this manager
+        // 2. author_has_unread:  author hasn't read the latest agent reply (thread->opened_at)
         $convIds = $tickets->pluck('id');
+
+        // Conversations with unread notifications for this manager
+        $unreadConvIds = \Modules\OrgPortal\Models\OrgPortalNotification::where('customer_id', $customer->id)
+            ->whereIn('conversation_id', $convIds)
+            ->whereNull('read_at')
+            ->pluck('conversation_id')
+            ->flip();
+
+        // Latest agent thread per conversation (for author_has_unread via opened_at)
         $latestThreads = Thread::whereIn('conversation_id', $convIds)
-            ->whereIn('type', [Thread::TYPE_CUSTOMER, Thread::TYPE_MESSAGE])
+            ->where('type', Thread::TYPE_MESSAGE)
             ->where('state', Thread::STATE_PUBLISHED)
             ->orderByDesc('id')
-            ->get(['id', 'conversation_id', 'type', 'opened_at']);
+            ->get(['id', 'conversation_id', 'opened_at']);
+
+        $latestAgentThread = [];
+        foreach ($latestThreads as $thread) {
+            $cid = $thread->conversation_id;
+            if (!isset($latestAgentThread[$cid])) {
+                $latestAgentThread[$cid] = $thread;
+            }
+        }
 
         foreach ($tickets as $ticket) {
-            $ticket->has_new_replies = false;
-            foreach ($latestThreads as $thread) {
-                if ($ticket->id === $thread->conversation_id) {
-                    if ($thread->type === Thread::TYPE_MESSAGE && !$thread->opened_at) {
-                        $ticket->has_new_replies = true;
-                    }
-                    break;
-                }
-            }
+            $ticket->manager_has_unread = isset($unreadConvIds[$ticket->id]);
+            $agentThread = $latestAgentThread[$ticket->id] ?? null;
+            $ticket->author_has_unread  = $agentThread && empty($agentThread->opened_at);
         }
 
         $tickets->appends(array_filter([
@@ -260,16 +273,11 @@ class OrgPortalFrontController extends Controller
             ->with('attachments')
             ->get();
 
-        // Mark agent threads as opened (FreeScout "Customer viewed" tracker)
-        foreach ($threads as $thread) {
-            if ($thread->type === Thread::TYPE_MESSAGE && !$thread->opened_at) {
-                $thread->opened_at = now();
-                $thread->save();
-            }
-        }
-
         // Record that this manager viewed all threads in the conversation
         OrgPortalThreadView::markConversationViewed($conversation->id, $customer->id);
+
+        // Mark all portal notifications for this conversation as read (server-side, like FreeScout admin)
+        \Modules\OrgPortal\Models\OrgPortalNotification::markReadForConversation($customer->id, $conversation->id);
 
         // Author dropdown — only members who can still be assigned (active).
         $orgMembers = Customer::whereIn('id', $this->assignableCustomerIds($member))->get();

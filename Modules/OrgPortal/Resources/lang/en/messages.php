@@ -244,6 +244,8 @@ return [
     'email_ticket_number'    => 'Ticket #',
     'view_ticket'            => 'View Ticket',
 
+    'author_not_read'        => 'Author has not read this reply yet',
+
     // Manager viewed (admin thread meta)
     'manager_org_label'    => 'Organization manager',
     'manager_viewed_when'  => 'viewed :when',

@@ -94,18 +94,6 @@
         'customer_reply': '{{ __("orgportal::messages.notif_customer_reply") }}',
     };
 
-    // Auto-mark read when author visits EUP ticket page
-    (function autoMarkRead() {
-        var m = window.location.pathname.match(/\/help\/[^/]+\/ticket\/(\d+)/);
-        if (!m) return;
-        var convId = m[1];
-        fetch(readBaseUrl + '/' + convId + '/read', {
-            method: 'POST',
-            headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
-            credentials: 'same-origin',
-        }).catch(function () {});
-    })();
-
     window.addEventListener('load', function () {
         var nav = document.querySelector('.nav.navbar-nav.navbar-right');
         if (!nav) return;
@@ -250,8 +238,16 @@
                 item.appendChild(dismiss);
 
                 item.addEventListener('click', function () {
-                    markRead(n.conversation_id, null);
-                    window.location.href = n.url;
+                    var dest = n.url;
+                    var convId = n.conversation_id;
+                    fetch(readBaseUrl + '/' + convId + '/read', {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+                        credentials: 'same-origin',
+                        keepalive: true,
+                    }).catch(function () {}).finally(function () {
+                        window.location.href = dest;
+                    });
                 });
 
                 list.appendChild(item);
@@ -286,8 +282,23 @@
             .catch(function () {});
         }
 
-        poll();
+        // If on a ticket page — first mark read, THEN poll so count is already correct
+        var ticketMatch = window.location.pathname.match(/\/help\/[^/]+\/(?:org\/)?ticket\/(\d+)/);
+        if (ticketMatch) {
+            fetch(readBaseUrl + '/' + ticketMatch[1] + '/read', {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+                credentials: 'same-origin',
+            }).then(function () { poll(); }).catch(function () { poll(); });
+        } else {
+            poll();
+        }
         setInterval(poll, POLL_INTERVAL);
+
+        // Re-poll when returning via browser back/forward (bfcache)
+        window.addEventListener('pageshow', function (e) {
+            if (e.persisted) { poll(); }
+        });
     });
 })();
 </script>

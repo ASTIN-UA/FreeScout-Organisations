@@ -244,6 +244,8 @@ return [
     'email_ticket_number'    => 'Тікет №',
     'view_ticket'            => 'Переглянути тікет',
 
+    'author_not_read'        => 'Автор ще не прочитав цю відповідь',
+
     // Manager viewed (admin thread meta)
     'manager_org_label'    => 'Менеджер організації',
     'manager_viewed_when'  => 'переглянув(ла) :when',

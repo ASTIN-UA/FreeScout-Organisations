@@ -142,7 +142,7 @@
             $convStatusKey   = $statusLangKey[$conversation->status]   ?? 'status_active';
             $convStatusClass = $statusClass[$conversation->status] ?? 'text-success';
         @endphp
-        <tr class="conv-row @if(\EndUserPortal::hasNewReplies($conversation)) conv-active @endif"
+        <tr class="conv-row @if($conversation->manager_has_unread ?? false) conv-active @endif"
             data-conversation_id="{{ $conversation->id }}">
             <td class="conv-current"></td>
             <td class="conver-number">#{{ $conversation->number }}</td>
@@ -180,7 +180,11 @@
                 <a href="{{ $ticketUrl }}"><span>{{ $conversation->threads_count }}</span></a>
             </td>
             <td class="conv-number">
-                <a href="{{ $ticketUrl }}">@if(\EndUserPortal::hasNewReplies($conversation))<span class="glyphicon glyphicon-envelope text-help"></span>@endif</a>
+                <a href="{{ $ticketUrl }}">
+                    @if($conversation->author_has_unread ?? false)
+                        <span class="glyphicon glyphicon-eye-close text-muted" title="{{ __('orgportal::messages.author_not_read') }}"></span>
+                    @endif
+                </a>
             </td>
             <td style="text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:0;"
                 title="{{ $authorName }}">
