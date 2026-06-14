@@ -81,6 +81,7 @@
       action="{{ route('orgportal.portal.settings.save', ['mailbox_id' => $mailbox_id]) }}">
     {{ csrf_field() }}
 
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
     <table class="orgp-subs">
         <thead>
             <tr>
@@ -234,6 +235,7 @@
 
         </tbody>
     </table>
+    </div>
 
     <small class="orgp-hint">{{ __('orgportal::messages.notif_hint') }}</small>
 
