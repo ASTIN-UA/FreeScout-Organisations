@@ -134,14 +134,16 @@
                         @foreach($tplEvents as $eKey => $eLabel)
                         <div class="panel panel-default">
                             <div class="panel-heading"
-                                 style="cursor:pointer;user-select:none;"
+                                 style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;"
                                  data-toggle="collapse"
                                  data-target="#tpl-panel-{{ $eKey }}">
-                                <strong>{{ __('orgportal::messages.tpl_heading') }}: {{ $eLabel }}</strong>
-                                <span class="text-muted" style="font-size:12px;margin-left:8px;">
-                                    {{ __('orgportal::messages.tpl_fallback_hint') }}
+                                <span class="glyphicon glyphicon-chevron-right" style="flex:0 0 auto;font-size:12px;transition:transform .15s ease;"></span>
+                                <span>
+                                    <strong>{{ __('orgportal::messages.tpl_heading') }}: {{ $eLabel }}</strong>
+                                    <span class="text-muted" style="font-size:12px;margin-left:8px;">
+                                        {{ __('orgportal::messages.tpl_fallback_hint') }}
+                                    </span>
                                 </span>
-                                <span class="pull-right glyphicon glyphicon-chevron-down" style="margin-top:2px;"></span>
                             </div>
                             <div id="tpl-panel-{{ $eKey }}" class="panel-collapse collapse">
                                 <div class="panel-body">
@@ -229,12 +231,12 @@ window.orgportalDefaults = JSON.parse(document.getElementById('orgportal-default
         // Rotate chevron on collapse
         $('[data-toggle="collapse"]').each(function () {
             var $heading = $(this);
-            var $icon    = $heading.find('.glyphicon-chevron-down,.glyphicon-chevron-up');
+            var $icon    = $heading.find('.glyphicon-chevron-right');
             var target   = $heading.data('target');
             $(target).on('show.bs.collapse', function () {
-                $icon.removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+                $icon.css('transform', 'rotate(90deg)');
             }).on('hide.bs.collapse', function () {
-                $icon.removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+                $icon.css('transform', 'rotate(0deg)');
             });
         });
 
