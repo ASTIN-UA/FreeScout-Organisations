@@ -132,6 +132,8 @@ class OrgPortalAdminController extends Controller
         if (!in_array($source, ['member', 'tag', 'tag_only'])) $source = 'member';
         \Option::set('orgportal.attribution_source', $source);
 
+        \Option::set('orgportal.attribution_cron_enabled', $request->input('attribution_cron_enabled') == '1' ? '1' : '0');
+
         \Option::set('orgportal.lang_switcher_enabled', $request->input('lang_switcher_enabled') == '1' ? '1' : '0');
 
         $locales = $request->input('lang_switcher_locales', []);
@@ -139,7 +141,7 @@ class OrgPortalAdminController extends Controller
         \Option::set('orgportal.lang_switcher_locales', array_values($locales));
 
         return redirect()->route('orgportal.admin.index', ['tab' => 'system'])
-            ->with('success', __('orgportal::messages.settings_saved'));
+            ->with('flash_success', __('orgportal::messages.settings_saved'));
     }
 
     public function create()
@@ -221,28 +223,6 @@ class OrgPortalAdminController extends Controller
 
         return redirect()->route('orgportal.admin.edit', $id)
             ->with('flash_success', __('orgportal::messages.org_updated'));
-    }
-
-    public function saveOrgTags(Request $request, int $id)
-    {
-        Organization::findOrFail($id);
-
-        $tagIds   = array_filter(array_map('intval', (array) $request->input('tag_ids', [])));
-        $tagUnits = (array) $request->input('tag_units', []);
-
-        \Modules\OrgPortal\Models\OrganizationTag::where('organization_id', $id)->delete();
-
-        foreach ($tagIds as $tagId) {
-            $unitId = isset($tagUnits[$tagId]) ? ((int) $tagUnits[$tagId] ?: null) : null;
-            \Modules\OrgPortal\Models\OrganizationTag::create([
-                'organization_id' => $id,
-                'tag_id'          => $tagId,
-                'unit_id'         => $unitId,
-            ]);
-        }
-
-        return redirect()->route('orgportal.admin.edit', $id)
-            ->with('flash_success', __('orgportal::messages.org_tags_saved'));
     }
 
     public function destroy(int $id)
@@ -459,10 +439,12 @@ class OrgPortalAdminController extends Controller
             usort($kanbanColumns, fn($a, $b) => $a['id'] <=> $b['id']);
         }
 
-        $perConv   = \Option::get('orgportal.show_badge_conversation_' . $mailbox_id);
-        $perKanban = \Option::get('orgportal.show_badge_kanban_' . $mailbox_id);
-        $show_badge_conversation = $perConv !== null ? (bool) $perConv : true;
-        $show_badge_kanban       = $perKanban !== null ? (bool) $perKanban : true;
+        $perConv     = \Option::get('orgportal.show_badge_conversation_' . $mailbox_id);
+        $perKanban   = \Option::get('orgportal.show_badge_kanban_' . $mailbox_id);
+        $perProfile  = \Option::get('orgportal.show_org_in_profile_' . $mailbox_id);
+        $show_badge_conversation = $perConv    !== null ? (bool) $perConv    : true;
+        $show_badge_kanban       = $perKanban  !== null ? (bool) $perKanban  : true;
+        $show_org_in_profile     = $perProfile !== null ? (bool) $perProfile : true;
 
         return view('orgportal::admin.mailbox_settings', [
             'mailbox'                 => $mailbox,
@@ -470,6 +452,7 @@ class OrgPortalAdminController extends Controller
             'kanbanColumns'           => $kanbanColumns,
             'show_badge_conversation' => $show_badge_conversation,
             'show_badge_kanban'       => $show_badge_kanban,
+            'show_org_in_profile'     => $show_org_in_profile,
         ]);
     }
 
@@ -493,6 +476,7 @@ class OrgPortalAdminController extends Controller
 
         \Option::set('orgportal.show_badge_conversation_' . $id, (bool) $request->input('show_badge_conversation'));
         \Option::set('orgportal.show_badge_kanban_' . $id, (bool) $request->input('show_badge_kanban'));
+        \Option::set('orgportal.show_org_in_profile_' . $id, (bool) $request->input('show_org_in_profile'));
 
         return redirect()->route('orgportal.admin.mailbox-settings', $id)
             ->with('flash_success', __('orgportal::messages.settings_saved'));

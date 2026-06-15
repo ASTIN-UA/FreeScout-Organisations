@@ -360,22 +360,20 @@
 
                                     {{-- Backfill buttons --}}
                                     <div style="margin-top:10px;">
-                                        <form method="POST" action="{{ route('orgportal.admin.system.backfill') }}" style="display:inline;margin-right:6px;">
-                                            {{ csrf_field() }}
-                                            <button type="submit" class="btn btn-default btn-sm">
-                                                <i class="glyphicon glyphicon-refresh"></i>
-                                                {{ __('orgportal::messages.system_run_backfill') }}
-                                            </button>
-                                        </form>
-                                        <form method="POST" action="{{ route('orgportal.admin.system.reset-attribution') }}"
-                                              style="display:inline;"
-                                              onsubmit="return confirm('{{ __('orgportal::messages.system_reset_confirm') }}')">
-                                            {{ csrf_field() }}
-                                            <button type="submit" class="btn btn-danger btn-sm">
-                                                <i class="glyphicon glyphicon-trash"></i>
-                                                {{ __('orgportal::messages.system_reset_attribution') }}
-                                            </button>
-                                        </form>
+                                        <button type="submit"
+                                                formaction="{{ route('orgportal.admin.system.backfill') }}"
+                                                class="btn btn-default btn-sm"
+                                                style="margin-right:6px;">
+                                            <i class="glyphicon glyphicon-refresh"></i>
+                                            {{ __('orgportal::messages.system_run_backfill') }}
+                                        </button>
+                                        <button type="submit"
+                                                formaction="{{ route('orgportal.admin.system.reset-attribution') }}"
+                                                class="btn btn-danger btn-sm"
+                                                onclick="return confirm('{{ __('orgportal::messages.system_reset_confirm') }}')">
+                                            <i class="glyphicon glyphicon-trash"></i>
+                                            {{ __('orgportal::messages.system_reset_attribution') }}
+                                        </button>
                                         <span class="text-muted" style="font-size:11px;margin-left:8px;">{{ __('orgportal::messages.system_cron_hint') }}</span>
                                     </div>
 
@@ -388,6 +386,17 @@
                                         {{ __('orgportal::messages.system_snapshot_warning') }}
                                     </div>
                                     @endif
+                                    <div class="checkbox" style="margin-top:0;">
+                                        <label>
+                                            <input type="checkbox" name="attribution_cron_enabled" value="1"
+                                                   {{ \Option::get('orgportal.attribution_cron_enabled') ? 'checked' : '' }}>
+                                            <strong>{{ __('orgportal::messages.system_attr_cron_enabled') }}</strong>
+                                        </label>
+                                        <p class="text-muted" style="margin-left:20px;font-size:12px;margin-bottom:0;">
+                                            {{ __('orgportal::messages.system_attr_cron_enabled_hint') }}
+                                        </p>
+                                    </div>
+
                                     <div class="checkbox" style="margin-top:0;">
                                         <label>
                                             <input type="checkbox" name="snapshot_visibility" value="1"
@@ -588,12 +597,16 @@ window.orgportalDefaults = JSON.parse(document.getElementById('orgportal-default
         });
 
         // Sync Summernote → textarea on form submit
-        $('form').on('submit', function () {
-            $('.orgportal-editor').each(function () {
+        $(document).on('submit', 'form', function () {
+            var $form = $(this);
+            var hasEditors = false;
+            $form.find('.orgportal-editor').each(function () {
                 if ($(this).data('summernote-inited')) {
                     $(this).val($(this).summernote('code'));
+                    hasEditors = true;
                 }
             });
+            // Allow form to submit normally (return true or don't prevent)
         });
     });
 })();

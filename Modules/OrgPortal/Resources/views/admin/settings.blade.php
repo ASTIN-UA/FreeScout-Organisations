@@ -179,10 +179,18 @@
         });
 
         // Before form submit — sync Summernote content to textarea values
-        $('form').on('submit', function () {
+        $('form').on('submit', function (e) {
+            var hasEditor = false;
             $('.orgportal-editor').each(function () {
-                $(this).val($(this).summernote('code'));
+                if ($(this).data('summernote')) {
+                    $(this).val($(this).summernote('code'));
+                    hasEditor = true;
+                }
             });
+            // Only prevent default if we found editors, otherwise let form submit normally
+            if (!hasEditor) {
+                // No editors found, allow normal form submission
+            }
         });
     });
 })();
