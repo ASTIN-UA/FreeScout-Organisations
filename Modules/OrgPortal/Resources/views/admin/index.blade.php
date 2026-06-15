@@ -274,16 +274,25 @@
                     </div>
 
                     {{-- Manual backfill trigger --}}
-                    <form method="POST" action="{{ route('orgportal.admin.system.backfill') }}" style="margin-bottom:20px;">
+                    <form method="POST" action="{{ route('orgportal.admin.system.backfill') }}" style="display:inline;margin-right:8px;">
                         {{ csrf_field() }}
                         <button type="submit" class="btn btn-default btn-sm">
                             <i class="glyphicon glyphicon-refresh"></i>
                             {{ __('orgportal::messages.system_run_backfill') }}
                         </button>
-                        <span class="text-muted" style="font-size:12px;margin-left:8px;">
-                            {{ __('orgportal::messages.system_cron_hint') }}
-                        </span>
                     </form>
+                    <form method="POST" action="{{ route('orgportal.admin.system.reset-attribution') }}"
+                          style="display:inline;"
+                          onsubmit="return confirm('{{ __('orgportal::messages.system_reset_confirm') }}')">
+                        {{ csrf_field() }}
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            <i class="glyphicon glyphicon-trash"></i>
+                            {{ __('orgportal::messages.system_reset_attribution') }}
+                        </button>
+                    </form>
+                    <p class="text-muted" style="font-size:12px;margin-top:6px;">
+                        {{ __('orgportal::messages.system_cron_hint') }}
+                    </p>
 
                     <hr>
 

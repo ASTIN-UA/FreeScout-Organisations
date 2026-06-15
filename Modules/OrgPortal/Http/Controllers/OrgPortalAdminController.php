@@ -108,6 +108,18 @@ class OrgPortalAdminController extends Controller
             ->with('success', __('orgportal::messages.system_backfill_done', ['count' => $processed]));
     }
 
+    public function resetAttribution()
+    {
+        $this->authorizeAdmin();
+        \App\Conversation::whereNotNull('customer_id')->update([
+            'org_id'            => null,
+            'org_unit_id'       => null,
+            'org_attributed_at' => null,
+        ]);
+        return redirect()->route('orgportal.admin.index', ['tab' => 'system'])
+            ->with('success', __('orgportal::messages.system_reset_done'));
+    }
+
     public function saveSystemSettings(Request $request)
     {
         $this->authorizeAdmin();

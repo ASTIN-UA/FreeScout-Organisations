@@ -74,6 +74,9 @@ Route::group([
     Route::post('system/backfill', 'OrgPortalAdminController@runBackfill')
         ->name('orgportal.admin.system.backfill');
 
+    Route::post('system/reset-attribution', 'OrgPortalAdminController@resetAttribution')
+        ->name('orgportal.admin.system.reset-attribution');
+
     Route::post('system', 'OrgPortalAdminController@saveSystemSettings')
         ->name('orgportal.admin.system.save');
 });
