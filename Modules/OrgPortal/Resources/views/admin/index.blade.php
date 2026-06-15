@@ -312,7 +312,8 @@
 
                         <div id="lang-locales-block" style="{{ $langSwitcherEnabled ? '' : 'display:none;' }}">
                             <label>{{ __('orgportal::messages.system_lang_locales') }}</label>
-                            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+                            <div class="orgportal-table-wrap" style="margin-bottom:12px;">
+                            <div style="display:flex;flex-wrap:wrap;gap:8px;min-width:max-content;">
                                 @foreach($availableLocales as $code => $name)
                                 <label style="font-weight:normal;background:#f5f5f5;border:1px solid #ddd;border-radius:4px;padding:4px 10px;cursor:pointer;margin:0;">
                                     <input type="checkbox"
@@ -322,6 +323,7 @@
                                     {{ $name }}
                                 </label>
                                 @endforeach
+                            </div>
                             </div>
                             <p class="text-muted" style="font-size:12px;">{{ __('orgportal::messages.system_lang_locales_hint') }}</p>
                         </div>

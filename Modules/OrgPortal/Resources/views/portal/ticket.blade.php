@@ -12,28 +12,19 @@
 <div id="eup-container">
     <div class="eup-container-padded">
 
-        <p>
+        {{-- Top action row: back link (left) + close ticket button (right) --}}
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
             <a href="{{ route('orgportal.portal.company-tickets', ['mailbox_id' => $mailbox_id]) }}"
                class="btn btn-default btn-sm">
                 &larr; {{ __('orgportal::messages.company_tickets') }}
             </a>
-        </p>
-
-        @if(session('flash_success'))
-            <div class="alert alert-success">{{ session('flash_success') }}</div>
-        @endif
-        @if($errors->any())
-            <div class="alert alert-danger">{{ $errors->first() }}</div>
-        @endif
-
-        <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:8px;">
-            <h3 style="margin:0;">{{ $conversation->subject ?: __('orgportal::messages.no_subject') }}</h3>
 
             {{-- Close ticket button --}}
             @if($conversation->status !== \App\Conversation::STATUS_CLOSED)
             <form method="POST"
                   action="{{ route('orgportal.portal.ticket.close', ['mailbox_id' => $mailbox_id, 'conversation_id' => $conversation->id]) }}"
-                  onsubmit="return confirm('{{ __('orgportal::messages.close_ticket_confirm') }}')">
+                  onsubmit="return confirm('{{ __('orgportal::messages.close_ticket_confirm') }}')"
+                  style="margin:0;">
                 {{ csrf_field() }}
                 <button type="submit" class="btn btn-default btn-sm">
                     <i class="glyphicon glyphicon-lock"></i>
@@ -46,6 +37,17 @@
                 {{ __('orgportal::messages.ticket_closed_label') }}
             </span>
             @endif
+        </div>
+
+        @if(session('flash_success'))
+            <div class="alert alert-success">{{ session('flash_success') }}</div>
+        @endif
+        @if($errors->any())
+            <div class="alert alert-danger">{{ $errors->first() }}</div>
+        @endif
+
+        <div style="margin-bottom:8px;">
+            <h3 style="margin:0;">{{ $conversation->subject ?: __('orgportal::messages.no_subject') }}</h3>
         </div>
 
         <div style="display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:4px;">

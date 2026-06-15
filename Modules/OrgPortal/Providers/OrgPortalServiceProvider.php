@@ -527,6 +527,14 @@ class OrgPortalServiceProvider extends ServiceProvider
             }
         });
 
+        // Inject module CSS on every EUP page (the admin `stylesheets` filter is not
+        // applied in the EUP portal layout, so we must inject it manually here).
+        \Eventy::addAction('layout.body_bottom', function () {
+            if (!\EndUserPortal::isEup()) return;
+            $cssUrl = asset('modules/orgportal/css/module.css') . '?v=3';
+            echo '<link rel="stylesheet" href="' . e($cssUrl) . '">';
+        }, 5, 0);
+
         // EUP has no tab/settings hooks — inject nav links via JS on layout.body_bottom.
         // Fires on every EUP page; skipped for non-EUP pages and non-managers.
         \Eventy::addAction('layout.body_bottom', function () {

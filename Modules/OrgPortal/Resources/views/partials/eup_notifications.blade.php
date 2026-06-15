@@ -75,6 +75,22 @@
 #orgportal-notif-panel .notif-empty {
     padding:24px 14px; text-align:center; color:#aaa; font-size:13px;
 }
+
+/* Mobile: bell lives in navbar-header, positioned left of the hamburger toggle */
+.navbar-header { position:relative; }
+#orgportal-notif-wrap.orgportal-notif-mobile {
+    position:absolute; top:0; right:58px; z-index:10;
+    float:none; list-style:none; margin:0;
+}
+#orgportal-notif-wrap.orgportal-notif-mobile > a {
+    padding:13px 8px;
+}
+#orgportal-notif-wrap.orgportal-notif-mobile #orgportal-notif-badge {
+    top:6px; right:0;
+}
+#orgportal-notif-wrap.orgportal-notif-mobile #orgportal-notif-panel {
+    position:fixed; top:50px; right:8px; left:8px; width:auto;
+}
 </style>
 <script{!! \Helper::cspNonceAttr() !!}>
 (function () {
@@ -95,8 +111,9 @@
     };
 
     window.addEventListener('load', function () {
-        var nav = document.querySelector('.nav.navbar-nav.navbar-right');
-        if (!nav) return;
+        var nav       = document.querySelector('.nav.navbar-nav.navbar-right');
+        var navHeader = document.querySelector('.navbar-header');
+        if (!nav && !navHeader) return;
 
         // Bell wrapper
         var li = document.createElement('li');
@@ -146,7 +163,24 @@
         li.appendChild(bellLink);
         li.appendChild(panel);
 
-        nav.insertBefore(li, nav.lastElementChild);
+        // Place bell responsively: desktop → navbar-right; mobile → next to hamburger
+        var mq = window.matchMedia('(max-width: 767px)');
+        function placeBell() {
+            if (mq.matches && navHeader) {
+                li.classList.add('orgportal-notif-mobile');
+                navHeader.appendChild(li);
+            } else if (nav) {
+                li.classList.remove('orgportal-notif-mobile');
+                nav.insertBefore(li, nav.lastElementChild);
+            } else if (navHeader) {
+                li.classList.add('orgportal-notif-mobile');
+                navHeader.appendChild(li);
+            }
+        }
+        placeBell();
+        if (mq.addEventListener) { mq.addEventListener('change', placeBell); }
+        else if (mq.addListener) { mq.addListener(placeBell); }
+
         badge = document.getElementById('orgportal-notif-badge');
 
         // Toggle on bell click

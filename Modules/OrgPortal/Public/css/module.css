@@ -69,6 +69,103 @@ a.orgportal-org-badge:focus {
     -webkit-overflow-scrolling: touch;
 }
 
+/* ── Company tickets: desktop fixed-layout helpers ───────────────────────── */
+/* max-width:0 trick enables text-overflow:ellipsis in table-layout:fixed.
+   Defined here (not inline) so media query can override without !important. */
+.eup-table-tickets td.conv-subject {
+    max-width: 0;
+    overflow: hidden;
+}
+
+/* ── Company tickets: mobile card layout ─────────────────────────────────── */
+@media (max-width: 767px) {
+    /* Hide table header — card layout is self-explanatory */
+    .eup-table-tickets thead { display: none; }
+
+    /* Each row becomes a card */
+    .eup-table-tickets,
+    .eup-table-tickets tbody,
+    .eup-table-tickets tr { display: block; }
+
+    .eup-table-tickets tr.conv-row {
+        border-bottom: 1px solid #e5e7eb;
+        padding: 10px 12px;
+        position: relative;
+        overflow: hidden;
+    }
+    .eup-table-tickets tr.conv-row.conv-active {
+        border-left: 3px solid #337ab7;
+        padding-left: 9px;
+    }
+
+    /* Hide non-essential cells */
+    .eup-table-tickets .conv-hide-mobile,
+    .eup-table-tickets td.conv-current,
+    .eup-table-tickets td.conv-attachment,
+    .eup-table-tickets td.conv-number { display: none !important; }
+
+    /* Line 1: #number (left) + date (right) */
+    .eup-table-tickets td.conver-number {
+        display: block !important;
+        float: left;
+        font-size: 12px;
+        font-weight: 600;
+        color: #6b7280;
+        padding: 0;
+        border: none;
+    }
+    .eup-table-tickets td.conv-date {
+        display: block !important;
+        float: right;
+        text-align: right;
+        font-size: 12px;
+        color: #6b7280;
+        white-space: nowrap;
+        padding: 0;
+        border: none;
+    }
+    .eup-table-tickets td.conv-date a { color: #6b7280; }
+
+    /* Line 2: subject — full width, prominent */
+    .eup-table-tickets td.conv-subject {
+        display: block !important;
+        clear: both;
+        max-width: none;
+        overflow: hidden;
+        padding: 4px 0 3px;
+        border: none;
+    }
+    .eup-table-tickets td.conv-subject a {
+        font-size: 14px;
+        font-weight: 500;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
+        display: block;
+    }
+
+    /* Line 3: status (left) + reply count (right) */
+    .eup-table-tickets td.conv-status-cell {
+        display: inline-block !important;
+        padding: 0;
+        border: none;
+        font-size: 12px;
+    }
+    .eup-table-tickets td.conv-thread-count {
+        display: inline-block !important;
+        float: right;
+        padding: 0;
+        border: none;
+        font-size: 12px;
+    }
+    .eup-table-tickets td.conv-thread-count .conv-star { display: none; }
+
+    /* Hide status label, keep icon on very narrow screens */
+    @media (max-width: 400px) {
+        .eup-table-tickets .conv-status-text { display: none; }
+    }
+}
+
 /* ── Kanban org filter dropdown ─────────────────────────────────────────── */
 .orgportal-kn-filter-wrap {
     display: inline-block;
