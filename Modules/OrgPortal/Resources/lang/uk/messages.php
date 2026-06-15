@@ -247,9 +247,10 @@ return [
     // Admin — org edit: tag bindings
     'org_tags_heading'  => 'Прив\'язані теги',
     'org_tags_hint'     => 'Оберіть теги, за якими заявки належать цій організації. За потреби призначте підрозділ для кожного тегу.',
-    'org_tags_none'     => 'Теги не знайдено. Спочатку створіть їх у Керування → Теги.',
-    'org_tags_unit_any' => '— будь-який підрозділ —',
-    'org_tags_saved'    => 'Прив\'язки тегів збережено.',
+    'org_tags_none'               => 'Теги не знайдено. Спочатку створіть їх у Керування → Теги.',
+    'org_tags_unit_any'           => '— будь-який підрозділ —',
+    'org_tags_saved'              => 'Прив\'язки тегів збережено.',
+    'org_tags_search_placeholder' => 'Пошук тегу…',
 
     // Admin — system tab: language switcher
     'system_lang_heading'       => 'Перемикач мови порталу',

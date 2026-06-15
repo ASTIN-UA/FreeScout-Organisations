@@ -192,6 +192,19 @@ class OrgPortalAdminController extends Controller
             'mailbox_id' => $request->input('mailbox_id') ?: null,
         ]);
 
+        // Save tag bindings if Tags module active
+        if (\Module::isActive('tags') && \Schema::hasTable('organization_tags')) {
+            $tagIds = array_filter(array_map('intval', (array) $request->input('tag_ids', [])));
+            \Modules\OrgPortal\Models\OrganizationTag::where('organization_id', $id)->delete();
+            foreach ($tagIds as $tagId) {
+                \Modules\OrgPortal\Models\OrganizationTag::create([
+                    'organization_id' => $id,
+                    'tag_id'          => $tagId,
+                    'unit_id'         => null,
+                ]);
+            }
+        }
+
         return redirect()->route('orgportal.admin.edit', $id)
             ->with('flash_success', __('orgportal::messages.org_updated'));
     }

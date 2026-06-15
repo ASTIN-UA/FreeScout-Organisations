@@ -35,6 +35,38 @@
                             @endif
                         </div>
 
+                        @if($tagsModuleActive && $allTags->count())
+                        <div class="form-group" id="org-tag-group">
+                            <label>{{ __('orgportal::messages.org_tags_heading') }}</label>
+
+                            {{-- Chips for already-selected tags --}}
+                            <div id="org-tag-chips" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;min-height:4px;">
+                                @foreach($allTags->whereIn('id', $boundTagIds) as $bt)
+                                <span class="label label-default org-tag-chip"
+                                      data-id="{{ $bt->id }}"
+                                      style="font-size:13px;padding:4px 8px;cursor:default;display:inline-flex;align-items:center;gap:4px;">
+                                    {{ $bt->name }}
+                                    <input type="hidden" name="tag_ids[]" value="{{ $bt->id }}">
+                                    <span class="org-tag-remove" style="cursor:pointer;opacity:.7;margin-left:2px;" title="{{ __('orgportal::messages.remove') }}">×</span>
+                                </span>
+                                @endforeach
+                            </div>
+
+                            {{-- Search input --}}
+                            <div style="position:relative;">
+                                <input type="text"
+                                       id="org-tag-search"
+                                       class="form-control"
+                                       placeholder="{{ __('orgportal::messages.org_tags_search_placeholder') }}"
+                                       autocomplete="off">
+                                <ul id="org-tag-suggestions"
+                                    class="list-group"
+                                    style="position:absolute;z-index:1000;width:100%;display:none;max-height:180px;overflow-y:auto;top:100%;left:0;margin-top:2px;box-shadow:0 4px 8px rgba(0,0,0,.15);"></ul>
+                            </div>
+                            <p class="text-muted" style="font-size:11px;margin-top:4px;margin-bottom:0;">{{ __('orgportal::messages.org_tags_hint') }}</p>
+                        </div>
+                        @endif
+
                         @php
                             $defaultColor = \Modules\OrgPortal\Models\Organization::DEFAULT_COLOR;
                             $currentColor = old('color', $organization->color ?: '');
@@ -115,56 +147,6 @@
                     </form>
                 </div>
             </div>
-
-            {{-- Tag bindings (only when Tags module is active) --}}
-            @if($tagsModuleActive)
-            <div class="panel panel-default">
-                <div class="panel-heading"><strong>{{ __('orgportal::messages.org_tags_heading') }}</strong></div>
-                <div class="panel-body">
-                    <p class="text-muted" style="font-size:12px;margin-top:0;">{{ __('orgportal::messages.org_tags_hint') }}</p>
-                    <form method="POST" action="{{ route('orgportal.admin.org.tags.save', $organization->id) }}">
-                        {{ csrf_field() }}
-
-                        @if($allTags->count())
-                        <div style="max-height:220px;overflow-y:auto;border:1px solid #ddd;border-radius:4px;padding:8px 12px;margin-bottom:12px;">
-                            @foreach($allTags as $tag)
-                            <div style="margin-bottom:6px;">
-                                <label style="font-weight:normal;margin:0;display:flex;align-items:center;gap:8px;">
-                                    <input type="checkbox"
-                                           name="tag_ids[]"
-                                           value="{{ $tag->id }}"
-                                           {{ in_array($tag->id, $boundTagIds) ? 'checked' : '' }}
-                                           class="orgportal-tag-cb"
-                                           data-tag="{{ $tag->id }}">
-                                    <span>{{ $tag->name }}</span>
-                                    {{-- Optional unit assignment --}}
-                                    @if($units->count())
-                                    <select name="tag_units[{{ $tag->id }}]"
-                                            class="form-control input-xs"
-                                            style="display:inline-block;width:auto;font-size:12px;height:24px;padding:2px 6px;"
-                                            {{ !in_array($tag->id, $boundTagIds) ? 'disabled' : '' }}>
-                                        <option value="">{{ __('orgportal::messages.org_tags_unit_any') }}</option>
-                                        @foreach($units as $unit)
-                                        <option value="{{ $unit->id }}"
-                                            {{ (isset($boundTagUnits[$tag->id]) && $boundTagUnits[$tag->id] == $unit->id) ? 'selected' : '' }}>
-                                            {{ $unit->name }}
-                                        </option>
-                                        @endforeach
-                                    </select>
-                                    @endif
-                                </label>
-                            </div>
-                            @endforeach
-                        </div>
-                        @else
-                        <p class="text-muted">{{ __('orgportal::messages.org_tags_none') }}</p>
-                        @endif
-
-                        <button type="submit" class="btn btn-primary btn-sm">{{ __('orgportal::messages.save') }}</button>
-                    </form>
-                </div>
-            </div>
-            @endif
 
             {{-- Structural units --}}
             <div class="panel panel-default">
@@ -496,16 +478,68 @@
     }
 })();
 
-// Tag checkboxes — enable/disable unit select
+// Tag search widget
 (function () {
-    document.querySelectorAll('.orgportal-tag-cb').forEach(function (cb) {
-        var row    = cb.closest('div');
-        var select = row ? row.querySelector('select') : null;
-        if (!select) return;
-        cb.addEventListener('change', function () {
-            select.disabled = !cb.checked;
-            if (!cb.checked) select.value = '';
+    var allTags = {!! json_encode($allTags->map(fn($t) => ['id' => $t->id, 'name' => $t->name])->values()) !!};
+    var chips   = document.getElementById('org-tag-chips');
+    var search  = document.getElementById('org-tag-search');
+    var suggest = document.getElementById('org-tag-suggestions');
+    if (!search) return;
+
+    function selectedIds() {
+        return Array.from(chips.querySelectorAll('input[name="tag_ids[]"]'))
+                    .map(function (i) { return parseInt(i.value); });
+    }
+
+    function addChip(tag) {
+        if (selectedIds().indexOf(tag.id) !== -1) return;
+        var span = document.createElement('span');
+        span.className = 'label label-default org-tag-chip';
+        span.setAttribute('data-id', tag.id);
+        span.style.cssText = 'font-size:13px;padding:4px 8px;cursor:default;display:inline-flex;align-items:center;gap:4px;';
+        span.innerHTML = tag.name +
+            '<input type="hidden" name="tag_ids[]" value="' + tag.id + '">' +
+            '<span class="org-tag-remove" style="cursor:pointer;opacity:.7;margin-left:2px;" title="×">×</span>';
+        chips.appendChild(span);
+    }
+
+    chips.addEventListener('click', function (e) {
+        if (e.target.classList.contains('org-tag-remove')) {
+            e.target.closest('.org-tag-chip').remove();
+        }
+    });
+
+    search.addEventListener('input', function () {
+        var q = this.value.trim().toLowerCase();
+        suggest.innerHTML = '';
+        if (!q) { suggest.style.display = 'none'; return; }
+        var sel = selectedIds();
+        var matches = allTags.filter(function (t) {
+            return t.name.toLowerCase().indexOf(q) !== -1 && sel.indexOf(t.id) === -1;
+        }).slice(0, 10);
+        if (!matches.length) { suggest.style.display = 'none'; return; }
+        matches.forEach(function (tag) {
+            var li = document.createElement('li');
+            li.className = 'list-group-item';
+            li.style.cursor = 'pointer';
+            li.textContent = tag.name;
+            li.addEventListener('mouseenter', function () { this.style.backgroundColor = '#f5f5f5'; });
+            li.addEventListener('mouseleave', function () { this.style.backgroundColor = ''; });
+            li.addEventListener('click', function () {
+                addChip(tag);
+                search.value = '';
+                suggest.style.display = 'none';
+                search.focus();
+            });
+            suggest.appendChild(li);
         });
+        suggest.style.display = 'block';
+    });
+
+    document.addEventListener('click', function (e) {
+        if (e.target !== search && !suggest.contains(e.target)) {
+            suggest.style.display = 'none';
+        }
     });
 })();
 </script>

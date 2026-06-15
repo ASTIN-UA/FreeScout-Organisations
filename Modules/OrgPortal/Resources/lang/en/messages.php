@@ -247,9 +247,10 @@ return [
     // Admin — org edit: tag bindings
     'org_tags_heading'  => 'Tag Bindings',
     'org_tags_hint'     => 'Select which tags identify tickets belonging to this organization. Optionally assign a structural unit per tag.',
-    'org_tags_none'     => 'No tags found. Create tags in Manage → Tags first.',
-    'org_tags_unit_any' => '— any unit —',
-    'org_tags_saved'    => 'Tag bindings saved.',
+    'org_tags_none'               => 'No tags found. Create tags in Manage → Tags first.',
+    'org_tags_unit_any'           => '— any unit —',
+    'org_tags_saved'              => 'Tag bindings saved.',
+    'org_tags_search_placeholder' => 'Search tag…',
 
     // Admin — system tab: language switcher
     'system_lang_heading'       => 'Portal Language Switcher',
