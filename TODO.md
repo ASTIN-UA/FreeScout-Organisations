@@ -75,16 +75,14 @@
 
 ---
 
-## Збереження мови клієнта в профілі
+## Мова клієнта при відправці email-сповіщень
 
-Клієнт обирає мову на порталі → зберігати в `organization_members.locale` → використовувати при:
-- Відправці email-сповіщень (`SendOrgNotification` — рендерити шаблон мовою клієнта)
-- Системних повідомленнях у bell-нотифікаціях
+Поле `locale` в `organization_members` вже є. Але `SendOrgNotification` його не використовує.
 
-**Технічно:**
-- Додати `locale` (varchar 8, nullable) до `organization_members`
-- Перемикач мови → POST → зберігати в `member->locale` + дублювати в cookie (для UI)
-- При `SendOrgNotification::handle()` — `App::setLocale($manager->member->locale ?? config('app.locale'))`
+**Що залишилось:**
+- Перемикач мови на порталі → POST → зберігати в `member->locale` (зараз лише cookie)
+- У `SendOrgNotification::handle()` — завантажити `$manager->member->locale`, викликати `App::setLocale()` перед рендером шаблону
+- Fallback: `config('app.locale')`
 
 ---
 
