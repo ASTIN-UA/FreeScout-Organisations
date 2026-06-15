@@ -254,4 +254,14 @@ return [
     'system_lang_enable_hint' => 'Pokazuje ikonę globusa na pasku nawigacyjnym portalu, którą klienci mogą używać do przełączania języka portalu.',
     'system_lang_locales' => 'Dostępne języki',
     'system_lang_locales_hint' => 'W przełączeniu pojawią się tylko zaznaczone języki. Pozostaw wszystkie zaznaczone, aby wyświetlić każdy dostępny język.',
+
+    // Notification bell
+    'notifications'        => 'Powiadomienia',
+    'no_notifications'     => 'Brak nowych powiadomień',
+    'notif_new_ticket'     => 'utworzył(a) zgłoszenie',
+    'notif_new_reply'      => 'odpowiedział(a) na rozmowę',
+    'notif_customer_reply' => 'odpowiedział(a) na rozmowę',
+    'notif_mark_all_read'  => 'Oznacz wszystko jako przeczytane',
+    'notif_today'          => 'Dziś',
+    'notif_yesterday'      => 'Wczoraj',
 ];

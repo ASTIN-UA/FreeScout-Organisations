@@ -254,4 +254,14 @@ return [
     'system_lang_enable_hint' => 'Mostra un\'icona globo nella barra di navigazione del portale che consente ai clienti di cambiare la lingua del portale.',
     'system_lang_locales' => 'Lingue disponibili',
     'system_lang_locales_hint' => 'Nel selettore vengono visualizzate solo le lingue selezionate. Lascia tutti selezionati per mostrare ogni lingua disponibile.',
+
+    // Notification bell
+    'notifications'        => 'Notifiche',
+    'no_notifications'     => 'Nessuna nuova notifica',
+    'notif_new_ticket'     => 'ha creato un ticket',
+    'notif_new_reply'      => 'ha risposto alla conversazione',
+    'notif_customer_reply' => 'ha risposto alla conversazione',
+    'notif_mark_all_read'  => 'Segna tutto come letto',
+    'notif_today'          => 'Oggi',
+    'notif_yesterday'      => 'Ieri',
 ];

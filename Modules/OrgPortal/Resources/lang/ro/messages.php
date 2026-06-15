@@ -254,4 +254,14 @@ return [
     'system_lang_enable_hint' => 'Afișează o pictogramă de glob în bara de navigare a portalului care permite clienților să schimbe limba portalului.',
     'system_lang_locales' => 'Limbi disponibile',
     'system_lang_locales_hint' => 'Doar limbile bifate apar în selector. Lăsați toate bifate pentru a afișa fiecare limbă disponibilă.',
+
+    // Notification bell
+    'notifications'        => 'Notificări',
+    'no_notifications'     => 'Fără notificări noi',
+    'notif_new_ticket'     => 'a creat un tichet',
+    'notif_new_reply'      => 'a răspuns la conversație',
+    'notif_customer_reply' => 'a răspuns la conversație',
+    'notif_mark_all_read'  => 'Marchează tot ca citit',
+    'notif_today'          => 'Astăzi',
+    'notif_yesterday'      => 'Ieri',
 ];

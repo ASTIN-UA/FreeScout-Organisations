@@ -254,4 +254,14 @@ return [
     'system_lang_enable_hint' => 'Näyttää globusikonin portaalin navigointipalkkissa, jonka avulla asiakkaat voivat vaihtaa portaalin kielen.',
     'system_lang_locales' => 'Käytettävissä olevat kielet',
     'system_lang_locales_hint' => 'Valitsimessa näkyvät vain valitut kielet. Jätä kaikki valitut näyttääksesi jokaisen käytettävissä olevan kielen.',
+
+    // Notification bell
+    'notifications'        => 'Ilmoitukset',
+    'no_notifications'     => 'Ei uusia ilmoituksia',
+    'notif_new_ticket'     => 'loi tiketin',
+    'notif_new_reply'      => 'vastasi keskusteluun',
+    'notif_customer_reply' => 'vastasi keskusteluun',
+    'notif_mark_all_read'  => 'Merkitse kaikki luetuiksi',
+    'notif_today'          => 'Tänään',
+    'notif_yesterday'      => 'Eilen',
 ];

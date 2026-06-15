@@ -254,4 +254,14 @@ return [
     'system_lang_enable_hint' => 'Zobrazí ikonu zemegule v navigačním panelu portálu, která zákazníkům umožňuje přepínat jazyk portálu.',
     'system_lang_locales' => 'Dostupné jazyky',
     'system_lang_locales_hint' => 'V přepínači se zobrazují pouze zaškrtnuté jazyky. Nechte všechny zaškrtnuté, aby se zobrazoval každý dostupný jazyk.',
+
+    // Notification bell
+    'notifications'        => 'Oznámení',
+    'no_notifications'     => 'Žádná nová oznámení',
+    'notif_new_ticket'     => 'vytvořil(a) tiket',
+    'notif_new_reply'      => 'odpověděl(a) na konverzaci',
+    'notif_customer_reply' => 'odpověděl(a) na konverzaci',
+    'notif_mark_all_read'  => 'Označit vše jako přečtené',
+    'notif_today'          => 'Dnes',
+    'notif_yesterday'      => 'Včera',
 ];

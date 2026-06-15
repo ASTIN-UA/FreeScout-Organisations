@@ -209,4 +209,14 @@ return [
     'system_lang_enable_hint' => 'Zeigt ein Globussymbol in der Portal-Navigationsleiste an, mit dem Kunden die Portal-Sprache wechseln können.',
     'system_lang_locales' => 'Verfügbare Sprachen',
     'system_lang_locales_hint' => 'Im Umschalter werden nur die aktivierten Sprachen angezeigt. Lassen Sie alle aktiviert, um jede verfügbare Sprache anzuzeigen.',
+
+    // Notification bell
+    'notifications'        => 'Benachrichtigungen',
+    'no_notifications'     => 'Keine neuen Benachrichtigungen',
+    'notif_new_ticket'     => 'hat ein Ticket erstellt',
+    'notif_new_reply'      => 'hat auf Gespräch geantwortet',
+    'notif_customer_reply' => 'hat auf Gespräch geantwortet',
+    'notif_mark_all_read'  => 'Alle als gelesen markieren',
+    'notif_today'          => 'Heute',
+    'notif_yesterday'      => 'Gestern',
 ];

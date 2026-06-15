@@ -254,4 +254,14 @@ return [
     'system_lang_enable_hint' => 'Geeft een globuspictogram in de portaalnavigatiebalk weer waarmee klanten de portaaltaal kunnen wijzigen.',
     'system_lang_locales' => 'Beschikbare talen',
     'system_lang_locales_hint' => 'Alleen de ingevinkte talen verschijnen in de schakelaar. Laat alle talen aangevinkt om alle beschikbare talen weer te geven.',
+
+    // Notification bell
+    'notifications'        => 'Meldingen',
+    'no_notifications'     => 'Geen nieuwe meldingen',
+    'notif_new_ticket'     => 'heeft een ticket aangemaakt',
+    'notif_new_reply'      => 'heeft gereageerd op gesprek',
+    'notif_customer_reply' => 'heeft gereageerd op gesprek',
+    'notif_mark_all_read'  => 'Alles als gelezen markeren',
+    'notif_today'          => 'Vandaag',
+    'notif_yesterday'      => 'Gisteren',
 ];

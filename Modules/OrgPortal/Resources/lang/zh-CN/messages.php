@@ -254,4 +254,14 @@ return [
     'system_lang_enable_hint' => '在门户导航栏中显示一个地球图标，让客户可以切换门户语言。',
     'system_lang_locales' => '可用语言',
     'system_lang_locales_hint' => '切换器中只显示选中的语言。勾选所有语言以显示每种可用语言。',
+
+    // Notification bell
+    'notifications'        => '通知',
+    'no_notifications'     => '暂无新通知',
+    'notif_new_ticket'     => '创建了工单',
+    'notif_new_reply'      => '回复了对话',
+    'notif_customer_reply' => '回复了对话',
+    'notif_mark_all_read'  => '全部标为已读',
+    'notif_today'          => '今天',
+    'notif_yesterday'      => '昨天',
 ];

@@ -254,4 +254,14 @@ return [
     'system_lang_enable_hint' => 'Zobrazí ikonu glóbusu v navigačnom paneli portálu, ktorá umožní zákazníkom zmeniť jazyk portálu.',
     'system_lang_locales' => 'Dostupné jazyky',
     'system_lang_locales_hint' => 'V prepínači sa zobrazujú iba zaškrtnuté jazyky. Nechajte všetky zaškrtnuté, aby sa zobrazil každý dostupný jazyk.',
+
+    // Notification bell
+    'notifications'        => 'Oznámenia',
+    'no_notifications'     => 'Žiadne nové oznámenia',
+    'notif_new_ticket'     => 'vytvoril(a) tiket',
+    'notif_new_reply'      => 'odpovedal(a) na konverzáciu',
+    'notif_customer_reply' => 'odpovedal(a) na konverzáciu',
+    'notif_mark_all_read'  => 'Označiť všetko ako prečítané',
+    'notif_today'          => 'Dnes',
+    'notif_yesterday'      => 'Včera',
 ];

@@ -254,4 +254,14 @@ return [
     'system_lang_enable_hint' => 'Affiche une icône de globe dans la barre de navigation du portail qui permet aux clients de changer la langue du portail.',
     'system_lang_locales' => 'Langues disponibles',
     'system_lang_locales_hint' => 'Seules les langues cochées apparaissent dans le sélecteur. Laissez tous cochés pour afficher chaque langue disponible.',
+
+    // Notification bell
+    'notifications'        => 'Notifications',
+    'no_notifications'     => 'Aucune nouvelle notification',
+    'notif_new_ticket'     => 'a créé un ticket',
+    'notif_new_reply'      => 'a répondu à la conversation',
+    'notif_customer_reply' => 'a répondu à la conversation',
+    'notif_mark_all_read'  => 'Tout marquer comme lu',
+    'notif_today'          => 'Aujourd\'hui',
+    'notif_yesterday'      => 'Hier',
 ];

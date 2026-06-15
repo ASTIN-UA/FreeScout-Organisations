@@ -254,4 +254,14 @@ return [
     'system_lang_enable_hint' => 'Visar en globikon i portalens navigeringsfält som låter kunder byta portalens språk.',
     'system_lang_locales' => 'Tillgängliga språk',
     'system_lang_locales_hint' => 'Endast de markerade språken visas i väljaren. Låt alla markeras för att visa alla tillgängliga språk.',
+
+    // Notification bell
+    'notifications'        => 'Aviseringar',
+    'no_notifications'     => 'Inga nya aviseringar',
+    'notif_new_ticket'     => 'skapade ett ärende',
+    'notif_new_reply'      => 'svarade på konversation',
+    'notif_customer_reply' => 'svarade på konversation',
+    'notif_mark_all_read'  => 'Markera alla som lästa',
+    'notif_today'          => 'Idag',
+    'notif_yesterday'      => 'Igår',
 ];
