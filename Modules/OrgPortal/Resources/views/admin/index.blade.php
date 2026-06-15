@@ -273,6 +273,53 @@
                         @endif
                     </div>
 
+                    {{-- Preflight stats --}}
+                    @if($preflightStats && $preflightStats['pending_total'] > 0)
+                    <div style="background:#f9f9f9;border:1px solid #e3e3e3;border-radius:4px;padding:12px 16px;margin-bottom:14px;font-size:13px;">
+                        <strong>{{ __('orgportal::messages.system_preflight_heading') }}</strong>
+                        <table style="width:100%;margin-top:8px;border-collapse:collapse;">
+                            <tr>
+                                <td style="padding:3px 0;color:#555;">{{ __('orgportal::messages.system_preflight_pending') }}</td>
+                                <td style="padding:3px 0;font-weight:bold;">{{ number_format($preflightStats['pending_total']) }}</td>
+                            </tr>
+                            @if($preflightStats['tags_active'])
+                            <tr>
+                                <td style="padding:3px 0;color:#555;">{{ __('orgportal::messages.system_preflight_orgs_with_tags', ['n' => $preflightStats['orgs_with_tags'], 'total' => $preflightStats['orgs_total']]) }}</td>
+                                <td style="padding:3px 0;">
+                                    <span class="label label-success">{{ number_format($preflightStats['pending_by_tag']) }}</span>
+                                    {{ __('orgportal::messages.system_preflight_will_tag') }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:3px 0;color:#555;">{{ __('orgportal::messages.system_preflight_orgs_no_tags', ['n' => $preflightStats['orgs_without_tags']]) }}</td>
+                                <td style="padding:3px 0;">
+                                    <span class="label label-default">{{ number_format($preflightStats['pending_no_tag_match']) }}</span>
+                                    {{ __('orgportal::messages.system_preflight_will_member') }}
+                                </td>
+                            </tr>
+                            @endif
+                        </table>
+                    </div>
+                    @endif
+
+                    {{-- Backfill result summary --}}
+                    @if(session('backfill_result'))
+                    @php $br = session('backfill_result'); @endphp
+                    <div class="alert alert-info" style="font-size:13px;">
+                        <strong>{{ __('orgportal::messages.system_backfill_summary_heading') }}</strong><br>
+                        {{ __('orgportal::messages.system_backfill_summary_processed', ['n' => number_format($br['processed'])]) }}<br>
+                        @if($br['by_tag'] > 0)
+                        <span class="label label-success">{{ number_format($br['by_tag']) }}</span> {{ __('orgportal::messages.system_backfill_summary_by_tag') }}<br>
+                        @endif
+                        @if($br['by_member'] > 0)
+                        <span class="label label-info" style="background:#aaa;">{{ number_format($br['by_member']) }}</span> {{ __('orgportal::messages.system_backfill_summary_by_member') }}<br>
+                        @endif
+                        @if($br['unmatched'] > 0)
+                        <span class="label label-default">{{ number_format($br['unmatched']) }}</span> {{ __('orgportal::messages.system_backfill_summary_unmatched') }}
+                        @endif
+                    </div>
+                    @endif
+
                     {{-- Manual backfill trigger --}}
                     <form method="POST" action="{{ route('orgportal.admin.system.backfill') }}" style="display:inline;margin-right:8px;">
                         {{ csrf_field() }}

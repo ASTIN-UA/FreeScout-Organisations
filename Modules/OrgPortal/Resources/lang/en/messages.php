@@ -229,6 +229,21 @@ return [
     'system_run_backfill'       => 'Run backfill now',
     'system_cron_hint'          => 'Processes up to 2 000 tickets immediately (cron runs every 5 min automatically).',
     'system_backfill_done'        => 'Backfill complete: :count tickets processed.',
+    // Preflight stats
+    'system_preflight_heading'          => 'What will happen when you run the backfill:',
+    'system_preflight_pending'          => 'Tickets awaiting attribution',
+    'system_preflight_orgs_with_tags'   => ':n of :total organizations have tag bindings configured',
+    'system_preflight_orgs_no_tags'     => ':n organizations have no tag bindings',
+    'system_preflight_will_tag'         => 'will be attributed via tag',
+    'system_preflight_will_member'      => 'will fall back to membership / remain unmatched',
+
+    // Backfill result summary
+    'system_backfill_summary_heading'   => 'Backfill batch complete:',
+    'system_backfill_summary_processed' => ':n tickets processed in this pass.',
+    'system_backfill_summary_by_tag'    => 'attributed via tag binding',
+    'system_backfill_summary_by_member' => 'attributed via active membership',
+    'system_backfill_summary_unmatched' => 'no match found (org_id left empty)',
+
     'system_reset_attribution'    => 'Reset all attribution',
     'system_reset_confirm'        => 'This will clear org_id, org_unit_id and org_attributed_at on ALL tickets and restart attribution from scratch. Are you sure?',
     'system_reset_done'           => 'Attribution reset. All tickets will be re-attributed on the next backfill run.',

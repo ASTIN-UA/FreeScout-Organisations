@@ -74,8 +74,9 @@ class OrgPortalAdminController extends Controller
             }
         }
 
-        $isAdmin     = auth()->user() && auth()->user()->isAdmin();
-        $systemStats = $isAdmin ? OrgAttribution::stats() : null;
+        $isAdmin        = auth()->user() && auth()->user()->isAdmin();
+        $systemStats    = $isAdmin ? OrgAttribution::stats() : null;
+        $preflightStats = $isAdmin ? OrgAttribution::preflightStats() : null;
 
         $SP = \Modules\OrgPortal\Providers\OrgPortalServiceProvider::class;
         $availableLocales     = $isAdmin ? $SP::getAvailablePortalLocales() : [];
@@ -92,6 +93,7 @@ class OrgPortalAdminController extends Controller
             'isAdmin'             => $isAdmin,
             'systemStats'         => $systemStats,
             'snapshotEnabled'     => $isAdmin ? OrgAttribution::snapshotEnabled() : false,
+            'preflightStats'      => $preflightStats,
             'attributionSource'   => $isAdmin ? OrgAttribution::attributionSource() : 'member',
             'tagsModuleActive'    => $isAdmin ? OrgAttribution::tagsModuleActive() : false,
             'availableLocales'    => $availableLocales,
@@ -103,9 +105,9 @@ class OrgPortalAdminController extends Controller
     public function runBackfill()
     {
         $this->authorizeAdmin();
-        $processed = OrgAttribution::backfillBatch(2000);
+        $result = OrgAttribution::backfillBatchDetailed(2000);
         return redirect()->route('orgportal.admin.index', ['tab' => 'system'])
-            ->with('success', __('orgportal::messages.system_backfill_done', ['count' => $processed]));
+            ->with('backfill_result', $result);
     }
 
     public function resetAttribution()

@@ -188,6 +188,123 @@ class OrgAttribution
     }
 
     /**
+     * Pre-flight stats for the backfill confirmation block.
+     */
+    public static function preflightStats(): array
+    {
+        $tagsActive = static::tagsModuleActive();
+        $hasBound   = $tagsActive
+            && Schema::hasTable('organization_tags')
+            && Schema::hasTable('conversation_tag');
+
+        $orgsTotal   = \DB::table('organizations')->count();
+        $orgsWithTags = $hasBound
+            ? \DB::table('organization_tags')->distinct()->count('organization_id')
+            : 0;
+
+        $pendingTotal = Schema::hasColumn('conversations', 'org_attributed_at')
+            ? Conversation::whereNull('org_attributed_at')->whereNotNull('customer_id')->count()
+            : Conversation::whereNotNull('customer_id')->count();
+
+        $pendingByTag = 0;
+        if ($hasBound && $pendingTotal > 0) {
+            $pendingByTag = \DB::table('conversations')
+                ->whereNull('org_attributed_at')
+                ->whereNotNull('customer_id')
+                ->whereExists(function ($q) {
+                    $q->from('conversation_tag')
+                      ->join('organization_tags', 'organization_tags.tag_id', '=', 'conversation_tag.tag_id')
+                      ->whereColumn('conversation_tag.conversation_id', 'conversations.id');
+                })
+                ->count();
+        }
+
+        return [
+            'tags_active'          => $tagsActive,
+            'orgs_total'           => $orgsTotal,
+            'orgs_with_tags'       => $orgsWithTags,
+            'orgs_without_tags'    => $orgsTotal - $orgsWithTags,
+            'pending_total'        => $pendingTotal,
+            'pending_by_tag'       => $pendingByTag,
+            'pending_no_tag_match' => $pendingTotal - $pendingByTag,
+        ];
+    }
+
+    /**
+     * Same as backfillBatch() but returns a breakdown array instead of an int.
+     * Used by the manual "Run backfill" action to display a detailed summary.
+     */
+    public static function backfillBatchDetailed(int $limit = 2000): array
+    {
+        $result = ['processed' => 0, 'by_tag' => 0, 'by_member' => 0, 'unmatched' => 0];
+
+        $batch = Conversation::whereNull('org_attributed_at')
+            ->whereNotNull('customer_id')
+            ->orderBy('id')
+            ->limit($limit)
+            ->get(['id', 'customer_id']);
+
+        if ($batch->isEmpty()) return $result;
+
+        $source = static::attributionSource();
+        $now    = now();
+
+        $tagBindings = [];
+        if (in_array($source, ['tag', 'tag_only'])
+            && static::tagsModuleActive()
+            && Schema::hasTable('organization_tags')
+            && Schema::hasTable('conversation_tag')
+        ) {
+            $rows = \DB::table('conversation_tag')
+                ->join('organization_tags', 'organization_tags.tag_id', '=', 'conversation_tag.tag_id')
+                ->whereIn('conversation_tag.conversation_id', $batch->pluck('id'))
+                ->select('conversation_tag.conversation_id', 'organization_tags.organization_id', 'organization_tags.unit_id')
+                ->get();
+            foreach ($rows as $row) {
+                $tagBindings[$row->conversation_id] = $row;
+            }
+        }
+
+        $members = collect();
+        if ($source !== 'tag_only') {
+            $members = OrganizationMember::whereIn('customer_id', $batch->pluck('customer_id'))
+                ->where('is_active', true)
+                ->get(['customer_id', 'organization_id', 'unit_id'])
+                ->keyBy('customer_id');
+        }
+
+        foreach ($batch as $conv) {
+            $orgId  = null;
+            $unitId = null;
+            $via    = 'unmatched';
+
+            if (isset($tagBindings[$conv->id])) {
+                $orgId  = $tagBindings[$conv->id]->organization_id;
+                $unitId = $tagBindings[$conv->id]->unit_id;
+                $via    = 'by_tag';
+            } elseif ($source !== 'tag_only') {
+                $m = $members->get($conv->customer_id);
+                if ($m) {
+                    $orgId  = $m->organization_id;
+                    $unitId = $m->unit_id;
+                    $via    = 'by_member';
+                }
+            }
+
+            Conversation::where('id', $conv->id)->update([
+                'org_id'            => $orgId,
+                'org_unit_id'       => $unitId,
+                'org_attributed_at' => $now,
+            ]);
+
+            $result[$via]++;
+            $result['processed']++;
+        }
+
+        return $result;
+    }
+
+    /**
      * Count remaining un-attributed conversations (for monitoring).
      */
     public static function pendingCount(): int

@@ -229,6 +229,21 @@ return [
     'system_run_backfill'       => 'Запустити backfill зараз',
     'system_cron_hint'          => 'Обробить до 2 000 тікетів негайно (крон запускається автоматично кожні 5 хв).',
     'system_backfill_done'        => 'Backfill виконано: оброблено :count тікетів.',
+    // Preflight stats
+    'system_preflight_heading'          => 'Що відбудеться під час наступного запуску бекфілу:',
+    'system_preflight_pending'          => 'Тікетів очікують атрибуції',
+    'system_preflight_orgs_with_tags'   => ':n з :total організацій мають прив\'язані теги',
+    'system_preflight_orgs_no_tags'     => ':n організацій без прив\'язаних тегів',
+    'system_preflight_will_tag'         => 'буде атрибутовано за тегом',
+    'system_preflight_will_member'      => 'використає членство або залишиться без атрибуції',
+
+    // Backfill result summary
+    'system_backfill_summary_heading'   => 'Бекфіл завершено:',
+    'system_backfill_summary_processed' => 'Оброблено :n тікетів у цьому проході.',
+    'system_backfill_summary_by_tag'    => 'атрибутовано за тегом',
+    'system_backfill_summary_by_member' => 'атрибутовано за членством',
+    'system_backfill_summary_unmatched' => 'збіг не знайдено (org_id не встановлено)',
+
     'system_reset_attribution'    => 'Скинути всю атрибуцію',
     'system_reset_confirm'        => 'Це очистить org_id, org_unit_id та org_attributed_at для ВСІХ тікетів і запустить атрибуцію з нуля. Ви впевнені?',
     'system_reset_done'           => 'Атрибуцію скинуто. Всі тікети буде переатрибутовано під час наступного запуску бекфілу.',
