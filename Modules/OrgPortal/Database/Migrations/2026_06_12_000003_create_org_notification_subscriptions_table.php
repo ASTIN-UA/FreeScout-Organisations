@@ -9,6 +9,7 @@ class CreateOrgNotificationSubscriptionsTable extends Migration
 {
     public function up()
     {
+        if (!Schema::hasTable('org_notification_subscriptions')) {
         Schema::create('org_notification_subscriptions', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('member_id');
@@ -27,6 +28,7 @@ class CreateOrgNotificationSubscriptionsTable extends Migration
             // MySQL-compatible unique: treat NULL scope_id as 0
             $table->unique(['member_id', 'event', 'scope_type', 'scope_id'], 'org_notif_subs_unique');
         });
+        } // end hasTable check
 
         // Migrate existing notify_on_new_ticket=true members → org-scope new_ticket subscription
         if (Schema::hasColumn('organization_members', 'notify_on_new_ticket')) {
@@ -35,14 +37,10 @@ class CreateOrgNotificationSubscriptionsTable extends Migration
                 ->get(['id']);
 
             foreach ($members as $m) {
-                \DB::table('org_notification_subscriptions')->insertOrIgnore([
-                    'member_id'  => $m->id,
-                    'event'      => 'new_ticket',
-                    'scope_type' => 'org',
-                    'scope_id'   => null,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
+                \DB::statement(
+                    'INSERT IGNORE INTO org_notification_subscriptions (member_id, event, scope_type, scope_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+                    [$m->id, 'new_ticket', 'org', null, now(), now()]
+                );
             }
         }
     }

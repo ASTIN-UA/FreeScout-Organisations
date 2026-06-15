@@ -8,6 +8,7 @@ class CreateOrganizationUnitsTable extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('organization_units')) return;
         Schema::create('organization_units', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('organization_id');

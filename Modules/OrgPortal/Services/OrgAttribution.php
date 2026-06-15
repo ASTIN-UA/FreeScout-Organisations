@@ -4,6 +4,7 @@ namespace Modules\OrgPortal\Services;
 
 use App\Conversation;
 use Modules\OrgPortal\Models\OrganizationMember;
+use Illuminate\Support\Facades\Schema;
 
 class OrgAttribution
 {
@@ -83,6 +84,7 @@ class OrgAttribution
      */
     public static function pendingCount(): int
     {
+        if (!Schema::hasColumn('conversations', 'org_attributed_at')) return 0;
         return Conversation::whereNull('org_attributed_at')
             ->whereNotNull('customer_id')
             ->count();
@@ -93,7 +95,10 @@ class OrgAttribution
      */
     public static function stats(): array
     {
-        $total      = Conversation::whereNotNull('customer_id')->count();
+        $total = Conversation::whereNotNull('customer_id')->count();
+        if (!Schema::hasColumn('conversations', 'org_attributed_at')) {
+            return ['total' => $total, 'attributed' => 0, 'pending' => $total];
+        }
         $attributed = Conversation::whereNotNull('customer_id')->whereNotNull('org_attributed_at')->count();
         return [
             'total'      => $total,
