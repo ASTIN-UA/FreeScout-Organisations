@@ -2,7 +2,7 @@
     "name": "OrgPortal",
     "alias": "orgportal",
     "description": "Organization Portal — organization management with End-User Portal integration for FreeScout",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "detailsUrl": "https://github.com/ASTIN-UA/FreeScout-Organisations?tab=readme-ov-file#readme",
     "author": "ASTIN-UA",
     "authorUrl": "https://github.com/ASTIN-UA",
