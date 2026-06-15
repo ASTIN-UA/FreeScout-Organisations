@@ -257,19 +257,21 @@
                                     {{-- Attribution source --}}
                                     <label style="font-size:13px;font-weight:600;margin-bottom:6px;display:block;">{{ __('orgportal::messages.system_attr_source_heading') }}</label>
                                     <p class="text-muted" style="font-size:12px;margin-top:0;">{{ __('orgportal::messages.system_attr_source_desc') }}</p>
-                                    <div style="margin-bottom:16px;">
+                                    <div style="margin-bottom:12px;">
                                         @foreach(['member' => 'system_attr_member', 'tag' => 'system_attr_tag', 'tag_only' => 'system_attr_tag_only'] as $val => $key)
-                                        <div class="radio" style="margin-bottom:4px;{{ ($val !== 'member' && !$tagsModuleActive) ? 'opacity:.45;pointer-events:none;' : '' }}">
-                                            <label>
+                                        <div style="margin-bottom:2px;{{ ($val !== 'member' && !$tagsModuleActive) ? 'opacity:.45;pointer-events:none;' : '' }}">
+                                            <label style="font-weight:normal;margin:0;cursor:pointer;"
+                                                   title="{{ __('orgportal::messages.' . $key . '_hint') }}"
+                                                   data-toggle="tooltip" data-placement="right">
                                                 <input type="radio" name="attribution_source" value="{{ $val }}"
                                                     {{ $attributionSource === $val ? 'checked' : '' }}>
-                                                <strong>{{ __('orgportal::messages.' . $key) }}</strong>
-                                                <span class="text-muted" style="font-size:12px;margin-left:6px;">— {{ __('orgportal::messages.' . $key . '_hint') }}</span>
+                                                {{ __('orgportal::messages.' . $key) }}
+                                                <i class="glyphicon glyphicon-question-sign text-muted" style="font-size:11px;margin-left:3px;"></i>
                                             </label>
                                         </div>
                                         @endforeach
                                         @if(!$tagsModuleActive)
-                                        <p class="text-muted" style="font-size:12px;margin:4px 0 0 20px;">
+                                        <p class="text-muted" style="font-size:11px;margin:4px 0 0 18px;">
                                             <i class="glyphicon glyphicon-info-sign"></i>
                                             {{ __('orgportal::messages.system_attr_tags_inactive') }}
                                         </p>
@@ -377,7 +379,7 @@
                                         <span class="text-muted" style="font-size:11px;margin-left:8px;">{{ __('orgportal::messages.system_cron_hint') }}</span>
                                     </div>
 
-                                    <hr style="margin:14px 0;">
+                                    <hr style="margin:10px 0;">
 
                                     {{-- Snapshot visibility --}}
                                     @if($systemStats['pending'] > 0)
@@ -473,6 +475,8 @@ window.orgportalDefaults = JSON.parse(document.getElementById('orgportal-default
         if (typeof $ === 'undefined' || typeof $.fn.summernote === 'undefined') return;
 
         // System tab — show/hide locale checkboxes based on lang switcher toggle
+        $('[data-toggle="tooltip"]').tooltip();
+
         $('#lang_switcher_enabled').on('change', function () {
             $('#lang-locales-block').toggle(this.checked);
         });
