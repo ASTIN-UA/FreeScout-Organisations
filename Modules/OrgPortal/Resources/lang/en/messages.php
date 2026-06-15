@@ -233,6 +233,24 @@ return [
     'system_snapshot_label'     => 'Enable snapshot-based ticket visibility',
     'system_snapshot_hint'      => 'When enabled, the portal shows tickets by stored org_id snapshot instead of the live member list. A safe fallback for un-attributed tickets remains active at all times.',
 
+    // Admin — system tab: attribution source
+    'system_attr_source_heading'  => 'Attribution Source',
+    'system_attr_source_desc'     => 'Controls how tickets are linked to an organization. When the Tags module is inactive, only member-based attribution is available.',
+    'system_attr_member'          => 'By membership',
+    'system_attr_member_hint'     => 'Default. Tickets are attributed to the organization the customer belongs to at the time of creation.',
+    'system_attr_tag'             => 'By tag, fall back to membership',
+    'system_attr_tag_hint'        => 'If a ticket has a tag bound to an organization, that binding wins. Otherwise membership is used. Requires the Tags module.',
+    'system_attr_tag_only'        => 'By tag only',
+    'system_attr_tag_only_hint'   => 'Tickets are attributed only via tag bindings. Tickets without a matching tag get no attribution. Requires the Tags module.',
+    'system_attr_tags_inactive'   => 'Tag-based options are disabled because the Tags module is not active.',
+
+    // Admin — org edit: tag bindings
+    'org_tags_heading'  => 'Tag Bindings',
+    'org_tags_hint'     => 'Select which tags identify tickets belonging to this organization. Optionally assign a structural unit per tag.',
+    'org_tags_none'     => 'No tags found. Create tags in Manage → Tags first.',
+    'org_tags_unit_any' => '— any unit —',
+    'org_tags_saved'    => 'Tag bindings saved.',
+
     // Admin — system tab: language switcher
     'system_lang_heading'       => 'Portal Language Switcher',
     'system_lang_desc'          => 'Adds a language switcher dropdown to the customer portal navbar. The chosen language is saved to the customer\'s profile and used when sending email notifications. Has no effect when the EupSwLang module is active (use EupSwLang settings instead).',

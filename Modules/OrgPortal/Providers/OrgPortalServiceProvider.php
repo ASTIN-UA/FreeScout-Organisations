@@ -701,6 +701,11 @@ class OrgPortalServiceProvider extends ServiceProvider
             }
         }, 30, 3);
 
+        // Re-attribute conversation when a tag is attached (tag/tag_only modes).
+        \Eventy::addAction('tag.attached', function ($tag, $conversationId) {
+            OrgAttribution::attributeByTag((int) $conversationId, (int) $tag->id);
+        }, 30, 2);
+
         // Register the backfill command and schedule it to run every 5 minutes.
         $this->commands([\Modules\OrgPortal\Console\BackfillOrgAttribution::class]);
 

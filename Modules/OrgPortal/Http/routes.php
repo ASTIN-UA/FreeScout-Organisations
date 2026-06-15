@@ -32,6 +32,9 @@ Route::group([
     Route::delete('organizations/{id}', 'OrgPortalAdminController@destroy')
         ->name('orgportal.admin.destroy');
 
+    Route::post('organizations/{id}/tags', 'OrgPortalAdminController@saveOrgTags')
+        ->name('orgportal.admin.org.tags.save');
+
     Route::post('organizations/{id}/members', 'OrgPortalAdminController@addMember')
         ->name('orgportal.admin.members.add');
 

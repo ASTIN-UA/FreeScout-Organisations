@@ -287,6 +287,45 @@
 
                     <hr>
 
+                    {{-- Attribution source --}}
+                    <h4>{{ __('orgportal::messages.system_attr_source_heading') }}</h4>
+                    <p class="text-muted" style="font-size:13px;">{{ __('orgportal::messages.system_attr_source_desc') }}</p>
+
+                    <form method="POST" action="{{ route('orgportal.admin.system.save') }}" style="margin-bottom:28px;">
+                        {{ csrf_field() }}
+                        {{-- preserve other settings --}}
+                        <input type="hidden" name="snapshot_visibility" value="{{ $snapshotEnabled ? '1' : '0' }}">
+                        @if($langSwitcherEnabled)
+                            <input type="hidden" name="lang_switcher_enabled" value="1">
+                        @endif
+                        @foreach($langSwitcherLocales as $lc)
+                            <input type="hidden" name="lang_switcher_locales[]" value="{{ $lc }}">
+                        @endforeach
+
+                        <div class="form-group">
+                            @foreach(['member' => 'system_attr_member', 'tag' => 'system_attr_tag', 'tag_only' => 'system_attr_tag_only'] as $val => $key)
+                            <div class="radio" style="{{ ($val !== 'member' && !$tagsModuleActive) ? 'opacity:.45;pointer-events:none;' : '' }}">
+                                <label>
+                                    <input type="radio" name="attribution_source" value="{{ $val }}"
+                                        {{ $attributionSource === $val ? 'checked' : '' }}>
+                                    <strong>{{ __('orgportal::messages.' . $key) }}</strong>
+                                    <p class="text-muted" style="margin-left:20px;font-size:12px;margin-bottom:0;">{{ __('orgportal::messages.' . $key . '_hint') }}</p>
+                                </label>
+                            </div>
+                            @endforeach
+                            @if(!$tagsModuleActive)
+                            <p class="text-muted" style="font-size:12px;margin-top:6px;">
+                                <i class="glyphicon glyphicon-info-sign"></i>
+                                {{ __('orgportal::messages.system_attr_tags_inactive') }}
+                            </p>
+                            @endif
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-sm">{{ __('orgportal::messages.save') }}</button>
+                    </form>
+
+                    <hr>
+
                     {{-- Language switcher --}}
                     <h4>{{ __('orgportal::messages.system_lang_heading') }}</h4>
                     <p class="text-muted" style="font-size:13px;">{{ __('orgportal::messages.system_lang_desc') }}</p>

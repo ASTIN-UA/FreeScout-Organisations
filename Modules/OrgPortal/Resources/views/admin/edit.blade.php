@@ -116,6 +116,56 @@
                 </div>
             </div>
 
+            {{-- Tag bindings (only when Tags module is active) --}}
+            @if($tagsModuleActive)
+            <div class="panel panel-default">
+                <div class="panel-heading"><strong>{{ __('orgportal::messages.org_tags_heading') }}</strong></div>
+                <div class="panel-body">
+                    <p class="text-muted" style="font-size:12px;margin-top:0;">{{ __('orgportal::messages.org_tags_hint') }}</p>
+                    <form method="POST" action="{{ route('orgportal.admin.org.tags.save', $organization->id) }}">
+                        {{ csrf_field() }}
+
+                        @if($allTags->count())
+                        <div style="max-height:220px;overflow-y:auto;border:1px solid #ddd;border-radius:4px;padding:8px 12px;margin-bottom:12px;">
+                            @foreach($allTags as $tag)
+                            <div style="margin-bottom:6px;">
+                                <label style="font-weight:normal;margin:0;display:flex;align-items:center;gap:8px;">
+                                    <input type="checkbox"
+                                           name="tag_ids[]"
+                                           value="{{ $tag->id }}"
+                                           {{ in_array($tag->id, $boundTagIds) ? 'checked' : '' }}
+                                           class="orgportal-tag-cb"
+                                           data-tag="{{ $tag->id }}">
+                                    <span>{{ $tag->name }}</span>
+                                    {{-- Optional unit assignment --}}
+                                    @if($units->count())
+                                    <select name="tag_units[{{ $tag->id }}]"
+                                            class="form-control input-xs"
+                                            style="display:inline-block;width:auto;font-size:12px;height:24px;padding:2px 6px;"
+                                            {{ !in_array($tag->id, $boundTagIds) ? 'disabled' : '' }}>
+                                        <option value="">{{ __('orgportal::messages.org_tags_unit_any') }}</option>
+                                        @foreach($units as $unit)
+                                        <option value="{{ $unit->id }}"
+                                            {{ (isset($boundTagUnits[$tag->id]) && $boundTagUnits[$tag->id] == $unit->id) ? 'selected' : '' }}>
+                                            {{ $unit->name }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                    @endif
+                                </label>
+                            </div>
+                            @endforeach
+                        </div>
+                        @else
+                        <p class="text-muted">{{ __('orgportal::messages.org_tags_none') }}</p>
+                        @endif
+
+                        <button type="submit" class="btn btn-primary btn-sm">{{ __('orgportal::messages.save') }}</button>
+                    </form>
+                </div>
+            </div>
+            @endif
+
             {{-- Structural units --}}
             <div class="panel panel-default">
                 <div class="panel-heading"><strong>{{ __('orgportal::messages.tab_units') }}</strong></div>
@@ -444,6 +494,19 @@
             swatch.addEventListener('click', function () { select(swatch); });
         })(swatches[i]);
     }
+})();
+
+// Tag checkboxes — enable/disable unit select
+(function () {
+    document.querySelectorAll('.orgportal-tag-cb').forEach(function (cb) {
+        var row    = cb.closest('div');
+        var select = row ? row.querySelector('select') : null;
+        if (!select) return;
+        cb.addEventListener('change', function () {
+            select.disabled = !cb.checked;
+            if (!cb.checked) select.value = '';
+        });
+    });
 })();
 </script>
 @endsection

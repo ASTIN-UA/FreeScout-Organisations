@@ -4,25 +4,101 @@ namespace Modules\OrgPortal\Services;
 
 use App\Conversation;
 use Modules\OrgPortal\Models\OrganizationMember;
+use Modules\OrgPortal\Models\OrganizationTag;
 use Illuminate\Support\Facades\Schema;
 
 class OrgAttribution
 {
+    public static function attributionSource(): string
+    {
+        return (string) \Option::get('orgportal.attribution_source', 'member');
+    }
+
+    public static function tagsModuleActive(): bool
+    {
+        return \Module::isActive('tags');
+    }
+
     /**
-     * Stamp org_id / org_unit_id onto a single conversation from the author's
-     * active membership. Called at conversation creation (write-path).
+     * Resolve org_id + unit_id for a conversation using tag bindings.
+     * Returns ['org_id' => int|null, 'unit_id' => int|null] or null if no match.
+     */
+    public static function resolveByTags(int $conversationId): ?array
+    {
+        if (!static::tagsModuleActive()) return null;
+        if (!Schema::hasTable('organization_tags') || !Schema::hasTable('conversation_tag')) return null;
+
+        $binding = \DB::table('conversation_tag')
+            ->join('organization_tags', 'organization_tags.tag_id', '=', 'conversation_tag.tag_id')
+            ->where('conversation_tag.conversation_id', $conversationId)
+            ->select('organization_tags.organization_id', 'organization_tags.unit_id')
+            ->first();
+
+        if (!$binding) return null;
+
+        return [
+            'org_id'     => $binding->organization_id,
+            'unit_id'    => $binding->unit_id,
+        ];
+    }
+
+    /**
+     * Stamp org_id / org_unit_id onto a single conversation.
+     * Source priority depends on attribution_source setting:
+     *   member     — membership only
+     *   tag        — tag first, fall back to membership
+     *   tag_only   — tag only
      */
     public static function attribute(Conversation $conversation): void
     {
         if (!$conversation->customer_id) return;
 
-        $member = OrganizationMember::where('customer_id', $conversation->customer_id)
-            ->where('is_active', true)
-            ->first();
+        $source = static::attributionSource();
+        $orgId  = null;
+        $unitId = null;
+
+        // Tag-based resolution
+        if (in_array($source, ['tag', 'tag_only'])) {
+            $resolved = static::resolveByTags($conversation->id);
+            if ($resolved) {
+                $orgId  = $resolved['org_id'];
+                $unitId = $resolved['unit_id'];
+            }
+        }
+
+        // Membership fallback (unless tag_only)
+        if ($orgId === null && $source !== 'tag_only') {
+            $member = OrganizationMember::where('customer_id', $conversation->customer_id)
+                ->where('is_active', true)
+                ->first();
+            $orgId  = $member?->organization_id;
+            $unitId = $member?->unit_id;
+        }
 
         Conversation::where('id', $conversation->id)->update([
-            'org_id'            => $member?->organization_id,
-            'org_unit_id'       => $member?->unit_id,
+            'org_id'            => $orgId,
+            'org_unit_id'       => $unitId,
+            'org_attributed_at' => now(),
+        ]);
+    }
+
+    /**
+     * Re-attribute a single conversation by its tag bindings (called from tag.attached hook).
+     * Only overwrites if snapshot is not yet stamped OR tag attribution is higher priority.
+     */
+    public static function attributeByTag(int $conversationId, int $tagId): void
+    {
+        if (!Schema::hasColumn('conversations', 'org_attributed_at')) return;
+
+        $source = static::attributionSource();
+        if (!in_array($source, ['tag', 'tag_only'])) return;
+
+        $binding = OrganizationTag::where('tag_id', $tagId)->first();
+        if (!$binding) return;
+
+        Conversation::where('id', $conversationId)->update([
+            'org_id'            => $binding->organization_id,
+            'org_unit_id'       => $binding->unit_id,
             'org_attributed_at' => now(),
         ]);
     }
@@ -58,20 +134,52 @@ class OrgAttribution
 
         if ($batch->isEmpty()) return 0;
 
-        // One query to resolve all customer → membership mappings for this batch.
-        $members = OrganizationMember::whereIn('customer_id', $batch->pluck('customer_id'))
-            ->where('is_active', true)
-            ->get(['customer_id', 'organization_id', 'unit_id'])
-            ->keyBy('customer_id');
+        $source = static::attributionSource();
+        $now    = now();
 
-        $now = now();
+        // Build tag-binding lookup: conversation_id → {org_id, unit_id}
+        $tagBindings = [];
+        if (in_array($source, ['tag', 'tag_only'])
+            && static::tagsModuleActive()
+            && Schema::hasTable('organization_tags')
+            && Schema::hasTable('conversation_tag')
+        ) {
+            $rows = \DB::table('conversation_tag')
+                ->join('organization_tags', 'organization_tags.tag_id', '=', 'conversation_tag.tag_id')
+                ->whereIn('conversation_tag.conversation_id', $batch->pluck('id'))
+                ->select('conversation_tag.conversation_id', 'organization_tags.organization_id', 'organization_tags.unit_id')
+                ->get();
+            foreach ($rows as $row) {
+                // First tag binding wins per conversation
+                $tagBindings[$row->conversation_id] = $row;
+            }
+        }
+
+        // Build membership lookup: customer_id → member
+        $members = collect();
+        if ($source !== 'tag_only') {
+            $members = OrganizationMember::whereIn('customer_id', $batch->pluck('customer_id'))
+                ->where('is_active', true)
+                ->get(['customer_id', 'organization_id', 'unit_id'])
+                ->keyBy('customer_id');
+        }
 
         foreach ($batch as $conv) {
-            $m = $members->get($conv->customer_id);
+            $orgId  = null;
+            $unitId = null;
+
+            if (isset($tagBindings[$conv->id])) {
+                $orgId  = $tagBindings[$conv->id]->organization_id;
+                $unitId = $tagBindings[$conv->id]->unit_id;
+            } elseif ($source !== 'tag_only') {
+                $m      = $members->get($conv->customer_id);
+                $orgId  = $m?->organization_id;
+                $unitId = $m?->unit_id;
+            }
+
             Conversation::where('id', $conv->id)->update([
-                'org_id'            => $m?->organization_id,
-                'org_unit_id'       => $m?->unit_id,
-                // Mark as processed even when org_id is NULL — keeps the cursor moving.
+                'org_id'            => $orgId,
+                'org_unit_id'       => $unitId,
                 'org_attributed_at' => $now,
             ]);
         }

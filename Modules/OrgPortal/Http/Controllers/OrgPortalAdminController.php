@@ -92,6 +92,8 @@ class OrgPortalAdminController extends Controller
             'isAdmin'             => $isAdmin,
             'systemStats'         => $systemStats,
             'snapshotEnabled'     => $isAdmin ? OrgAttribution::snapshotEnabled() : false,
+            'attributionSource'   => $isAdmin ? OrgAttribution::attributionSource() : 'member',
+            'tagsModuleActive'    => $isAdmin ? OrgAttribution::tagsModuleActive() : false,
             'availableLocales'    => $availableLocales,
             'langSwitcherEnabled' => $langSwitcherEnabled,
             'langSwitcherLocales' => $langSwitcherLocales,
@@ -111,6 +113,10 @@ class OrgPortalAdminController extends Controller
         $this->authorizeAdmin();
 
         \Option::set('orgportal.snapshot_visibility', $request->input('snapshot_visibility') == '1' ? '1' : '0');
+
+        $source = $request->input('attribution_source', 'member');
+        if (!in_array($source, ['member', 'tag', 'tag_only'])) $source = 'member';
+        \Option::set('orgportal.attribution_source', $source);
 
         \Option::set('orgportal.lang_switcher_enabled', $request->input('lang_switcher_enabled') == '1' ? '1' : '0');
 
@@ -153,7 +159,21 @@ class OrgPortalAdminController extends Controller
         $units        = $organization->units()->orderBy('name')->get();
         $mailboxes    = \App\Mailbox::orderBy('name')->get(['id', 'name']);
 
-        return view('orgportal::admin.edit', compact('organization', 'members', 'units', 'mailboxes'));
+        $tagsModuleActive = \Module::isActive('tags');
+        $allTags          = [];
+        $boundTagIds      = [];
+        $boundTagUnits    = [];
+        if ($tagsModuleActive && \Schema::hasTable('tags') && \Schema::hasTable('organization_tags')) {
+            $allTags     = \DB::table('tags')->orderBy('name')->get(['id', 'name']);
+            $bindings    = \Modules\OrgPortal\Models\OrganizationTag::where('organization_id', $id)->get();
+            $boundTagIds = $bindings->pluck('tag_id')->toArray();
+            $boundTagUnits = $bindings->pluck('unit_id', 'tag_id')->toArray();
+        }
+
+        return view('orgportal::admin.edit', compact(
+            'organization', 'members', 'units', 'mailboxes',
+            'tagsModuleActive', 'allTags', 'boundTagIds', 'boundTagUnits'
+        ));
     }
 
     public function update(Request $request, int $id)
@@ -174,6 +194,28 @@ class OrgPortalAdminController extends Controller
 
         return redirect()->route('orgportal.admin.edit', $id)
             ->with('flash_success', __('orgportal::messages.org_updated'));
+    }
+
+    public function saveOrgTags(Request $request, int $id)
+    {
+        Organization::findOrFail($id);
+
+        $tagIds   = array_filter(array_map('intval', (array) $request->input('tag_ids', [])));
+        $tagUnits = (array) $request->input('tag_units', []);
+
+        \Modules\OrgPortal\Models\OrganizationTag::where('organization_id', $id)->delete();
+
+        foreach ($tagIds as $tagId) {
+            $unitId = isset($tagUnits[$tagId]) ? ((int) $tagUnits[$tagId] ?: null) : null;
+            \Modules\OrgPortal\Models\OrganizationTag::create([
+                'organization_id' => $id,
+                'tag_id'          => $tagId,
+                'unit_id'         => $unitId,
+            ]);
+        }
+
+        return redirect()->route('orgportal.admin.edit', $id)
+            ->with('flash_success', __('orgportal::messages.org_tags_saved'));
     }
 
     public function destroy(int $id)
