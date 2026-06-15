@@ -41,6 +41,15 @@
                         </label>
                     </div>
                 </div>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="show_org_in_profile" value="1"
+                                {{ $show_org_in_profile ? 'checked' : '' }}>
+                            {{ __('orgportal::messages.show_org_in_profile') }}
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
 

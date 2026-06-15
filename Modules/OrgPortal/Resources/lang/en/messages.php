@@ -201,6 +201,7 @@ return [
     'display_settings'       => 'Display Settings',
     'show_badge_conversation'=> 'Show organization badge on ticket page (near tags)',
     'show_badge_kanban'      => 'Show organization badge on Kanban cards',
+    'show_org_in_profile'   => 'Show organization block in customer profile in tickets',
 
     // Kanban filter
     'kanban_filter_org'           => 'Organization',
@@ -249,6 +250,8 @@ return [
     'system_reset_confirm'        => 'This will clear org_id, org_unit_id and org_attributed_at on ALL tickets and restart attribution from scratch. Are you sure?',
     'system_reset_done'           => 'Attribution reset. All tickets will be re-attributed on the next backfill run.',
     'system_snapshot_warning'   => 'There are still unattributed tickets. We recommend enabling snapshot visibility only after the counter reaches 0 — otherwise those tickets may temporarily disappear from the portal.',
+    'system_attr_cron_enabled'      => 'Automatically attribute tickets via scheduler',
+    'system_attr_cron_enabled_hint' => 'When enabled, the scheduler runs a backfill every 5 minutes to attribute unprocessed tickets. Disable if you prefer to run attribution manually.',
     'system_snapshot_label'     => 'Enable snapshot-based ticket visibility',
     'system_snapshot_hint'      => 'When enabled, the portal shows tickets by stored org_id snapshot instead of the live member list. A safe fallback for un-attributed tickets remains active at all times.',
 
@@ -266,9 +269,6 @@ return [
     // Admin — org edit: tag bindings
     'org_tags_heading'  => 'Tag Bindings',
     'org_tags_hint'     => 'Select which tags identify tickets belonging to this organization. Optionally assign a structural unit per tag.',
-    'org_tags_none'               => 'No tags found. Create tags in Manage → Tags first.',
-    'org_tags_unit_any'           => '— any unit —',
-    'org_tags_saved'              => 'Tag bindings saved.',
     'org_tags_search_placeholder' => 'Search tag…',
 
     // Admin — system tab: language switcher

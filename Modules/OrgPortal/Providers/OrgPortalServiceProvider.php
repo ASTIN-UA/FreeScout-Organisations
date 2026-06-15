@@ -261,6 +261,11 @@ class OrgPortalServiceProvider extends ServiceProvider
 
         // Show org / unit / role info in the customer sidebar (conversation view)
         \Eventy::addAction('customer.profile_data', function ($customer, $conversation) {
+            $mailboxId = $conversation ? (int) $conversation->mailbox_id : 0;
+            if ($mailboxId && !$this->badgeEnabled('show_org_in_profile', $mailboxId)) {
+                return;
+            }
+
             $member = OrganizationMember::where('customer_id', $customer->id)
                 ->where('is_active', true)
                 ->with('organization', 'unit')
@@ -710,9 +715,11 @@ class OrgPortalServiceProvider extends ServiceProvider
         $this->commands([\Modules\OrgPortal\Console\BackfillOrgAttribution::class]);
 
         \Eventy::addFilter('schedule', function ($schedule) {
-            $schedule->command('orgportal:backfill-attribution --limit=1000')
-                     ->everyFiveMinutes()
-                     ->withoutOverlapping();
+            if (\Option::get('orgportal.attribution_cron_enabled', false)) {
+                $schedule->command('orgportal:backfill-attribution --limit=1000')
+                         ->everyFiveMinutes()
+                         ->withoutOverlapping();
+            }
             return $schedule;
         });
     }
