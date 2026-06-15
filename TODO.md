@@ -1,51 +1,66 @@
 # OrgPortal — TODO
 
-## Phase 7 Stage 3: перемкнути читання на snapshot-visibility
+---
 
-**Що зроблено (Stages 0-2):**
-- Нові тікети отримують `org_id`/`org_unit_id` при створенні (write-path)
-- Backfill крутиться автоматично через cron (кожні 5 хв, по 1000 тікетів)
-- При додаванні клієнта в орг — його старі тікети одразу атрибутуються
-- Статус: `SELECT COUNT(*) FROM conversations WHERE org_attributed_at IS NULL AND customer_id IS NOT NULL`
+## Phase 7 Stage 3: рефакторинг читання на snapshot-visibility
 
-**Що залишилось (Stage 3):**
-Рефакторинг читання у `OrgPortalFrontController` — 5 методів:
-- `companyTickets()` рядок 153 — `whereIn('customer_id', $filteredMemberIds)`
-- `viewTicket()` рядок 265 — `whereIn('customer_id', $orgMemberIds)`
-- `replyTicket()` рядок 305 — `whereIn('customer_id', $orgMemberIds)`
-- `changeAuthor()` рядок 373 — `whereIn('customer_id', $orgMemberIds)`
-- `closeTicket()` рядок 425 — `whereIn('customer_id', $orgMemberIds)`
+Чекбокс в адмін-панелі реалізовано. Залишилось: рефакторинг читання у `OrgPortalFrontController` — 5 методів:
 
-Замінити на `OrgAttribution::visibleConversationsQuery($member)` з COALESCE-логікою:
+- `companyTickets()` — `whereIn('customer_id', $filteredMemberIds)`
+- `viewTicket()` — `whereIn('customer_id', $orgMemberIds)`
+- `replyTicket()` — `whereIn('customer_id', $orgMemberIds)`
+- `changeAuthor()` — `whereIn('customer_id', $orgMemberIds)`
+- `closeTicket()` — `whereIn('customer_id', $orgMemberIds)`
+
+Замінити на COALESCE-логіку:
 ```php
 // Тікет видимий якщо:
 // (a) org_id = орга менеджера (snapshot — авторитетний шлях)
 // АБО
-// (b) org_attributed_at IS NULL І customer_id IN $orgMemberIds (fallback для хвоста)
+// (b) org_attributed_at IS NULL І customer_id IN $orgMemberIds (fallback поки backfill не завершений)
 ```
 Гілку (b) прибрати після того як backfill = 0.
 
 ---
 
-**Ідея: чекбокс в адмін-налаштуваннях замість feature-flag у коді**
+## Атрибуція через теги
 
-Плюси:
-- Адмін сам вирішує коли перемикати, без деплою
-- Можна показати поруч `pending_count` — "Залишилось X тікетів без атрибуції"
-- Зрозуміло для будь-кого хто буде підтримувати систему
+Теги використовуються **лише на етапі backfill** як додатковий сигнал атрибуції.
+Після того як `org_id` встановлено — теги більше не беруться до уваги при показі порталу.
 
-Мінуси / застереження:
-- **Важливо:** перемикати можна лише коли backfill = 0 (або близько до 0)
-  Якщо увімкнути раніше — тікети без `org_attributed_at` тимчасово "зникнуть" з порталу
-  (поки fallback-гілка (b) ще активна це безпечно, але без неї — ні)
-- Тому або: блокувати чекбокс поки `pending_count > 0`
-- Або: завжди тримати COALESCE-логіку (безпечно але трохи повільніше)
+**Flow атрибуції:**
+1. Є тег що прив'язаний до організації → `org_id` за тегом *(пріоритет)*
+2. Немає тегу → автор є членом організації → `org_id` за членством
+3. Нічого не збіглось → unattributed
 
-**Рекомендований підхід:**
-Зробити в адмін-панелі (вкладка Settings або окремий розділ):
-- Показати `pending_count` з кнопкою "Запустити backfill зараз"
-- Чекбокс "Використовувати snapshot-видимість" — активний лише коли `pending_count = 0`
-- Після увімкнення — COALESCE-fallback лишається назавжди (безпечно, гілка (b) просто ніколи не спрацьовує)
+**Що реалізувати:**
+- Таблиця `organization_tag` (org_id, tag_id) для маппінгу тег → організація
+- UI в адмін edit.blade.php: блок "Прив'язані теги" з мультіселектом — показувати лише якщо модуль Tags активний (`\Module::isActive('tags')`)
+- Врахування тегів у backfill-логіці (`OrgPortalAdminController::runBackfill()`)
+
+---
+
+## Перенаправлення стандартного EUP на наш портал
+
+**Проблема:** стандартний EUP "Мої заявки" показує клієнту ВСІ його заявки, без урахування `org_id`. Людина що перейшла з Компанії А в Компанію Б бачить старі заявки А на порталі Б.
+
+**Рішення:** системна опція, що вимикає стандартний EUP і перенаправляє на наш портал.
+
+**Що реалізувати:**
+- Чекбокс в адмін System tab: "Перенаправляти 'Мої заявки' EUP на портал організації"
+- У ServiceProvider: хук на `enduserportal.tickets` route → якщо опція увімкнена і клієнт є активним членом організації → redirect на `orgportal.portal.company-tickets`
+- Потрібно розширити Company Tickets: зробити доступним не тільки для менеджерів, але й для звичайних членів (з обмеженим виглядом — лише свої заявки, без зміни автора тощо)
+
+---
+
+## Інтеграція Custom Fields у вигляді тікету на порталі
+
+Якщо встановлений модуль Custom Fields (User Fields) — виводити значення кастомних полів всередині тікету на порталі EUP.
+
+**Що реалізувати:**
+- Перевірка `\Module::isActive('customfields')` у `viewTicket()`
+- Завантаження custom fields для conversation
+- Відображення у `portal/ticket.blade.php` між заголовком і тредами
 
 ---
 
@@ -60,47 +75,16 @@
 
 ---
 
-## i18n: переклад нових ключів на всі мови
+## Збереження мови клієнта в профілі
 
-Додані ключі `notif_scope_no_unit` лише в `en` + `uk`. Потрібно додати до решти 16 локалей:
-`cs, da, de, es, fi, fr, it, ka, nl, no, pl, pt-BR, pt-PT, ro, sk, sv, zh-CN`
-
-Значення: "No unit" (en) / "Без підрозділу" (uk) — переклад за аналогією з `notif_scope_org`.
-
----
-
-## Інтеграція EupSwLang як частини модуля
-
-Зараз EupSwLang — окремий модуль. Ідея: вбудувати вибір мови безпосередньо в OrgPortal.
-
-**Scope:**
-- Опція в адмін-налаштуваннях: увімкнути/вимкнути перемикач мов на порталі
-- Вибір переліку доступних мов (мультіселект)
-- Рендер перемикача в шапці EUP-порталу (вже є місце через `layout.body_bottom` або nav inject)
-- Залежність від EupSwLang як опціональна (якщо встановлений — делегуємо, якщо ні — своя реалізація)
-
-**Питання для рішення:** повна заміна EupSwLang чи доповнення?
-
----
-
-## Збереження обраної мови клієнта
-
-Клієнт обирає мову на порталі → зберігати в профіль → використовувати при:
+Клієнт обирає мову на порталі → зберігати в `organization_members.locale` → використовувати при:
 - Відправці email-сповіщень (`SendOrgNotification` — рендерити шаблон мовою клієнта)
 - Системних повідомленнях у bell-нотифікаціях
 
-**Контекст:** EupSwLang зберігає мову лише в cookie браузера — серверний job (`SendOrgNotification`)
-не має до неї доступу. Отже, потрібне власне поле в БД.
-
 **Технічно:**
 - Додати `locale` (varchar 8, nullable) до `organization_members`
-- Перемикач мови на порталі → POST → зберігати в `member->locale` + дублювати в cookie (для UI)
-- При `SendOrgNotification::handle()` — завантажити `$manager->member->locale`,
-  викликати `App::setLocale($locale)` перед рендером шаблону
-- Fallback: якщо locale null — використовувати `config('app.locale')`
-- Вже є TODO-коментар у міграції seed: `// TODO: render through App::setLocale($managerLocale)`
-
-**Залежить від:** інтеграції EupSwLang або власного перемикача (п. вище).
+- Перемикач мови → POST → зберігати в `member->locale` + дублювати в cookie (для UI)
+- При `SendOrgNotification::handle()` — `App::setLocale($manager->member->locale ?? config('app.locale'))`
 
 ---
 
@@ -108,6 +92,5 @@
 
 - [ ] `notify_on_new_ticket` колонка в `organization_members` — мертва після впровадження
       системи підписок. Прибрати (міграція + fillable/casts).
-- [ ] `whereIn('role', ['manager', 'unit_manager', 'global_manager'])` в кількох місцях —
-      ці рядки ніколи не зберігаються в БД (є лише `'manager'`/`'member'`).
-      Замінити на `->where('role', 'manager')`.
+- [ ] i18n: ключ `notif_scope_no_unit` додати до 16 локалей (є лише в `en` + `uk`):
+      `cs, da, de, es, fi, fr, it, ka, nl, no, pl, pt-BR, pt-PT, ro, sk, sv, zh-CN`
