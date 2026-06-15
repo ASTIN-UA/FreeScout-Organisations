@@ -2,6 +2,11 @@
 
 All notable changes to OrgPortal are documented here.
 
+## [1.0.4] — 2026-06-15
+
+### Fixed
+- Portal ticket view: customer messages sent from email clients (Gmail, Outlook) were displaying raw HTML tags instead of rendered content — body is now rendered as HTML, consistent with agent replies
+
 ## [1.0.3] — 2026-06-11
 
 ### Changed
