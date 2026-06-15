@@ -244,6 +244,7 @@ return [
     'system_backfill_summary_by_member' => 'attributed via active membership',
     'system_backfill_summary_unmatched' => 'no match found (org_id left empty)',
 
+    'system_save_settings'        => 'Save settings',
     'system_reset_attribution'    => 'Reset all attribution',
     'system_reset_confirm'        => 'This will clear org_id, org_unit_id and org_attributed_at on ALL tickets and restart attribution from scratch. Are you sure?',
     'system_reset_done'           => 'Attribution reset. All tickets will be re-attributed on the next backfill run.',

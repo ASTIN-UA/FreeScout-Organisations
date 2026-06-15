@@ -244,6 +244,7 @@ return [
     'system_backfill_summary_by_member' => 'атрибутовано за членством',
     'system_backfill_summary_unmatched' => 'збіг не знайдено (org_id не встановлено)',
 
+    'system_save_settings'        => 'Зберегти налаштування',
     'system_reset_attribution'    => 'Скинути всю атрибуцію',
     'system_reset_confirm'        => 'Це очистить org_id, org_unit_id та org_attributed_at для ВСІХ тікетів і запустить атрибуцію з нуля. Ви впевнені?',
     'system_reset_done'           => 'Атрибуцію скинуто. Всі тікети буде переатрибутовано під час наступного запуску бекфілу.',

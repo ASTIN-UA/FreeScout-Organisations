@@ -225,241 +225,234 @@
                 @if($isAdmin)
                 <div role="tabpanel" class="tab-pane {{ $activeTab === 'system' ? 'active' : '' }}" id="tab-system">
 
-                    <div style="margin-bottom:16px;">
-                        <span style="cursor:pointer;user-select:none;"
-                              data-toggle="collapse"
-                              data-target="#system-attribution-desc">
-                            <h4 style="display:inline-block;margin:0 6px 0 0;">{{ __('orgportal::messages.system_attribution_heading') }}</h4>
-                            <span class="text-muted" style="font-size:13px;">({{ __('orgportal::messages.system_attribution_more') }})</span>
-                            <span class="glyphicon glyphicon-chevron-right orgportal-sys-chevron"
-                                  style="font-size:11px;transition:transform .15s ease;vertical-align:middle;color:#999;margin-left:4px;"></span>
-                        </span>
-                        <div id="system-attribution-desc" class="collapse" style="margin-top:8px;">
-                            <p class="text-muted">{{ __('orgportal::messages.system_attribution_desc') }}</p>
-                        </div>
-                    </div>
+                    {{-- Single form for all system settings --}}
+                    <form method="POST" action="{{ route('orgportal.admin.system.save') }}" id="system-settings-form">
+                        {{ csrf_field() }}
 
-                    {{-- Progress --}}
-                    @php
-                        $pct = $systemStats['total'] > 0
-                            ? round($systemStats['attributed'] / $systemStats['total'] * 100)
-                            : 100;
-                    @endphp
-                    <div class="margin-bottom">
-                        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-                            <span>
-                                <strong>{{ number_format($systemStats['attributed']) }}</strong>
-                                /
-                                {{ number_format($systemStats['total']) }}
-                                {{ __('orgportal::messages.system_tickets_attributed') }}
-                            </span>
-                            <span class="text-muted">{{ $pct }}%</span>
-                        </div>
-                        <div class="progress" style="margin-bottom:4px;">
-                            <div class="progress-bar {{ $pct >= 100 ? 'progress-bar-success' : 'progress-bar-info' }}"
-                                 role="progressbar"
-                                 style="width:{{ $pct }}%;min-width:2em;">
+                        {{-- ═══════════════════════════════════════════════════
+                             PANEL 1: Ticket Attribution
+                        ════════════════════════════════════════════════════ --}}
+                        <div class="panel panel-default">
+                            <div class="panel-heading" style="cursor:pointer;" data-toggle="collapse" data-target="#sys-panel-attribution">
+                                <strong>
+                                    <span class="glyphicon glyphicon-tag" style="margin-right:6px;"></span>
+                                    {{ __('orgportal::messages.system_attribution_heading') }}
+                                </strong>
+                                <span class="pull-right glyphicon glyphicon-chevron-down orgportal-panel-chevron" style="margin-top:2px;transition:transform .15s;"></span>
+                            </div>
+                            <div id="sys-panel-attribution" class="collapse in">
+                                <div class="panel-body">
+
+                                    {{-- Description spoiler --}}
+                                    <p class="text-muted" style="font-size:12px;margin-top:0;">
+                                        <span style="cursor:pointer;" data-toggle="collapse" data-target="#system-attribution-desc">
+                                            {{ __('orgportal::messages.system_attribution_more') }}
+                                            <span class="glyphicon glyphicon-chevron-right orgportal-sys-chevron" style="font-size:10px;"></span>
+                                        </span>
+                                    </p>
+                                    <div id="system-attribution-desc" class="collapse" style="margin-bottom:12px;">
+                                        <p class="text-muted" style="font-size:13px;">{{ __('orgportal::messages.system_attribution_desc') }}</p>
+                                    </div>
+
+                                    {{-- Attribution source --}}
+                                    <label style="font-size:13px;font-weight:600;margin-bottom:6px;display:block;">{{ __('orgportal::messages.system_attr_source_heading') }}</label>
+                                    <p class="text-muted" style="font-size:12px;margin-top:0;">{{ __('orgportal::messages.system_attr_source_desc') }}</p>
+                                    <div style="margin-bottom:16px;">
+                                        @foreach(['member' => 'system_attr_member', 'tag' => 'system_attr_tag', 'tag_only' => 'system_attr_tag_only'] as $val => $key)
+                                        <div class="radio" style="margin-bottom:4px;{{ ($val !== 'member' && !$tagsModuleActive) ? 'opacity:.45;pointer-events:none;' : '' }}">
+                                            <label>
+                                                <input type="radio" name="attribution_source" value="{{ $val }}"
+                                                    {{ $attributionSource === $val ? 'checked' : '' }}>
+                                                <strong>{{ __('orgportal::messages.' . $key) }}</strong>
+                                                <span class="text-muted" style="font-size:12px;margin-left:6px;">— {{ __('orgportal::messages.' . $key . '_hint') }}</span>
+                                            </label>
+                                        </div>
+                                        @endforeach
+                                        @if(!$tagsModuleActive)
+                                        <p class="text-muted" style="font-size:12px;margin:4px 0 0 20px;">
+                                            <i class="glyphicon glyphicon-info-sign"></i>
+                                            {{ __('orgportal::messages.system_attr_tags_inactive') }}
+                                        </p>
+                                        @endif
+                                    </div>
+
+                                    <hr style="margin:12px 0;">
+
+                                    {{-- Progress --}}
+                                    @php
+                                        $pct = $systemStats['total'] > 0
+                                            ? round($systemStats['attributed'] / $systemStats['total'] * 100)
+                                            : 100;
+                                    @endphp
+                                    <div style="margin-bottom:10px;">
+                                        <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:13px;">
+                                            <span>
+                                                <strong>{{ number_format($systemStats['attributed']) }}</strong>
+                                                / {{ number_format($systemStats['total']) }}
+                                                {{ __('orgportal::messages.system_tickets_attributed') }}
+                                            </span>
+                                            <span class="text-muted">{{ $pct }}%</span>
+                                        </div>
+                                        <div class="progress" style="margin-bottom:4px;height:10px;">
+                                            <div class="progress-bar {{ $pct >= 100 ? 'progress-bar-success' : 'progress-bar-info' }}"
+                                                 role="progressbar" style="width:{{ $pct }}%;min-width:2em;"></div>
+                                        </div>
+                                        @if($systemStats['pending'] > 0)
+                                        <p class="text-muted" style="font-size:12px;margin-bottom:0;">
+                                            {{ __('orgportal::messages.system_tickets_pending', ['count' => number_format($systemStats['pending'])]) }}
+                                        </p>
+                                        @else
+                                        <p class="text-success" style="font-size:12px;margin-bottom:0;">
+                                            <i class="glyphicon glyphicon-ok"></i>
+                                            {{ __('orgportal::messages.system_backfill_complete') }}
+                                        </p>
+                                        @endif
+                                    </div>
+
+                                    {{-- Preflight --}}
+                                    @if($preflightStats && $preflightStats['pending_total'] > 0)
+                                    <div style="background:#f9f9f9;border:1px solid #e3e3e3;border-radius:4px;padding:10px 14px;margin:10px 0;font-size:12px;">
+                                        <strong>{{ __('orgportal::messages.system_preflight_heading') }}</strong>
+                                        <table style="width:100%;margin-top:6px;border-collapse:collapse;">
+                                            <tr>
+                                                <td style="padding:2px 0;color:#555;width:65%;">{{ __('orgportal::messages.system_preflight_pending') }}</td>
+                                                <td style="padding:2px 0;font-weight:bold;">{{ number_format($preflightStats['pending_total']) }}</td>
+                                            </tr>
+                                            @if($preflightStats['tags_active'])
+                                            <tr>
+                                                <td style="padding:2px 0;color:#555;">{{ __('orgportal::messages.system_preflight_orgs_with_tags', ['n' => $preflightStats['orgs_with_tags'], 'total' => $preflightStats['orgs_total']]) }}</td>
+                                                <td style="padding:2px 0;">
+                                                    <span class="label label-success">{{ number_format($preflightStats['pending_by_tag']) }}</span>
+                                                    {{ __('orgportal::messages.system_preflight_will_tag') }}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:2px 0;color:#555;">{{ __('orgportal::messages.system_preflight_orgs_no_tags', ['n' => $preflightStats['orgs_without_tags']]) }}</td>
+                                                <td style="padding:2px 0;">
+                                                    <span class="label label-default">{{ number_format($preflightStats['pending_no_tag_match']) }}</span>
+                                                    {{ __('orgportal::messages.system_preflight_will_member') }}
+                                                </td>
+                                            </tr>
+                                            @endif
+                                        </table>
+                                    </div>
+                                    @endif
+
+                                    {{-- Backfill result --}}
+                                    @if(session('backfill_result'))
+                                    @php $br = session('backfill_result'); @endphp
+                                    <div class="alert alert-info" style="font-size:12px;padding:8px 12px;margin-top:8px;">
+                                        <strong>{{ __('orgportal::messages.system_backfill_summary_heading') }}</strong>
+                                        {{ __('orgportal::messages.system_backfill_summary_processed', ['n' => number_format($br['processed'])]) }}
+                                        @if($br['by_tag'] > 0)
+                                        · <span class="label label-success">{{ number_format($br['by_tag']) }}</span> {{ __('orgportal::messages.system_backfill_summary_by_tag') }}
+                                        @endif
+                                        @if($br['by_member'] > 0)
+                                        · <span class="label label-default">{{ number_format($br['by_member']) }}</span> {{ __('orgportal::messages.system_backfill_summary_by_member') }}
+                                        @endif
+                                        @if($br['unmatched'] > 0)
+                                        · <span class="label label-warning">{{ number_format($br['unmatched']) }}</span> {{ __('orgportal::messages.system_backfill_summary_unmatched') }}
+                                        @endif
+                                    </div>
+                                    @endif
+
+                                    {{-- Backfill buttons --}}
+                                    <div style="margin-top:10px;">
+                                        <form method="POST" action="{{ route('orgportal.admin.system.backfill') }}" style="display:inline;margin-right:6px;">
+                                            {{ csrf_field() }}
+                                            <button type="submit" class="btn btn-default btn-sm">
+                                                <i class="glyphicon glyphicon-refresh"></i>
+                                                {{ __('orgportal::messages.system_run_backfill') }}
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ route('orgportal.admin.system.reset-attribution') }}"
+                                              style="display:inline;"
+                                              onsubmit="return confirm('{{ __('orgportal::messages.system_reset_confirm') }}')">
+                                            {{ csrf_field() }}
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="glyphicon glyphicon-trash"></i>
+                                                {{ __('orgportal::messages.system_reset_attribution') }}
+                                            </button>
+                                        </form>
+                                        <span class="text-muted" style="font-size:11px;margin-left:8px;">{{ __('orgportal::messages.system_cron_hint') }}</span>
+                                    </div>
+
+                                    <hr style="margin:14px 0;">
+
+                                    {{-- Snapshot visibility --}}
+                                    @if($systemStats['pending'] > 0)
+                                    <div class="alert alert-warning" style="font-size:12px;padding:8px 12px;margin-bottom:10px;">
+                                        <i class="glyphicon glyphicon-warning-sign"></i>
+                                        {{ __('orgportal::messages.system_snapshot_warning') }}
+                                    </div>
+                                    @endif
+                                    <div class="checkbox" style="margin-top:0;">
+                                        <label>
+                                            <input type="checkbox" name="snapshot_visibility" value="1"
+                                                   {{ $snapshotEnabled ? 'checked' : '' }}>
+                                            <strong>{{ __('orgportal::messages.system_snapshot_label') }}</strong>
+                                        </label>
+                                        <p class="text-muted" style="margin-left:20px;font-size:12px;margin-bottom:0;">
+                                            {{ __('orgportal::messages.system_snapshot_hint') }}
+                                        </p>
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
-                        @if($systemStats['pending'] > 0)
-                        <p class="text-muted" style="font-size:12px;">
-                            {{ __('orgportal::messages.system_tickets_pending', ['count' => number_format($systemStats['pending'])]) }}
-                        </p>
-                        @else
-                        <p class="text-success" style="font-size:12px;">
-                            <i class="glyphicon glyphicon-ok"></i>
-                            {{ __('orgportal::messages.system_backfill_complete') }}
-                        </p>
-                        @endif
-                    </div>
 
-                    {{-- Preflight stats --}}
-                    @if($preflightStats && $preflightStats['pending_total'] > 0)
-                    <div style="background:#f9f9f9;border:1px solid #e3e3e3;border-radius:4px;padding:12px 16px;margin-bottom:14px;font-size:13px;">
-                        <strong>{{ __('orgportal::messages.system_preflight_heading') }}</strong>
-                        <table style="width:100%;margin-top:8px;border-collapse:collapse;">
-                            <tr>
-                                <td style="padding:3px 0;color:#555;">{{ __('orgportal::messages.system_preflight_pending') }}</td>
-                                <td style="padding:3px 0;font-weight:bold;">{{ number_format($preflightStats['pending_total']) }}</td>
-                            </tr>
-                            @if($preflightStats['tags_active'])
-                            <tr>
-                                <td style="padding:3px 0;color:#555;">{{ __('orgportal::messages.system_preflight_orgs_with_tags', ['n' => $preflightStats['orgs_with_tags'], 'total' => $preflightStats['orgs_total']]) }}</td>
-                                <td style="padding:3px 0;">
-                                    <span class="label label-success">{{ number_format($preflightStats['pending_by_tag']) }}</span>
-                                    {{ __('orgportal::messages.system_preflight_will_tag') }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="padding:3px 0;color:#555;">{{ __('orgportal::messages.system_preflight_orgs_no_tags', ['n' => $preflightStats['orgs_without_tags']]) }}</td>
-                                <td style="padding:3px 0;">
-                                    <span class="label label-default">{{ number_format($preflightStats['pending_no_tag_match']) }}</span>
-                                    {{ __('orgportal::messages.system_preflight_will_member') }}
-                                </td>
-                            </tr>
-                            @endif
-                        </table>
-                    </div>
-                    @endif
-
-                    {{-- Backfill result summary --}}
-                    @if(session('backfill_result'))
-                    @php $br = session('backfill_result'); @endphp
-                    <div class="alert alert-info" style="font-size:13px;">
-                        <strong>{{ __('orgportal::messages.system_backfill_summary_heading') }}</strong><br>
-                        {{ __('orgportal::messages.system_backfill_summary_processed', ['n' => number_format($br['processed'])]) }}<br>
-                        @if($br['by_tag'] > 0)
-                        <span class="label label-success">{{ number_format($br['by_tag']) }}</span> {{ __('orgportal::messages.system_backfill_summary_by_tag') }}<br>
-                        @endif
-                        @if($br['by_member'] > 0)
-                        <span class="label label-info" style="background:#aaa;">{{ number_format($br['by_member']) }}</span> {{ __('orgportal::messages.system_backfill_summary_by_member') }}<br>
-                        @endif
-                        @if($br['unmatched'] > 0)
-                        <span class="label label-default">{{ number_format($br['unmatched']) }}</span> {{ __('orgportal::messages.system_backfill_summary_unmatched') }}
-                        @endif
-                    </div>
-                    @endif
-
-                    {{-- Manual backfill trigger --}}
-                    <form method="POST" action="{{ route('orgportal.admin.system.backfill') }}" style="display:inline;margin-right:8px;">
-                        {{ csrf_field() }}
-                        <button type="submit" class="btn btn-default btn-sm">
-                            <i class="glyphicon glyphicon-refresh"></i>
-                            {{ __('orgportal::messages.system_run_backfill') }}
-                        </button>
-                    </form>
-                    <form method="POST" action="{{ route('orgportal.admin.system.reset-attribution') }}"
-                          style="display:inline;"
-                          onsubmit="return confirm('{{ __('orgportal::messages.system_reset_confirm') }}')">
-                        {{ csrf_field() }}
-                        <button type="submit" class="btn btn-danger btn-sm">
-                            <i class="glyphicon glyphicon-trash"></i>
-                            {{ __('orgportal::messages.system_reset_attribution') }}
-                        </button>
-                    </form>
-                    <p class="text-muted" style="font-size:12px;margin-top:6px;">
-                        {{ __('orgportal::messages.system_cron_hint') }}
-                    </p>
-
-                    <hr>
-
-                    {{-- Attribution source --}}
-                    <h4>{{ __('orgportal::messages.system_attr_source_heading') }}</h4>
-                    <p class="text-muted" style="font-size:13px;">{{ __('orgportal::messages.system_attr_source_desc') }}</p>
-
-                    <form method="POST" action="{{ route('orgportal.admin.system.save') }}" style="margin-bottom:28px;">
-                        {{ csrf_field() }}
-                        {{-- preserve other settings --}}
-                        <input type="hidden" name="snapshot_visibility" value="{{ $snapshotEnabled ? '1' : '0' }}">
-                        @if($langSwitcherEnabled)
-                            <input type="hidden" name="lang_switcher_enabled" value="1">
-                        @endif
-                        @foreach($langSwitcherLocales as $lc)
-                            <input type="hidden" name="lang_switcher_locales[]" value="{{ $lc }}">
-                        @endforeach
-
-                        <div class="form-group">
-                            @foreach(['member' => 'system_attr_member', 'tag' => 'system_attr_tag', 'tag_only' => 'system_attr_tag_only'] as $val => $key)
-                            <div class="radio" style="{{ ($val !== 'member' && !$tagsModuleActive) ? 'opacity:.45;pointer-events:none;' : '' }}">
-                                <label>
-                                    <input type="radio" name="attribution_source" value="{{ $val }}"
-                                        {{ $attributionSource === $val ? 'checked' : '' }}>
-                                    <strong>{{ __('orgportal::messages.' . $key) }}</strong>
-                                    <p class="text-muted" style="margin-left:20px;font-size:12px;margin-bottom:0;">{{ __('orgportal::messages.' . $key . '_hint') }}</p>
-                                </label>
+                        {{-- ═══════════════════════════════════════════════════
+                             PANEL 2: Portal Language Switcher
+                        ════════════════════════════════════════════════════ --}}
+                        <div class="panel panel-default">
+                            <div class="panel-heading" style="cursor:pointer;" data-toggle="collapse" data-target="#sys-panel-lang">
+                                <strong>
+                                    <span class="glyphicon glyphicon-globe" style="margin-right:6px;"></span>
+                                    {{ __('orgportal::messages.system_lang_heading') }}
+                                </strong>
+                                <span class="pull-right glyphicon glyphicon-chevron-right orgportal-panel-chevron" style="margin-top:2px;transition:transform .15s;"></span>
                             </div>
-                            @endforeach
-                            @if(!$tagsModuleActive)
-                            <p class="text-muted" style="font-size:12px;margin-top:6px;">
-                                <i class="glyphicon glyphicon-info-sign"></i>
-                                {{ __('orgportal::messages.system_attr_tags_inactive') }}
-                            </p>
-                            @endif
-                        </div>
+                            <div id="sys-panel-lang" class="collapse">
+                                <div class="panel-body">
+                                    <p class="text-muted" style="font-size:12px;margin-top:0;">{{ __('orgportal::messages.system_lang_desc') }}</p>
 
-                        <button type="submit" class="btn btn-primary btn-sm">{{ __('orgportal::messages.save') }}</button>
-                    </form>
+                                    <div class="checkbox" style="margin-bottom:10px;">
+                                        <label>
+                                            <input type="checkbox" name="lang_switcher_enabled" value="1"
+                                                   id="lang_switcher_enabled"
+                                                   {{ $langSwitcherEnabled ? 'checked' : '' }}>
+                                            <strong>{{ __('orgportal::messages.system_lang_enable') }}</strong>
+                                        </label>
+                                        <p class="text-muted" style="margin-left:20px;font-size:12px;">{{ __('orgportal::messages.system_lang_enable_hint') }}</p>
+                                    </div>
 
-                    <hr>
-
-                    {{-- Language switcher --}}
-                    <h4>{{ __('orgportal::messages.system_lang_heading') }}</h4>
-                    <p class="text-muted" style="font-size:13px;">{{ __('orgportal::messages.system_lang_desc') }}</p>
-
-                    <form method="POST" action="{{ route('orgportal.admin.system.save') }}" style="margin-bottom:28px;">
-                        {{ csrf_field() }}
-                        <input type="hidden" name="snapshot_visibility" value="{{ $snapshotEnabled ? '1' : '0' }}">
-
-                        <div class="checkbox" style="margin-bottom:12px;">
-                            <label>
-                                <input type="checkbox"
-                                       name="lang_switcher_enabled"
-                                       value="1"
-                                       id="lang_switcher_enabled"
-                                       {{ $langSwitcherEnabled ? 'checked' : '' }}>
-                                <strong>{{ __('orgportal::messages.system_lang_enable') }}</strong>
-                            </label>
-                            <p class="text-muted" style="margin-left:20px;font-size:12px;">
-                                {{ __('orgportal::messages.system_lang_enable_hint') }}
-                            </p>
-                        </div>
-
-                        <div id="lang-locales-block" style="{{ $langSwitcherEnabled ? '' : 'display:none;' }}">
-                            <label>{{ __('orgportal::messages.system_lang_locales') }}</label>
-                            <div class="orgportal-table-wrap" style="margin-bottom:12px;">
-                            <div style="display:flex;flex-wrap:wrap;gap:8px;min-width:max-content;">
-                                @foreach($availableLocales as $code => $name)
-                                <label style="font-weight:normal;background:#f5f5f5;border:1px solid #ddd;border-radius:4px;padding:4px 10px;cursor:pointer;margin:0;">
-                                    <input type="checkbox"
-                                           name="lang_switcher_locales[]"
-                                           value="{{ $code }}"
-                                           {{ in_array($code, $langSwitcherLocales) || empty($langSwitcherLocales) ? 'checked' : '' }}>
-                                    {{ $name }}
-                                </label>
-                                @endforeach
+                                    <div id="lang-locales-block" style="{{ $langSwitcherEnabled ? '' : 'display:none;' }}">
+                                        <label style="font-size:13px;">{{ __('orgportal::messages.system_lang_locales') }}</label>
+                                        <div class="orgportal-table-wrap" style="margin-bottom:8px;">
+                                            <div style="display:flex;flex-wrap:wrap;gap:6px;min-width:max-content;">
+                                                @foreach($availableLocales as $code => $name)
+                                                <label style="font-weight:normal;background:#f5f5f5;border:1px solid #ddd;border-radius:4px;padding:3px 10px;cursor:pointer;margin:0;font-size:13px;">
+                                                    <input type="checkbox" name="lang_switcher_locales[]" value="{{ $code }}"
+                                                           {{ in_array($code, $langSwitcherLocales) || empty($langSwitcherLocales) ? 'checked' : '' }}>
+                                                    {{ $name }}
+                                                </label>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                        <p class="text-muted" style="font-size:12px;">{{ __('orgportal::messages.system_lang_locales_hint') }}</p>
+                                    </div>
+                                </div>
                             </div>
-                            </div>
-                            <p class="text-muted" style="font-size:12px;">{{ __('orgportal::messages.system_lang_locales_hint') }}</p>
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-sm">
-                            {{ __('orgportal::messages.save') }}
-                        </button>
-                    </form>
-
-                    <hr>
-
-                    {{-- Snapshot visibility toggle --}}
-                    @if($systemStats['pending'] > 0)
-                    <div class="alert alert-warning">
-                        <i class="glyphicon glyphicon-warning-sign"></i>
-                        {{ __('orgportal::messages.system_snapshot_warning') }}
-                    </div>
-                    @endif
-
-                    <form method="POST" action="{{ route('orgportal.admin.system.save') }}">
-                        {{ csrf_field() }}
-                        @if($langSwitcherEnabled)
-                            <input type="hidden" name="lang_switcher_enabled" value="1">
-                        @endif
-                        @foreach($langSwitcherLocales as $lc)
-                            <input type="hidden" name="lang_switcher_locales[]" value="{{ $lc }}">
-                        @endforeach
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox"
-                                       name="snapshot_visibility"
-                                       value="1"
-                                       {{ $snapshotEnabled ? 'checked' : '' }}>
-                                <strong>{{ __('orgportal::messages.system_snapshot_label') }}</strong>
-                            </label>
-                            <p class="text-muted" style="margin-left:20px;font-size:12px;">
-                                {{ __('orgportal::messages.system_snapshot_hint') }}
-                            </p>
+                        {{-- Single Save button --}}
+                        <div style="margin-top:4px;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="glyphicon glyphicon-floppy-disk" style="margin-right:4px;"></i>
+                                {{ __('orgportal::messages.system_save_settings') }}
+                            </button>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-sm">
-                            {{ __('orgportal::messages.save') }}
-                        </button>
+
                     </form>
 
                 </div>
@@ -491,6 +484,24 @@ window.orgportalDefaults = JSON.parse(document.getElementById('orgportal-default
             })
             .on('hide.bs.collapse', function () {
                 $('.orgportal-sys-chevron').css('transform', 'rotate(0deg)');
+            });
+
+        // Panel chevrons (down when open, right when closed)
+        function syncPanelChevron($panel) {
+            var $icon = $panel.prev('.panel-heading').find('.orgportal-panel-chevron');
+            if ($panel.hasClass('in')) {
+                $icon.css('transform', 'rotate(0deg)');
+            } else {
+                $icon.css('transform', 'rotate(-90deg)');
+            }
+        }
+        $('.panel .collapse').each(function () { syncPanelChevron($(this)); });
+        $('.panel .collapse')
+            .on('show.bs.collapse', function () {
+                $(this).prev('.panel-heading').find('.orgportal-panel-chevron').css('transform', 'rotate(0deg)');
+            })
+            .on('hide.bs.collapse', function () {
+                $(this).prev('.panel-heading').find('.orgportal-panel-chevron').css('transform', 'rotate(-90deg)');
             });
 
         // Rotate chevron on collapse
