@@ -16,7 +16,7 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-md-10 col-md-offset-1">
+        <div class="col-md-12">
 
             @include('partials/flash_messages')
 
@@ -293,7 +293,6 @@
 
                     <form method="POST" action="{{ route('orgportal.admin.system.save') }}" style="margin-bottom:28px;">
                         {{ csrf_field() }}
-                        {{-- hidden fields to carry snapshot setting through this form too --}}
                         <input type="hidden" name="snapshot_visibility" value="{{ $snapshotEnabled ? '1' : '0' }}">
 
                         <div class="checkbox" style="margin-bottom:12px;">
@@ -345,7 +344,6 @@
 
                     <form method="POST" action="{{ route('orgportal.admin.system.save') }}">
                         {{ csrf_field() }}
-                        {{-- carry lang settings through this form --}}
                         @if($langSwitcherEnabled)
                             <input type="hidden" name="lang_switcher_enabled" value="1">
                         @endif
