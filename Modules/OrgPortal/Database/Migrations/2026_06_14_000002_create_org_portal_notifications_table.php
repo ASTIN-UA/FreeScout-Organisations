@@ -8,6 +8,7 @@ class CreateOrgPortalNotificationsTable extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('org_portal_notifications')) return;
         Schema::create('org_portal_notifications', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('customer_id');

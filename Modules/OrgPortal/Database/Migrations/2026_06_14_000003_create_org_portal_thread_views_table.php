@@ -8,6 +8,7 @@ class CreateOrgPortalThreadViewsTable extends Migration
 {
     public function up()
     {
+        if (Schema::hasTable('org_portal_thread_views')) return;
         Schema::create('org_portal_thread_views', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('thread_id');
