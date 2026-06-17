@@ -412,12 +412,6 @@ class OrgPortalServiceProvider extends ServiceProvider
             if (!$mailboxId) {
                 return;
             }
-            if (!isset($enabled[$mailboxId])) {
-                $enabled[$mailboxId] = $this->badgeEnabled('show_badge_kanban', $mailboxId);
-            }
-            if (!$enabled[$mailboxId]) {
-                return;
-            }
 
             $customerId = $conversation->customer_id;
             if (!array_key_exists($customerId, $cache)) {
@@ -431,13 +425,23 @@ class OrgPortalServiceProvider extends ServiceProvider
                 return;
             }
 
-            $searchBase = rtrim(url(\Helper::getSubdirectory() . 'search'), '/');
-            $searchUrl  = $searchBase . '?' . http_build_query(['f' => ['organization' => $member->organization_id]]);
+            if (!isset($enabled[$mailboxId])) {
+                $enabled[$mailboxId] = $this->badgeEnabled('show_badge_kanban', $mailboxId);
+            }
 
-            echo view('orgportal::partials.org_badge', [
-                'organization' => $member->organization,
-                'searchUrl'    => $searchUrl,
-            ])->render();
+            if ($enabled[$mailboxId]) {
+                $searchBase = rtrim(url(\Helper::getSubdirectory() . 'search'), '/');
+                $searchUrl  = $searchBase . '?' . http_build_query(['f' => ['organization' => $member->organization_id]]);
+
+                echo view('orgportal::partials.org_badge', [
+                    'organization' => $member->organization,
+                    'searchUrl'    => $searchUrl,
+                ])->render();
+            } else {
+                // Render hidden marker so the JS org filter can still work
+                // even when the visible badge is disabled for this mailbox.
+                echo '<span class="orgportal-org-badge" data-org-id="' . (int) $member->organization_id . '" style="display:none"></span>';
+            }
         }, 20, 1);
 
         \Eventy::addAction('layout.body_bottom', function () {
