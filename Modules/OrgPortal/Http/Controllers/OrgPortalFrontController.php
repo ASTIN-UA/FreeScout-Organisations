@@ -311,7 +311,7 @@ class OrgPortalFrontController extends Controller
             'message' => 'required|string|min:1|max:65000',
         ]);
 
-        $body = $request->input('message');
+        $body = \Purifier::clean($request->input('message'));
 
         $thread                          = new Thread();
         $thread->conversation_id         = $conversation->id;
