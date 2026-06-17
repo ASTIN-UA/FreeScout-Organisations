@@ -99,3 +99,6 @@
       системи підписок. Прибрати (міграція + fillable/casts).
 - [ ] i18n: ключ `notif_scope_no_unit` додати до 16 локалей (є лише в `en` + `uk`):
       `cs, da, de, es, fi, fr, it, ka, nl, no, pl, pt-BR, pt-PT, ro, sk, sv, zh-CN`
+- [ ] Рефакторинг `OrgPortalServiceProvider::getLocaleName()` — видалити хардкод список мов.
+      `getAvailablePortalLocales()` вже динамічно тягне мови з EUP; `getLocaleName()` мав би
+      покладатися тільки на `Helper::getLocaleData()`, а не мати хардкод для синхронізації.
