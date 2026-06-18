@@ -48,7 +48,7 @@ class OrgPortalSetLocale
                 // so the cookie is stored as plain text and readable via $_COOKIE.
                 return redirect($cleanUrl)
                     ->withCookie(cookie(self::COOKIE_NAME, '', -1, '/'))
-                    ->withCookie(cookie(self::COOKIE_NAME, $locale, self::COOKIE_LIFETIME, self::COOKIE_PATH, null, false, true));
+                    ->withCookie(cookie(self::COOKIE_NAME, $locale, self::COOKIE_LIFETIME, self::COOKIE_PATH, null, config('session.secure', false), true));
             }
 
             $query = $request->except('eup_locale');

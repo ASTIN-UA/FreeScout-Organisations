@@ -91,7 +91,7 @@
                 &nbsp;&middot;&nbsp; {{ \EndUserPortal::dateFormat($thread->created_at) }}
             </div>
             <div class="eup-thread-body">
-                {!! $thread->body !!}
+                {!! \Purifier::clean($thread->body ?? '') !!}
             </div>
 
             {{-- Attachments --}}

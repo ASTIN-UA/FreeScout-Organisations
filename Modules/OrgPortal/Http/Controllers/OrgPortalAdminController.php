@@ -224,6 +224,9 @@ class OrgPortalAdminController extends Controller
         // Save tag bindings if Tags module active
         if (\Module::isActive('tags') && \Schema::hasTable('organization_tags')) {
             $tagIds = array_filter(array_map('intval', (array) $request->input('tag_ids', [])));
+            if (!empty($tagIds) && \Schema::hasTable('tags')) {
+                $tagIds = \DB::table('tags')->whereIn('id', $tagIds)->pluck('id')->map(fn ($i) => (int) $i)->all();
+            }
             \Modules\OrgPortal\Models\OrganizationTag::where('organization_id', $id)->delete();
             foreach ($tagIds as $tagId) {
                 \Modules\OrgPortal\Models\OrganizationTag::create([
@@ -287,31 +290,39 @@ class OrgPortalAdminController extends Controller
                 ->with('flash_error', __('orgportal::messages.already_member'));
         }
 
-        // One ACTIVE membership per customer — block only if they are an active
-        // member elsewhere. Inactive (historical) memberships are allowed.
-        if (OrganizationMember::where('customer_id', $customerId)->where('is_active', true)->exists()) {
-            return redirect()->route('orgportal.admin.edit', $id)
-                ->with('flash_error', __('orgportal::messages.already_in_org'));
-        }
+        $role         = $request->input('role');
+        $canManageOrg = (bool) $request->input('can_manage_org', false);
 
-        // Unit (if any) must belong to this organization.
-        if ($unitId && !OrganizationUnit::where('organization_id', $id)->where('id', $unitId)->exists()) {
-            return redirect()->route('orgportal.admin.edit', $id)
-                ->with('flash_error', __('orgportal::messages.unit_not_found'));
-        }
+        $result = \DB::transaction(function () use ($id, $customerId, $unitId, $role, $canManageOrg) {
+            // One ACTIVE membership per customer — block only if they are an active
+            // member elsewhere. Inactive (historical) memberships are allowed.
+            if (OrganizationMember::where('customer_id', $customerId)->where('is_active', true)->exists()) {
+                return 'already_in_org';
+            }
 
-        try {
+            // Unit (if any) must belong to this organization.
+            if ($unitId && !OrganizationUnit::where('organization_id', $id)->where('id', $unitId)->exists()) {
+                return 'unit_not_found';
+            }
+
             OrganizationMember::create([
                 'organization_id' => $id,
                 'customer_id'     => $customerId,
                 'unit_id'         => $unitId,
-                'role'            => $request->input('role'),
-                'can_manage_org'  => (bool) $request->input('can_manage_org', false),
+                'role'            => $role,
+                'can_manage_org'  => $canManageOrg,
             ]);
-        } catch (\Illuminate\Database\QueryException $e) {
-            // Unique constraint: concurrent request already added this customer
+
+            return 'ok';
+        });
+
+        if ($result === 'already_in_org') {
             return redirect()->route('orgportal.admin.edit', $id)
-                ->with('flash_error', __('orgportal::messages.already_member'));
+                ->with('flash_error', __('orgportal::messages.already_in_org'));
+        }
+        if ($result === 'unit_not_found') {
+            return redirect()->route('orgportal.admin.edit', $id)
+                ->with('flash_error', __('orgportal::messages.unit_not_found'));
         }
 
         // Back-fill snapshot on existing un-attributed conversations for this customer.

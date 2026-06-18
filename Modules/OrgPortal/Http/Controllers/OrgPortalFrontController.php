@@ -51,6 +51,7 @@ class OrgPortalFrontController extends Controller
     {
         $member = OrganizationMember::where('customer_id', $customer->id)
             ->where('role', 'manager')
+            ->where('is_active', true)
             ->with('organization')
             ->first();
 
@@ -116,7 +117,7 @@ class OrgPortalFrontController extends Controller
         $orgMemberIds = $this->visibleCustomerIds($member);
 
         $orderField     = 'last_reply_at';
-        $orderDirection = $request->input('order', 'desc');
+        $orderDirection = in_array($request->input('order'), ['asc', 'desc']) ? $request->input('order') : 'desc';
         $searchField    = $request->input('searchField', '');
         $status         = $request->input('status', []);
         $closed         = (bool) $request->input('closed', false);

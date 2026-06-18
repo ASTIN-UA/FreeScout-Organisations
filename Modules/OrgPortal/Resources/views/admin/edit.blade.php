@@ -480,7 +480,7 @@
 
 // Tag search widget
 (function () {
-    var allTags = {!! json_encode($allTags->map(fn($t) => ['id' => $t->id, 'name' => $t->name])->values()) !!};
+    var allTags = {!! json_encode($allTags->map(fn($t) => ['id' => $t->id, 'name' => $t->name])->values(), JSON_HEX_TAG | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) !!};
     var chips   = document.getElementById('org-tag-chips');
     var search  = document.getElementById('org-tag-search');
     var suggest = document.getElementById('org-tag-suggestions');
