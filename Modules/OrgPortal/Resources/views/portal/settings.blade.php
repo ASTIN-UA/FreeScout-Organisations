@@ -122,6 +122,14 @@
                 @if($members->isEmpty())
                     <p class="text-muted">{{ __('orgportal::messages.no_members') }}</p>
                 @else
+                    @php $hasInactive = $members->contains(fn($m) => !$m->is_active); @endphp
+                    @if($hasInactive)
+                        <div class="form-group">
+                            <label style="font-weight:normal;cursor:pointer;">
+                                <input type="checkbox" id="orgportal-show-inactive"> {{ __('orgportal::messages.show_deactivated') }}
+                            </label>
+                        </div>
+                    @endif
                     <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
                     <table class="table" style="min-width:520px;">
                         <thead>
@@ -136,7 +144,7 @@
                         <tbody>
                         @foreach($members as $m)
                             @php $isGlobal = ($m->role === 'manager' && $m->unit_id === null); @endphp
-                            <tr class="{{ $m->is_active ? '' : 'text-muted' }}">
+                            <tr class="{{ $m->is_active ? '' : 'text-muted orgportal-member-inactive' }}" @if(!$m->is_active) style="display:none;" @endif>
                                 <td>
                                     {{ optional($m->customer)->getFullName() ?: __('orgportal::messages.deleted_customer') }}
                                     @if($isGlobal)
@@ -215,4 +223,17 @@
         </div>
     </div>
 </div>
+
+<script {!! \Helper::cspNonceAttr() !!}>
+(function () {
+    var cb = document.getElementById('orgportal-show-inactive');
+    if (!cb) return;
+    cb.addEventListener('change', function () {
+        var rows = document.querySelectorAll('.orgportal-member-inactive');
+        for (var i = 0; i < rows.length; i++) {
+            rows[i].style.display = cb.checked ? '' : 'none';
+        }
+    });
+})();
+</script>
 @endsection

@@ -36,7 +36,7 @@
 
     // Members without any unit (global manager sees them; unit manager never has such members).
     $noUnitMembers = $isGlobal
-        ? ($members ?? collect())->filter(fn($m) => is_null($m->unit_id) && $m->id !== $member->id)->values()
+        ? ($members ?? collect())->filter(fn($m) => $m->is_active && is_null($m->unit_id) && $m->id !== $member->id)->values()
         : collect();
 
     // Deterministic avatar colour from a string.

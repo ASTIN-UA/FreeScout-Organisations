@@ -28,6 +28,25 @@ return [
     'org_created'            => 'Організацію створено.',
     'org_updated'            => 'Організацію оновлено.',
     'org_deleted'            => 'Організацію видалено.',
+    'org_deactivated'        => 'Організацію деактивовано.',
+    'org_activated'          => 'Організацію активовано.',
+
+    // Admin — organizations list columns & actions
+    'col_tickets'            => 'Заявки',
+    'col_tags'               => 'Теги',
+    'col_status'             => 'Статус',
+    'org_status_active'      => 'Активна',
+    'org_status_inactive'    => 'Неактивна',
+    'filter_active'          => 'Активні',
+    'filter_inactive'        => 'Неактивні',
+    'filter_all'             => 'Всі',
+    'btn_tickets'            => 'Заявки',
+    'btn_deactivate'         => 'Деактивувати',
+    'btn_activate'           => 'Активувати',
+    'deactivate_no_snapshot' => 'Увімкніть режим snapshot у системних налаштуваннях, щоб деактивувати організації.',
+    'confirm_deactivate_org' => 'Деактивувати цю організацію? Вона більше не буде доступна на порталі.',
+    'confirm_activate_org'   => 'Активувати цю організацію?',
+    'search_organizations'   => 'Пошук організацій…',
 
     // Admin — badge color
     'badge_color'            => 'Колір позначки',
@@ -133,6 +152,7 @@ return [
     'activate'               => 'Відновити',
     'member_deactivated'     => 'Учасника звільнено.',
     'member_activated'       => 'Учасника відновлено.',
+    'show_deactivated'       => 'Показувати звільнених',
     'confirm_deactivate'     => 'Звільнити цього учасника? Нові заявки на нього не призначатимуться.',
     'cannot_deactivate_self' => 'Ви не можете звільнити самого себе.',
 

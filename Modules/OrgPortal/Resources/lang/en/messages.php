@@ -28,6 +28,25 @@ return [
     'org_created'            => 'Organization created.',
     'org_updated'            => 'Organization updated.',
     'org_deleted'            => 'Organization deleted.',
+    'org_deactivated'        => 'Organization deactivated.',
+    'org_activated'          => 'Organization activated.',
+
+    // Admin — organizations list columns & actions
+    'col_tickets'            => 'Tickets',
+    'col_tags'               => 'Tags',
+    'col_status'             => 'Status',
+    'org_status_active'      => 'Active',
+    'org_status_inactive'    => 'Inactive',
+    'filter_active'          => 'Active',
+    'filter_inactive'        => 'Inactive',
+    'filter_all'             => 'All',
+    'btn_tickets'            => 'Tickets',
+    'btn_deactivate'         => 'Deactivate',
+    'btn_activate'           => 'Activate',
+    'deactivate_no_snapshot' => 'Enable snapshot visibility in System settings to deactivate organizations.',
+    'confirm_deactivate_org' => 'Deactivate this organization? It will no longer be accessible on the portal.',
+    'confirm_activate_org'   => 'Activate this organization?',
+    'search_organizations'   => 'Search organizations…',
 
     // Admin — badge color
     'badge_color'            => 'Badge color',
@@ -133,6 +152,7 @@ return [
     'activate'               => 'Activate',
     'member_deactivated'     => 'Member deactivated.',
     'member_activated'       => 'Member reactivated.',
+    'show_deactivated'       => 'Show deactivated',
     'confirm_deactivate'     => 'Deactivate this member? They will no longer receive ticket assignments.',
     'cannot_deactivate_self' => 'You cannot deactivate yourself.',
 
