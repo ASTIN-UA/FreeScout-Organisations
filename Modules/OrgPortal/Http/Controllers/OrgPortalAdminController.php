@@ -53,7 +53,20 @@ class OrgPortalAdminController extends Controller
     {
         $this->authorizeManage();
 
-        $organizations = Organization::withCount('members')->with('mailbox')->orderBy('name')->paginate(20);
+        $tagsActive = OrgAttribution::tagsModuleActive()
+            && \Illuminate\Support\Facades\Schema::hasTable('organization_tags');
+
+        $orgQuery = Organization::withCount(['members', 'conversations'])
+            ->with('mailbox')
+            ->orderBy('name');
+
+        if ($tagsActive) {
+            $orgQuery->withCount(['organizationTags as has_tags' => function ($q) {
+                $q->select(\DB::raw('count(*)'));
+            }]);
+        }
+
+        $organizations = $orgQuery->paginate(20);
 
         $SP = \Modules\OrgPortal\Providers\OrgPortalServiceProvider::class;
         $canManageTemplates = $SP::userCanManageTemplates(auth()->user());
@@ -92,10 +105,10 @@ class OrgPortalAdminController extends Controller
             'canManageTemplates'  => $canManageTemplates,
             'isAdmin'             => $isAdmin,
             'systemStats'         => $systemStats,
-            'snapshotEnabled'     => $isAdmin ? OrgAttribution::snapshotEnabled() : false,
+            'snapshotEnabled'     => OrgAttribution::snapshotEnabled(),
             'preflightStats'      => $preflightStats,
             'attributionSource'   => $isAdmin ? OrgAttribution::attributionSource() : 'member',
-            'tagsModuleActive'    => $isAdmin ? OrgAttribution::tagsModuleActive() : false,
+            'tagsModuleActive'    => $tagsActive,
             'availableLocales'    => $availableLocales,
             'langSwitcherEnabled' => $langSwitcherEnabled,
             'langSwitcherLocales' => $langSwitcherLocales,
@@ -234,6 +247,22 @@ class OrgPortalAdminController extends Controller
 
         return redirect()->route('orgportal.admin.index')
             ->with('flash_success', __('orgportal::messages.org_deleted'));
+    }
+
+    public function deactivateOrg(int $id)
+    {
+        $this->authorizeAdmin();
+
+        $org = Organization::findOrFail($id);
+        $org->is_active = !$org->is_active;
+        $org->save();
+
+        $msg = $org->is_active
+            ? __('orgportal::messages.org_activated')
+            : __('orgportal::messages.org_deactivated');
+
+        return redirect()->route('orgportal.admin.index')
+            ->with('flash_success', $msg);
     }
 
     public function addMember(Request $request, int $id)
@@ -691,6 +720,22 @@ class OrgPortalAdminController extends Controller
                 'email' => optional($c->emails->first())->email ?? '',
             ])
         );
+    }
+
+    public function searchOrganizations(Request $request)
+    {
+        $query = trim($request->input('q', ''));
+
+        if (strlen($query) < 1) {
+            return response()->json([]);
+        }
+
+        $orgs = Organization::where('name', 'like', "%{$query}%")
+            ->orderBy('name')
+            ->limit(25)
+            ->get(['id', 'name']);
+
+        return response()->json($orgs->map(fn ($o) => ['id' => $o->id, 'name' => $o->name]));
     }
 
     public function apiDocs()

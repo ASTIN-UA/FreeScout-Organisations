@@ -20,6 +20,9 @@ Route::group([
     Route::get('organizations/create', 'OrgPortalAdminController@create')
         ->name('orgportal.admin.create');
 
+    Route::get('organizations/search', 'OrgPortalAdminController@searchOrganizations')
+        ->name('orgportal.admin.organizations.search');
+
     Route::post('organizations', 'OrgPortalAdminController@store')
         ->name('orgportal.admin.store');
 
@@ -31,6 +34,9 @@ Route::group([
 
     Route::delete('organizations/{id}', 'OrgPortalAdminController@destroy')
         ->name('orgportal.admin.destroy');
+
+    Route::post('organizations/{id}/deactivate', 'OrgPortalAdminController@deactivateOrg')
+        ->name('orgportal.admin.deactivate');
 
     Route::post('organizations/{id}/members', 'OrgPortalAdminController@addMember')
         ->name('orgportal.admin.members.add');
