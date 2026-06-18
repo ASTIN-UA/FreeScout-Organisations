@@ -86,6 +86,16 @@ class Organization extends Model
     /**
      * Global managers: managers not scoped to any unit.
      */
+    public function conversations()
+    {
+        return $this->hasMany(\App\Conversation::class, 'org_id');
+    }
+
+    public function organizationTags()
+    {
+        return $this->hasMany(\Modules\OrgPortal\Models\OrganizationTag::class, 'organization_id');
+    }
+
     public function globalManagers()
     {
         return $this->managers()->whereNull('unit_id');
