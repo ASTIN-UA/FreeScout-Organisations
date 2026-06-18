@@ -47,25 +47,49 @@
                 {{-- ── Organizations ─────────────────────────────────────── --}}
                 <div role="tabpanel" class="tab-pane {{ $activeTab === 'organizations' ? 'active' : '' }}" id="tab-organizations">
 
-                    <div class="margin-bottom">
-                        <a href="{{ route('orgportal.admin.create') }}" class="btn btn-primary">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+                        <a href="{{ route('orgportal.admin.create') }}" class="btn btn-primary btn-sm">
                             <i class="glyphicon glyphicon-plus"></i> {{ __('orgportal::messages.new_organization') }}
                         </a>
+                        <div class="btn-group" data-toggle="buttons" id="orgportal-status-filter">
+                            <label class="btn btn-sm btn-default active">
+                                <input type="radio" name="org-status" value="active" checked> {{ __('orgportal::messages.filter_active') }}
+                            </label>
+                            <label class="btn btn-sm btn-default">
+                                <input type="radio" name="org-status" value="inactive"> {{ __('orgportal::messages.filter_inactive') }}
+                            </label>
+                            <label class="btn btn-sm btn-default">
+                                <input type="radio" name="org-status" value="all"> {{ __('orgportal::messages.filter_all') }}
+                            </label>
+                        </div>
+                        <div style="flex:1;min-width:180px;max-width:320px;">
+                            <input type="text"
+                                   id="orgportal-org-search"
+                                   class="form-control input-sm"
+                                   placeholder="{{ __('orgportal::messages.search_organizations') }}"
+                                   autocomplete="off">
+                        </div>
                     </div>
 
                     @if($organizations->count())
-                        <table class="table table-striped">
+                        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+                        <table class="table table-striped" id="orgportal-org-table" style="min-width:760px;white-space:nowrap;">
                             <thead>
                                 <tr>
                                     <th>{{ __('orgportal::messages.name') }}</th>
                                     <th>{{ __('orgportal::messages.mailbox') }}</th>
                                     <th>{{ __('orgportal::messages.members') }}</th>
+                                    <th>{{ __('orgportal::messages.col_tickets') }}</th>
+                                    @if($tagsModuleActive)
+                                    <th>{{ __('orgportal::messages.col_tags') }}</th>
+                                    @endif
+                                    <th>{{ __('orgportal::messages.col_status') }}</th>
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($organizations as $org)
-                                <tr>
+                                <tr data-org-name="{{ mb_strtolower($org->name) }}" data-is-active="{{ $org->is_active ? '1' : '0' }}">
                                     <td>
                                         <a href="{{ route('orgportal.admin.edit', $org->id) }}">
                                             {{ $org->name }}
@@ -79,12 +103,76 @@
                                         @endif
                                     </td>
                                     <td>{{ $org->members_count }}</td>
-                                    <td class="text-right">
+                                    <td>
+                                        @if($org->conversations_count > 0)
+                                            <a href="{{ url(\Helper::getSubdirectory() . 'search') . '?' . http_build_query(['f' => ['organization' => $org->id]]) }}" target="_blank">
+                                                {{ $org->conversations_count }}
+                                            </a>
+                                        @else
+                                            <span class="text-muted">0</span>
+                                        @endif
+                                    </td>
+                                    @if($tagsModuleActive)
+                                    <td>
+                                        @if(!empty($org->has_tags))
+                                            <span class="text-success" title="{{ __('orgportal::messages.col_tags') }}">
+                                                <i class="glyphicon glyphicon-ok"></i>
+                                            </span>
+                                        @else
+                                            <span class="text-danger">
+                                                <i class="glyphicon glyphicon-remove"></i>
+                                            </span>
+                                        @endif
+                                    </td>
+                                    @endif
+                                    <td>
+                                        @if($org->is_active)
+                                            <span class="label label-success">{{ __('orgportal::messages.org_status_active') }}</span>
+                                        @else
+                                            <span class="label label-default">{{ __('orgportal::messages.org_status_inactive') }}</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-right" style="white-space:nowrap;">
+                                        {{-- Tickets button --}}
+                                        <a href="{{ url(\Helper::getSubdirectory() . 'search') . '?' . http_build_query(['f' => ['organization' => $org->id]]) }}"
+                                           target="_blank"
+                                           class="btn btn-xs btn-default"
+                                           title="{{ __('orgportal::messages.btn_tickets') }}">
+                                            <i class="glyphicon glyphicon-list-alt"></i>
+                                            {{ __('orgportal::messages.btn_tickets') }}
+                                        </a>
+
+                                        {{-- Edit button --}}
                                         <a href="{{ route('orgportal.admin.edit', $org->id) }}"
                                            class="btn btn-xs btn-default">
                                             {{ __('orgportal::messages.edit') }}
                                         </a>
+
                                         @if(auth()->user()->isAdmin())
+                                        {{-- Deactivate / Activate button --}}
+                                        @if($snapshotEnabled)
+                                            <form method="POST"
+                                                  action="{{ route('orgportal.admin.deactivate', $org->id) }}"
+                                                  style="display:inline;"
+                                                  onsubmit="return confirm('{{ $org->is_active ? __('orgportal::messages.confirm_deactivate_org') : __('orgportal::messages.confirm_activate_org') }}')">
+                                                {{ csrf_field() }}
+                                                <button type="submit"
+                                                        class="btn btn-xs {{ $org->is_active ? 'btn-warning' : 'btn-success' }}">
+                                                    {{ $org->is_active ? __('orgportal::messages.btn_deactivate') : __('orgportal::messages.btn_activate') }}
+                                                </button>
+                                            </form>
+                                        @else
+                                            <button type="button"
+                                                    class="btn btn-xs btn-default"
+                                                    disabled
+                                                    title="{{ __('orgportal::messages.deactivate_no_snapshot') }}"
+                                                    data-toggle="tooltip" data-placement="top">
+                                                {{ __('orgportal::messages.btn_deactivate') }}
+                                            </button>
+                                        @endif
+
+                                        {{-- Delete button: only if no members AND no tickets --}}
+                                        @if($org->members_count == 0 && $org->conversations_count == 0)
                                         <form method="POST"
                                               action="{{ route('orgportal.admin.destroy', $org->id) }}"
                                               style="display:inline;"
@@ -96,11 +184,16 @@
                                             </button>
                                         </form>
                                         @endif
+                                        @endif
                                     </td>
                                 </tr>
                                 @endforeach
                             </tbody>
                         </table>
+                        </div>
+                        <div id="orgportal-org-no-results" style="display:none;" class="alert alert-info">
+                            {{ __('orgportal::messages.no_organizations') }}
+                        </div>
                         {{ $organizations->links() }}
                     @else
                         <div class="alert alert-info">
@@ -483,8 +576,48 @@ window.orgportalDefaults = JSON.parse(document.getElementById('orgportal-default
     document.addEventListener('DOMContentLoaded', function () {
         if (typeof $ === 'undefined' || typeof $.fn.summernote === 'undefined') return;
 
-        // System tab — show/hide locale checkboxes based on lang switcher toggle
+        // Tooltip init (system tab + disabled deactivate btn)
         $('[data-toggle="tooltip"]').tooltip();
+
+        // Organizations list — live search + status filter
+        var $orgSearch = $('#orgportal-org-search');
+        var $orgTable  = $('#orgportal-org-table');
+        var $noResults = $('#orgportal-org-no-results');
+        var orgStatus  = 'active'; // default
+
+        function applyOrgFilters() {
+            var q = $orgSearch.length ? $orgSearch.val().trim().toLowerCase() : '';
+            var visibleCount = 0;
+            $orgTable.find('tbody tr').each(function () {
+                var name     = $(this).data('org-name') || '';
+                var isActive = $(this).data('is-active') === 1 || $(this).data('is-active') === '1';
+                var matchSearch = q.length < 2 || name.indexOf(q) !== -1;
+                var matchStatus = orgStatus === 'all' ||
+                                  (orgStatus === 'active' && isActive) ||
+                                  (orgStatus === 'inactive' && !isActive);
+                var show = matchSearch && matchStatus;
+                $(this).toggle(show);
+                if (show) visibleCount++;
+            });
+            $noResults.toggle(visibleCount === 0);
+            $orgTable.toggle(visibleCount > 0);
+        }
+
+        if ($orgSearch.length && $orgTable.length) {
+            $orgSearch.on('input', function () {
+                var q = $(this).val().trim();
+                if (q.length > 0 && q.length < 2) return;
+                applyOrgFilters();
+            });
+        }
+
+        $('#orgportal-status-filter input[type=radio]').on('change', function () {
+            orgStatus = $(this).val();
+            applyOrgFilters();
+        });
+
+        // Apply default filter on load
+        applyOrgFilters();
 
         $('#lang_switcher_enabled').on('change', function () {
             $('#lang-locales-block').toggle(this.checked);

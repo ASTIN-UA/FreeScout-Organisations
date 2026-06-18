@@ -215,6 +215,77 @@ class OrgPortalServiceProvider extends ServiceProvider
             ])->render();
         }, 20, 2);
 
+        // Inject org search JS after jQuery (javascript action fires inside main <script> block at page bottom)
+        \Eventy::addAction('javascript', function () {
+            if (!\Route::is('customers.update')) return;
+            $searchUrl = route('orgportal.admin.organizations.search');
+            echo "
+(function () {
+    var elSearch  = document.getElementById('orgportal_org_search');
+    if (!elSearch) return;
+    var searchUrl = elSearch.getAttribute('data-search-url');
+    var elHidden  = document.getElementById('orgportal_org_id');
+    var elClear   = document.getElementById('orgportal_org_clear');
+    var elList    = document.getElementById('orgportal_org_suggestions');
+    var elRole    = document.querySelector('.orgportal-role-row');
+    var timer     = null;
+    var activeXhr = null;
+
+    function setVisible(el, show) { if (el) el.style.display = show ? '' : 'none'; }
+
+    function selectOrg(id, name) {
+        elHidden.value = id; elSearch.value = name;
+        setVisible(elList, false); setVisible(elRole, true); setVisible(elClear, true);
+    }
+    function clearOrg() {
+        elHidden.value = ''; elSearch.value = '';
+        setVisible(elList, false); setVisible(elRole, false); setVisible(elClear, false);
+    }
+    function showSuggestions(data) {
+        elList.innerHTML = '';
+        if (!data || !data.length) { setVisible(elList, false); return; }
+        data.forEach(function (o) {
+            var li = document.createElement('li');
+            li.style.cssText = 'padding:7px 12px;cursor:pointer;border-bottom:1px solid #eee;';
+            li.textContent = o.name;
+            li.addEventListener('mousedown', function (e) { e.preventDefault(); selectOrg(o.id, o.name); });
+            li.addEventListener('mouseover', function () { li.style.background = '#f5f5f5'; });
+            li.addEventListener('mouseout',  function () { li.style.background = ''; });
+            elList.appendChild(li);
+        });
+        setVisible(elList, true);
+    }
+    elSearch.addEventListener('input', function () {
+        var q = this.value.trim();
+        clearTimeout(timer);
+        if (activeXhr) { activeXhr.abort(); activeXhr = null; }
+        if (!q) { clearOrg(); return; }
+        timer = setTimeout(function () {
+            var xhr = new XMLHttpRequest();
+            activeXhr = xhr;
+            xhr.open('GET', searchUrl + '?q=' + encodeURIComponent(q), true);
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.onload = function () {
+                if (xhr !== activeXhr) return;
+                activeXhr = null;
+                if (xhr.status === 200) {
+                    try { showSuggestions(JSON.parse(xhr.responseText)); } catch(e) {}
+                }
+            };
+            xhr.send();
+        });
+    });
+    elSearch.addEventListener('blur', function () {
+        setTimeout(function () {
+            setVisible(elList, false);
+            if (!elHidden.value) elSearch.value = '';
+        }, 200);
+    });
+    if (elClear) elClear.addEventListener('click', clearOrg);
+})();
+";
+        });
+
         // Save organization assignment when customer form is submitted
         \Eventy::addAction('customer.updated', function ($customer) {
             $orgId = request()->input('orgportal_organization_id');
