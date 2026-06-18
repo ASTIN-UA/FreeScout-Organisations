@@ -264,4 +264,63 @@ return [
     'notif_mark_all_read'  => 'Marcar todo como leído',
     'notif_today'          => 'Hoy',
     'notif_yesterday'      => 'Ayer',
+
+    // Organization status & deactivation
+    'org_deactivated'                   => 'Organización desactivada.',
+    'org_activated'                     => 'Organización activada.',
+    'col_tickets'                       => 'Tickets',
+    'col_tags'                          => 'Etiquetas',
+    'col_status'                        => 'Estado',
+    'org_status_active'                 => 'Activo',
+    'org_status_inactive'               => 'Inactivo',
+    'filter_active'                     => 'Activo',
+    'filter_inactive'                   => 'Inactivo',
+    'filter_all'                        => 'Todos',
+    'btn_tickets'                       => 'Tickets',
+    'btn_deactivate'                    => 'Desactivar',
+    'btn_activate'                      => 'Activar',
+    'deactivate_no_snapshot'            => 'Habilite la visibilidad de instantánea en Configuración del Sistema para desactivar organizaciones.',
+    'confirm_deactivate_org'            => '¿Desactivar esta organización? Ya no será accesible en el portal.',
+    'confirm_activate_org'              => '¿Activar esta organización?',
+    'search_organizations'              => 'Buscar organizaciones…',
+    'unit_not_found'                    => 'Unidad no encontrada en esta organización.',
+    'show_deactivated'                  => 'Mostrar desactivados',
+    'show_org_in_profile'               => 'Mostrar bloque de organización en el perfil del cliente en tickets',
+
+    // System settings — backfill
+    'system_preflight_heading'          => 'Lo que sucederá cuando ejecute el backfill:',
+    'system_preflight_pending'          => 'Tickets esperando atribución',
+    'system_preflight_orgs_with_tags'   => ':n de :total organizaciones tienen vinculaciones de etiquetas configuradas',
+    'system_preflight_orgs_no_tags'     => ':n organizaciones no tienen vinculaciones de etiquetas',
+    'system_preflight_will_tag'         => 'serán atribuidos mediante etiqueta',
+    'system_preflight_will_member'      => 'se retrasarán en membresía / permanecerán sin coincidir',
+    'system_backfill_summary_heading'   => 'Lote de backfill completado:',
+    'system_backfill_summary_processed' => ':n tickets procesados en este paso.',
+    'system_backfill_summary_by_tag'    => 'atribuido mediante vinculación de etiqueta',
+    'system_backfill_summary_by_member' => 'atribuido mediante membresía activa',
+    'system_backfill_summary_unmatched' => 'sin coincidencia encontrada (org_id vacío)',
+
+    // System settings — controls
+    'system_save_settings'              => 'Guardar configuración',
+    'system_reset_attribution'          => 'Restablecer toda la atribución',
+    'system_reset_confirm'              => 'Esto borrará org_id, org_unit_id y org_attributed_at en TODOS los tickets e iniciará la atribución desde cero. ¿Está seguro?',
+    'system_reset_done'                 => 'Atribución restablecida. Todos los tickets serán reattribuidos en la próxima ejecución de backfill.',
+    'system_attr_cron_enabled'          => 'Atribuir tickets automáticamente mediante programador',
+    'system_attr_cron_enabled_hint'     => 'Cuando está habilitado, el programador ejecuta un backfill cada 5 minutos para atribuir tickets no procesados. Deshabilitar si prefiere ejecutar la atribución manualmente.',
+
+    // System settings — attribution source
+    'system_attr_source_heading'        => 'Fuente de Atribución',
+    'system_attr_source_desc'           => 'Controla cómo se vinculan los tickets a una organización. Cuando el módulo Tags está inactivo, solo está disponible la atribución basada en membresía.',
+    'system_attr_member'                => 'Por membresía',
+    'system_attr_member_hint'           => 'Predeterminado. Los tickets se atribuyen a la organización a la que pertenece el cliente en el momento de la creación.',
+    'system_attr_tag'                   => 'Por etiqueta, retrasarse a membresía',
+    'system_attr_tag_hint'              => 'Si un ticket tiene una etiqueta vinculada a una organización, esa vinculación gana. De lo contrario, se usa la membresía. Requiere el módulo Tags.',
+    'system_attr_tag_only'              => 'Solo por etiqueta',
+    'system_attr_tag_only_hint'         => 'Los tickets se atribuyen solo mediante vinculaciones de etiqueta. Los tickets sin una etiqueta coincidente no reciben atribución. Requiere el módulo Tags.',
+    'system_attr_tags_inactive'         => 'Las opciones basadas en etiquetas están deshabilitadas porque el módulo Tags no está activo.',
+
+    // Org tag bindings
+    'org_tags_heading'                  => 'Vinculaciones de Etiquetas',
+    'org_tags_hint'                     => 'Seleccione qué etiquetas identifican tickets pertenecientes a esta organización. Opcionalmente asigne una unidad estructural por etiqueta.',
+    'org_tags_search_placeholder'       => 'Buscar etiqueta…',
 ];

@@ -264,4 +264,67 @@ return [
     'notif_mark_all_read'  => 'Marchează tot ca citit',
     'notif_today'          => 'Astăzi',
     'notif_yesterday'      => 'Ieri',
+
+    // Organizations — activation / deactivation
+    'org_deactivated'                   => 'Organizație dezactivată.',
+    'org_activated'                     => 'Organizație activată.',
+    'col_tickets'                       => 'Tichete',
+    'col_tags'                          => 'Etichete',
+    'col_status'                        => 'Status',
+    'org_status_active'                 => 'Activ',
+    'org_status_inactive'               => 'Inactiv',
+    'filter_active'                     => 'Activ',
+    'filter_inactive'                   => 'Inactiv',
+    'filter_all'                        => 'Toate',
+    'btn_tickets'                       => 'Tichete',
+    'btn_deactivate'                    => 'Dezactivați',
+    'btn_activate'                      => 'Activați',
+    'deactivate_no_snapshot'            => 'Activați vizibilitatea instantaneu în Setări sistem pentru a dezactiva organizații.',
+    'confirm_deactivate_org'            => 'Dezactivați această organizație? Nu va mai fi accesibilă pe portal.',
+    'confirm_activate_org'              => 'Activați această organizație?',
+    'search_organizations'              => 'Căutați organizații…',
+    'unit_not_found'                    => 'Unitate negăsită în această organizație.',
+    'show_deactivated'                  => 'Afișați dezactivate',
+    'show_org_in_profile'               => 'Afișați blocul de organizație în profilul clientului în tichete',
+
+    // System settings — backfill preflight
+    'system_preflight_heading'          => 'Ce se va întâmpla când rulați backfill:',
+    'system_preflight_pending'          => 'Tichete în așteptare atribuire',
+    'system_preflight_orgs_with_tags'   => ':n din :total organizații au bindinguri de etichete configurate',
+    'system_preflight_orgs_no_tags'     => ':n organizații nu au bindinguri de etichete',
+    'system_preflight_will_tag'         => 'vor fi atribuite prin etichetă',
+    'system_preflight_will_member'      => 'vor reveni la membru / rămân neataşate',
+
+    // System settings — backfill summary
+    'system_backfill_summary_heading'   => 'Backfill completat:',
+    'system_backfill_summary_processed' => ':n tichete procesate în această trecere.',
+    'system_backfill_summary_by_tag'    => 'atribuite prin binding de etichete',
+    'system_backfill_summary_by_member' => 'atribuite prin membri activi',
+    'system_backfill_summary_unmatched' => 'niciun potrivire găsit (org_id rămâne gol)',
+
+    // System settings — controls
+    'system_save_settings'              => 'Salvați setările',
+    'system_reset_attribution'          => 'Resetați toată atribuirea',
+    'system_reset_confirm'              => 'Aceasta va șterge org_id, org_unit_id și org_attributed_at pe TOATE tichetele și va restarta atribuirea de la zero. Sunteți sigur?',
+    'system_reset_done'                 => 'Atribuire resetată. Toate tichetele vor fi re-atribuite la următoarea rulare backfill.',
+
+    // System settings — attribution scheduler
+    'system_attr_cron_enabled'          => 'Atribuiți automat tichete prin planificator',
+    'system_attr_cron_enabled_hint'     => 'Când este activat, planificatorul rulează un backfill la fiecare 5 minute pentru a atribui tichete neprocesate. Dezactivați dacă preferați atribuirea manuală.',
+
+    // System settings — attribution source
+    'system_attr_source_heading'        => 'Sursă atribuire',
+    'system_attr_source_desc'           => 'Controlează cum sunt legate tichetele la o organizație. Când modulul Etichete este inactiv, doar atribuirea bazată pe membri este disponibilă.',
+    'system_attr_member'                => 'După membri',
+    'system_attr_member_hint'           => 'Implicit. Tichetele sunt atribuite organizației din care face parte clientul la momentul creării.',
+    'system_attr_tag'                   => 'După etichetă, reveniți la membri',
+    'system_attr_tag_hint'              => 'Dacă un tichet are o etichetă legată la o organizație, acea legătură câștigă. În caz contrar se folosesc membri. Necesită modulul Etichete.',
+    'system_attr_tag_only'              => 'Doar după etichetă',
+    'system_attr_tag_only_hint'         => 'Tichetele sunt atribuite doar prin bindinguri de etichete. Tichetele fără etichetă potrivit nu primesc atribuire. Necesită modulul Etichete.',
+    'system_attr_tags_inactive'         => 'Opțiunile bazate pe etichete sunt dezactivate deoarece modulul Etichete nu este activ.',
+
+    // System settings — org tag bindings
+    'org_tags_heading'                  => 'Bindinguri etichete',
+    'org_tags_hint'                     => 'Selectați care etichete identifică tichetele acestei organizații. Opțional atribuiți o unitate structurală per etichetă.',
+    'org_tags_search_placeholder'       => 'Căutați etichetă…',
 ];

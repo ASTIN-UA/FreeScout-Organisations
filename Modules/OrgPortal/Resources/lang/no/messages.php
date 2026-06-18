@@ -264,4 +264,67 @@ return [
     'notif_mark_all_read'  => 'Merk alle som lest',
     'notif_today'          => 'I dag',
     'notif_yesterday'      => 'I går',
+
+    // Organizations — status and activity
+    'org_deactivated'                   => 'Organisasjon deaktivert.',
+    'org_activated'                     => 'Organisasjon aktivert.',
+    'col_tickets'                       => 'Billetter',
+    'col_tags'                          => 'Merkelapper',
+    'col_status'                        => 'Status',
+    'org_status_active'                 => 'Aktiv',
+    'org_status_inactive'               => 'Inaktiv',
+    'filter_active'                     => 'Aktiv',
+    'filter_inactive'                   => 'Inaktiv',
+    'filter_all'                        => 'Alle',
+    'btn_tickets'                       => 'Billetter',
+    'btn_deactivate'                    => 'Deaktiver',
+    'btn_activate'                      => 'Aktiver',
+    'deactivate_no_snapshot'            => 'Aktiver øyeblikksbildesynlighet i Systeminnstillinger for å deaktivere organisasjoner.',
+    'confirm_deactivate_org'            => 'Deaktivere denne organisasjonen? Den vil ikke lenger være tilgjengelig på portalen.',
+    'confirm_activate_org'              => 'Aktivere denne organisasjonen?',
+    'search_organizations'              => 'Søk organisasjoner…',
+    'unit_not_found'                    => 'Enhet ikke funnet i denne organisasjonen.',
+    'show_deactivated'                  => 'Vis deaktiverte',
+    'show_org_in_profile'               => 'Vis organisasjonsblokk i kundeprofil i billetter',
+
+    // System — backfill preflight
+    'system_preflight_heading'          => 'Hva som skjer når du kjører fyllingen:',
+    'system_preflight_pending'          => 'Billetter i påvente av tilskrivning',
+    'system_preflight_orgs_with_tags'   => ':n av :total organisasjoner har merkelab-bindinger konfigurert',
+    'system_preflight_orgs_no_tags'     => ':n organisasjoner har ingen merkelab-bindinger',
+    'system_preflight_will_tag'         => 'vil bli tilskrevet via merkelab',
+    'system_preflight_will_member'      => 'vil falle tilbake til medlemskap / forbli umatched',
+
+    // System — backfill summary
+    'system_backfill_summary_heading'   => 'Fyllingsbatch fullført:',
+    'system_backfill_summary_processed' => ':n billetter behandlet i denne kjøringen.',
+    'system_backfill_summary_by_tag'    => 'tilskrevet via merkelab-binding',
+    'system_backfill_summary_by_member' => 'tilskrevet via aktivt medlemskap',
+    'system_backfill_summary_unmatched' => 'ingen kamp funnet (org_id forblir tomt)',
+
+    // System — general settings
+    'system_save_settings'              => 'Lagre innstillinger',
+    'system_reset_attribution'          => 'Tilbakestill all tilskrivning',
+    'system_reset_confirm'              => 'Dette vil rydde org_id, org_unit_id og org_attributed_at på ALLE billetter og starte tilskrivningen på nytt. Er du sikker?',
+    'system_reset_done'                 => 'Tilskrivning tilbakestilt. Alle billetter vil bli omattribuert på neste fyllingskjøring.',
+
+    // System — attribution scheduling
+    'system_attr_cron_enabled'          => 'Tilskriv billetter automatisk via planlegger',
+    'system_attr_cron_enabled_hint'     => 'Når aktivert, kjører planleggeren en fylling hver 5. minutt for å tilskrive ubehandlede billetter. Deaktiver hvis du foretrekker å kjøre tilskrivningen manuelt.',
+
+    // System — attribution source
+    'system_attr_source_heading'        => 'Tilskrivningskilde',
+    'system_attr_source_desc'           => 'Kontrollerer hvordan billetter er knyttet til en organisasjon. Når Tags-modulen er inaktiv, er bare medlemskapsbasert tilskrivning tilgjengelig.',
+    'system_attr_member'                => 'Etter medlemskap',
+    'system_attr_member_hint'           => 'Standard. Billetter tilskrives organisasjonen kunden tilhører på opprettelsestidspunktet.',
+    'system_attr_tag'                   => 'Etter merkelab, fall tilbake til medlemskap',
+    'system_attr_tag_hint'              => 'Hvis en billett har en merkelab bundet til en organisasjon, vinner denne bindingen. Ellers brukes medlemskap. Krever Tags-modulen.',
+    'system_attr_tag_only'              => 'Bare etter merkelab',
+    'system_attr_tag_only_hint'         => 'Billetter tilskrives bare via merkelab-bindinger. Billetter uten samsvarende merkelab får ingen tilskrivning. Krever Tags-modulen.',
+    'system_attr_tags_inactive'         => 'Merkelab-baserte alternativer er deaktivert fordi Tags-modulen ikke er aktiv.',
+
+    // System — organization tag bindings
+    'org_tags_heading'                  => 'Merkelab-bindinger',
+    'org_tags_hint'                     => 'Velg hvilke merkelapper som identifiserer billetter som tilhører denne organisasjonen. Du kan eventuelt tildele en strukturell enhet per merkelab.',
+    'org_tags_search_placeholder'       => 'Søk merkelab…',
 ];
