@@ -50,11 +50,11 @@ class OrgPortalFrontController extends Controller
     protected function requireManager(Customer $customer, Mailbox $mailbox): OrganizationMember
     {
         $member = OrganizationMember::where('customer_id', $customer->id)
-            ->whereIn('role', ['manager', 'unit_manager', 'global_manager'])
+            ->where('role', 'manager')
             ->with('organization')
             ->first();
 
-        if (!$member || !$member->organization) {
+        if (!$member || !$member->organization || !$member->organization->is_active) {
             abort(403, __('orgportal::messages.access_denied'));
         }
 

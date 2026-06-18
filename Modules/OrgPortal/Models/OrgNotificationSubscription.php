@@ -34,8 +34,12 @@ class OrgNotificationSubscription extends Model
             ->where(function ($q) use ($authorUnitId) {
                 $q->where('scope_type', self::SCOPE_ORG)
                   ->orWhere(function ($q2) use ($authorUnitId) {
-                      $q2->where('scope_type', self::SCOPE_UNIT)
-                         ->where('scope_id', $authorUnitId);
+                      $q2->where('scope_type', self::SCOPE_UNIT);
+                      if (is_null($authorUnitId)) {
+                          $q2->whereNull('scope_id');
+                      } else {
+                          $q2->where('scope_id', $authorUnitId);
+                      }
                   });
             })
             ->exists();

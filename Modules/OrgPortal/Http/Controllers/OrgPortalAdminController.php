@@ -297,7 +297,7 @@ class OrgPortalAdminController extends Controller
         // Unit (if any) must belong to this organization.
         if ($unitId && !OrganizationUnit::where('organization_id', $id)->where('id', $unitId)->exists()) {
             return redirect()->route('orgportal.admin.edit', $id)
-                ->with('flash_error', __('orgportal::messages.unit_exists'));
+                ->with('flash_error', __('orgportal::messages.unit_not_found'));
         }
 
         try {
@@ -337,7 +337,7 @@ class OrgPortalAdminController extends Controller
 
         if ($unitId && !OrganizationUnit::where('organization_id', $id)->where('id', $unitId)->exists()) {
             return redirect()->route('orgportal.admin.edit', $id)
-                ->with('flash_error', __('orgportal::messages.unit_exists'));
+                ->with('flash_error', __('orgportal::messages.unit_not_found'));
         }
 
         $member->update([

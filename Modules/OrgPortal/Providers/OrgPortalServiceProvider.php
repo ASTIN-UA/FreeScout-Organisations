@@ -629,7 +629,7 @@ class OrgPortalServiceProvider extends ServiceProvider
             }
 
             $member = OrganizationMember::where('customer_id', $customer->id)
-                ->whereIn('role', ['manager', 'unit_manager', 'global_manager'])
+                ->where('role', 'manager')
                 ->where('is_active', true)
                 ->first();
 
@@ -819,7 +819,7 @@ class OrgPortalServiceProvider extends ServiceProvider
         if (!$authorMember) return;
 
         $managers = OrganizationMember::where('organization_id', $authorMember->organization_id)
-            ->whereIn('role', ['manager', 'unit_manager', 'global_manager'])
+            ->where('role', 'manager')
             ->where('is_active', true)
             ->where('customer_id', '!=', $authorCustomerId)
             ->get();
@@ -868,13 +868,14 @@ class OrgPortalServiceProvider extends ServiceProvider
             if (!$email) continue;
 
             $prevLocale = app()->getLocale();
-            if ($manager->locale) {
-                app()->setLocale($manager->locale);
+            try {
+                if ($manager->locale) {
+                    app()->setLocale($manager->locale);
+                }
+                [$subject, $body] = $this->renderNotificationTemplate($event, $manager, $authorMember, $conversation, $thread);
+            } finally {
+                app()->setLocale($prevLocale);
             }
-
-            [$subject, $body] = $this->renderNotificationTemplate($event, $manager, $authorMember, $conversation, $thread);
-
-            app()->setLocale($prevLocale);
 
             \Modules\OrgPortal\Jobs\SendOrgNotification::dispatch(
                 (int) $conversation->mailbox_id,
@@ -940,8 +941,9 @@ class OrgPortalServiceProvider extends ServiceProvider
         $htmlMacros = array_combine(array_keys($rawMacros), $htmlMacros);
 
         if ($subject === '' || $body === '') {
-            // Built-in fallback template.
-            return $this->builtinNotificationTemplate($event, $htmlMacros, $ticketUrl);
+            // Built-in fallback template — pass rawMacros so subject lines are plain text,
+            // not double-escaped HTML entities. The method applies e() itself for HTML body.
+            return $this->builtinNotificationTemplate($event, $rawMacros, $ticketUrl);
         }
 
         $subject = str_replace(array_keys($rawMacros), array_values($rawMacros), $subject);

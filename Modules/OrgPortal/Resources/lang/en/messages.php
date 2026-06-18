@@ -130,6 +130,7 @@ return [
     'unit_updated'           => 'Unit updated.',
     'unit_deleted'           => 'Unit deleted.',
     'unit_exists'            => 'A unit with this name already exists.',
+    'unit_not_found'         => 'Unit not found in this organization.',
     'confirm_delete_unit'    => 'Delete this unit? Its members will be unassigned and unit managers demoted to members.',
 
     // Portal — member management

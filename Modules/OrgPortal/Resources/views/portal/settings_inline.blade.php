@@ -42,7 +42,7 @@
     // Deterministic avatar colour from a string.
     $avatarColor = function(string $seed): string {
         $palette = ['#5b8def','#7c5cef','#ef5c8a','#ef8a5c','#27ae8f','#e0a30b','#3aa3c9','#9b59b6'];
-        return $palette[crc32($seed) % count($palette)];
+        return $palette[abs(crc32($seed)) % count($palette)];
     };
 @endphp
 
