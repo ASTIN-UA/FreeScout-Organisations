@@ -1047,8 +1047,10 @@ class OrgPortalServiceProvider extends ServiceProvider
         ];
 
         foreach ($targets as $src => $dst) {
-            if (!file_exists($dst)) {
-                @copy($src, $dst);
+            if (!file_exists($dst) && !copy($src, $dst)) {
+                \Log::warning('[OrgPortal] Failed to deploy Georgian asset', [
+                    'src' => $src, 'dst' => $dst,
+                ]);
             }
         }
     }

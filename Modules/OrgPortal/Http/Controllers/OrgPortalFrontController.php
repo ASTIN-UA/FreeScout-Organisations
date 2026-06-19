@@ -118,7 +118,7 @@ class OrgPortalFrontController extends Controller
 
         $orderField     = 'last_reply_at';
         $orderDirection = in_array($request->input('order'), ['asc', 'desc']) ? $request->input('order') : 'desc';
-        $searchField    = $request->input('searchField', '');
+        $searchField    = str_replace(['%', '_'], ['\%', '\_'], trim($request->input('searchField', '')));
         $status         = $request->input('status', []);
         $closed         = (bool) $request->input('closed', false);
         $direction      = $orderDirection === 'asc' ? 'desc' : 'asc';
