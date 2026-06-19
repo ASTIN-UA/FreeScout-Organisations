@@ -1,12 +1,12 @@
-# OrgPortal — B2B Organization Portal for FreeScout
+# OrgPortal — B2B Organization Management Module for FreeScout
 
-<img src="Modules/OrgPortal/logo.png" alt="OrgPortal" width="140" align="right">
+<img src="Modules/OrgPortal/logo.png" alt="OrgPortal — FreeScout B2B module" width="140" align="right">
 
-**OrgPortal** turns FreeScout into a full-featured **B2B helpdesk platform**. Instead of treating every customer as an individual, you work with *companies* — with roles, hierarchies, shared visibility, and a self-service portal your corporate clients actually want to use.
+**OrgPortal** is a FreeScout module that adds full **B2B organization management** to your helpdesk: group customers into companies, define department hierarchies, give corporate managers a self-service portal, and automate notifications — all inside FreeScout, with no external tools required.
 
-Built for teams that support other businesses, not just individual users.
+> Looking for a way to manage company accounts in FreeScout? To give corporate clients their own support portal? To control which tickets each B2B contact can see based on their role and department? OrgPortal solves all of that.
 
-**Minimum FreeScout version:** 1.8.147  
+**Works with:** FreeScout 1.8.147+  
 **Optional integrations:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
 
 ---
@@ -32,18 +32,19 @@ Built for teams that support other businesses, not just individual users.
 
 ---
 
-## What changes with OrgPortal
+## What OrgPortal adds to FreeScout
 
-Without OrgPortal, FreeScout sees customers — individual people who send emails. Your team has no way to know that Alice, Bob, and Carol all work at Acme Corp, or that Alice is the account manager who should see every ticket, while Carol can only see her own.
+FreeScout is built around individual customers — every email is from a person, and there is no built-in concept of a company that person works for. This works fine for B2C helpdesks. For B2B, it falls short.
 
-With OrgPortal:
+OrgPortal fills that gap:
 
-- Every customer belongs to a **company (organization)**
-- Companies have **departments** with scoped access
-- Corporate managers get their **own self-service portal** — view all company tickets, reply, close, reassign authors, manage notification preferences
-- Your team sees the **org badge** on every ticket and Kanban card — no hunting for context
-- Every ticket is permanently attributed to its organization at creation time — **historical reporting never breaks**
-- Everything is **API-driven** — connect your CRM, automate onboarding, sync memberships
+- **Company accounts** — group customers into organizations with a name, color badge, mailbox scope, and active/inactive status
+- **Department hierarchies** — divide organizations into structural units (departments, branches, teams); each member is scoped to their unit
+- **Role-based access** — `member` sees own tickets only; `unit_manager` sees the entire unit; `manager` sees the entire organization
+- **Corporate self-service portal** — managers view all company tickets, reply, close, reassign authors, and manage notification preferences without contacting your team
+- **Permanent ticket attribution** — every ticket is snapshotted to its organization at creation; historical reporting survives client roster changes
+- **Multilingual notifications** — automated email alerts in each manager's own language, with per-locale templates and a built-in WYSIWYG editor
+- **REST API** — sync memberships from your CRM, automate onboarding, manage tags programmatically
 
 ---
 
