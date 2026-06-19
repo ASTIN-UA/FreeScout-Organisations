@@ -71,6 +71,15 @@ class OrgPortalAdminController extends Controller
         $SP = \Modules\OrgPortal\Providers\OrgPortalServiceProvider::class;
         $canManageTemplates = $SP::userCanManageTemplates(auth()->user());
 
+        $isAdmin        = auth()->user() && auth()->user()->isAdmin();
+        $systemStats    = $isAdmin ? OrgAttribution::stats() : null;
+        $preflightStats = $isAdmin ? OrgAttribution::preflightStats() : null;
+
+        $availableLocales     = $isAdmin ? $SP::getAvailablePortalLocales() : [];
+        $langSwitcherEnabled  = (bool) \Option::get('orgportal.lang_switcher_enabled', false);
+        $rawLocales           = \Option::get('orgportal.lang_switcher_locales', []);
+        $langSwitcherLocales  = is_array($rawLocales) ? $rawLocales : (json_decode($rawLocales, true) ?: []);
+
         $tplEvents    = [];
         $tplTemplates = [];
         $tplDefaults  = [];
@@ -93,16 +102,6 @@ class OrgPortalAdminController extends Controller
                 $tplDefaults[$locale] = self::defaultTemplates($locale);
             }
         }
-
-        $isAdmin        = auth()->user() && auth()->user()->isAdmin();
-        $systemStats    = $isAdmin ? OrgAttribution::stats() : null;
-        $preflightStats = $isAdmin ? OrgAttribution::preflightStats() : null;
-
-        $SP = \Modules\OrgPortal\Providers\OrgPortalServiceProvider::class;
-        $availableLocales     = $isAdmin ? $SP::getAvailablePortalLocales() : [];
-        $langSwitcherEnabled  = (bool) \Option::get('orgportal.lang_switcher_enabled', false);
-        $rawLocales           = \Option::get('orgportal.lang_switcher_locales', []);
-        $langSwitcherLocales  = is_array($rawLocales) ? $rawLocales : (json_decode($rawLocales, true) ?: []);
 
         return view('orgportal::admin.index', [
             'organizations'       => $organizations,
