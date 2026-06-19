@@ -62,7 +62,6 @@
                 @if(!empty($kanbanColumns))
                 @php
                     $savedById = collect($companyFilters)->keyBy('id');
-                    // Build ordered rows: saved filters first (in saved order), then unsaved columns
                     $orderedRows = [];
                     foreach ($companyFilters as $cf) {
                         $colId = $cf['id'];
@@ -77,7 +76,20 @@
                         }
                     }
                     $activeLocale = $filterLocales[0] ?? 'en';
+
+                    // Build JS memory store: { colId: { locale: label } }
+                    $cfMemory = [];
+                    foreach ($orderedRows as $row) {
+                        $cid = $row['col']['id'];
+                        $cfMemory[$cid] = $row['saved']['labels'] ?? [];
+                    }
                 @endphp
+
+                {{-- Data carrier for JS (picked up by @section('javascript') below) --}}
+                <div id="cf-data"
+                     data-saved="{{ e(json_encode($cfMemory)) }}"
+                     data-locale="{{ e($activeLocale) }}"
+                     style="display:none;"></div>
 
                 {{-- Locale selector (only when more than one locale) --}}
                 @if(count($filterLocales) > 1)
@@ -95,11 +107,14 @@
                 </div>
                 @endif
 
+                {{-- Hidden inputs that carry all locale labels on submit --}}
+                <div id="cf-hidden-labels"></div>
+
                 <table class="table table-condensed" id="cf-sortable-table">
                     <thead>
                         <tr>
-                            <th style="width:24px;"></th>{{-- drag handle --}}
-                            <th style="width:32px;"></th>{{-- checkbox --}}
+                            <th style="width:24px;"></th>
+                            <th style="width:32px;"></th>
                             <th style="color:#999;">{{ __('orgportal::messages.filter_original_name') }}</th>
                             <th>{{ __('orgportal::messages.filter_label') }}</th>
                             <th style="width:150px;color:#999;">{{ __('orgportal::messages.filter_board') }}</th>
@@ -112,7 +127,6 @@
                             $colId   = $col['id'];
                             $checked = $row['checked'];
                             $saved   = $row['saved'];
-                            // labels map for all locales
                             $labelsMap = $saved['labels'] ?? [];
                         @endphp
                         <tr class="cf-row" data-col-id="{{ $colId }}">
@@ -134,16 +148,12 @@
                                 {{ $col['name'] }}
                             </td>
                             <td>
-                                {{-- One input per locale, show/hide via JS --}}
-                                @foreach($filterLocales as $loc)
+                                {{-- Single visible input — JS loads/saves value for active locale --}}
                                 <input type="text"
-                                       name="company_filter_labels[{{ $colId }}][{{ $loc }}]"
                                        class="form-control input-sm cf-label-input"
-                                       data-locale="{{ $loc }}"
+                                       data-col-id="{{ $colId }}"
                                        placeholder="{{ $col['name'] }}"
-                                       value="{{ $labelsMap[$loc] ?? '' }}"
-                                       style="{{ $loc === $activeLocale ? '' : 'display:none;' }}">
-                                @endforeach
+                                       value="{{ $labelsMap[$activeLocale] ?? '' }}">
                             </td>
                             <td style="color:#999;font-size:12px;vertical-align:middle;">
                                 {{ $col['board_name'] }}
@@ -158,33 +168,6 @@
             </div>
         </div>
 
-        <script>
-        $(function() {
-            // Locale switcher
-            $('#cf-locale-select').on('change', function() {
-                var loc = $(this).val();
-                $('.cf-label-input').hide();
-                $('.cf-label-input[data-locale="' + loc + '"]').show();
-            });
-
-            // Drag & drop sorting via jQuery UI sortable
-            if ($.fn.sortable) {
-                $('#cf-tbody').sortable({
-                    handle: '.cf-drag-handle',
-                    axis: 'y',
-                    update: function() {
-                        $('#cf-tbody .cf-row').each(function(i) {
-                            $(this).find('.cf-sort-input').val(i);
-                        });
-                    }
-                });
-                // Set initial sort values
-                $('#cf-tbody .cf-row').each(function(i) {
-                    $(this).find('.cf-sort-input').val(i);
-                });
-            }
-        });
-        </script>
         @endif
 
         <div class="form-group">
@@ -194,4 +177,70 @@
         </div>
     </form>
 </div>
+@endsection
+
+@section('javascript')
+if ($('#cf-data').length) {
+    var cfSaved  = JSON.parse($('#cf-data').attr('data-saved') || '{}');
+    var cfLocale = $('#cf-data').attr('data-locale') || 'en';
+    // Normalize: PHP [] serializes as JSON array, but we need plain objects.
+    var cfMemory = {};
+    $.each(cfSaved, function(colId, labels) {
+        cfMemory[String(colId)] = (labels && !Array.isArray(labels)) ? labels : {};
+    });
+
+    console.log('[CF] cfSaved:', cfSaved, '| cfLocale:', cfLocale);
+
+    function cfSaveCurrentToMemory() {
+        $('#cf-tbody .cf-row').each(function() {
+            var colId = String($(this).attr('data-col-id'));
+            var val   = $(this).find('.cf-label-input').val();
+            if (!cfMemory[colId]) cfMemory[colId] = {};
+            cfMemory[colId][cfLocale] = val;
+        });
+    }
+
+    function cfLoadFromMemory(locale) {
+        $('#cf-tbody .cf-row').each(function() {
+            var colId = String($(this).attr('data-col-id'));
+            var saved = cfMemory[colId];
+            $(this).find('.cf-label-input').val(saved && saved[locale] ? saved[locale] : '');
+        });
+    }
+
+    function cfBuildHiddenInputs() {
+        var $c = $('#cf-hidden-labels').empty();
+        $.each(cfMemory, function(colId, labels) {
+            $.each(labels, function(loc, lbl) {
+                if (lbl && lbl.trim() !== '') {
+                    $('<input>').attr({ type: 'hidden', name: 'company_filter_labels[' + colId + '][' + loc + ']', value: lbl.trim() }).appendTo($c);
+                }
+            });
+        });
+    }
+
+    $('#cf-locale-select').on('change', function() {
+        var newLocale = $(this).val();
+        cfSaveCurrentToMemory();
+        console.log('[CF] switch', cfLocale, '->', newLocale, cfMemory);
+        cfLocale = newLocale;
+        cfLoadFromMemory(newLocale);
+    });
+
+    $('form').on('submit', function() {
+        cfSaveCurrentToMemory();
+        cfBuildHiddenInputs();
+    });
+
+    if ($.fn.sortable) {
+        $('#cf-tbody').sortable({
+            handle: '.cf-drag-handle',
+            axis: 'y',
+            update: function() {
+                $('#cf-tbody .cf-row').each(function(i) { $(this).find('.cf-sort-input').val(i); });
+            }
+        });
+        $('#cf-tbody .cf-row').each(function(i) { $(this).find('.cf-sort-input').val(i); });
+    }
+}
 @endsection

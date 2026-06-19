@@ -1,8 +1,8 @@
 # OrgPortal REST API
 
-[← Terug naar README](../README.nl.md)
+[← Terug naar README](../../README.md)
 
-🌐 **Taal:**
+🌐 **Language:**
 [English](README.md) ·
 [Українська](README.uk.md) ·
 [Deutsch](README.de.md) ·
@@ -36,9 +36,15 @@ Authenticatie — `X-FreeScout-API-Key` header of `api_key` queryparameter.
 |---------|----------|-------------|
 | `GET` | `/api/organizations` | Organisaties weergeven (paginering, postvakfilter) |
 | `POST` | `/api/organizations` | Organisatie aanmaken |
-| `GET` | `/api/organizations/{id}` | Organisatie met leden en eenheden ophalen |
-| `PUT` | `/api/organizations/{id}` | Organisatie bijwerken |
+| `GET` | `/api/organizations/{id}` | Organisatie ophalen met leden en eenheden |
+| `PUT` | `/api/organizations/{id}` | Organisatie bijwerken (naam, kleur, postvak, isActive) |
 | `DELETE` | `/api/organizations/{id}` | Organisatie verwijderen |
+| `GET` | `/api/organizations/{id}/members` | Leden van organisatie weergeven |
+| `GET` | `/api/organizations/{id}/members/{memberId}` | Één lid ophalen |
+| `PUT` | `/api/organizations/{id}/members/{memberId}` | Lid bijwerken (rol, eenheid, canManageOrg, isActive) |
+| `DELETE` | `/api/organizations/{id}/members/{memberId}` | Lid verwijderen |
+| `GET` | `/api/organizations/{id}/tags` | Taggenbindingen weergeven (vereist Tags-module) |
+| `PUT` | `/api/organizations/{id}/tags` | Alle taggenbindingen vervangen (vereist Tags-module) |
 | `GET` | `/api/organizations/{id}/units` | Structurele eenheden weergeven |
 | `POST` | `/api/organizations/{id}/units` | Structurele eenheid aanmaken |
 | `PUT` | `/api/units/{unitId}` | Eenheid hernoemen |
@@ -51,12 +57,13 @@ Authenticatie — `X-FreeScout-API-Key` header of `api_key` queryparameter.
 
 | Code | Betekenis |
 |------|-----------|
-| `200` | Succes of geen-operatie (niets is gewijzigd) |
+| `200` | Succes |
 | `201` | Bron aangemaakt; `Resource-ID` header bevat de ID |
 | `400` | Validatiefout — details in `_embedded.errors` |
 | `401` | Ongeldige of ontbrekende API-sleutel |
 | `404` | Bron niet gevonden |
-| `409` | Conflict — klant behoort al tot een andere organisatie |
+| `409` | Conflict — klant heeft al een actief lidmaatschap in een andere organisatie |
+| `503` | Vereiste module (bijv. Tags) is niet actief |
 
 ---
 
@@ -67,7 +74,7 @@ Authenticatie — `X-FreeScout-API-Key` header of `api_key` queryparameter.
 **Queryparameters**
 
 | Parameter | Type | Standaard | Beschrijving |
-|-----------|------|:--------:|-------------|
+|-----------|------|:-------:|-------------|
 | `page` | integer | `1` | Paginanummer |
 | `pageSize` | integer | `25` | Records per pagina (max 100) |
 | `mailboxId` | integer | — | Postvakfilter: retourneert globale organisaties + die gebonden zijn aan dit postvak |
@@ -85,6 +92,8 @@ curl -X GET "https://your-freescout.com/api/organizations?mailboxId=3" \
       {
         "id": 1,
         "name": "Acme Corp",
+        "color": "#4a90d9",
+        "isActive": true,
         "mailboxId": null,
         "createdAt": "2026-06-01T10:00:00+00:00",
         "updatedAt": "2026-06-01T10:00:00+00:00"
@@ -99,7 +108,7 @@ curl -X GET "https://your-freescout.com/api/organizations?mailboxId=3" \
 
 ### POST /api/organizations
 
-**Verzoekbody**
+**Aanvraagtekst**
 
 | Veld | Type | Vereist | Beschrijving |
 |------|------|:-------:|-------------|
@@ -118,6 +127,8 @@ curl -X POST "https://your-freescout.com/api/organizations" \
 {
   "id": 1,
   "name": "Acme Corp",
+  "color": null,
+  "isActive": true,
   "mailboxId": 3,
   "createdAt": "2026-06-01T10:00:00+00:00",
   "updatedAt": "2026-06-01T10:00:00+00:00"
@@ -128,13 +139,15 @@ curl -X POST "https://your-freescout.com/api/organizations" \
 
 ### GET /api/organizations/{id}
 
-Retourneert de organisatie met ingesloten **leden** en **eenheden**.
+Geeft de organisatie terug met ingebedde **leden** en **eenheden**.
 
 **200 OK**
 ```json
 {
   "id": 1,
   "name": "Acme Corp",
+  "color": "#4a90d9",
+  "isActive": true,
   "mailboxId": null,
   "createdAt": "2026-06-01T10:00:00+00:00",
   "updatedAt": "2026-06-01T10:00:00+00:00",
@@ -166,32 +179,34 @@ Retourneert de organisatie met ingesloten **leden** en **eenheden**.
 }
 ```
 
-**Lidvelden**
+**Lidesvelden**
 
 | Veld | Type | Beschrijving |
 |------|------|-------------|
-| `unitId` | integer\|null | Structurele eenheid waaraan het lid behoort, of `null` voor de gehele organisatie |
+| `unitId` | integer\|null | Structurele eenheid waartoe het lid behoort, of `null` voor de hele organisatie |
 | `role` | string | `member` of `manager` |
-| `canManageOrg` | boolean | Of deze beheerder anderen tot globale beheerder mag promoveren vanuit het portaal |
-| `isActive` | boolean | Actief lidmaatschap; inactieve leden ontvangen geen tickettoewijzingen of meldingen |
-| `notifyOnNewTicket` | boolean | Oude per-lid nieuwe-ticket-melding |
+| `canManageOrg` | boolean | Of deze manager anderen tot globale manager van het portaal kan bevorderen |
+| `isActive` | boolean | Actief lidmaatschap; inactieve leden ontvangen geen kaartoewijzingen of meldingen |
+| `notifyOnNewTicket` | boolean | Per-lid nieuw-kaartmelding vlag |
 
 ---
 
 ### PUT /api/organizations/{id}
 
-**Verzoekbody**
+**Aanvraagtekst**
 
 | Veld | Type | Vereist | Beschrijving |
 |------|------|:-------:|-------------|
 | `name` | string | ✅ | Nieuwe organisatienaam (max 255 tekens, uniek) |
+| `color` | string\|null | — | Badgekleur als hex (`"#ff0000"`), `null` om naar standaard grijs terug te stellen; weglaten om huidige te behouden |
 | `mailboxId` | integer\|null | — | Nieuw postvak; `null` — maak globaal; weglaten — laat ongewijzigd |
+| `isActive` | boolean | — | `false` om de organisatie te deactiveren; weglaten om huidige te behouden |
 
 ```bash
 curl -X PUT "https://your-freescout.com/api/organizations/1" \
   -H "X-FreeScout-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"name": "Acme Corporation", "mailboxId": null}'
+  -d '{"name": "Acme Corporation", "color": "#4a90d9", "isActive": true}'
 ```
 
 **200 OK**
@@ -199,15 +214,150 @@ curl -X PUT "https://your-freescout.com/api/organizations/1" \
 {"success": true, "message": "Organization updated."}
 ```
 
-Wanneer niets verandert, is het antwoordbericht `No changes — organization already has this name and mailbox.`
-
 ---
 
 ### DELETE /api/organizations/{id}
 
-**200 OK** *(alle leden worden cascade verwijderd)*
+**200 OK** *(alle leden worden verwijderd)*
 ```json
 {"success": true, "message": "Organization deleted."}
+```
+
+---
+
+## Organisatieleden
+
+### GET /api/organizations/{id}/members
+
+Geeft een lijst van alle ledenrecords voor de organisatie.
+
+**200 OK**
+```json
+{
+  "_embedded": {
+    "members": [
+      {
+        "id": 5,
+        "organizationId": 1,
+        "unitId": 2,
+        "customerId": 42,
+        "role": "manager",
+        "canManageOrg": false,
+        "isActive": true,
+        "notifyOnNewTicket": true,
+        "createdAt": "2026-06-01T10:05:00+00:00",
+        "updatedAt": "2026-06-01T10:05:00+00:00"
+      }
+    ]
+  }
+}
+```
+
+---
+
+### GET /api/organizations/{id}/members/{memberId}
+
+Geeft een enkel ledenrecord terug.
+
+**200 OK**
+```json
+{
+  "id": 5,
+  "organizationId": 1,
+  "unitId": 2,
+  "customerId": 42,
+  "role": "manager",
+  "canManageOrg": false,
+  "isActive": true,
+  "notifyOnNewTicket": true,
+  "createdAt": "2026-06-01T10:05:00+00:00",
+  "updatedAt": "2026-06-01T10:05:00+00:00"
+}
+```
+
+---
+
+### PUT /api/organizations/{id}/members/{memberId}
+
+Werk de rol van een lid, eenheidsopdracht, canManageOrg-vlag of actieve status bij. Alleen velden aanwezig in de tekst worden bijgewerkt (gedeeltelijke update).
+
+**Aanvraagtekst**
+
+| Veld | Type | Vereist | Beschrijving |
+|------|------|:-------:|-------------|
+| `role` | string | — | `"member"` of `"manager"` |
+| `unitId` | integer\|null | — | Structurele eenheid (moet tot deze organisatie behoren), of `null` om toe te wijzen |
+| `canManageOrg` | boolean | — | Globale managerrechten in het portaal verlenen |
+| `isActive` | boolean | — | `false` om te deactiveren zonder te verwijderen |
+
+```bash
+curl -X PUT "https://your-freescout.com/api/organizations/1/members/5" \
+  -H "X-FreeScout-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"role": "manager", "unitId": 2, "canManageOrg": true, "isActive": true}'
+```
+
+**200 OK**
+```json
+{"success": true, "message": "Member updated."}
+```
+
+---
+
+### DELETE /api/organizations/{id}/members/{memberId}
+
+Verwijder een lid uit de organisatie.
+
+**200 OK**
+```json
+{"success": true, "message": "Member removed."}
+```
+
+---
+
+## Organisatietags
+
+> Vereist dat de module [Tags](https://freescout.net/module/tags/) actief is. Geeft `503` terug als de module niet is geïnstalleerd.
+
+### GET /api/organizations/{id}/tags
+
+Geeft alle taggenbindingen voor de organisatie terug. Elke binding beperkt optioneel een tag tot een specifieke eenheid.
+
+**200 OK**
+```json
+{
+  "_embedded": {
+    "tags": [
+      { "id": 1, "organizationId": 1, "tagId": 5, "unitId": null },
+      { "id": 2, "organizationId": 1, "tagId": 8, "unitId": 2 }
+    ]
+  }
+}
+```
+
+---
+
+### PUT /api/organizations/{id}/tags
+
+**Volledig vervangen** — vervangt alle bestaande taggenbindingen voor deze organisatie door de verstrekte lijst. Verstuur een lege array `[]` om alle bindingen te verwijderen.
+
+**Aanvraagtekst** — een JSON-array van taggenbindingobjecten:
+
+| Veld | Type | Vereist | Beschrijving |
+|------|------|:-------:|-------------|
+| `tagId` | integer | ✅ | FreeScout tag-ID |
+| `unitId` | integer\|null | — | Beperk de tag tot een specifieke eenheid, of weglaten/`null` voor organisatiebreedte |
+
+```bash
+curl -X PUT "https://your-freescout.com/api/organizations/1/tags" \
+  -H "X-FreeScout-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '[{"tagId": 5}, {"tagId": 8, "unitId": 2}]'
+```
+
+**200 OK**
+```json
+{"success": true, "message": "Tags updated."}
 ```
 
 ---
@@ -237,7 +387,7 @@ Wanneer niets verandert, is het antwoordbericht `No changes — organization alr
 
 ### POST /api/organizations/{id}/units
 
-**Verzoekbody**
+**Aanvraagtekst**
 
 | Veld | Type | Vereist | Beschrijving |
 |------|------|:-------:|-------------|
@@ -265,7 +415,7 @@ curl -X POST "https://your-freescout.com/api/organizations/1/units" \
 
 ### PUT /api/units/{unitId}
 
-**Verzoekbody**
+**Aanvraagtekst**
 
 | Veld | Type | Vereist | Beschrijving |
 |------|------|:-------:|-------------|
@@ -287,7 +437,7 @@ curl -X PUT "https://your-freescout.com/api/units/2" \
 
 ### DELETE /api/units/{unitId}
 
-Verwijdert de eenheid. Beheerders beperkt tot deze eenheid worden gedegradeerd tot `member`; alle leden van de eenheid worden ontkoppeld (hun `unitId` wordt `null`).
+Verwijdert de eenheid. Managers beperkt tot deze eenheid worden gedegradeerd naar `member`; alle leden van de eenheid worden ontkoppeld (hun `unitId` wordt `null`).
 
 **200 OK**
 ```json
@@ -319,22 +469,23 @@ Verwijdert de eenheid. Beheerders beperkt tot deze eenheid worden gedegradeerd t
 
 ### PUT /api/customers/{id}/organization
 
-Wijst een klant toe aan een organisatie of werkt hun lidmaatschap bij. **Één actief lidmaatschap per klant**: als de klant al een *actief* lidmaatschap in *een andere* organisatie heeft, wordt het verzoek afgewezen met `409 Conflict`. Om over te dragen — deactiveer of verwijder eerst het huidige lidmaatschap via `DELETE`.
+Wijs een klant toe aan een organisatie of werk hun lidmaatschap bij. **Één actief lidmaatschap per klant**: als de klant al een *actief* lidmaatschap in *een andere* organisatie heeft, wordt het verzoek afgewezen met `409 Conflict`. Om over te dragen — eerst het huidige lidmaatschap deactiveren of verwijderen via `DELETE`.
 
-**Verzoekbody**
+**Aanvraagtekst**
 
 | Veld | Type | Vereist | Beschrijving |
 |------|------|:-------:|-------------|
 | `organizationId` | integer | ✅ | Organisatie-ID |
 | `role` | string | — | `"member"` (standaard) of `"manager"` |
-| `unitId` | integer\|null | — | Structurele eenheid (moet behoren tot de doelorganisatie), of `null` voor de gehele organisatie |
-| `canManageOrg` | boolean | — | Verleen deze beheerder het recht om anderen tot globale beheerder te promoveren (standaard `false`) |
+| `unitId` | integer\|null | — | Structurele eenheid (moet tot de doelorganisatie behoren), of `null` voor de hele organisatie |
+| `canManageOrg` | boolean | — | Geef deze manager het recht om anderen tot globale manager te bevorderen (standaard `false`) |
+| `isActive` | boolean | — | `false` om als inactief te maken/bijwerken (standaard `true`) |
 
 ```bash
 curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
   -H "X-FreeScout-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"organizationId": 1, "role": "manager", "unitId": 2, "canManageOrg": false}'
+  -d '{"organizationId": 1, "role": "manager", "unitId": 2, "canManageOrg": false, "isActive": true}'
 ```
 
 **201 Created** *(nieuw lidmaatschap)*
@@ -347,7 +498,7 @@ curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
 {"success": true, "message": "Membership updated."}
 ```
 
-**409 Conflict** *(klant al actief in andere organisatie)*
+**409 Conflict** *(klant al actief in een andere organisatie)*
 ```json
 {
   "message": "Customer already has an active membership in another organization.",

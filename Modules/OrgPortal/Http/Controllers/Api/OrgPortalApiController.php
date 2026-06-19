@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\OrgPortal\Models\Organization;
 use Modules\OrgPortal\Models\OrganizationMember;
+use Modules\OrgPortal\Models\OrganizationTag;
 use Modules\OrgPortal\Models\OrganizationUnit;
 
 class OrgPortalApiController extends Controller
@@ -61,6 +62,8 @@ class OrgPortalApiController extends Controller
         $data = [
             'id'         => $org->id,
             'name'       => $org->name,
+            'color'      => $org->color ?: null,
+            'isActive'   => (bool) $org->is_active,
             'mailboxId'  => $org->mailbox_id,
             'createdAt'  => $org->created_at->toIso8601String(),
             'updatedAt'  => $org->updated_at->toIso8601String(),
@@ -98,6 +101,16 @@ class OrgPortalApiController extends Controller
             'notifyOnNewTicket'  => (bool) $m->notify_on_new_ticket,
             'createdAt'          => $m->created_at->toIso8601String(),
             'updatedAt'          => $m->updated_at->toIso8601String(),
+        ];
+    }
+
+    private function tagToArray(OrganizationTag $t): array
+    {
+        return [
+            'id'             => $t->id,
+            'organizationId' => $t->organization_id,
+            'tagId'          => $t->tag_id,
+            'unitId'         => $t->unit_id,
         ];
     }
 
@@ -193,7 +206,9 @@ class OrgPortalApiController extends Controller
 
     /**
      * PUT /api/organizations/{id}
-     * Update organization name.
+     * Update organization name, color, mailboxId, or isActive.
+     *
+     * Body: { "name": "Acme", "color": "#ff0000"|null, "mailboxId": 1|null, "isActive": true }
      */
     public function updateOrganization(Request $request, int $id): JsonResponse
     {
@@ -228,11 +243,15 @@ class OrgPortalApiController extends Controller
             $mailboxId = $org->mailbox_id;
         }
 
-        if ($org->name === $name && $org->mailbox_id === $mailboxId) {
-            return response()->json(['success' => true, 'message' => 'No changes — organization already has this name and mailbox.']);
-        }
+        $color    = $request->has('color') ? ($request->input('color') ?: null) : $org->color;
+        $isActive = $request->has('isActive') ? (bool) $request->input('isActive') : (bool) $org->is_active;
 
-        $org->update(['name' => $name, 'mailbox_id' => $mailboxId]);
+        $org->update([
+            'name'       => $name,
+            'mailbox_id' => $mailboxId,
+            'color'      => $color,
+            'is_active'  => $isActive,
+        ]);
 
         return response()->json(['success' => true, 'message' => 'Organization updated.']);
     }
@@ -252,6 +271,223 @@ class OrgPortalApiController extends Controller
         $org->delete();
 
         return response()->json(['success' => true, 'message' => 'Organization deleted.']);
+    }
+
+    // ─── Organization members (sub-resource) ─────────────────────────────────
+
+    /**
+     * GET /api/organizations/{id}/members
+     * List all members of an organization.
+     */
+    public function listMembers(int $id): JsonResponse
+    {
+        $org = Organization::find($id);
+
+        if (!$org) {
+            return $this->errorResponse('Organization not found.', 404);
+        }
+
+        return response()->json([
+            '_embedded' => [
+                'members' => $org->members()->orderBy('id')->get()
+                    ->map(fn ($m) => $this->memberToArray($m))->values()->all(),
+            ],
+        ]);
+    }
+
+    /**
+     * GET /api/organizations/{id}/members/{memberId}
+     * Get a single member record.
+     */
+    public function getMember(int $id, int $memberId): JsonResponse
+    {
+        $org = Organization::find($id);
+
+        if (!$org) {
+            return $this->errorResponse('Organization not found.', 404);
+        }
+
+        $member = OrganizationMember::where('organization_id', $id)->where('id', $memberId)->first();
+
+        if (!$member) {
+            return $this->errorResponse('Member not found.', 404);
+        }
+
+        return response()->json($this->memberToArray($member));
+    }
+
+    /**
+     * PUT /api/organizations/{id}/members/{memberId}
+     * Update a member's role, unit, canManageOrg, or isActive.
+     *
+     * Body: { "role": "member"|"manager", "unitId": 2|null, "canManageOrg": false, "isActive": true }
+     */
+    public function updateMember(Request $request, int $id, int $memberId): JsonResponse
+    {
+        $org = Organization::find($id);
+
+        if (!$org) {
+            return $this->errorResponse('Organization not found.', 404);
+        }
+
+        $member = OrganizationMember::where('organization_id', $id)->where('id', $memberId)->first();
+
+        if (!$member) {
+            return $this->errorResponse('Member not found.', 404);
+        }
+
+        $updates = [];
+
+        if ($request->has('role')) {
+            $role = $request->input('role');
+            if (!in_array($role, ['member', 'manager'], true)) {
+                return $this->errorResponse('Validation failed', 400, [
+                    ['path' => 'role', 'message' => 'role must be "member" or "manager".', 'source' => 'JSON'],
+                ]);
+            }
+            $updates['role'] = $role;
+        }
+
+        if ($request->has('unitId')) {
+            $unitId = $request->input('unitId') ?: null;
+            if ($unitId !== null && !OrganizationUnit::where('organization_id', $id)->where('id', $unitId)->exists()) {
+                return $this->errorResponse('Validation failed', 400, [
+                    ['path' => 'unitId', 'message' => 'Unit does not belong to organization #' . $id . '.', 'source' => 'JSON'],
+                ]);
+            }
+            $updates['unit_id'] = $unitId;
+        }
+
+        if ($request->has('canManageOrg')) {
+            $updates['can_manage_org'] = (bool) $request->input('canManageOrg');
+        }
+
+        if ($request->has('isActive')) {
+            $updates['is_active'] = (bool) $request->input('isActive');
+        }
+
+        if (empty($updates)) {
+            return response()->json(['success' => true, 'message' => 'No changes.']);
+        }
+
+        $member->update($updates);
+
+        return response()->json(['success' => true, 'message' => 'Member updated.']);
+    }
+
+    /**
+     * DELETE /api/organizations/{id}/members/{memberId}
+     * Remove a member from an organization.
+     */
+    public function deleteMember(int $id, int $memberId): JsonResponse
+    {
+        $org = Organization::find($id);
+
+        if (!$org) {
+            return $this->errorResponse('Organization not found.', 404);
+        }
+
+        $member = OrganizationMember::where('organization_id', $id)->where('id', $memberId)->first();
+
+        if (!$member) {
+            return $this->errorResponse('Member not found.', 404);
+        }
+
+        $member->delete();
+
+        return response()->json(['success' => true, 'message' => 'Member removed.']);
+    }
+
+    // ─── Organization tags (sub-resource) ────────────────────────────────────
+
+    /**
+     * GET /api/organizations/{id}/tags
+     * List all tag bindings for an organization.
+     * Requires the Tags module to be active.
+     */
+    public function listTags(int $id): JsonResponse
+    {
+        if (!\Module::isActive('tags')) {
+            return $this->errorResponse('Tags module is not active.', 503);
+        }
+
+        $org = Organization::find($id);
+
+        if (!$org) {
+            return $this->errorResponse('Organization not found.', 404);
+        }
+
+        return response()->json([
+            '_embedded' => [
+                'tags' => $org->organizationTags()->orderBy('tag_id')->get()
+                    ->map(fn ($t) => $this->tagToArray($t))->values()->all(),
+            ],
+        ]);
+    }
+
+    /**
+     * PUT /api/organizations/{id}/tags
+     * Replace all tag bindings for an organization (full replace semantics).
+     * Requires the Tags module to be active.
+     *
+     * Body: [ { "tagId": 5, "unitId": 2 }, { "tagId": 8 } ]
+     */
+    public function setTags(Request $request, int $id): JsonResponse
+    {
+        if (!\Module::isActive('tags')) {
+            return $this->errorResponse('Tags module is not active.', 503);
+        }
+
+        $org = Organization::find($id);
+
+        if (!$org) {
+            return $this->errorResponse('Organization not found.', 404);
+        }
+
+        $items = $request->json()->all();
+
+        if (!is_array($items)) {
+            return $this->errorResponse('Validation failed', 400, [
+                ['path' => '(root)', 'message' => 'Request body must be a JSON array.', 'source' => 'JSON'],
+            ]);
+        }
+
+        $rows   = [];
+        $errors = [];
+
+        foreach ($items as $i => $item) {
+            $tagId  = isset($item['tagId'])  ? (int) $item['tagId']  : null;
+            $unitId = isset($item['unitId']) ? (int) $item['unitId'] : null;
+
+            if (!$tagId || $tagId <= 0) {
+                $errors[] = ['path' => "[$i].tagId", 'message' => 'tagId must be a positive integer.', 'source' => 'JSON'];
+                continue;
+            }
+
+            if ($unitId !== null && !OrganizationUnit::where('organization_id', $id)->where('id', $unitId)->exists()) {
+                $errors[] = ['path' => "[$i].unitId", 'message' => 'Unit does not belong to organization #' . $id . '.', 'source' => 'JSON'];
+                continue;
+            }
+
+            $rows[] = [
+                'organization_id' => $id,
+                'tag_id'          => $tagId,
+                'unit_id'         => $unitId ?: null,
+            ];
+        }
+
+        if ($errors) {
+            return $this->errorResponse('Validation failed', 400, $errors);
+        }
+
+        \DB::transaction(function () use ($id, $rows) {
+            OrganizationTag::where('organization_id', $id)->delete();
+            foreach ($rows as $row) {
+                OrganizationTag::create($row);
+            }
+        });
+
+        return response()->json(['success' => true, 'message' => 'Tags updated.']);
     }
 
     // ─── Customer membership ─────────────────────────────────────────────────
@@ -292,7 +528,7 @@ class OrgPortalApiController extends Controller
      * Assign or update a customer's organization membership.
      *
      * Body: { "organizationId": 1, "role": "member"|"manager", "unitId": 2|null,
-     *         "canManageOrg": false }
+     *         "canManageOrg": false, "isActive": true }
      */
     public function setCustomerOrganization(Request $request, int $customerId): JsonResponse
     {
@@ -304,6 +540,7 @@ class OrgPortalApiController extends Controller
         $role         = $request->input('role', 'member');
         $unitId       = $request->input('unitId') ?: null;
         $canManageOrg = (bool) $request->input('canManageOrg', false);
+        $isActive     = $request->has('isActive') ? (bool) $request->input('isActive') : true;
 
         if (!$orgId) {
             return $this->errorResponse('Validation failed', 400, [
@@ -354,6 +591,7 @@ class OrgPortalApiController extends Controller
                 'unit_id'         => $unitId,
                 'role'            => $role,
                 'can_manage_org'  => $canManageOrg,
+                'is_active'       => $isActive,
             ]);
             return response()->json(['success' => true, 'message' => 'Membership created.'], 201);
         }
@@ -362,6 +600,7 @@ class OrgPortalApiController extends Controller
             'unit_id'        => $unitId,
             'role'           => $role,
             'can_manage_org' => $canManageOrg,
+            'is_active'      => $isActive,
         ]);
 
         return response()->json(['success' => true, 'message' => 'Membership updated.']);

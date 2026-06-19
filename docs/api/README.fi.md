@@ -1,6 +1,6 @@
 # OrgPortal REST API
 
-[← Takaisin READMEen](../README.fi.md)
+[← Takaisin README-tiedostoon](../../README.md)
 
 🌐 **Language:**
 [English](README.md) ·
@@ -24,39 +24,46 @@
 
 ---
 
-*Valinnainen — vaatii [API:n ja webhookit](https://freescout.net/module/api-webhooks/) -moduulin.*
+*Valinnainen — vaatii [API ja Webhook-moduulin](https://freescout.net/module/api-webhooks/).*
 
 Todentaminen — `X-FreeScout-API-Key`-otsikko tai `api_key`-kyselyparametri.
 
-> **Interaktiivinen dokumentaatio** (ReDoc) on saatavilla sivulla **Hallinta → API ja webhookit** (linkki "OrgPortal API-dokumentaatio") tai suoraan osoitteessa `/orgportal/admin/api-docs`.
+> **Interaktiivinen dokumentaatio** (ReDoc) on saatavilla **Hallinta → API & Webhook-moduuli** -sivulla (linkki "OrgPortal API Docs") tai suoraan osoitteessa `/orgportal/admin/api-docs`.
 
-## Päätepisteet
+## Päätepisteistö
 
-| Menetelmä | Päätepiste | Kuvaus |
+| Metodi | Pääteiste | Kuvaus |
 |--------|----------|-------------|
-| `GET` | `/api/organizations` | Luettele organisaatiot (sivutus, postilaatikon suodatin) |
+| `GET` | `/api/organizations` | Listaa organisaatiot (sivutus, postilaatikon suodatin) |
 | `POST` | `/api/organizations` | Luo organisaatio |
 | `GET` | `/api/organizations/{id}` | Hae organisaatio jäsenineen ja yksiköineen |
-| `PUT` | `/api/organizations/{id}` | Päivitä organisaatio |
+| `PUT` | `/api/organizations/{id}` | Päivitä organisaatio (nimi, väri, postilaatikko, isActive) |
 | `DELETE` | `/api/organizations/{id}` | Poista organisaatio |
-| `GET` | `/api/organizations/{id}/units` | Luettele rakenneyksiköt |
-| `POST` | `/api/organizations/{id}/units` | Luo rakennetuokikko |
+| `GET` | `/api/organizations/{id}/members` | Listaa organisaation jäsenet |
+| `GET` | `/api/organizations/{id}/members/{memberId}` | Hae yksittäinen jäsen |
+| `PUT` | `/api/organizations/{id}/members/{memberId}` | Päivitä jäsenen tiedot (rooli, yksikkö, canManageOrg, isActive) |
+| `DELETE` | `/api/organizations/{id}/members/{memberId}` | Poista jäsen |
+| `GET` | `/api/organizations/{id}/tags` | Listaa tunnisteen sitoutuneisuudet (vaatii Tags-moduulin) |
+| `PUT` | `/api/organizations/{id}/tags` | Korvaa kaikki tunnisteen sitoutuneisuudet (vaatii Tags-moduulin) |
+| `GET` | `/api/organizations/{id}/units` | Listaa rakenteelliset yksiköt |
+| `POST` | `/api/organizations/{id}/units` | Luo rakenteellinen yksikkö |
 | `PUT` | `/api/units/{unitId}` | Nimeä yksikkö uudelleen |
-| `DELETE` | `/api/units/{unitId}` | Poista yksikkö (jäsenet määrittämätöntä, yksikkö- johtajat alennetaan) |
+| `DELETE` | `/api/units/{unitId}` | Poista yksikkö (jäsenet poistetaan, yksikön johtajat alennetaan) |
 | `GET` | `/api/customers/{id}/organization` | Asiakkaan organisaatiojäsenyys |
 | `PUT` | `/api/customers/{id}/organization` | Aseta/päivitä asiakkaan jäsenyys |
 | `DELETE` | `/api/customers/{id}/organization` | Poista asiakas organisaatiosta |
 
-## Vastauksen koodit
+## Vastauskodit
 
 | Koodi | Merkitys |
 |------|---------|
-| `200` | Onnistui tai no-op (mitään ei muuttunut) |
-| `201` | Resurssi luotu; `Resource-ID`-otsikko sisältää ID:n |
-| `400` | Validointivirhe — tiedot osoitteessa `_embedded.errors` |
+| `200` | Onnistui |
+| `201` | Resurssi luotu; `Resource-ID`-otsikko sisältää tunnisteen |
+| `400` | Vahvistusvirhe — yksityiskohdat `_embedded.errors`-osassa |
 | `401` | Virheellinen tai puuttuva API-avain |
-| `404` | Resurssia ei löydy |
-| `409` | Ristiriita — asiakas kuuluu jo toiseen organisaatioon |
+| `404` | Resurssia ei löytynyt |
+| `409` | Ristiriita — asiakas on jo aktiivinen jäsen toisessa organisaatiossa |
+| `503` | Vaadittu moduuli (esim. Tags) ei ole aktiivinen |
 
 ---
 
@@ -69,8 +76,8 @@ Todentaminen — `X-FreeScout-API-Key`-otsikko tai `api_key`-kyselyparametri.
 | Parametri | Tyyppi | Oletus | Kuvaus |
 |-----------|------|:-------:|-------------|
 | `page` | kokonaisluku | `1` | Sivunumero |
-| `pageSize` | kokonaisluku | `25` | Tietueita sivua kohti (enintään 100) |
-| `mailboxId` | kokonaisluku | — | Postilaatikon suodatin: palauttaa globaalit organisaatiot + niihin sidotut |
+| `pageSize` | kokonaisluku | `25` | Tietueet sivua kohden (enimmäismäärä 100) |
+| `mailboxId` | kokonaisluku | — | Postilaatikon suodatin: palauttaa globaalit organisaatiot + tähän postilaatikkoon sidotut |
 
 ```bash
 curl -X GET "https://your-freescout.com/api/organizations?mailboxId=3" \
@@ -85,6 +92,8 @@ curl -X GET "https://your-freescout.com/api/organizations?mailboxId=3" \
       {
         "id": 1,
         "name": "Acme Corp",
+        "color": "#4a90d9",
+        "isActive": true,
         "mailboxId": null,
         "createdAt": "2026-06-01T10:00:00+00:00",
         "updatedAt": "2026-06-01T10:00:00+00:00"
@@ -103,8 +112,8 @@ curl -X GET "https://your-freescout.com/api/organizations?mailboxId=3" \
 
 | Kenttä | Tyyppi | Vaadittu | Kuvaus |
 |-------|------|:--------:|-------------|
-| `name` | merkkijono | ✅ | Organisaation nimi (enintään 255 merkkiä, uniikki) |
-| `mailboxId` | kokonaisluku\|null | — | Postilaatikon ID tai `null` / jätä pois globaalin organisaation osalta |
+| `name` | merkkijono | ✅ | Organisaation nimi (enintään 255 merkkiä, yksilöllinen) |
+| `mailboxId` | kokonaisluku\|null | — | Postilaatikon tunnus tai `null` / jätä pois globaalille organisaatiolle |
 
 ```bash
 curl -X POST "https://your-freescout.com/api/organizations" \
@@ -118,6 +127,8 @@ curl -X POST "https://your-freescout.com/api/organizations" \
 {
   "id": 1,
   "name": "Acme Corp",
+  "color": null,
+  "isActive": true,
   "mailboxId": 3,
   "createdAt": "2026-06-01T10:00:00+00:00",
   "updatedAt": "2026-06-01T10:00:00+00:00"
@@ -128,13 +139,15 @@ curl -X POST "https://your-freescout.com/api/organizations" \
 
 ### GET /api/organizations/{id}
 
-Palauttaa organisaation sisäänrakennettujen **jäsenten** ja **yksiköiden** kanssa.
+Palauttaa organisaation sen sisältyvien **jäsenten** ja **yksiköiden** kanssa.
 
 **200 OK**
 ```json
 {
   "id": 1,
   "name": "Acme Corp",
+  "color": "#4a90d9",
+  "isActive": true,
   "mailboxId": null,
   "createdAt": "2026-06-01T10:00:00+00:00",
   "updatedAt": "2026-06-01T10:00:00+00:00",
@@ -170,11 +183,11 @@ Palauttaa organisaation sisäänrakennettujen **jäsenten** ja **yksiköiden** k
 
 | Kenttä | Tyyppi | Kuvaus |
 |-------|------|-------------|
-| `unitId` | kokonaisluku\|null | Rakennetuokikko, johon jäsen kuuluu, tai `null` koko organisaatiolle |
+| `unitId` | kokonaisluku\|null | Rakenteellinen yksikkö, johon jäsen kuuluu, tai `null` koko organisaatiolle |
 | `role` | merkkijono | `member` tai `manager` |
-| `canManageOrg` | boolean | Voiko tämä johtaja ylennetä muita globaaliksi johtajaksi portaalista |
-| `isActive` | boolean | Aktiivinen jäsenyys; passiiviset jäsenet eivät saa lippujen määrittelyä tai ilmoituksia |
-| `notifyOnNewTicket` | boolean | Perintö per-jäsenen uuden lipun ilmoituslippu |
+| `canManageOrg` | looginen | Oikeuttaako tämä johtaja muita globaaleiksi johtajiksi portaalissa |
+| `isActive` | looginen | Aktiivinen jäsenyys; passiiviset jäsenet eivät saa lippujen tehtäviä tai ilmoituksia |
+| `notifyOnNewTicket` | looginen | Jäsenkohtainen uuden lipun ilmoituslippu |
 
 ---
 
@@ -184,14 +197,16 @@ Palauttaa organisaation sisäänrakennettujen **jäsenten** ja **yksiköiden** k
 
 | Kenttä | Tyyppi | Vaadittu | Kuvaus |
 |-------|------|:--------:|-------------|
-| `name` | merkkijono | ✅ | Uusi organisaation nimi (enintään 255 merkkiä, uniikki) |
-| `mailboxId` | kokonaisluku\|null | — | Uusi postilaatikko; `null` — tee globaali; jätä pois — jätä muuttumattomaksi |
+| `name` | merkkijono | ✅ | Organisaation uusi nimi (enintään 255 merkkiä, yksilöllinen) |
+| `color` | merkkijono\|null | — | Merkin väri heksadesimaalimuodossa (`"#ff0000"`), `null` nollaa oletusharmaaksi; jätä pois säilyttääksesi nykyisen |
+| `mailboxId` | kokonaisluku\|null | — | Uusi postilaatikko; `null` — tee globaaliksi; jätä pois — jätä muuttumattomaksi |
+| `isActive` | looginen | — | `false` organisaation poistamiseksi käytöstä; jätä pois säilyttääksesi nykyisen |
 
 ```bash
 curl -X PUT "https://your-freescout.com/api/organizations/1" \
   -H "X-FreeScout-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"name": "Acme Corporation", "mailboxId": null}'
+  -d '{"name": "Acme Corporation", "color": "#4a90d9", "isActive": true}'
 ```
 
 **200 OK**
@@ -199,20 +214,155 @@ curl -X PUT "https://your-freescout.com/api/organizations/1" \
 {"success": true, "message": "Organization updated."}
 ```
 
-Kun mitään ei muutu, vastausviesti on `No changes — organization already has this name and mailbox.`
-
 ---
 
 ### DELETE /api/organizations/{id}
 
-**200 OK** *(kaikki jäsenet poistetaan kaskadissa)*
+**200 OK** *(kaikki jäsenet poistetaan kaskadilla)*
 ```json
 {"success": true, "message": "Organization deleted."}
 ```
 
 ---
 
-## Rakenneyksiköt
+## Organisaation jäsenet
+
+### GET /api/organizations/{id}/members
+
+Palauttaa listan kaikista organisaation jäsentietueista.
+
+**200 OK**
+```json
+{
+  "_embedded": {
+    "members": [
+      {
+        "id": 5,
+        "organizationId": 1,
+        "unitId": 2,
+        "customerId": 42,
+        "role": "manager",
+        "canManageOrg": false,
+        "isActive": true,
+        "notifyOnNewTicket": true,
+        "createdAt": "2026-06-01T10:05:00+00:00",
+        "updatedAt": "2026-06-01T10:05:00+00:00"
+      }
+    ]
+  }
+}
+```
+
+---
+
+### GET /api/organizations/{id}/members/{memberId}
+
+Palauttaa yksittäisen jäsentietueen.
+
+**200 OK**
+```json
+{
+  "id": 5,
+  "organizationId": 1,
+  "unitId": 2,
+  "customerId": 42,
+  "role": "manager",
+  "canManageOrg": false,
+  "isActive": true,
+  "notifyOnNewTicket": true,
+  "createdAt": "2026-06-01T10:05:00+00:00",
+  "updatedAt": "2026-06-01T10:05:00+00:00"
+}
+```
+
+---
+
+### PUT /api/organizations/{id}/members/{memberId}
+
+Päivitä jäsenen rooli, yksikön sijoittelu, canManageOrg-merkki tai aktiivinen tila. Vain rungossa läsnä olevat kentät päivitetään (osittainen päivitys).
+
+**Pyynnön runko**
+
+| Kenttä | Tyyppi | Vaadittu | Kuvaus |
+|-------|------|:--------:|-------------|
+| `role` | merkkijono | — | `"member"` tai `"manager"` |
+| `unitId` | kokonaisluku\|null | — | Rakenteellinen yksikkö (tulee kuulua tähän organisaatioon), tai `null` poistaaksesi |
+| `canManageOrg` | looginen | — | Anna globaalin johtajan oikeudet portaalissa |
+| `isActive` | looginen | — | `false` poistaaksesi käytöstä poistamatta |
+
+```bash
+curl -X PUT "https://your-freescout.com/api/organizations/1/members/5" \
+  -H "X-FreeScout-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"role": "manager", "unitId": 2, "canManageOrg": true, "isActive": true}'
+```
+
+**200 OK**
+```json
+{"success": true, "message": "Member updated."}
+```
+
+---
+
+### DELETE /api/organizations/{id}/members/{memberId}
+
+Poista jäsen organisaatiosta.
+
+**200 OK**
+```json
+{"success": true, "message": "Member removed."}
+```
+
+---
+
+## Organisaation tunnisteet
+
+> Vaatii [Tags](https://freescout.net/module/tags/) -moduulin olevan aktiivinen. Palauttaa `503`, jos moduulia ei ole asennettu.
+
+### GET /api/organizations/{id}/tags
+
+Palauttaa kaikki organisaation tunnisteen sitoutuneisuudet. Jokainen sitoutuneisuus voi valinnaisesti rajoittaa tunnisteen tiettyyn yksikköön.
+
+**200 OK**
+```json
+{
+  "_embedded": {
+    "tags": [
+      { "id": 1, "organizationId": 1, "tagId": 5, "unitId": null },
+      { "id": 2, "organizationId": 1, "tagId": 8, "unitId": 2 }
+    ]
+  }
+}
+```
+
+---
+
+### PUT /api/organizations/{id}/tags
+
+**Täysi korvaaminen** — korvaa kaikki olemassa olevat tunnisteen sitoutuneisuudet tälle organisaatiolle toimitetulla luettelolla. Lähetä tyhjä matriisi `[]` poistaaksesi kaikki sitoutuneisuudet.
+
+**Pyynnön runko** — JSON-matriisi tunnisteen sitoutuneisuuden objekteista:
+
+| Kenttä | Tyyppi | Vaadittu | Kuvaus |
+|-------|------|:--------:|-------------|
+| `tagId` | kokonaisluku | ✅ | FreeScout-tunnisteen tunnus |
+| `unitId` | kokonaisluku\|null | — | Rajoita tunniste tiettyyn yksikköön, tai jätä pois/`null` organisaation laajuiselle |
+
+```bash
+curl -X PUT "https://your-freescout.com/api/organizations/1/tags" \
+  -H "X-FreeScout-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '[{"tagId": 5}, {"tagId": 8, "unitId": 2}]'
+```
+
+**200 OK**
+```json
+{"success": true, "message": "Tags updated."}
+```
+
+---
+
+## Rakenteelliset yksiköt
 
 ### GET /api/organizations/{id}/units
 
@@ -241,7 +391,7 @@ Kun mitään ei muutu, vastausviesti on `No changes — organization already has
 
 | Kenttä | Tyyppi | Vaadittu | Kuvaus |
 |-------|------|:--------:|-------------|
-| `name` | merkkijono | ✅ | Yksikön nimi (uniikki organisaation sisällä) |
+| `name` | merkkijono | ✅ | Yksikön nimi (yksilöllinen organisaatiossa) |
 
 ```bash
 curl -X POST "https://your-freescout.com/api/organizations/1/units" \
@@ -269,7 +419,7 @@ curl -X POST "https://your-freescout.com/api/organizations/1/units" \
 
 | Kenttä | Tyyppi | Vaadittu | Kuvaus |
 |-------|------|:--------:|-------------|
-| `name` | merkkijono | ✅ | Uusi yksikön nimi (uniikki organisaation sisällä) |
+| `name` | merkkijono | ✅ | Uusi yksikön nimi (yksilöllinen organisaatiossa) |
 
 ```bash
 curl -X PUT "https://your-freescout.com/api/units/2" \
@@ -287,7 +437,7 @@ curl -X PUT "https://your-freescout.com/api/units/2" \
 
 ### DELETE /api/units/{unitId}
 
-Poistaa yksikön. Tähän yksikköön rajoitetut johtajat alennetaan `member`-tasoon; kaikki yksikön jäsenet määritetään uudelleen (heidän `unitId` muuttuu `null`-arvoksi).
+Poista yksikkö. Tähän yksikköön sidotut johtajat alennetaan `memberiksi`; kaikki yksikön jäsenet poistetaan (heidän `unitId` tulee `null`).
 
 **200 OK**
 ```json
@@ -319,22 +469,23 @@ Poistaa yksikön. Tähän yksikköön rajoitetut johtajat alennetaan `member`-ta
 
 ### PUT /api/customers/{id}/organization
 
-Määritä asiakas organisaatioon tai päivitä heidän jäsenyyttään. **Yksi aktiivinen jäsenyys asiakasta kohti**: jos asiakas kuuluu jo *aktiivisesti* *toiseen* organisaatioon, pyyntö hylätään `409 Ristiriita`-virheellä. Siirtämiseksi — poista ensin nykyinen jäsenyys `DELETE`-metodilla.
+Määritä asiakas organisaatioon tai päivitä heidän jäsenyyttään. **Yksi aktiivinen jäsenyys per asiakas**: jos asiakkaalla on jo *aktiivinen* jäsenyys *toisessa* organisaatiossa, pyyntö hylätään `409 Conflict`-virheellä. Siirron suorittamiseksi — poista tai passivoi ensin nykyinen jäsenyys `DELETE`-pyynnöllä.
 
 **Pyynnön runko**
 
 | Kenttä | Tyyppi | Vaadittu | Kuvaus |
 |-------|------|:--------:|-------------|
-| `organizationId` | kokonaisluku | ✅ | Organisaation ID |
+| `organizationId` | kokonaisluku | ✅ | Organisaation tunnus |
 | `role` | merkkijono | — | `"member"` (oletus) tai `"manager"` |
-| `unitId` | kokonaisluku\|null | — | Rakennetuokikko (on kuuluttava kohde-organisaatioon), tai `null` koko organisaatiolle |
-| `canManageOrg` | boolean | — | Myönnä tälle johtajalle oikeus ylennetä muita globaaliksi johtajaksi (oletus `false`) |
+| `unitId` | kokonaisluku\|null | — | Rakenteellinen yksikkö (tulee kuulua kohdeorganisaatioon), tai `null` koko organisaatiolle |
+| `canManageOrg` | looginen | — | Anna tälle johtajalle oikeus edistää muita globaaliksi johtajiksi (oletus `false`) |
+| `isActive` | looginen | — | `false` luodaksesi/päivittääksesi passiivisena (oletus `true`) |
 
 ```bash
 curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
   -H "X-FreeScout-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"organizationId": 1, "role": "manager", "unitId": 2, "canManageOrg": false}'
+  -d '{"organizationId": 1, "role": "manager", "unitId": 2, "canManageOrg": false, "isActive": true}'
 ```
 
 **201 Created** *(uusi jäsenyys)*
@@ -342,12 +493,12 @@ curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
 {"success": true, "message": "Membership created."}
 ```
 
-**200 OK** *(jäsenyys päivitetty)*
+**200 OK** *(jäsenyys päivitettynä)*
 ```json
 {"success": true, "message": "Membership updated."}
 ```
 
-**409 Conflict** *(asiakas jo aktiivinen toisessa organisaatiossa)*
+**409 Conflict** *(asiakas on jo aktiivinen toisessa organisaatiossa)*
 ```json
 {
   "message": "Customer already has an active membership in another organization.",

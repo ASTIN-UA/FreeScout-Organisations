@@ -1,6 +1,6 @@
 # OrgPortal REST API
 
-[← Tilbake til README](../README.no.md)
+[← Tilbake til README](../../README.md)
 
 🌐 **Language:**
 [English](README.md) ·
@@ -37,8 +37,14 @@ Autentisering — `X-FreeScout-API-Key`-header eller `api_key`-spørringsparamet
 | `GET` | `/api/organizations` | List organisasjoner (paginering, postkassefilter) |
 | `POST` | `/api/organizations` | Opprett en organisasjon |
 | `GET` | `/api/organizations/{id}` | Hent organisasjon med medlemmer og enheter |
-| `PUT` | `/api/organizations/{id}` | Oppdater organisasjon |
+| `PUT` | `/api/organizations/{id}` | Oppdater organisasjon (navn, farge, postkasse, isActive) |
 | `DELETE` | `/api/organizations/{id}` | Slett organisasjon |
+| `GET` | `/api/organizations/{id}/members` | List organisasjonsmedlemmer |
+| `GET` | `/api/organizations/{id}/members/{memberId}` | Hent ett medlem |
+| `PUT` | `/api/organizations/{id}/members/{memberId}` | Oppdater medlem (rolle, enhet, canManageOrg, isActive) |
+| `DELETE` | `/api/organizations/{id}/members/{memberId}` | Fjern medlem |
+| `GET` | `/api/organizations/{id}/tags` | List taggbindinger (krever Tags-modul) |
+| `PUT` | `/api/organizations/{id}/tags` | Erstatt alle taggbindinger (krever Tags-modul) |
 | `GET` | `/api/organizations/{id}/units` | List strukturelle enheter |
 | `POST` | `/api/organizations/{id}/units` | Opprett en strukturell enhet |
 | `PUT` | `/api/units/{unitId}` | Gi nytt navn til en enhet |
@@ -51,12 +57,13 @@ Autentisering — `X-FreeScout-API-Key`-header eller `api_key`-spørringsparamet
 
 | Kode | Betydning |
 |------|---------|
-| `200` | Suksess eller ingen-op (ingenting endret) |
+| `200` | Suksess |
 | `201` | Ressurs opprettet; `Resource-ID`-header inneholder ID-en |
 | `400` | Valideringsfeil — detaljer i `_embedded.errors` |
 | `401` | Ugyldig eller manglende API-nøkkel |
 | `404` | Ressurs ikke funnet |
 | `409` | Konflikt — kunde har allerede aktivt medlemskap i en annen organisasjon |
+| `503` | Påkrevd modul (f.eks. Tags) er ikke aktiv |
 
 ---
 
@@ -68,9 +75,9 @@ Autentisering — `X-FreeScout-API-Key`-header eller `api_key`-spørringsparamet
 
 | Parameter | Type | Standard | Beskrivelse |
 |-----------|------|:-------:|-------------|
-| `page` | heltall | `1` | Sidenummer |
-| `pageSize` | heltall | `25` | Poster per side (maks 100) |
-| `mailboxId` | heltall | — | Postkassefilter: returnerer globale organisasjoner + de bundet til denne postkassen |
+| `page` | integer | `1` | Sidenummer |
+| `pageSize` | integer | `25` | Poster per side (maks 100) |
+| `mailboxId` | integer | — | Postkassefilter: returnerer globale organisasjoner + de bundet til denne postkassen |
 
 ```bash
 curl -X GET "https://your-freescout.com/api/organizations?mailboxId=3" \
@@ -85,6 +92,8 @@ curl -X GET "https://your-freescout.com/api/organizations?mailboxId=3" \
       {
         "id": 1,
         "name": "Acme Corp",
+        "color": "#4a90d9",
+        "isActive": true,
         "mailboxId": null,
         "createdAt": "2026-06-01T10:00:00+00:00",
         "updatedAt": "2026-06-01T10:00:00+00:00"
@@ -99,12 +108,12 @@ curl -X GET "https://your-freescout.com/api/organizations?mailboxId=3" \
 
 ### POST /api/organizations
 
-**Forespørselskropp**
+**Forespørselstekst**
 
-| Felt | Type | Obligatorisk | Beskrivelse |
-|-------|------|:--------:|-------------|
-| `name` | streng | ✅ | Organisasjonsnavn (maks 255 tegn, unikt) |
-| `mailboxId` | heltall\|null | — | Postkasse-ID eller `null` / utelat for global organisasjon |
+| Felt | Type | Påkrevd | Beskrivelse |
+|------|------|:-------:|-------------|
+| `name` | string | ✅ | Organisasjonsnavn (maks 255 tegn, unikt) |
+| `mailboxId` | integer\|null | — | Postkasse-ID eller `null` / utelat for global organisasjon |
 
 ```bash
 curl -X POST "https://your-freescout.com/api/organizations" \
@@ -118,6 +127,8 @@ curl -X POST "https://your-freescout.com/api/organizations" \
 {
   "id": 1,
   "name": "Acme Corp",
+  "color": null,
+  "isActive": true,
   "mailboxId": 3,
   "createdAt": "2026-06-01T10:00:00+00:00",
   "updatedAt": "2026-06-01T10:00:00+00:00"
@@ -135,6 +146,8 @@ Returnerer organisasjonen med innebygde **medlemmer** og **enheter**.
 {
   "id": 1,
   "name": "Acme Corp",
+  "color": "#4a90d9",
+  "isActive": true,
   "mailboxId": null,
   "createdAt": "2026-06-01T10:00:00+00:00",
   "updatedAt": "2026-06-01T10:00:00+00:00",
@@ -169,29 +182,31 @@ Returnerer organisasjonen med innebygde **medlemmer** og **enheter**.
 **Medlemsfelt**
 
 | Felt | Type | Beskrivelse |
-|-------|------|-------------|
-| `unitId` | heltall\|null | Strukturell enhet medlemmet tilhører, eller `null` for hele organisasjonen |
-| `role` | streng | `member` eller `manager` |
-| `canManageOrg` | boolean | Hvorvidt denne lederen får lov til å promotere andre til global leder fra portalen |
+|------|------|-------------|
+| `unitId` | integer\|null | Strukturell enhet medlemmet tilhører, eller `null` for hele organisasjonen |
+| `role` | string | `member` eller `manager` |
+| `canManageOrg` | boolean | Om denne lederen kan promotere andre til global leder fra portalen |
 | `isActive` | boolean | Aktivt medlemskap; inaktive medlemmer mottar ingen billettildelinger eller varsler |
-| `notifyOnNewTicket` | boolean | Eldre per-medlem-flagg for varsling om nye billetter |
+| `notifyOnNewTicket` | boolean | Per-medlem ny-billett varselsflagg |
 
 ---
 
 ### PUT /api/organizations/{id}
 
-**Forespørselskropp**
+**Forespørselstekst**
 
-| Felt | Type | Obligatorisk | Beskrivelse |
-|-------|------|:--------:|-------------|
-| `name` | streng | ✅ | Nytt organisasjonsnavn (maks 255 tegn, unikt) |
-| `mailboxId` | heltall\|null | — | Ny postkasse; `null` — gjør global; utelat — la være uendret |
+| Felt | Type | Påkrevd | Beskrivelse |
+|------|------|:-------:|-------------|
+| `name` | string | ✅ | Nytt organisasjonsnavn (maks 255 tegn, unikt) |
+| `color` | string\|null | — | Badgefarge som heks (`"#ff0000"`), `null` for å tilbakestille til standard grå; utelat for å beholde nåværende |
+| `mailboxId` | integer\|null | — | Ny postkasse; `null` — gjør global; utelat — la være uendret |
+| `isActive` | boolean | — | `false` for å deaktivere organisasjonen; utelat for å beholde nåværende |
 
 ```bash
 curl -X PUT "https://your-freescout.com/api/organizations/1" \
   -H "X-FreeScout-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"name": "Acme Corporation", "mailboxId": null}'
+  -d '{"name": "Acme Corporation", "color": "#4a90d9", "isActive": true}'
 ```
 
 **200 OK**
@@ -199,15 +214,150 @@ curl -X PUT "https://your-freescout.com/api/organizations/1" \
 {"success": true, "message": "Organization updated."}
 ```
 
-Når ingenting endrer seg, er svarsmeldingen `No changes — organization already has this name and mailbox.`
-
 ---
 
 ### DELETE /api/organizations/{id}
 
-**200 OK** *(alle medlemmer kaskadeslettes)*
+**200 OK** *(alle medlemmer slettes)*
 ```json
 {"success": true, "message": "Organization deleted."}
+```
+
+---
+
+## Organisasjonsmedlemmer
+
+### GET /api/organizations/{id}/members
+
+Returnerer en liste over alle medlemsposter for organisasjonen.
+
+**200 OK**
+```json
+{
+  "_embedded": {
+    "members": [
+      {
+        "id": 5,
+        "organizationId": 1,
+        "unitId": 2,
+        "customerId": 42,
+        "role": "manager",
+        "canManageOrg": false,
+        "isActive": true,
+        "notifyOnNewTicket": true,
+        "createdAt": "2026-06-01T10:05:00+00:00",
+        "updatedAt": "2026-06-01T10:05:00+00:00"
+      }
+    ]
+  }
+}
+```
+
+---
+
+### GET /api/organizations/{id}/members/{memberId}
+
+Returnerer en enkel medlemspost.
+
+**200 OK**
+```json
+{
+  "id": 5,
+  "organizationId": 1,
+  "unitId": 2,
+  "customerId": 42,
+  "role": "manager",
+  "canManageOrg": false,
+  "isActive": true,
+  "notifyOnNewTicket": true,
+  "createdAt": "2026-06-01T10:05:00+00:00",
+  "updatedAt": "2026-06-01T10:05:00+00:00"
+}
+```
+
+---
+
+### PUT /api/organizations/{id}/members/{memberId}
+
+Oppdater medlemmets rolle, enhettilordning, canManageOrg-flagg eller aktiv status. Bare felt som finnes i teksten oppdateres (delvis oppdatering).
+
+**Forespørselstekst**
+
+| Felt | Type | Påkrevd | Beskrivelse |
+|------|------|:-------:|-------------|
+| `role` | string | — | `"member"` eller `"manager"` |
+| `unitId` | integer\|null | — | Strukturell enhet (må tilhøre denne organisasjonen), eller `null` for å fjerne tilordning |
+| `canManageOrg` | boolean | — | Gi global ledelsesrettigheter i portalen |
+| `isActive` | boolean | — | `false` for å deaktivere uten å fjerne |
+
+```bash
+curl -X PUT "https://your-freescout.com/api/organizations/1/members/5" \
+  -H "X-FreeScout-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"role": "manager", "unitId": 2, "canManageOrg": true, "isActive": true}'
+```
+
+**200 OK**
+```json
+{"success": true, "message": "Member updated."}
+```
+
+---
+
+### DELETE /api/organizations/{id}/members/{memberId}
+
+Fjern et medlem fra organisasjonen.
+
+**200 OK**
+```json
+{"success": true, "message": "Member removed."}
+```
+
+---
+
+## Organisasjonstagger
+
+> Krever at [Tags](https://freescout.net/module/tags/)-modulen er aktiv. Returnerer `503` hvis modulen ikke er installert.
+
+### GET /api/organizations/{id}/tags
+
+Returnerer alle taggbindinger for organisasjonen. Hver binding begrenser valgfritt en tagg til en spesifikk enhet.
+
+**200 OK**
+```json
+{
+  "_embedded": {
+    "tags": [
+      { "id": 1, "organizationId": 1, "tagId": 5, "unitId": null },
+      { "id": 2, "organizationId": 1, "tagId": 8, "unitId": 2 }
+    ]
+  }
+}
+```
+
+---
+
+### PUT /api/organizations/{id}/tags
+
+**Fullstendig erstatning** — erstatter alle eksisterende taggbindinger for denne organisasjonen med den angitte listen. Send en tom array `[]` for å fjerne alle bindinger.
+
+**Forespørselstekst** — en JSON-array av taggbindingsobjekter:
+
+| Felt | Type | Påkrevd | Beskrivelse |
+|------|------|:-------:|-------------|
+| `tagId` | integer | ✅ | FreeScout tagg-ID |
+| `unitId` | integer\|null | — | Begrens taggen til en spesifikk enhet, eller utelat/`null` for organisasjonsomfang |
+
+```bash
+curl -X PUT "https://your-freescout.com/api/organizations/1/tags" \
+  -H "X-FreeScout-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '[{"tagId": 5}, {"tagId": 8, "unitId": 2}]'
+```
+
+**200 OK**
+```json
+{"success": true, "message": "Tags updated."}
 ```
 
 ---
@@ -237,11 +387,11 @@ Når ingenting endrer seg, er svarsmeldingen `No changes — organization alread
 
 ### POST /api/organizations/{id}/units
 
-**Forespørselskropp**
+**Forespørselstekst**
 
-| Felt | Type | Obligatorisk | Beskrivelse |
-|-------|------|:--------:|-------------|
-| `name` | streng | ✅ | Enhetsnavn (unikt innenfor organisasjonen) |
+| Felt | Type | Påkrevd | Beskrivelse |
+|------|------|:-------:|-------------|
+| `name` | string | ✅ | Enhetsnavn (unikt innen organisasjonen) |
 
 ```bash
 curl -X POST "https://your-freescout.com/api/organizations/1/units" \
@@ -265,11 +415,11 @@ curl -X POST "https://your-freescout.com/api/organizations/1/units" \
 
 ### PUT /api/units/{unitId}
 
-**Forespørselskropp**
+**Forespørselstekst**
 
-| Felt | Type | Obligatorisk | Beskrivelse |
-|-------|------|:--------:|-------------|
-| `name` | streng | ✅ | Nytt enhetsnavn (unikt innenfor organisasjonen) |
+| Felt | Type | Påkrevd | Beskrivelse |
+|------|------|:-------:|-------------|
+| `name` | string | ✅ | Nytt enhetsnavn (unikt innen organisasjonen) |
 
 ```bash
 curl -X PUT "https://your-freescout.com/api/units/2" \
@@ -287,7 +437,7 @@ curl -X PUT "https://your-freescout.com/api/units/2" \
 
 ### DELETE /api/units/{unitId}
 
-Sletter enheten. Ledere som er knyttet til denne enheten degraderes til `member`; alle medlemmer av enheten fjernes (deres `unitId` blir `null`).
+Sletter enheten. Ledere som er begrenset til denne enheten blir degradert til `member`; alle medlemmer av enheten blir fjernet fra enheten (deres `unitId` blir `null`).
 
 **200 OK**
 ```json
@@ -319,22 +469,23 @@ Sletter enheten. Ledere som er knyttet til denne enheten degraderes til `member`
 
 ### PUT /api/customers/{id}/organization
 
-Tildeler en kunde til en organisasjon eller oppdaterer deres medlemskap. **Én aktivt medlemskap per kunde**: hvis kunden allerede har et *aktivt* medlemskap i *en annen* organisasjon, avvises forespørselen med `409 Konflikt`. For å overføre — deaktivér eller fjern først gjeldende medlemskap via `DELETE`.
+Tilordner en kunde til en organisasjon eller oppdaterer deres medlemskap. **Ett aktivt medlemskap per kunde**: hvis kunden allerede har et *aktivt* medlemskap i *en annen* organisasjon, blir forespørselen avvist med `409 Conflict`. For å overføre — deaktiver eller fjern først gjeldende medlemskap via `DELETE`.
 
-**Forespørselskropp**
+**Forespørselstekst**
 
-| Felt | Type | Obligatorisk | Beskrivelse |
-|-------|------|:--------:|-------------|
-| `organizationId` | heltall | ✅ | Organisasjons-ID |
-| `role` | streng | — | `"member"` (standard) eller `"manager"` |
-| `unitId` | heltall\|null | — | Strukturell enhet (må tilhøre målorganisasjonen), eller `null` for hele organisasjonen |
-| `canManageOrg` | boolean | — | Gi denne lederen rett til å promotere andre til global leder (standard `false`) |
+| Felt | Type | Påkrevd | Beskrivelse |
+|------|------|:-------:|-------------|
+| `organizationId` | integer | ✅ | Organisasjons-ID |
+| `role` | string | — | `"member"` (standard) eller `"manager"` |
+| `unitId` | integer\|null | — | Strukturell enhet (må tilhøre målorganisasjonen), eller `null` for hele organisasjonen |
+| `canManageOrg` | boolean | — | Gi denne lederen rettigheten til å promotere andre til global leder (standard `false`) |
+| `isActive` | boolean | — | `false` for å opprette/oppdatere som inaktiv (standard `true`) |
 
 ```bash
 curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
   -H "X-FreeScout-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"organizationId": 1, "role": "manager", "unitId": 2, "canManageOrg": false}'
+  -d '{"organizationId": 1, "role": "manager", "unitId": 2, "canManageOrg": false, "isActive": true}'
 ```
 
 **201 Created** *(nytt medlemskap)*
@@ -347,7 +498,7 @@ curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
 {"success": true, "message": "Membership updated."}
 ```
 
-**409 Conflict** *(kunde har allerede aktivt medlemskap i en annen organisasjon)*
+**409 Conflict** *(kunde allerede aktiv i en annen organisasjon)*
 ```json
 {
   "message": "Customer already has an active membership in another organization.",

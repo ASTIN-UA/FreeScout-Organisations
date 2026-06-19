@@ -68,9 +68,16 @@
             $cfRaw = \Option::get('orgportal.company_filters', '[]');
         }
         $companyFilters = is_array($cfRaw) ? $cfRaw : (json_decode($cfRaw, true) ?: []);
+        $cfLocale = app()->getLocale();
         foreach ($companyFilters as $cf) {
             $cfId = (int) ($cf['id'] ?? 0);
-            if ($cfId && !empty($cf['label'])) {
+            if (!$cfId) continue;
+            if (!empty($cf['labels'])) {
+                $knColumnNames[$cfId] = $cf['labels'][$cfLocale]
+                    ?? $cf['labels']['en']
+                    ?? $cf['name']
+                    ?? '';
+            } elseif (!empty($cf['label'])) {
                 $knColumnNames[$cfId] = $cf['label'];
             }
         }

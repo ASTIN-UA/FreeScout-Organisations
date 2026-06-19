@@ -503,9 +503,10 @@ class OrgPortalAdminController extends Controller
 
         $langSwitcherEnabled = (bool) \Option::get('orgportal.lang_switcher_enabled', false);
         $rawLocales          = \Option::get('orgportal.lang_switcher_locales', []);
+        $parsedLocales       = is_array($rawLocales) ? $rawLocales : (json_decode($rawLocales, true) ?: []);
         $filterLocales       = array_unique(array_merge(
             ['en'],
-            $langSwitcherEnabled && is_array($rawLocales) ? $rawLocales : []
+            $langSwitcherEnabled ? $parsedLocales : []
         ));
         $localeNames = [];
         foreach ($filterLocales as $loc) {

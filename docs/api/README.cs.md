@@ -1,6 +1,6 @@
 # OrgPortal REST API
 
-[← Zpět na README](../README.cs.md)
+[← Back to README](../../README.md)
 
 🌐 **Language:**
 [English](README.md) ·
@@ -24,39 +24,46 @@
 
 ---
 
-*Volitelné — vyžaduje modul [API a Webhooks](https://freescout.net/module/api-webhooks/).*
+*Volitelné — vyžaduje modul [API and Webhooks](https://freescout.net/module/api-webhooks/).*
 
-Ověření — hlavička `X-FreeScout-API-Key` nebo parametr dotazu `api_key`.
+Ověřování — hlavička `X-FreeScout-API-Key` nebo parametr dotazu `api_key`.
 
-> **Interaktivní dokumentace** (ReDoc) je dostupná na stránce **Správa → API a Webhooks** (odkaz "Dokumentace OrgPortal API") nebo přímo na `/orgportal/admin/api-docs`.
+> **Interaktivní dokumentace** (ReDoc) je k dispozici na stránce **Spravovat → API a Webhooks** (odkaz "OrgPortal API Docs") nebo přímo na `/orgportal/admin/api-docs`.
 
 ## Koncové body
 
 | Metoda | Koncový bod | Popis |
-|--------|-------------|-------|
-| `GET` | `/api/organizations` | Seznam organizací (stránkování, filtr poštovní schránky) |
-| `POST` | `/api/organizations` | Vytvoří organizaci |
-| `GET` | `/api/organizations/{id}` | Získá organizaci se členy a jednotkami |
-| `PUT` | `/api/organizations/{id}` | Aktualizuje organizaci |
-| `DELETE` | `/api/organizations/{id}` | Smaže organizaci |
-| `GET` | `/api/organizations/{id}/units` | Seznam strukturálních jednotek |
-| `POST` | `/api/organizations/{id}/units` | Vytvoří strukturální jednotku |
-| `PUT` | `/api/units/{unitId}` | Přejmenuje jednotku |
-| `DELETE` | `/api/units/{unitId}` | Smaže jednotku (členové zrušeni, manažeři degradováni) |
-| `GET` | `/api/customers/{id}/organization` | Organizace zákazníka |
-| `PUT` | `/api/customers/{id}/organization` | Nastaví/aktualizuje členství zákazníka |
-| `DELETE` | `/api/customers/{id}/organization` | Odebere zákazníka z organizace |
+|--------|----------|-------------|
+| `GET` | `/api/organizations` | Vypsat organizace (stránkování, filtr poštovní schránky) |
+| `POST` | `/api/organizations` | Vytvořit organizaci |
+| `GET` | `/api/organizations/{id}` | Získat organizaci s členy a jednotkami |
+| `PUT` | `/api/organizations/{id}` | Aktualizovat organizaci (název, barva, poštovní schránka, isActive) |
+| `DELETE` | `/api/organizations/{id}` | Smazat organizaci |
+| `GET` | `/api/organizations/{id}/members` | Vypsat členy organizace |
+| `GET` | `/api/organizations/{id}/members/{memberId}` | Získat jednoho člena |
+| `PUT` | `/api/organizations/{id}/members/{memberId}` | Aktualizovat člena (role, jednotka, canManageOrg, isActive) |
+| `DELETE` | `/api/organizations/{id}/members/{memberId}` | Odebrat člena |
+| `GET` | `/api/organizations/{id}/tags` | Vypsat vazby značek (vyžaduje modul Tags) |
+| `PUT` | `/api/organizations/{id}/tags` | Nahradit všechny vazby značek (vyžaduje modul Tags) |
+| `GET` | `/api/organizations/{id}/units` | Vypsat strukturální jednotky |
+| `POST` | `/api/organizations/{id}/units` | Vytvořit strukturální jednotku |
+| `PUT` | `/api/units/{unitId}` | Přejmenovat jednotku |
+| `DELETE` | `/api/units/{unitId}` | Smazat jednotku (členové přiřazeni, správcové jednotky degradováni) |
+| `GET` | `/api/customers/{id}/organization` | Členství zákazníka v organizaci |
+| `PUT` | `/api/customers/{id}/organization` | Nastavit/aktualizovat členství zákazníka |
+| `DELETE` | `/api/customers/{id}/organization` | Odebrat zákazníka z organizace |
 
 ## Kódy odpovědí
 
 | Kód | Význam |
-|-----|--------|
-| `200` | Úspěch nebo no-op (nic se nezměnilo) |
-| `201` | Zdroj vytvořen; hlavička `Resource-ID` obsahuje ID |
-| `400` | Chyba ověření — detaily v `_embedded.errors` |
+|------|---------|
+| `200` | Úspěch |
+| `201` | Prostředek vytvořen; hlavička `Resource-ID` obsahuje ID |
+| `400` | Chyba ověření — podrobnosti v `_embedded.errors` |
 | `401` | Neplatný nebo chybějící klíč API |
-| `404` | Zdroj nenalezen |
-| `409` | Konflikt — zákazník již patří do jiné organizace |
+| `404` | Prostředek nenalezen |
+| `409` | Konflikt — zákazník již má aktivní členství v jiné organizaci |
+| `503` | Požadovaný modul (např. Tags) není aktivní |
 
 ---
 
@@ -67,10 +74,10 @@ Ověření — hlavička `X-FreeScout-API-Key` nebo parametr dotazu `api_key`.
 **Parametry dotazu**
 
 | Parametr | Typ | Výchozí | Popis |
-|----------|-----|:-------:|-------|
-| `page` | integer | `1` | Číslo stránky |
-| `pageSize` | integer | `25` | Záznamů na stránku (max 100) |
-| `mailboxId` | integer | — | Filtr poštovní schránky: vrací globální organizace + vázané na tuto schránku |
+|-----------|------|:-------:|-------------|
+| `page` | celé číslo | `1` | Číslo stránky |
+| `pageSize` | celé číslo | `25` | Záznamy na stránku (max 100) |
+| `mailboxId` | celé číslo | — | Filtr poštovní schránky: vrátí globální organizace + ty vázané na tuto schránku |
 
 ```bash
 curl -X GET "https://your-freescout.com/api/organizations?mailboxId=3" \
@@ -85,6 +92,8 @@ curl -X GET "https://your-freescout.com/api/organizations?mailboxId=3" \
       {
         "id": 1,
         "name": "Acme Corp",
+        "color": "#4a90d9",
+        "isActive": true,
         "mailboxId": null,
         "createdAt": "2026-06-01T10:00:00+00:00",
         "updatedAt": "2026-06-01T10:00:00+00:00"
@@ -101,10 +110,10 @@ curl -X GET "https://your-freescout.com/api/organizations?mailboxId=3" \
 
 **Tělo požadavku**
 
-| Pole | Typ | Povinné | Popis |
-|------|-----|:--------:|-------|
-| `name` | string | ✅ | Název organizace (max 255 znaků, jedinečný) |
-| `mailboxId` | integer\|null | — | ID poštovní schránky nebo `null` / vynechte pro globální organizaci |
+| Pole | Typ | Požadováno | Popis |
+|-------|------|:--------:|-------------|
+| `name` | řetězec | ✅ | Název organizace (max 255 znaků, unikátní) |
+| `mailboxId` | celé číslo\|null | — | ID poštovní schránky nebo `null` / vynechat pro globální organizaci |
 
 ```bash
 curl -X POST "https://your-freescout.com/api/organizations" \
@@ -118,6 +127,8 @@ curl -X POST "https://your-freescout.com/api/organizations" \
 {
   "id": 1,
   "name": "Acme Corp",
+  "color": null,
+  "isActive": true,
   "mailboxId": 3,
   "createdAt": "2026-06-01T10:00:00+00:00",
   "updatedAt": "2026-06-01T10:00:00+00:00"
@@ -128,13 +139,15 @@ curl -X POST "https://your-freescout.com/api/organizations" \
 
 ### GET /api/organizations/{id}
 
-Vrátí organizaci s integrovanými **členy** a **jednotkami**.
+Vrátí organizaci s vloženými **členy** a **jednotkami**.
 
 **200 OK**
 ```json
 {
   "id": 1,
   "name": "Acme Corp",
+  "color": "#4a90d9",
+  "isActive": true,
   "mailboxId": null,
   "createdAt": "2026-06-01T10:00:00+00:00",
   "updatedAt": "2026-06-01T10:00:00+00:00",
@@ -169,12 +182,12 @@ Vrátí organizaci s integrovanými **členy** a **jednotkami**.
 **Pole člena**
 
 | Pole | Typ | Popis |
-|------|-----|-------|
-| `unitId` | integer\|null | Strukturální jednotka, do které člen patří, nebo `null` pro celou organizaci |
-| `role` | string | `member` nebo `manager` |
-| `canManageOrg` | boolean | Zda smí být tento manažer povýšit ostatní na globálního manažera z portálu |
-| `isActive` | boolean | Aktivní členství; neaktivní členové se nepřiřazují lístkům ani nedostávají oznámení |
-| `notifyOnNewTicket` | boolean | Starší příznak oznámení o novém lístku na člena |
+|-------|------|-------------|
+| `unitId` | celé číslo\|null | Strukturální jednotka, do které člen patří, nebo `null` pro celou organizaci |
+| `role` | řetězec | `member` nebo `manager` |
+| `canManageOrg` | logická hodnota | Zda může tento správce povyšovat ostatní na globálního správce z portálu |
+| `isActive` | logická hodnota | Aktivní členství; neaktivní členové neobdrží přiřazení lístků ani oznámení |
+| `notifyOnNewTicket` | logická hodnota | Příznak oznámení o novém lístku na člena |
 
 ---
 
@@ -182,16 +195,18 @@ Vrátí organizaci s integrovanými **členy** a **jednotkami**.
 
 **Tělo požadavku**
 
-| Pole | Typ | Povinné | Popis |
-|------|-----|:--------:|-------|
-| `name` | string | ✅ | Nový název organizace (max 255 znaků, jedinečný) |
-| `mailboxId` | integer\|null | — | Nová schránka; `null` — učinit globální; vynechte — ponechat nezměněno |
+| Pole | Typ | Požadováno | Popis |
+|-------|------|:--------:|-------------|
+| `name` | řetězec | ✅ | Nový název organizace (max 255 znaků, unikátní) |
+| `color` | řetězec\|null | — | Barva odznáku jako šestnáctkový (`"#ff0000"`), `null` pro obnovení výchozí šedé; vynechat pro zachování aktuální |
+| `mailboxId` | celé číslo\|null | — | Nová poštovní schránka; `null` — učinit globální; vynechat — ponechat beze změny |
+| `isActive` | logická hodnota | — | `false` pro deaktivaci organizace; vynechat pro zachování aktuální |
 
 ```bash
 curl -X PUT "https://your-freescout.com/api/organizations/1" \
   -H "X-FreeScout-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"name": "Acme Corporation", "mailboxId": null}'
+  -d '{"name": "Acme Corporation", "color": "#4a90d9", "isActive": true}'
 ```
 
 **200 OK**
@@ -199,15 +214,150 @@ curl -X PUT "https://your-freescout.com/api/organizations/1" \
 {"success": true, "message": "Organization updated."}
 ```
 
-Pokud se nic nezmění, zpráva odpovědi je `No changes — organization already has this name and mailbox.`
-
 ---
 
 ### DELETE /api/organizations/{id}
 
-**200 OK** *(všichni členové budou vymazáni kaskádově)*
+**200 OK** *(všichni členové jsou odstraněni kaskádově)*
 ```json
 {"success": true, "message": "Organization deleted."}
+```
+
+---
+
+## Členové organizace
+
+### GET /api/organizations/{id}/members
+
+Vrátí seznam všech záznamů členů pro organizaci.
+
+**200 OK**
+```json
+{
+  "_embedded": {
+    "members": [
+      {
+        "id": 5,
+        "organizationId": 1,
+        "unitId": 2,
+        "customerId": 42,
+        "role": "manager",
+        "canManageOrg": false,
+        "isActive": true,
+        "notifyOnNewTicket": true,
+        "createdAt": "2026-06-01T10:05:00+00:00",
+        "updatedAt": "2026-06-01T10:05:00+00:00"
+      }
+    ]
+  }
+}
+```
+
+---
+
+### GET /api/organizations/{id}/members/{memberId}
+
+Vrátí jediný záznam člena.
+
+**200 OK**
+```json
+{
+  "id": 5,
+  "organizationId": 1,
+  "unitId": 2,
+  "customerId": 42,
+  "role": "manager",
+  "canManageOrg": false,
+  "isActive": true,
+  "notifyOnNewTicket": true,
+  "createdAt": "2026-06-01T10:05:00+00:00",
+  "updatedAt": "2026-06-01T10:05:00+00:00"
+}
+```
+
+---
+
+### PUT /api/organizations/{id}/members/{memberId}
+
+Aktualizujte roli člena, přiřazení jednotky, příznak canManageOrg nebo aktivní status. Aktualizují se pouze pole přítomná v těle (částečná aktualizace).
+
+**Tělo požadavku**
+
+| Pole | Typ | Požadováno | Popis |
+|-------|------|:--------:|-------------|
+| `role` | řetězec | — | `"member"` nebo `"manager"` |
+| `unitId` | celé číslo\|null | — | Strukturální jednotka (musí patřit do této organizace), nebo `null` pro nepřiřazení |
+| `canManageOrg` | logická hodnota | — | Udělit práva globálního správce v portálu |
+| `isActive` | logická hodnota | — | `false` pro deaktivaci bez odebrání |
+
+```bash
+curl -X PUT "https://your-freescout.com/api/organizations/1/members/5" \
+  -H "X-FreeScout-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"role": "manager", "unitId": 2, "canManageOrg": true, "isActive": true}'
+```
+
+**200 OK**
+```json
+{"success": true, "message": "Member updated."}
+```
+
+---
+
+### DELETE /api/organizations/{id}/members/{memberId}
+
+Odebrat člena z organizace.
+
+**200 OK**
+```json
+{"success": true, "message": "Member removed."}
+```
+
+---
+
+## Značky organizace
+
+> Vyžaduje, aby byl modul [Tags](https://freescout.net/module/tags/) aktivní. Vrátí `503` pokud modul není nainstalován.
+
+### GET /api/organizations/{id}/tags
+
+Vrátí všechny vazby značek pro organizaci. Každá vazba volitelně rozsahuje značku na konkrétní jednotku.
+
+**200 OK**
+```json
+{
+  "_embedded": {
+    "tags": [
+      { "id": 1, "organizationId": 1, "tagId": 5, "unitId": null },
+      { "id": 2, "organizationId": 1, "tagId": 8, "unitId": 2 }
+    ]
+  }
+}
+```
+
+---
+
+### PUT /api/organizations/{id}/tags
+
+**Úplná výměna** — nahradí všechny existující vazby značek pro tuto organizaci poskytnutým seznamem. Odešlete prázdné pole `[]` pro odebrání všech vazeb.
+
+**Tělo požadavku** — pole JSON objektů vazeb značek:
+
+| Pole | Typ | Požadováno | Popis |
+|-------|------|:--------:|-------------|
+| `tagId` | celé číslo | ✅ | ID značky FreeScout |
+| `unitId` | celé číslo\|null | — | Rozsah značky na konkrétní jednotku, nebo vynechat/`null` pro celou organizaci |
+
+```bash
+curl -X PUT "https://your-freescout.com/api/organizations/1/tags" \
+  -H "X-FreeScout-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '[{"tagId": 5}, {"tagId": 8, "unitId": 2}]'
+```
+
+**200 OK**
+```json
+{"success": true, "message": "Tags updated."}
 ```
 
 ---
@@ -239,9 +389,9 @@ Pokud se nic nezmění, zpráva odpovědi je `No changes — organization alread
 
 **Tělo požadavku**
 
-| Pole | Typ | Povinné | Popis |
-|------|-----|:--------:|-------|
-| `name` | string | ✅ | Název jednotky (jedinečný v rámci organizace) |
+| Pole | Typ | Požadováno | Popis |
+|-------|------|:--------:|-------------|
+| `name` | řetězec | ✅ | Název jednotky (unikátní v rámci organizace) |
 
 ```bash
 curl -X POST "https://your-freescout.com/api/organizations/1/units" \
@@ -267,9 +417,9 @@ curl -X POST "https://your-freescout.com/api/organizations/1/units" \
 
 **Tělo požadavku**
 
-| Pole | Typ | Povinné | Popis |
-|------|-----|:--------:|-------|
-| `name` | string | ✅ | Nový název jednotky (jedinečný v rámci organizace) |
+| Pole | Typ | Požadováno | Popis |
+|-------|------|:--------:|-------------|
+| `name` | řetězec | ✅ | Nový název jednotky (unikátní v rámci organizace) |
 
 ```bash
 curl -X PUT "https://your-freescout.com/api/units/2" \
@@ -287,7 +437,7 @@ curl -X PUT "https://your-freescout.com/api/units/2" \
 
 ### DELETE /api/units/{unitId}
 
-Smaže jednotku. Manažeři omezeni na tuto jednotku jsou degradováni na `member`; všichni členové jednotky jsou zrušeni (jejich `unitId` se stane `null`).
+Smazat jednotku. Správcové omezeni na tuto jednotku jsou degradováni na `member`; všichni členové jednotky jsou nepřiřazeni (jejich `unitId` se stane `null`).
 
 **200 OK**
 ```json
@@ -319,22 +469,23 @@ Smaže jednotku. Manažeři omezeni na tuto jednotku jsou degradováni na `membe
 
 ### PUT /api/customers/{id}/organization
 
-Přiřadí zákazníka organizaci nebo aktualizuje jejich členství. **Jedno aktivní členství na zákazníka**: pokud má zákazník již *aktivní* členství v *jiné* organizaci, požadavek je odmítnut s `409 Conflict`. Pro přenos — nejdříve deaktivujte nebo odeberte aktuální členství přes `DELETE`.
+Přiřadit zákazníka k organizaci nebo aktualizovat jeho členství. **Jedno aktivní členství na zákazníka**: pokud má zákazník již *aktivní* členství v *jiné* organizaci, požadavek je odmítnut s `409 Conflict`. Chcete-li přesunout — nejdříve deaktivujte nebo odeberte aktuální členství prostřednictvím `DELETE`.
 
 **Tělo požadavku**
 
-| Pole | Typ | Povinné | Popis |
-|------|-----|:--------:|-------|
-| `organizationId` | integer | ✅ | ID organizace |
-| `role` | string | — | `"member"` (výchozí) nebo `"manager"` |
-| `unitId` | integer\|null | — | Strukturální jednotka (musí patřit cílové organizaci), nebo `null` pro celou organizaci |
-| `canManageOrg` | boolean | — | Udělit tomuto manažerovi právo povýšit ostatní na globálního manažera (výchozí `false`) |
+| Pole | Typ | Požadováno | Popis |
+|-------|------|:--------:|-------------|
+| `organizationId` | celé číslo | ✅ | ID organizace |
+| `role` | řetězec | — | `"member"` (výchozí) nebo `"manager"` |
+| `unitId` | celé číslo\|null | — | Strukturální jednotka (musí patřit do cílové organizace), nebo `null` pro celou organizaci |
+| `canManageOrg` | logická hodnota | — | Udělit tomuto správci právo povyšovat ostatní na globálního správce (výchozí `false`) |
+| `isActive` | logická hodnota | — | `false` pro vytvoření/aktualizaci jako neaktivní (výchozí `true`) |
 
 ```bash
 curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
   -H "X-FreeScout-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"organizationId": 1, "role": "manager", "unitId": 2, "canManageOrg": false}'
+  -d '{"organizationId": 1, "role": "manager", "unitId": 2, "canManageOrg": false, "isActive": true}'
 ```
 
 **201 Created** *(nové členství)*
@@ -347,7 +498,7 @@ curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
 {"success": true, "message": "Membership updated."}
 ```
 
-**409 Conflict** *(zákazník již aktivní v jiné organizaci)*
+**409 Conflict** *(zákazník je již aktivní v jiné organizaci)*
 ```json
 {
   "message": "Customer already has an active membership in another organization.",

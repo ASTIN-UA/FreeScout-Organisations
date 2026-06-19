@@ -1,6 +1,6 @@
 # OrgPortal REST API
 
-[← Назад до README](../README.uk.md)
+[← Повернутися до README](../../README.md)
 
 🌐 **Language:**
 [English](README.md) ·
@@ -24,39 +24,46 @@
 
 ---
 
-*Опціонально — потребує модуль [API and Webhooks](https://freescout.net/module/api-webhooks/).*
+*Опціонально — потребує модуля [API and Webhooks](https://freescout.net/module/api-webhooks/).*
 
-Автентифікація — заголовок `X-FreeScout-API-Key` або параметр запиту `api_key`.
+Аутентифікація — заголовок `X-FreeScout-API-Key` або параметр запиту `api_key`.
 
-> **Інтерактивна документація** (ReDoc) доступна на сторінці **Manage → API & Webhooks** (посилання "OrgPortal API Docs") або безпосередньо на `/orgportal/admin/api-docs`.
+> **Інтерактивна документація** (ReDoc) доступна на сторінці **Керування → API & Webhooks** (посилання "OrgPortal API Docs") або безпосередньо за адресою `/orgportal/admin/api-docs`.
 
-## Ендпоінти
+## Кінцеві точки
 
-| Метод | Ендпоінт | Опис |
+| Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/api/organizations` | Список організацій (пагінація, фільтр поштової скриньки) |
-| `POST` | `/api/organizations` | Створити організацію |
-| `GET` | `/api/organizations/{id}` | Отримати організацію з членами та підрозділами |
-| `PUT` | `/api/organizations/{id}` | Оновити організацію |
-| `DELETE` | `/api/organizations/{id}` | Видалити організацію |
-| `GET` | `/api/organizations/{id}/units` | Список структурних підрозділів |
-| `POST` | `/api/organizations/{id}/units` | Створити структурний підрозділ |
-| `PUT` | `/api/units/{unitId}` | Перейменувати підрозділ |
-| `DELETE` | `/api/units/{unitId}` | Видалити підрозділ (члени розпорядження, менеджери послаблені) |
+| `POST` | `/api/organizations` | Створення організації |
+| `GET` | `/api/organizations/{id}` | Отримання організації з членами та одиницями |
+| `PUT` | `/api/organizations/{id}` | Оновлення організації (назва, колір, поштова скринька, isActive) |
+| `DELETE` | `/api/organizations/{id}` | Видалення організації |
+| `GET` | `/api/organizations/{id}/members` | Список членів організації |
+| `GET` | `/api/organizations/{id}/members/{memberId}` | Отримання одного члена |
+| `PUT` | `/api/organizations/{id}/members/{memberId}` | Оновлення члена (роль, одиниця, canManageOrg, isActive) |
+| `DELETE` | `/api/organizations/{id}/members/{memberId}` | Видалення члена |
+| `GET` | `/api/organizations/{id}/tags` | Список прив'язок міток (потребує модуля Tags) |
+| `PUT` | `/api/organizations/{id}/tags` | Заміна всіх прив'язок міток (потребує модуля Tags) |
+| `GET` | `/api/organizations/{id}/units` | Список структурних одиниць |
+| `POST` | `/api/organizations/{id}/units` | Створення структурної одиниці |
+| `PUT` | `/api/units/{unitId}` | Перейменування одиниці |
+| `DELETE` | `/api/units/{unitId}` | Видалення одиниці (члени не призначені, менеджери одиниці понижені) |
 | `GET` | `/api/customers/{id}/organization` | Членство клієнта в організації |
-| `PUT` | `/api/customers/{id}/organization` | Встановити/оновити членство клієнта |
-| `DELETE` | `/api/customers/{id}/organization` | Видалити клієнта з організації |
+| `PUT` | `/api/customers/{id}/organization` | Встановлення/оновлення членства клієнта |
+| `DELETE` | `/api/customers/{id}/organization` | Видалення клієнта з організації |
 
 ## Коди відповідей
 
-| Код | Значення |
+| Code | Meaning |
 |------|---------|
-| `200` | Успіх або без операції (ніщо не змінилося) |
+| `200` | Успіх |
 | `201` | Ресурс створено; заголовок `Resource-ID` містить ID |
 | `400` | Помилка валідації — деталі в `_embedded.errors` |
-| `401` | Невалідний або відсутній API ключ |
+| `401` | Недійсний або відсутній ключ API |
 | `404` | Ресурс не знайдено |
-| `409` | Конфлікт — клієнт вже має активне членство в іншій організації |
+| `409` | Конфлікт — клієнт уже має активне членство в іншій організації |
+| `503` | Необхідний модуль (наприклад Tags) не активний |
 
 ---
 
@@ -66,11 +73,11 @@
 
 **Параметри запиту**
 
-| Параметр | Тип | За замовчуванням | Опис |
+| Parameter | Type | Default | Description |
 |-----------|------|:-------:|-------------|
 | `page` | integer | `1` | Номер сторінки |
 | `pageSize` | integer | `25` | Записів на сторінку (макс 100) |
-| `mailboxId` | integer | — | Фільтр поштової скриньки: повертає глобальні організації + пов'язані з цією поштовою скринькою |
+| `mailboxId` | integer | — | Фільтр поштової скриньки: повертає глобальні організації + ті, що прив'язані до цієї скриньки |
 
 ```bash
 curl -X GET "https://your-freescout.com/api/organizations?mailboxId=3" \
@@ -85,6 +92,8 @@ curl -X GET "https://your-freescout.com/api/organizations?mailboxId=3" \
       {
         "id": 1,
         "name": "Acme Corp",
+        "color": "#4a90d9",
+        "isActive": true,
         "mailboxId": null,
         "createdAt": "2026-06-01T10:00:00+00:00",
         "updatedAt": "2026-06-01T10:00:00+00:00"
@@ -101,10 +110,10 @@ curl -X GET "https://your-freescout.com/api/organizations?mailboxId=3" \
 
 **Тіло запиту**
 
-| Поле | Тип | Обов'язкове | Опис |
+| Field | Type | Required | Description |
 |-------|------|:--------:|-------------|
 | `name` | string | ✅ | Назва організації (макс 255 символів, унікальна) |
-| `mailboxId` | integer\|null | — | ID поштової скриньки або `null` / пропустити для глобальної організації |
+| `mailboxId` | integer\|null | — | ID поштової скриньки або `null` / опустити для глобальної організації |
 
 ```bash
 curl -X POST "https://your-freescout.com/api/organizations" \
@@ -118,6 +127,8 @@ curl -X POST "https://your-freescout.com/api/organizations" \
 {
   "id": 1,
   "name": "Acme Corp",
+  "color": null,
+  "isActive": true,
   "mailboxId": 3,
   "createdAt": "2026-06-01T10:00:00+00:00",
   "updatedAt": "2026-06-01T10:00:00+00:00"
@@ -128,13 +139,15 @@ curl -X POST "https://your-freescout.com/api/organizations" \
 
 ### GET /api/organizations/{id}
 
-Повертає організацію з вкладеними **членами** та **підрозділами**.
+Повертає організацію з вбудованими **членами** та **одиницями**.
 
 **200 OK**
 ```json
 {
   "id": 1,
   "name": "Acme Corp",
+  "color": "#4a90d9",
+  "isActive": true,
   "mailboxId": null,
   "createdAt": "2026-06-01T10:00:00+00:00",
   "updatedAt": "2026-06-01T10:00:00+00:00",
@@ -168,13 +181,13 @@ curl -X POST "https://your-freescout.com/api/organizations" \
 
 **Поля члена**
 
-| Поле | Тип | Опис |
+| Field | Type | Description |
 |-------|------|-------------|
-| `unitId` | integer\|null | Структурний підрозділ, до якого належить член, або `null` для цілої організації |
+| `unitId` | integer\|null | Структурна одиниця, до якої належить член, або `null` для всієї організації |
 | `role` | string | `member` або `manager` |
-| `canManageOrg` | boolean | Чи може цей менеджер просувати інших до глобального менеджера з портала |
-| `isActive` | boolean | Активне членство; неактивні члени не отримують призначення квитків або сповіщень |
-| `notifyOnNewTicket` | boolean | Застарілий прапор сповіщення про новий квиток для кожного члена |
+| `canManageOrg` | boolean | Чи може цей менеджер просувати інших до глобального менеджера через портал |
+| `isActive` | boolean | Активне членство; неактивні члени не отримують призначення або сповіщення про квитки |
+| `notifyOnNewTicket` | boolean | Прапорець сповіщення про новий квиток для окремого члена |
 
 ---
 
@@ -182,16 +195,18 @@ curl -X POST "https://your-freescout.com/api/organizations" \
 
 **Тіло запиту**
 
-| Поле | Тип | Обов'язкове | Опис |
+| Field | Type | Required | Description |
 |-------|------|:--------:|-------------|
 | `name` | string | ✅ | Нова назва організації (макс 255 символів, унікальна) |
-| `mailboxId` | integer\|null | — | Нова пошткова скринька; `null` — зробити глобальною; пропустити — залишити без змін |
+| `color` | string\|null | — | Колір значка як hex (`"#ff0000"`), `null` для скидання на сірий за замовчуванням; опустити, щоб залишити поточне |
+| `mailboxId` | integer\|null | — | Нова поштова скринька; `null` — зробити глобальною; опустити — залишити без змін |
+| `isActive` | boolean | — | `false` щоб деактивувати організацію; опустити, щоб залишити поточне |
 
 ```bash
 curl -X PUT "https://your-freescout.com/api/organizations/1" \
   -H "X-FreeScout-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"name": "Acme Corporation", "mailboxId": null}'
+  -d '{"name": "Acme Corporation", "color": "#4a90d9", "isActive": true}'
 ```
 
 **200 OK**
@@ -199,20 +214,155 @@ curl -X PUT "https://your-freescout.com/api/organizations/1" \
 {"success": true, "message": "Organization updated."}
 ```
 
-Коли нічого не змінюється, повідомлення відповіді буде `No changes — organization already has this name and mailbox.`
-
 ---
 
 ### DELETE /api/organizations/{id}
 
-**200 OK** *(всі члени видаляються каскадно)*
+**200 OK** *(усі члени видалені каскадно)*
 ```json
 {"success": true, "message": "Organization deleted."}
 ```
 
 ---
 
-## Структурні підрозділи
+## Члени організації
+
+### GET /api/organizations/{id}/members
+
+Повертає список усіх записів членів організації.
+
+**200 OK**
+```json
+{
+  "_embedded": {
+    "members": [
+      {
+        "id": 5,
+        "organizationId": 1,
+        "unitId": 2,
+        "customerId": 42,
+        "role": "manager",
+        "canManageOrg": false,
+        "isActive": true,
+        "notifyOnNewTicket": true,
+        "createdAt": "2026-06-01T10:05:00+00:00",
+        "updatedAt": "2026-06-01T10:05:00+00:00"
+      }
+    ]
+  }
+}
+```
+
+---
+
+### GET /api/organizations/{id}/members/{memberId}
+
+Повертає один запис члена.
+
+**200 OK**
+```json
+{
+  "id": 5,
+  "organizationId": 1,
+  "unitId": 2,
+  "customerId": 42,
+  "role": "manager",
+  "canManageOrg": false,
+  "isActive": true,
+  "notifyOnNewTicket": true,
+  "createdAt": "2026-06-01T10:05:00+00:00",
+  "updatedAt": "2026-06-01T10:05:00+00:00"
+}
+```
+
+---
+
+### PUT /api/organizations/{id}/members/{memberId}
+
+Оновіть роль члена, призначення одиниці, прапорець canManageOrg або статус активності. Оновлюються лише поля, присутні в тілі (часткове оновлення).
+
+**Тіло запиту**
+
+| Field | Type | Required | Description |
+|-------|------|:--------:|-------------|
+| `role` | string | — | `"member"` або `"manager"` |
+| `unitId` | integer\|null | — | Структурна одиниця (повинна належати цій організації), або `null` для скасування призначення |
+| `canManageOrg` | boolean | — | Надайте права глобального менеджера в портальному |
+| `isActive` | boolean | — | `false` щоб деактивувати без видалення |
+
+```bash
+curl -X PUT "https://your-freescout.com/api/organizations/1/members/5" \
+  -H "X-FreeScout-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"role": "manager", "unitId": 2, "canManageOrg": true, "isActive": true}'
+```
+
+**200 OK**
+```json
+{"success": true, "message": "Member updated."}
+```
+
+---
+
+### DELETE /api/organizations/{id}/members/{memberId}
+
+Видалення члена з організації.
+
+**200 OK**
+```json
+{"success": true, "message": "Member removed."}
+```
+
+---
+
+## Мітки організації
+
+> Потребує активного модуля [Tags](https://freescout.net/module/tags/). Повертає `503` якщо модуль не встановлено.
+
+### GET /api/organizations/{id}/tags
+
+Повертає всі прив'язки міток для організації. Кожна прив'язка опціонально обмежує мітку конкретною одиницею.
+
+**200 OK**
+```json
+{
+  "_embedded": {
+    "tags": [
+      { "id": 1, "organizationId": 1, "tagId": 5, "unitId": null },
+      { "id": 2, "organizationId": 1, "tagId": 8, "unitId": 2 }
+    ]
+  }
+}
+```
+
+---
+
+### PUT /api/organizations/{id}/tags
+
+**Повна заміна** — замінює всі існуючі прив'язки міток для цієї організації поданим списком. Надішліть порожній масив `[]` щоб видалити всі прив'язки.
+
+**Тіло запиту** — масив JSON об'єктів прив'язок міток:
+
+| Field | Type | Required | Description |
+|-------|------|:--------:|-------------|
+| `tagId` | integer | ✅ | ID мітки FreeScout |
+| `unitId` | integer\|null | — | Обмежте мітку конкретною одиницею, або опустіть/`null` для всієї організації |
+
+```bash
+curl -X PUT "https://your-freescout.com/api/organizations/1/tags" \
+  -H "X-FreeScout-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '[{"tagId": 5}, {"tagId": 8, "unitId": 2}]'
+```
+
+**200 OK**
+```json
+{"success": true, "message": "Tags updated."}
+```
+
+---
+
+## Структурні одиниці
 
 ### GET /api/organizations/{id}/units
 
@@ -239,9 +389,9 @@ curl -X PUT "https://your-freescout.com/api/organizations/1" \
 
 **Тіло запиту**
 
-| Поле | Тип | Обов'язкове | Опис |
+| Field | Type | Required | Description |
 |-------|------|:--------:|-------------|
-| `name` | string | ✅ | Назва підрозділу (унікальна в межах організації) |
+| `name` | string | ✅ | Назва одиниці (унікальна в межах організації) |
 
 ```bash
 curl -X POST "https://your-freescout.com/api/organizations/1/units" \
@@ -267,9 +417,9 @@ curl -X POST "https://your-freescout.com/api/organizations/1/units" \
 
 **Тіло запиту**
 
-| Поле | Тип | Обов'язкове | Опис |
+| Field | Type | Required | Description |
 |-------|------|:--------:|-------------|
-| `name` | string | ✅ | Нова назва підрозділу (унікальна в межах організації) |
+| `name` | string | ✅ | Нова назва одиниці (унікальна в межах організації) |
 
 ```bash
 curl -X PUT "https://your-freescout.com/api/units/2" \
@@ -287,7 +437,7 @@ curl -X PUT "https://your-freescout.com/api/units/2" \
 
 ### DELETE /api/units/{unitId}
 
-Видаляє підрозділ. Менеджери, обмежені цим підрозділом, понижуються до `member`; всі члени підрозділу розпорядження (їх `unitId` стає `null`).
+Видаляє одиницю. Менеджери обмежені цією одиницею понижуються до `member`; усі члени одиниці не призначуються (їх `unitId` стає `null`).
 
 **200 OK**
 ```json
@@ -319,22 +469,23 @@ curl -X PUT "https://your-freescout.com/api/units/2" \
 
 ### PUT /api/customers/{id}/organization
 
-Призначає клієнта організації або оновлює його членство. **Одне активне членство на клієнта**: якщо клієнт вже має *активне* членство в *іншій* організації, запит відхиляється з `409 Conflict`. Для передачі — спочатку деактивуйте або видаліть поточне членство через `DELETE`.
+Призначає клієнта до організації або оновлює його членство. **Одне активне членство на клієнта**: якщо клієнт вже має *активне* членство в *іншій* організації, запит відхиляється з `409 Conflict`. Для переведення — спочатку деактивуйте або видаліть поточне членство через `DELETE`.
 
 **Тіло запиту**
 
-| Поле | Тип | Обов'язкове | Опис |
+| Field | Type | Required | Description |
 |-------|------|:--------:|-------------|
 | `organizationId` | integer | ✅ | ID організації |
 | `role` | string | — | `"member"` (за замовчуванням) або `"manager"` |
-| `unitId` | integer\|null | — | Структурний підрозділ (повинен належати цільовій організації), або `null` для цілої організації |
-| `canManageOrg` | boolean | — | Надати цьому менеджеру право просувати інших до глобального менеджера (за замовчуванням `false`) |
+| `unitId` | integer\|null | — | Структурна одиниця (повинна належати цільовій організації), або `null` для всієї організації |
+| `canManageOrg` | boolean | — | Надайте цьому менеджеру право просувати інших до глобального менеджера (за замовчуванням `false`) |
+| `isActive` | boolean | — | `false` щоб створити/оновити як неактивне (за замовчуванням `true`) |
 
 ```bash
 curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
   -H "X-FreeScout-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"organizationId": 1, "role": "manager", "unitId": 2, "canManageOrg": false}'
+  -d '{"organizationId": 1, "role": "manager", "unitId": 2, "canManageOrg": false, "isActive": true}'
 ```
 
 **201 Created** *(нове членство)*
@@ -347,7 +498,7 @@ curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
 {"success": true, "message": "Membership updated."}
 ```
 
-**409 Conflict** *(клієнт уже активний в іншій організації)*
+**409 Conflict** *(клієнт вже активний в іншій організації)*
 ```json
 {
   "message": "Customer already has an active membership in another organization.",

@@ -1,8 +1,8 @@
-# API REST OrgPortal
+# OrgPortal REST API
 
-[← Retour au README](../README.fr.md)
+[← Retour au README](../../README.md)
 
-🌐 **Langue:**
+🌐 **Language:**
 [English](README.md) ·
 [Українська](README.uk.md) ·
 [Deutsch](README.de.md) ·
@@ -24,39 +24,46 @@
 
 ---
 
-*Optionnel — nécessite le module [API et Webhooks](https://freescout.net/module/api-webhooks/).*
+*Facultatif — nécessite le module [API and Webhooks](https://freescout.net/module/api-webhooks/).*
 
 Authentification — en-tête `X-FreeScout-API-Key` ou paramètre de requête `api_key`.
 
-> **Documentation interactive** (ReDoc) est disponible sur la page **Gérer → API & Webhooks** (lien "Documentation de l'API OrgPortal") ou directement à `/orgportal/admin/api-docs`.
+> **Documentation interactive** (ReDoc) est disponible sur la page **Gérer → API & Webhooks** (lien "OrgPortal API Docs") ou directement à `/orgportal/admin/api-docs`.
 
 ## Points de terminaison
 
-| Méthode | Point de terminaison | Description |
-|---------|-----------------|------------|
-| `GET` | `/api/organizations` | Lister les organisations (pagination, filtre boîte aux lettres) |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/organizations` | Lister les organisations (pagination, filtre de boîte postale) |
 | `POST` | `/api/organizations` | Créer une organisation |
-| `GET` | `/api/organizations/{id}` | Obtenir l'organisation avec les membres et unités |
-| `PUT` | `/api/organizations/{id}` | Mettre à jour l'organisation |
-| `DELETE` | `/api/organizations/{id}` | Supprimer l'organisation |
+| `GET` | `/api/organizations/{id}` | Obtenir une organisation avec ses membres et unités |
+| `PUT` | `/api/organizations/{id}` | Mettre à jour une organisation (nom, couleur, boîte postale, isActive) |
+| `DELETE` | `/api/organizations/{id}` | Supprimer une organisation |
+| `GET` | `/api/organizations/{id}/members` | Lister les membres de l'organisation |
+| `GET` | `/api/organizations/{id}/members/{memberId}` | Obtenir un seul membre |
+| `PUT` | `/api/organizations/{id}/members/{memberId}` | Mettre à jour un membre (rôle, unité, canManageOrg, isActive) |
+| `DELETE` | `/api/organizations/{id}/members/{memberId}` | Supprimer un membre |
+| `GET` | `/api/organizations/{id}/tags` | Lister les liaisons d'étiquettes (nécessite le module Tags) |
+| `PUT` | `/api/organizations/{id}/tags` | Remplacer toutes les liaisons d'étiquettes (nécessite le module Tags) |
 | `GET` | `/api/organizations/{id}/units` | Lister les unités structurelles |
 | `POST` | `/api/organizations/{id}/units` | Créer une unité structurelle |
 | `PUT` | `/api/units/{unitId}` | Renommer une unité |
-| `DELETE` | `/api/units/{unitId}` | Supprimer une unité (membres non assignés, gestionnaires rétrogradés) |
-| `GET` | `/api/customers/{id}/organization` | Adhésion du client à l'organisation |
-| `PUT` | `/api/customers/{id}/organization` | Définir/mettre à jour l'adhésion du client |
-| `DELETE` | `/api/customers/{id}/organization` | Supprimer le client de l'organisation |
+| `DELETE` | `/api/units/{unitId}` | Supprimer une unité (membres non assignés, responsables rétrogradés) |
+| `GET` | `/api/customers/{id}/organization` | Appartenance du client à l'organisation |
+| `PUT` | `/api/customers/{id}/organization` | Définir/mettre à jour l'appartenance du client |
+| `DELETE` | `/api/customers/{id}/organization` | Supprimer un client de l'organisation |
 
 ## Codes de réponse
 
-| Code | Signification |
-|------|-----------|
-| `200` | Succès ou pas d'opération (rien n'a changé) |
-| `201` | Ressource créée; l'en-tête `Resource-ID` contient l'ID |
+| Code | Meaning |
+|------|---------|
+| `200` | Succès |
+| `201` | Ressource créée ; l'en-tête `Resource-ID` contient l'ID |
 | `400` | Erreur de validation — détails dans `_embedded.errors` |
 | `401` | Clé API invalide ou manquante |
 | `404` | Ressource non trouvée |
-| `409` | Conflit — le client dispose déjà d'une adhésion active dans une autre organisation |
+| `409` | Conflit — le client a déjà un adhésion active dans une autre organisation |
+| `503` | Le module requis (par ex. Tags) n'est pas actif |
 
 ---
 
@@ -66,11 +73,11 @@ Authentification — en-tête `X-FreeScout-API-Key` ou paramètre de requête `a
 
 **Paramètres de requête**
 
-| Paramètre | Type | Par défaut | Description |
-|-----------|------|:--------:|------------|
-| `page` | integer | `1` | Numéro de page |
+| Parameter | Type | Default | Description |
+|-----------|------|:-------:|-------------|
+| `page` | integer | `1` | Numéro de la page |
 | `pageSize` | integer | `25` | Enregistrements par page (max 100) |
-| `mailboxId` | integer | — | Filtre de boîte aux lettres : retourne les organisations globales + celles liées à cette boîte |
+| `mailboxId` | integer | — | Filtre de boîte postale : renvoie les organisations globales + celles liées à cette boîte postale |
 
 ```bash
 curl -X GET "https://your-freescout.com/api/organizations?mailboxId=3" \
@@ -85,6 +92,8 @@ curl -X GET "https://your-freescout.com/api/organizations?mailboxId=3" \
       {
         "id": 1,
         "name": "Acme Corp",
+        "color": "#4a90d9",
+        "isActive": true,
         "mailboxId": null,
         "createdAt": "2026-06-01T10:00:00+00:00",
         "updatedAt": "2026-06-01T10:00:00+00:00"
@@ -101,10 +110,10 @@ curl -X GET "https://your-freescout.com/api/organizations?mailboxId=3" \
 
 **Corps de la requête**
 
-| Champ | Type | Requis | Description |
-|-------|------|:--------:|------------|
+| Field | Type | Required | Description |
+|-------|------|:--------:|-------------|
 | `name` | string | ✅ | Nom de l'organisation (max 255 caractères, unique) |
-| `mailboxId` | integer\|null | — | ID de la boîte aux lettres ou `null` / omis pour organisation globale |
+| `mailboxId` | integer\|null | — | ID de boîte postale ou `null` / omettre pour une organisation globale |
 
 ```bash
 curl -X POST "https://your-freescout.com/api/organizations" \
@@ -118,6 +127,8 @@ curl -X POST "https://your-freescout.com/api/organizations" \
 {
   "id": 1,
   "name": "Acme Corp",
+  "color": null,
+  "isActive": true,
   "mailboxId": 3,
   "createdAt": "2026-06-01T10:00:00+00:00",
   "updatedAt": "2026-06-01T10:00:00+00:00"
@@ -128,13 +139,15 @@ curl -X POST "https://your-freescout.com/api/organizations" \
 
 ### GET /api/organizations/{id}
 
-Retourne l'organisation avec ses **membres** et **unités** imbriqués.
+Retourne l'organisation avec ses **membres** et **unités** embarqués.
 
 **200 OK**
 ```json
 {
   "id": 1,
   "name": "Acme Corp",
+  "color": "#4a90d9",
+  "isActive": true,
   "mailboxId": null,
   "createdAt": "2026-06-01T10:00:00+00:00",
   "updatedAt": "2026-06-01T10:00:00+00:00",
@@ -168,13 +181,13 @@ Retourne l'organisation avec ses **membres** et **unités** imbriqués.
 
 **Champs des membres**
 
-| Champ | Type | Description |
-|-------|------|------------|
-| `unitId` | integer\|null | Unité structurelle à laquelle le membre appartient, ou `null` pour toute l'organisation |
+| Field | Type | Description |
+|-------|------|-------------|
+| `unitId` | integer\|null | Unité structurelle à laquelle appartient le membre, ou `null` pour l'ensemble de l'organisation |
 | `role` | string | `member` ou `manager` |
-| `canManageOrg` | boolean | Indique si ce gestionnaire peut promouvoir d'autres personnes gestionnaire global à partir du portail |
-| `isActive` | boolean | Adhésion active; les membres inactifs ne reçoivent ni assignations ni notifications de tickets |
-| `notifyOnNewTicket` | boolean | Paramètre de notification par ticket hérité pour chaque membre |
+| `canManageOrg` | boolean | Si ce responsable peut promouvoir d'autres responsables globaux via le portail |
+| `isActive` | boolean | Adhésion active ; les membres inactifs ne reçoivent pas d'assignations ou de notifications de tickets |
+| `notifyOnNewTicket` | boolean | Indicateur de notification de nouveau ticket par membre |
 
 ---
 
@@ -182,24 +195,24 @@ Retourne l'organisation avec ses **membres** et **unités** imbriqués.
 
 **Corps de la requête**
 
-| Champ | Type | Requis | Description |
-|-------|------|:--------:|------------|
+| Field | Type | Required | Description |
+|-------|------|:--------:|-------------|
 | `name` | string | ✅ | Nouveau nom de l'organisation (max 255 caractères, unique) |
-| `mailboxId` | integer\|null | — | Nouvelle boîte aux lettres; `null` — rendre global; omis — laisser inchangé |
+| `color` | string\|null | — | Couleur du badge en hex (`"#ff0000"`), `null` pour réinitialiser au gris par défaut ; omettre pour conserver le courant |
+| `mailboxId` | integer\|null | — | Nouvelle boîte postale ; `null` — rendre global ; omettre — laisser inchangé |
+| `isActive` | boolean | — | `false` pour désactiver l'organisation ; omettre pour conserver le courant |
 
 ```bash
 curl -X PUT "https://your-freescout.com/api/organizations/1" \
   -H "X-FreeScout-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"name": "Acme Corporation", "mailboxId": null}'
+  -d '{"name": "Acme Corporation", "color": "#4a90d9", "isActive": true}'
 ```
 
 **200 OK**
 ```json
 {"success": true, "message": "Organization updated."}
 ```
-
-En cas d'absence de modification, le message de réponse est `No changes — organization already has this name and mailbox.`
 
 ---
 
@@ -208,6 +221,143 @@ En cas d'absence de modification, le message de réponse est `No changes — org
 **200 OK** *(tous les membres sont supprimés en cascade)*
 ```json
 {"success": true, "message": "Organization deleted."}
+```
+
+---
+
+## Membres de l'organisation
+
+### GET /api/organizations/{id}/members
+
+Retourne une liste de tous les enregistrements de membres de l'organisation.
+
+**200 OK**
+```json
+{
+  "_embedded": {
+    "members": [
+      {
+        "id": 5,
+        "organizationId": 1,
+        "unitId": 2,
+        "customerId": 42,
+        "role": "manager",
+        "canManageOrg": false,
+        "isActive": true,
+        "notifyOnNewTicket": true,
+        "createdAt": "2026-06-01T10:05:00+00:00",
+        "updatedAt": "2026-06-01T10:05:00+00:00"
+      }
+    ]
+  }
+}
+```
+
+---
+
+### GET /api/organizations/{id}/members/{memberId}
+
+Retourne un seul enregistrement de membre.
+
+**200 OK**
+```json
+{
+  "id": 5,
+  "organizationId": 1,
+  "unitId": 2,
+  "customerId": 42,
+  "role": "manager",
+  "canManageOrg": false,
+  "isActive": true,
+  "notifyOnNewTicket": true,
+  "createdAt": "2026-06-01T10:05:00+00:00",
+  "updatedAt": "2026-06-01T10:05:00+00:00"
+}
+```
+
+---
+
+### PUT /api/organizations/{id}/members/{memberId}
+
+Mettez à jour le rôle d'un membre, l'assignation à une unité, l'indicateur canManageOrg ou le statut actif. Seuls les champs présents dans le corps sont mis à jour (mise à jour partielle).
+
+**Corps de la requête**
+
+| Field | Type | Required | Description |
+|-------|------|:--------:|-------------|
+| `role` | string | — | `"member"` ou `"manager"` |
+| `unitId` | integer\|null | — | Unité structurelle (doit appartenir à cette organisation), ou `null` pour annuler l'assignation |
+| `canManageOrg` | boolean | — | Accordez des droits de gestionnaire global dans le portail |
+| `isActive` | boolean | — | `false` pour désactiver sans supprimer |
+
+```bash
+curl -X PUT "https://your-freescout.com/api/organizations/1/members/5" \
+  -H "X-FreeScout-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"role": "manager", "unitId": 2, "canManageOrg": true, "isActive": true}'
+```
+
+**200 OK**
+```json
+{"success": true, "message": "Member updated."}
+```
+
+---
+
+### DELETE /api/organizations/{id}/members/{memberId}
+
+Supprimer un membre de l'organisation.
+
+**200 OK**
+```json
+{"success": true, "message": "Member removed."}
+```
+
+---
+
+## Étiquettes de l'organisation
+
+> Nécessite le module [Tags](https://freescout.net/module/tags/) actif. Renvoie `503` si le module n'est pas installé.
+
+### GET /api/organizations/{id}/tags
+
+Retourne toutes les liaisons d'étiquettes pour l'organisation. Chaque liaison limite facultativement une étiquette à une unité spécifique.
+
+**200 OK**
+```json
+{
+  "_embedded": {
+    "tags": [
+      { "id": 1, "organizationId": 1, "tagId": 5, "unitId": null },
+      { "id": 2, "organizationId": 1, "tagId": 8, "unitId": 2 }
+    ]
+  }
+}
+```
+
+---
+
+### PUT /api/organizations/{id}/tags
+
+**Remplacement complet** — remplace toutes les liaisons d'étiquettes existantes pour cette organisation par la liste fournie. Envoyez un tableau vide `[]` pour supprimer toutes les liaisons.
+
+**Corps de la requête** — un tableau JSON d'objets de liaison d'étiquettes :
+
+| Field | Type | Required | Description |
+|-------|------|:--------:|-------------|
+| `tagId` | integer | ✅ | ID d'étiquette FreeScout |
+| `unitId` | integer\|null | — | Limitez l'étiquette à une unité spécifique, ou omettre/`null` pour l'organisation entière |
+
+```bash
+curl -X PUT "https://your-freescout.com/api/organizations/1/tags" \
+  -H "X-FreeScout-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '[{"tagId": 5}, {"tagId": 8, "unitId": 2}]'
+```
+
+**200 OK**
+```json
+{"success": true, "message": "Tags updated."}
 ```
 
 ---
@@ -239,8 +389,8 @@ En cas d'absence de modification, le message de réponse est `No changes — org
 
 **Corps de la requête**
 
-| Champ | Type | Requis | Description |
-|-------|------|:--------:|------------|
+| Field | Type | Required | Description |
+|-------|------|:--------:|-------------|
 | `name` | string | ✅ | Nom de l'unité (unique au sein de l'organisation) |
 
 ```bash
@@ -267,8 +417,8 @@ curl -X POST "https://your-freescout.com/api/organizations/1/units" \
 
 **Corps de la requête**
 
-| Champ | Type | Requis | Description |
-|-------|------|:--------:|------------|
+| Field | Type | Required | Description |
+|-------|------|:--------:|-------------|
 | `name` | string | ✅ | Nouveau nom de l'unité (unique au sein de l'organisation) |
 
 ```bash
@@ -287,7 +437,7 @@ curl -X PUT "https://your-freescout.com/api/units/2" \
 
 ### DELETE /api/units/{unitId}
 
-Supprime l'unité. Les gestionnaires limités à cette unité sont rétrogradés à `member`; tous les membres de l'unité sont non assignés (leur `unitId` devient `null`).
+Supprime l'unité. Les responsables limités à cette unité sont rétrogradés à `member` ; tous les membres de l'unité ne sont pas assignés (leur `unitId` devient `null`).
 
 **200 OK**
 ```json
@@ -296,7 +446,7 @@ Supprime l'unité. Les gestionnaires limités à cette unité sont rétrogradés
 
 ---
 
-## Adhésion client
+## Appartenance du client
 
 ### GET /api/customers/{id}/organization
 
@@ -319,22 +469,23 @@ Supprime l'unité. Les gestionnaires limités à cette unité sont rétrogradés
 
 ### PUT /api/customers/{id}/organization
 
-Assigne un client à une organisation ou met à jour son adhésion. **Une adhésion active par client** : si le client dispose déjà d'une adhésion *active* dans *une autre* organisation, la requête est rejetée avec `409 Conflict`. Pour transférer — d'abord désactiver ou supprimer l'adhésion actuelle via `DELETE`.
+Assigne un client à une organisation ou met à jour son appartenance. **Une adhésion active par client** : si le client a déjà une adhésion *active* dans une *autre* organisation, la demande est rejetée avec `409 Conflict`. Pour transférer — déactivez ou supprimez d'abord l'adhésion actuelle via `DELETE`.
 
 **Corps de la requête**
 
-| Champ | Type | Requis | Description |
-|-------|------|:--------:|------------|
+| Field | Type | Required | Description |
+|-------|------|:--------:|-------------|
 | `organizationId` | integer | ✅ | ID de l'organisation |
 | `role` | string | — | `"member"` (par défaut) ou `"manager"` |
-| `unitId` | integer\|null | — | Unité structurelle (doit appartenir à l'organisation cible), ou `null` pour toute l'organisation |
-| `canManageOrg` | boolean | — | Accorder à ce gestionnaire le droit de promouvoir d'autres personnes gestionnaire global (par défaut `false`) |
+| `unitId` | integer\|null | — | Unité structurelle (doit appartenir à l'organisation cible), ou `null` pour l'ensemble de l'organisation |
+| `canManageOrg` | boolean | — | Accordez à ce responsable le droit de promouvoir d'autres responsables globaux (par défaut `false`) |
+| `isActive` | boolean | — | `false` pour créer/mettre à jour comme inactif (par défaut `true`) |
 
 ```bash
 curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
   -H "X-FreeScout-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"organizationId": 1, "role": "manager", "unitId": 2, "canManageOrg": false}'
+  -d '{"organizationId": 1, "role": "manager", "unitId": 2, "canManageOrg": false, "isActive": true}'
 ```
 
 **201 Created** *(nouvelle adhésion)*
@@ -347,7 +498,7 @@ curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
 {"success": true, "message": "Membership updated."}
 ```
 
-**409 Conflict** *(client déjà actif dans une autre organisation)*
+**409 Conflict** *(le client est déjà actif dans une autre organisation)*
 ```json
 {
   "message": "Customer already has an active membership in another organization.",

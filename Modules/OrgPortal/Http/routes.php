@@ -119,6 +119,24 @@ if (\Module::isActive('apiwebhooks')) {
         Route::delete('organizations/{id}', 'OrgPortalApiController@deleteOrganization')
             ->name('orgportal.api.organizations.delete');
 
+        Route::get('organizations/{id}/members', 'OrgPortalApiController@listMembers')
+            ->name('orgportal.api.members.list');
+
+        Route::get('organizations/{id}/members/{memberId}', 'OrgPortalApiController@getMember')
+            ->name('orgportal.api.members.get');
+
+        Route::put('organizations/{id}/members/{memberId}', 'OrgPortalApiController@updateMember')
+            ->name('orgportal.api.members.update');
+
+        Route::delete('organizations/{id}/members/{memberId}', 'OrgPortalApiController@deleteMember')
+            ->name('orgportal.api.members.delete');
+
+        Route::get('organizations/{id}/tags', 'OrgPortalApiController@listTags')
+            ->name('orgportal.api.tags.list');
+
+        Route::put('organizations/{id}/tags', 'OrgPortalApiController@setTags')
+            ->name('orgportal.api.tags.set');
+
         Route::get('organizations/{id}/units', 'OrgPortalApiController@listUnits')
             ->name('orgportal.api.units.list');
 

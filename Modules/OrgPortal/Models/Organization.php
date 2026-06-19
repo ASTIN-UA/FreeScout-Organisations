@@ -9,7 +9,7 @@ class Organization extends Model
 {
     protected $table = 'organizations';
 
-    protected $fillable = ['name', 'color', 'mailbox_id'];
+    protected $fillable = ['name', 'color', 'mailbox_id', 'is_active'];
 
     protected $casts = ['mailbox_id' => 'integer'];
 
