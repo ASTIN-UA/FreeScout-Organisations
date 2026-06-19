@@ -74,12 +74,23 @@
     @endphp
     <div style="display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center; margin-top:5px; gap:4px;">
         @foreach($companyFilters as $filter)
-        @php $fid = (int)$filter['id']; @endphp
+        @php
+            $fid = (int)$filter['id'];
+            $loc = app()->getLocale();
+            if (isset($filter['labels'])) {
+                $flabel = $filter['labels'][$loc]
+                       ?? $filter['labels']['en']
+                       ?? $filter['name']
+                       ?? '';
+            } else {
+                $flabel = $filter['label'] ?? '';
+            }
+        @endphp
         <label class="checkbox" style="margin:0;" for="ct-f{{ $fid }}">
             <input @if(isset($status[$fid])) checked @endif
                    type="checkbox" value="{{ $fid }}"
                    id="ct-f{{ $fid }}" name="status[{{ $fid }}]" />
-            {{ $filter['label'] }}
+            {{ $flabel }}
         </label>
         @endforeach
         <label class="checkbox" style="margin:0;" for="ct-closed">

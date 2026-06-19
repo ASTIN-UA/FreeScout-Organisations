@@ -59,37 +59,93 @@
             <div class="panel-body">
                 <p class="text-muted" style="font-size:13px;">{{ __('orgportal::messages.company_filters_hint') }}</p>
 
-                @php $savedById = collect($companyFilters)->keyBy('id'); @endphp
-
                 @if(!empty($kanbanColumns))
-                <table class="table table-condensed">
+                @php
+                    $savedById = collect($companyFilters)->keyBy('id');
+                    // Build ordered rows: saved filters first (in saved order), then unsaved columns
+                    $orderedRows = [];
+                    foreach ($companyFilters as $cf) {
+                        $colId = $cf['id'];
+                        if (isset($savedById[$colId])) {
+                            $col = collect($kanbanColumns)->firstWhere('id', $colId) ?? ['id' => $colId, 'name' => $cf['name'] ?? '', 'board_name' => ''];
+                            $orderedRows[] = ['col' => $col, 'saved' => $cf, 'checked' => true];
+                        }
+                    }
+                    foreach ($kanbanColumns as $col) {
+                        if (!isset($savedById[$col['id']])) {
+                            $orderedRows[] = ['col' => $col, 'saved' => null, 'checked' => false];
+                        }
+                    }
+                    $activeLocale = $filterLocales[0] ?? 'en';
+                @endphp
+
+                {{-- Locale selector (only when more than one locale) --}}
+                @if(count($filterLocales) > 1)
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+                    <label for="cf-locale-select" style="margin:0;font-weight:normal;">
+                        {{ __('orgportal::messages.filter_label_language') }}:
+                    </label>
+                    <select id="cf-locale-select" class="form-control" style="width:auto;min-width:160px;">
+                        @foreach($filterLocales as $loc)
+                        <option value="{{ $loc }}" {{ $loc === $activeLocale ? 'selected' : '' }}>
+                            {{ $localeNames[$loc] ?? $loc }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+                @endif
+
+                <table class="table table-condensed" id="cf-sortable-table">
                     <thead>
                         <tr>
-                            <th style="width:36px;"></th>
+                            <th style="width:24px;"></th>{{-- drag handle --}}
+                            <th style="width:32px;"></th>{{-- checkbox --}}
+                            <th style="color:#999;">{{ __('orgportal::messages.filter_original_name') }}</th>
                             <th>{{ __('orgportal::messages.filter_label') }}</th>
-                            <th style="width:160px; color:#999;">{{ __('orgportal::messages.filter_board') }}</th>
+                            <th style="width:150px;color:#999;">{{ __('orgportal::messages.filter_board') }}</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach($kanbanColumns as $col)
+                    <tbody id="cf-tbody">
+                        @foreach($orderedRows as $row)
                         @php
-                            $checked    = isset($savedById[$col['id']]);
-                            $savedLabel = $checked ? $savedById[$col['id']]['label'] : $col['name'];
+                            $col     = $row['col'];
+                            $colId   = $col['id'];
+                            $checked = $row['checked'];
+                            $saved   = $row['saved'];
+                            // labels map for all locales
+                            $labelsMap = $saved['labels'] ?? [];
                         @endphp
-                        <tr>
-                            <td>
+                        <tr class="cf-row" data-col-id="{{ $colId }}">
+                            <td style="cursor:move;color:#ccc;vertical-align:middle;">
+                                <span class="cf-drag-handle glyphicon glyphicon-menu-hamburger"></span>
+                                <input type="hidden" name="company_filter_sort[{{ $colId }}]"
+                                       class="cf-sort-input" value="0">
+                            </td>
+                            <td style="vertical-align:middle;">
                                 <input type="checkbox"
                                        name="company_filter_ids[]"
-                                       value="{{ $col['id'] }}"
+                                       value="{{ $colId }}"
                                        {{ $checked ? 'checked' : '' }}>
+                                <input type="hidden"
+                                       name="company_filter_names[{{ $colId }}]"
+                                       value="{{ e($col['name']) }}">
+                            </td>
+                            <td style="color:#555;vertical-align:middle;font-size:13px;">
+                                {{ $col['name'] }}
                             </td>
                             <td>
+                                {{-- One input per locale, show/hide via JS --}}
+                                @foreach($filterLocales as $loc)
                                 <input type="text"
-                                       name="company_filter_labels[{{ $col['id'] }}]"
-                                       class="form-control input-sm"
-                                       value="{{ $savedLabel }}">
+                                       name="company_filter_labels[{{ $colId }}][{{ $loc }}]"
+                                       class="form-control input-sm cf-label-input"
+                                       data-locale="{{ $loc }}"
+                                       placeholder="{{ $col['name'] }}"
+                                       value="{{ $labelsMap[$loc] ?? '' }}"
+                                       style="{{ $loc === $activeLocale ? '' : 'display:none;' }}">
+                                @endforeach
                             </td>
-                            <td style="color:#999; font-size:12px; vertical-align:middle;">
+                            <td style="color:#999;font-size:12px;vertical-align:middle;">
                                 {{ $col['board_name'] }}
                             </td>
                         </tr>
@@ -101,6 +157,34 @@
                 @endif
             </div>
         </div>
+
+        <script>
+        $(function() {
+            // Locale switcher
+            $('#cf-locale-select').on('change', function() {
+                var loc = $(this).val();
+                $('.cf-label-input').hide();
+                $('.cf-label-input[data-locale="' + loc + '"]').show();
+            });
+
+            // Drag & drop sorting via jQuery UI sortable
+            if ($.fn.sortable) {
+                $('#cf-tbody').sortable({
+                    handle: '.cf-drag-handle',
+                    axis: 'y',
+                    update: function() {
+                        $('#cf-tbody .cf-row').each(function(i) {
+                            $(this).find('.cf-sort-input').val(i);
+                        });
+                    }
+                });
+                // Set initial sort values
+                $('#cf-tbody .cf-row').each(function(i) {
+                    $(this).find('.cf-sort-input').val(i);
+                });
+            }
+        });
+        </script>
         @endif
 
         <div class="form-group">

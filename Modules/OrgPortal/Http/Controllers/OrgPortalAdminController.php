@@ -486,6 +486,32 @@ class OrgPortalAdminController extends Controller
             usort($kanbanColumns, fn($a, $b) => $a['id'] <=> $b['id']);
         }
 
+        // Migrate legacy format [{id, label}] → [{id, name, labels:{en:…}, sort}]
+        $nameById = collect($kanbanColumns)->keyBy('id');
+        foreach ($companyFilters as &$f) {
+            if (!isset($f['labels'])) {
+                $f['labels'] = ['en' => $f['label'] ?? ''];
+                $f['name']   = $nameById[$f['id']]['name'] ?? '';
+                unset($f['label']);
+            }
+            if (!isset($f['sort'])) {
+                $f['sort'] = 0;
+            }
+        }
+        unset($f);
+        usort($companyFilters, fn($a, $b) => $a['sort'] <=> $b['sort']);
+
+        $langSwitcherEnabled = (bool) \Option::get('orgportal.lang_switcher_enabled', false);
+        $rawLocales          = \Option::get('orgportal.lang_switcher_locales', []);
+        $filterLocales       = array_unique(array_merge(
+            ['en'],
+            $langSwitcherEnabled && is_array($rawLocales) ? $rawLocales : []
+        ));
+        $localeNames = [];
+        foreach ($filterLocales as $loc) {
+            $localeNames[$loc] = \Modules\OrgPortal\Providers\OrgPortalServiceProvider::getLocaleName($loc);
+        }
+
         $perConv     = \Option::get('orgportal.show_badge_conversation_' . $mailbox_id);
         $perKanban   = \Option::get('orgportal.show_badge_kanban_' . $mailbox_id);
         $perProfile  = \Option::get('orgportal.show_org_in_profile_' . $mailbox_id);
@@ -497,6 +523,8 @@ class OrgPortalAdminController extends Controller
             'mailbox'                 => $mailbox,
             'companyFilters'          => $companyFilters,
             'kanbanColumns'           => $kanbanColumns,
+            'filterLocales'           => $filterLocales,
+            'localeNames'             => $localeNames,
             'show_badge_conversation' => $show_badge_conversation,
             'show_badge_kanban'       => $show_badge_kanban,
             'show_org_in_profile'     => $show_org_in_profile,
@@ -509,16 +537,29 @@ class OrgPortalAdminController extends Controller
 
         \App\Mailbox::findOrFail($id);
 
-        $filters = [];
+        $filters      = [];
         $selectedIds  = $request->input('company_filter_ids', []);
-        $columnLabels = $request->input('company_filter_labels', []);
+        $columnLabels = $request->input('company_filter_labels', []);   // [colId][locale] = label
+        $columnNames  = $request->input('company_filter_names', []);    // [colId] = original name
+        $sortOrder    = $request->input('company_filter_sort', []);     // [colId] = sort index
         foreach ($selectedIds as $sid) {
-            $sid   = (int) $sid;
-            $label = trim($columnLabels[$sid] ?? '');
-            if ($sid > 0 && $label !== '') {
-                $filters[] = ['id' => $sid, 'label' => $label];
+            $sid = (int) $sid;
+            if ($sid <= 0) continue;
+            $labels = [];
+            foreach ((array) ($columnLabels[$sid] ?? []) as $loc => $lbl) {
+                $lbl = trim((string) $lbl);
+                if ($lbl !== '') {
+                    $labels[preg_replace('/[^a-zA-Z0-9_\-]/', '', $loc)] = $lbl;
+                }
             }
+            $filters[] = [
+                'id'     => $sid,
+                'name'   => strip_tags(trim($columnNames[$sid] ?? '')),
+                'labels' => $labels,
+                'sort'   => (int) ($sortOrder[$sid] ?? 999),
+            ];
         }
+        usort($filters, fn($a, $b) => $a['sort'] <=> $b['sort']);
         \Option::set('orgportal.company_filters_' . $id, json_encode($filters));
 
         \Option::set('orgportal.show_badge_conversation_' . $id, (bool) $request->input('show_badge_conversation'));

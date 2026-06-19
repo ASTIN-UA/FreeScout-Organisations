@@ -231,9 +231,11 @@ return [
 
     // Company tickets filters (settings)
     'company_filters_heading'     => 'Company Tickets Status Filters',
-    'company_filters_hint'        => 'Select which Kanban columns appear as filter checkboxes on the Company Tickets page. You can customise the label shown to portal users.',
+    'company_filters_hint'        => 'Select which Kanban columns appear as filter checkboxes on the Company Tickets page. Drag rows to reorder. Set a label per portal language — portal users see the label in their chosen language.',
     'filter_column_id'            => 'Column ID',
-    'filter_label'                => 'Label',
+    'filter_original_name'        => 'Kanban column',
+    'filter_label'                => 'Portal label',
+    'filter_label_language'       => 'Language',
     'filter_add'                  => 'Add filter',
     'filter_board'                => 'Board',
     'company_filters_no_boards'   => 'No Kanban boards found. Create a board first.',
