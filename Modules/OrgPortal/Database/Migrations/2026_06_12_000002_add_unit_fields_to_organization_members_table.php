@@ -30,10 +30,19 @@ class AddUnitFieldsToOrganizationMembersTable extends Migration
 
     public function down()
     {
-        Schema::table('organization_members', function (Blueprint $table) {
-            $table->dropForeign(['unit_id']);
-            $table->dropIndex(['unit_id']);
-            $table->dropColumn(['unit_id', 'can_manage_org', 'is_active', 'deactivated_at']);
-        });
+        if (Schema::hasColumn('organization_members', 'unit_id')) {
+            Schema::table('organization_members', function (Blueprint $table) {
+                try { $table->dropForeign(['unit_id']); } catch (\Exception $e) {}
+                try { $table->dropIndex(['unit_id']); } catch (\Exception $e) {}
+                $table->dropColumn('unit_id');
+            });
+        }
+        $extras = ['can_manage_org', 'is_active', 'deactivated_at'];
+        $toDrop = array_filter($extras, fn($c) => Schema::hasColumn('organization_members', $c));
+        if ($toDrop) {
+            Schema::table('organization_members', function (Blueprint $table) use ($toDrop) {
+                $table->dropColumn(array_values($toDrop));
+            });
+        }
     }
 }
