@@ -900,14 +900,24 @@ class OrgPortalServiceProvider extends ServiceProvider
      */
     protected function renderNotificationTemplate(string $event, $manager, $authorMember, $conversation, $thread): array
     {
-        $locale     = app()->getLocale();
-        $subject    = \Option::get('orgportal.tpl_' . $locale . '_' . $event . '_subject', '');
-        $body       = \Option::get('orgportal.tpl_' . $locale . '_' . $event . '_body', '');
+        $locale  = app()->getLocale();
+        $subject = \Option::get('orgportal.tpl_' . $locale . '_' . $event . '_subject', '');
+        $body    = \Option::get('orgportal.tpl_' . $locale . '_' . $event . '_body', '');
 
-        // Fallback to 'en' locale template if no locale-specific one is saved
+        // Fallback chain: DB locale → default file locale → DB en → default file en
+        if ($subject === '' || $body === '') {
+            $defaults = \Modules\OrgPortal\Http\Controllers\OrgPortalAdminController::defaultTemplates($locale);
+            $subject  = $defaults[$event]['subject'] ?? '';
+            $body     = $defaults[$event]['body'] ?? '';
+        }
         if ($subject === '' || $body === '') {
             $subject = \Option::get('orgportal.tpl_en_' . $event . '_subject', '');
             $body    = \Option::get('orgportal.tpl_en_' . $event . '_body', '');
+        }
+        if ($subject === '' || $body === '') {
+            $defaults = \Modules\OrgPortal\Http\Controllers\OrgPortalAdminController::defaultTemplates('en');
+            $subject  = $defaults[$event]['subject'] ?? '';
+            $body     = $defaults[$event]['body'] ?? '';
         }
 
         // Build ticket URL once.
