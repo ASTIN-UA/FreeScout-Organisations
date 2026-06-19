@@ -2,12 +2,11 @@
 
 <img src="Modules/OrgPortal/logo.png" alt="OrgPortal" width="140" align="right">
 
-**OrgPortal** transforms FreeScout into a full-featured **B2B helpdesk platform** with organization management, hierarchical access control, and a dedicated self-service portal for your corporate clients. Built for companies that support other businesses — not just individual customers.
+**OrgPortal** turns FreeScout into a full-featured **B2B helpdesk platform**. Instead of treating every customer as an individual, you work with *companies* — with roles, hierarchies, shared visibility, and a self-service portal your corporate clients actually want to use.
 
-Whether you manage dozens of corporate accounts or thousands, OrgPortal gives your team and your clients the structure, visibility, and automation they need to work at scale.
+Built for teams that support other businesses, not just individual users.
 
 **Minimum FreeScout version:** 1.8.147  
-**Dependencies:** none required  
 **Optional integrations:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
 
 ---
@@ -33,36 +32,41 @@ Whether you manage dozens of corporate accounts or thousands, OrgPortal gives yo
 
 ---
 
-## Why OrgPortal?
+## What changes with OrgPortal
 
-- 🏢 **Built for B2B helpdesks** — group customers into organizations, assign roles, and give corporate managers a self-service portal with full visibility into their company's tickets
-- 🗂️ **Hierarchical structure that scales** — divide organizations into departments, branches, or teams; global managers see everything, unit managers see only their scope
-- 📸 **Permanent ticket attribution** — every ticket is snapshotted to its organization at creation time; historical data stays intact even when customers change organizations
-- 🔔 **Granular notification control** — managers subscribe to exactly the events they care about, per unit, per event type, with per-member overrides in a visual matrix
-- 🌍 **19 languages, zero setup** — fully localized UI and notification email templates out of the box; emails are sent in each manager's own language automatically
-- ⚡ **Enterprise-ready REST API** — full API with interactive ReDoc docs for CRM integrations, automated onboarding, and custom workflows
+Without OrgPortal, FreeScout sees customers — individual people who send emails. Your team has no way to know that Alice, Bob, and Carol all work at Acme Corp, or that Alice is the account manager who should see every ticket, while Carol can only see her own.
+
+With OrgPortal:
+
+- Every customer belongs to a **company (organization)**
+- Companies have **departments** with scoped access
+- Corporate managers get their **own self-service portal** — view all company tickets, reply, close, reassign authors, manage notification preferences
+- Your team sees the **org badge** on every ticket and Kanban card — no hunting for context
+- Every ticket is permanently attributed to its organization at creation time — **historical reporting never breaks**
+- Everything is **API-driven** — connect your CRM, automate onboarding, sync memberships
 
 ---
 
-## Features
+## Organizations
 
-### Organization Management
+*One place for everything about a corporate account.*
 
-*Complete visibility into every corporate account, right inside FreeScout.*
-
-- **Manage → Organizations** — full CRUD: create, edit, delete, activate/deactivate organizations
-- **Live search** — filter the organizations list in real time by name
-- **Mailbox binding** — organizations can be global (all mailboxes) or bound to a specific mailbox
-- **Color-coded badges** — choose from 12 colors; badge appears on tickets and Kanban cards for instant visual identification; enable/disable per mailbox
+- **Manage → Organizations** — create, edit, delete, activate/deactivate organizations
+- **Live search** — filter the list in real time by name
+- **Color-coded badges** — 12 colors; badge appears on tickets and Kanban cards for instant visual identification
 - Clickable badge opens an instant search for all tickets from that organization
-- **Organization filter** in standard FreeScout search — find every ticket from a corporate account in one click
-- Organization info block in the admin ticket sidebar: organization name, structural unit, and member role on every ticket
-- One customer — one organization, enforced at database and API level
-- **Activate / deactivate organizations** — suspend an account without losing any history
-- **Tags column** in the Organizations list — see assigned tags at a glance without opening each record
-- **Ticket count column** — total tickets per organization shown directly in the list
+- **Mailbox binding** — organizations can be global (all mailboxes) or scoped to one mailbox
+- **Activate / deactivate** — suspend an account without losing any history
+- **Tags** — assign FreeScout tags to organizations; visible in the org list and manageable via API
+- **Ticket count** — total open tickets per organization shown directly in the list
+- **Organization filter** in standard FreeScout search — one click finds every ticket from a corporate account
+- Organization name, structural unit, and member role shown in the admin ticket sidebar
 
-### Structural Units — Department-Level Access Control
+![Organizations list — color badges, tags, ticket counts, active/inactive status](docs/screenshots/org-list.png)
+
+---
+
+## Structural Units — Department-Level Access Control
 
 *Support large enterprises with complex internal hierarchies.*
 
@@ -82,19 +86,40 @@ Organizations can be divided into unlimited **structural units** (departments, b
 - Unit managers have full portal capabilities — replies, attachments, author reassignment, close/reopen, notification management — scoped strictly to their unit
 - Ticket access and notification delivery are enforced at unit boundaries
 
-### Org Snapshot — Permanent Ticket Attribution
+![Organization edit — members with roles and units, unit management panel](docs/screenshots/org-edit.png)
+
+---
+
+## Org Snapshot — Permanent Ticket Attribution
 
 *Reliable historical reporting even as your client roster changes.*
 
 When a ticket is created, OrgPortal automatically records the organization context as a permanent snapshot:
 
 - `org_id`, `org_unit_id`, and `org_attributed_at` are written to the conversation at creation time
-- **Immutable snapshot** — if a customer later leaves an organization, their historical tickets remain attributed to that organization; your reporting never breaks
+- **Immutable** — if a customer later leaves an organization, their historical tickets remain attributed to that org; reporting never breaks
 - Attribution source is configurable: via organization membership or direct customer assignment
 - **Backfill existing tickets** with `php artisan orgportal:backfill-attribution`
-- Snapshot visibility and reset controls available in admin settings
+- Snapshot visibility and reset controls in admin settings
 
-### Access Control & Permissions
+![Org Snapshot settings — attribution source and backfill controls](docs/screenshots/attribution-settings.png)
+
+---
+
+## Kanban Integration
+
+*Keep your visual workflow aligned with your B2B accounts.*
+
+- Organization badge on every Kanban card with the account's assigned color
+- **Organization filter** in the Kanban filter panel — multi-select modal with checkboxes; filter state persists across navigation
+- **Multilingual Kanban status filter labels** — give each Kanban column a custom name per portal language; switch locales with the language picker in per-mailbox settings; drag to reorder filters
+- Translated labels appear in both the portal filter bar and the **State** column of the company tickets table; fallback chain: saved locale → saved English → original column name
+
+![Kanban — organization badges on cards and org filter modal](docs/screenshots/kanban-org.png)
+
+---
+
+## Access Control & Permissions
 
 *Delegate organization management without granting admin access.*
 
@@ -103,14 +128,7 @@ When a ticket is created, OrgPortal automatically records the organization conte
 - Deleting organizations remains exclusively admin-only
 - Portal access is strictly scoped per mailbox: a manager from Organization A cannot access Organization B
 
-### Kanban Integration
-
-*Keep your visual workflow aligned with your B2B accounts.*
-
-- Organization badge on every Kanban card with the account's assigned color
-- **Organization filter** in the Kanban filter panel — multi-select modal with checkboxes; filter state persists across navigation
-- **Multilingual Kanban status filter labels** — configure a custom display name for each Kanban column per portal language; switch locales with the language dropdown in per-mailbox settings; labels are shown in both the filter bar and the "State" column
-- "State" column in the Company Tickets portal table shows the translated label for the current portal language, with automatic fallback to English and then to the original column name
+![Granular permissions — allow managing organizations and notification templates](docs/screenshots/user-permissions.png)
 
 ---
 
@@ -131,12 +149,14 @@ A dedicated **Company Tickets** section in portal navigation with a full-feature
 | **Responsible** | Assigned support agent |
 | **Author** | Customer who opened the ticket; click to filter by this author |
 | **Status** | Active / Pending / Closed / Spam with icons |
-| **State** | Kanban column name (only when Kanban module is active) |
+| **State** | Kanban column name in the current portal language (only when Kanban module is active) |
 | **Updated** | Date and time of last reply |
 
 **Two independent read indicators per row:**
 - **Bold row** — manager has unread notifications for this conversation
 - **👁 Eye icon** — the ticket author has not yet opened the latest agent reply
+
+![Company Tickets — full table with read indicators, status filters, and unit filter](docs/screenshots/portal-tickets.png)
 
 ### Ticket Actions in the Portal
 
@@ -146,13 +166,17 @@ Managers can take action directly — no need to contact support:
 - **Close ticket** — a new reply automatically reopens it
 - **Change ticket author** — reassign a ticket to another organization member
 - **Filter by unit** — global managers filter the ticket list by structural unit
-- **Filter by Kanban status** — configurable per mailbox
+- **Filter by Kanban status** — configurable per mailbox, labels shown in the current portal language
+
+![Portal ticket view — reply form with drag & drop attachments](docs/screenshots/portal-reply.png)
 
 ### Manager Viewed Tracking
 
 - A **"viewed"** note appears under agent replies in the admin ticket view when a manager opens the ticket in the portal
 - Shows manager name, role (Organization manager / Unit manager), and time elapsed
 - Global manager and unit manager views tracked and displayed independently — same UX as FreeScout's native "Customer viewed"
+
+![Manager viewed tracking — 'viewed' note appears under agent reply in admin ticket view](docs/screenshots/manager-viewed.png)
 
 ---
 
@@ -168,6 +192,8 @@ Requires the [End-User Portal](https://freescout.net/module/end-user-portal/) mo
 - **Auto-mark as read** when the manager opens the ticket
 - Mark individual notifications read via ×; **Mark all as read** in panel header
 - Polls every 15 seconds; refreshes on browser back/forward navigation (bfcache-aware)
+
+![Real-time notification bell — dropdown with grouped unread notifications](docs/screenshots/portal-bell.png)
 
 ---
 
@@ -185,6 +211,8 @@ Requires the [End-User Portal](https://freescout.net/module/end-user-portal/) mo
   - Disabling a member → auto-reconciles the unit and organization checkboxes
 - Global managers manage all members; unit managers manage only their own unit
 - Notifications use the mail driver of the corresponding mailbox
+
+![Notification subscription matrix — per-unit and per-member toggles](docs/screenshots/portal-subscriptions.png)
 
 ---
 
@@ -217,6 +245,8 @@ Requires the [End-User Portal](https://freescout.net/module/end-user-portal/) mo
 
 Notification language is determined by each manager's portal language selection, saved automatically when they use the language switcher.
 
+![Email templates — per-locale editor with Summernote and macro variable picker](docs/screenshots/admin-templates.png)
+
 ---
 
 ## REST API *(optional)*
@@ -225,14 +255,16 @@ Notification language is determined by each manager's portal language selection,
 
 Requires the [API and Webhooks](https://freescout.net/module/api-webhooks/) module.
 
-- Full CRUD API for organizations, structural units, customer memberships, and tags
-- **Organization fields:** `name`, `color`, `mailboxId`, `isActive` — all updatable via API
-- **Members sub-resource** — `GET/PUT/DELETE /api/organizations/{id}/members/{memberId}` — update role, unit, canManageOrg, and per-member `isActive` flag independently
+- Full CRUD for organizations, structural units, customer memberships, and tags
+- **Organization fields:** `name`, `color`, `mailboxId`, `isActive` — all readable and updatable via API
+- **Members sub-resource** — `GET/PUT/DELETE /api/organizations/{id}/members/{memberId}` — update role, unit, `canManageOrg`, and per-member `isActive` flag independently without touching the rest of the membership
 - **Tags sub-resource** — `GET/PUT /api/organizations/{id}/tags` — list or fully replace tag bindings (requires Tags module; returns `503` if inactive)
 - Authentication via `X-FreeScout-API-Key` header or `api_key` query parameter
-- Interactive **ReDoc documentation** available at **Manage → API & Webhooks → OrgPortal API Docs** (`/orgportal/admin/api-docs`)
+- Interactive **ReDoc documentation** at **Manage → API & Webhooks → OrgPortal API Docs** (`/orgportal/admin/api-docs`)
 
 📖 **Full API reference → [docs/api/README.md](docs/api/README.md)**
+
+![Interactive API documentation — ReDoc with all OrgPortal endpoints](docs/screenshots/api-docs.png)
 
 ---
 
@@ -269,7 +301,7 @@ When a new version is available, a banner appears on **Manage → Modules**. Cli
 |--------|--------|-------|
 | End-User Portal ≥ 1.0.85 | Optional | Manager portal, notification bell, subscriptions |
 | API and Webhooks ≥ 1.0.80 | Optional | REST API endpoints |
-| Kanban ≥ 1.0.23 | Optional | Badge on cards, org filter, State column |
+| Kanban ≥ 1.0.23 | Optional | Badge on cards, org filter, multilingual State column labels |
 | Custom Fields | ✅ Compatible | — |
 | Workflows | ✅ Compatible | — |
 | Tags | ✅ Compatible | Tag bindings manageable via API (`/organizations/{id}/tags`) |
@@ -296,7 +328,9 @@ Overrides global values for the specific mailbox.
 | Show badge on ticket page | Enable/disable badge for this mailbox |
 | Show badge on Kanban cards | Enable/disable badge for this mailbox |
 | Show organization block in customer profile | Toggle org info in the ticket sidebar |
-| Company ticket status filters | Map Kanban columns to named filters visible in the portal; supports per-language labels with a locale switcher — drag to reorder |
+| Company ticket status filters | Map Kanban columns to named filters visible in the portal; supports per-language labels with a locale switcher; drag to reorder |
+
+![Per-mailbox settings — badge visibility and Kanban status filters with multilingual labels](docs/screenshots/mailbox-settings.png)
 
 ---
 
@@ -319,7 +353,7 @@ OrgPortal is fully localized in **19 languages**:
 
 Translation files: `Modules/OrgPortal/Resources/lang/{locale}/messages.php`
 
-Notification email templates also have built-in defaults for all 19 languages.
+Notification email templates have built-in defaults for all 19 languages.
 
 ### EUP Switch Language Integration
 
@@ -329,90 +363,23 @@ OrgPortal works seamlessly with [EUP Switch Language](https://freescout.net/modu
 
 ---
 
+## Screenshots
+
+| | |
+|---|---|
+| ![Organizations list](docs/screenshots/org-list.png) | ![Organization edit](docs/screenshots/org-edit.png) |
+| *Organizations list — color badges, tags, ticket counts* | *Organization edit — members, roles, units* |
+| ![Company Tickets portal](docs/screenshots/portal-tickets.png) | ![Portal reply](docs/screenshots/portal-reply.png) |
+| *Company Tickets portal — table with all columns* | *Portal ticket — reply with drag & drop attachments* |
+| ![Notification bell](docs/screenshots/portal-bell.png) | ![Subscription matrix](docs/screenshots/portal-subscriptions.png) |
+| *Real-time notification bell with dropdown* | *Notification subscription matrix — per-unit, per-member* |
+| ![Email templates](docs/screenshots/admin-templates.png) | ![Mailbox settings](docs/screenshots/mailbox-settings.png) |
+| *Email templates — per-locale WYSIWYG editor* | *Per-mailbox settings — Kanban filters with multilingual labels* |
+| ![Kanban integration](docs/screenshots/kanban-org.png) | ![API docs](docs/screenshots/api-docs.png) |
+| *Kanban — org badges and org filter modal* | *Interactive API documentation — ReDoc* |
+
+---
+
 ## License
 
 [MIT](LICENSE) — © 2026 ASTIN-UA
-
-<!-- SCREENSHOT PLACEHOLDERS
-Add screenshots to docs/screenshots/ and replace each placeholder below with the actual image tag.
-
-1. After section "Organization Management":
-   File: docs/screenshots/org-list.png
-   Caption: "Organizations list — color badges, mailbox binding, active/inactive status"
-   What to capture: Organizations table with colored badges, Mailbox/Tags/Tickets/Status columns, Edit/Deactivate/Delete action buttons
-
-2. After section "Structural Units (Departments & Branches)":
-   File: docs/screenshots/org-edit.png
-   Caption: "Organization edit — members with roles and units, unit management panel"
-   What to capture: Organization edit form — members table with Role/Unit/Can Manage/Active columns, unit management block, Add Member button
-
-3. After section "User Permissions":
-   File: docs/screenshots/user-permissions.png
-   Caption: "Granular permissions — allow managing organizations and notification templates"
-   What to capture: Agent permissions edit page with two new checkboxes: "Allow managing organizations" and "Allow managing notification templates"
-
-4. After section "Customer Profile Integration":
-   File: docs/screenshots/customer-org-field.png
-   Caption: "Customer profile — organization field with role selector and org info block in ticket sidebar"
-   What to capture: Left — customer edit form with Organization + Role fields. Right — admin ticket sidebar with org block (name, unit, role)
-
-5. After section "Organization Badge on Tickets":
-   File: docs/screenshots/ticket-badge.png
-   Caption: "Organization badge on ticket page and conversation list"
-   What to capture: Ticket with colored org badge below subject in conversation list + same badge on ticket detail page
-
-6. After section "Kanban Integration":
-   File: docs/screenshots/kanban-org.png
-   Caption: "Kanban — organization badges on cards and org filter modal"
-   What to capture: Kanban board with visible org badges on cards + open organization filter modal with checkboxes
-
-7. After section "Manager Viewed Tracking":
-   File: docs/screenshots/manager-viewed.png
-   Caption: "Manager viewed tracking — 'viewed' note appears under agent reply in admin ticket view"
-   What to capture: Admin ticket with note under agent reply: "Viewed by [Manager Name] (Organization manager) · X minutes ago"
-
-8. After section "Org Snapshot & Ticket Attribution":
-   File: docs/screenshots/attribution-settings.png
-   Caption: "Org Snapshot settings — attribution source and backfill controls"
-   What to capture: Attribution section in Manage → OrgPortal Settings: attribution source selector, Backfill button, Reset button with warning
-
-9. After "Company Tickets" table description in End-User Portal section:
-   File: docs/screenshots/portal-tickets.png
-   Caption: "Company Tickets — full table with read indicators, status filters, and unit filter"
-   What to capture: Company Tickets table with all columns (#, Subject, Responsible, Author, Status, State, Updated), bold rows (unread), eye icon, status filter checkboxes, unit dropdown
-
-10. After portal reply/attachment description in End-User Portal section:
-    File: docs/screenshots/portal-reply.png
-    Caption: "Portal ticket view — reply form with drag & drop attachments"
-    What to capture: Portal ticket page with open reply form, drag-and-drop attachment zone, Send/Close buttons
-
-11. After section "Portal Organization Settings":
-    File: docs/screenshots/portal-settings.png
-    Caption: "Portal Organization Settings — members tab with locale and unit info"
-    What to capture: Org Settings page in portal with tabs (Notifications, Members), members table with locale and unit columns
-
-12. After section "Real-Time Notification Bell":
-    File: docs/screenshots/portal-bell.png
-    Caption: "Real-time notification bell — dropdown with grouped unread notifications"
-    What to capture: EUP navbar with bell icon + unread badge, open dropdown with notifications grouped by date, Mark all read link
-
-13. After section "Granular Notification Subscriptions":
-    File: docs/screenshots/portal-subscriptions.png
-    Caption: "Notification subscription matrix — per-unit and per-member toggles"
-    What to capture: Subscription matrix (rows = org + units + expanded unit with members, columns = New ticket / Agent reply / Customer reply), checkboxes at intersections
-
-14. After section "Multilingual Email Notification Templates":
-    File: docs/screenshots/admin-templates.png
-    Caption: "Email templates — per-locale editor with Summernote and macro variable picker"
-    What to capture: Templates tab with locale dropdown at top, Summernote WYSIWYG editor, "Macro Variables" picker button, "Load Default" button
-
-15. After section "REST API":
-    File: docs/screenshots/api-docs.png
-    Caption: "Interactive API documentation — ReDoc with all OrgPortal endpoints"
-    What to capture: ReDoc page with endpoint list on left (Organizations, Units, Members) and expanded request/response example on right
-
-16. After "Per-Mailbox Settings" in Configuration section:
-    File: docs/screenshots/mailbox-settings.png
-    Caption: "Per-mailbox settings — badge visibility and Kanban status filters configuration"
-    What to capture: OrgPortal tab in Mailbox Settings with Show badge checkboxes + Kanban status filters table with custom labels
--->
