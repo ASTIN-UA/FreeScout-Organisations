@@ -38,6 +38,8 @@ class OrgPortalServiceProvider extends ServiceProvider
             \App\Misc\Helper::$locales['ka'] = ['name' => 'ქართული', 'name_en' => 'Georgian'];
         }
 
+        $this->deployGeorgianAssets();
+
         if (!app()->routesAreCached()) {
             require __DIR__ . '/../Http/routes.php';
         }
@@ -1034,6 +1036,22 @@ class OrgPortalServiceProvider extends ServiceProvider
     // -------------------------------------------------------------------------
     // Registration helpers
     // -------------------------------------------------------------------------
+
+    protected function deployGeorgianAssets(): void
+    {
+        $assets = __DIR__ . '/../Resources/assets/ka/';
+
+        $targets = [
+            $assets . 'parsley.js' => public_path('js/parsley/i18n/ka.js'),
+            $assets . 'eup.json'   => base_path('Modules/EndUserPortal/Resources/lang/ka.json'),
+        ];
+
+        foreach ($targets as $src => $dst) {
+            if (!file_exists($dst)) {
+                @copy($src, $dst);
+            }
+        }
+    }
 
     protected function registerConfig()
     {
