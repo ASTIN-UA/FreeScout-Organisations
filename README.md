@@ -51,6 +51,7 @@ Whether you manage dozens of corporate accounts or thousands, OrgPortal gives yo
 *Complete visibility into every corporate account, right inside FreeScout.*
 
 - **Manage → Organizations** — full CRUD: create, edit, delete, activate/deactivate organizations
+- **Live search** — filter the organizations list in real time by name
 - **Mailbox binding** — organizations can be global (all mailboxes) or bound to a specific mailbox
 - **Color-coded badges** — choose from 12 colors; badge appears on tickets and Kanban cards for instant visual identification; enable/disable per mailbox
 - Clickable badge opens an instant search for all tickets from that organization
@@ -58,6 +59,8 @@ Whether you manage dozens of corporate accounts or thousands, OrgPortal gives yo
 - Organization info block in the admin ticket sidebar: organization name, structural unit, and member role on every ticket
 - One customer — one organization, enforced at database and API level
 - **Activate / deactivate organizations** — suspend an account without losing any history
+- **Tags column** in the Organizations list — see assigned tags at a glance without opening each record
+- **Ticket count column** — total tickets per organization shown directly in the list
 
 ### Structural Units — Department-Level Access Control
 
@@ -106,7 +109,8 @@ When a ticket is created, OrgPortal automatically records the organization conte
 
 - Organization badge on every Kanban card with the account's assigned color
 - **Organization filter** in the Kanban filter panel — multi-select modal with checkboxes; filter state persists across navigation
-- "State" column in the Company Tickets portal table shows the current Kanban column name (with custom label if configured)
+- **Multilingual Kanban status filter labels** — configure a custom display name for each Kanban column per portal language; switch locales with the language dropdown in per-mailbox settings; labels are shown in both the filter bar and the "State" column
+- "State" column in the Company Tickets portal table shows the translated label for the current portal language, with automatic fallback to English and then to the original column name
 
 ---
 
@@ -221,7 +225,10 @@ Notification language is determined by each manager's portal language selection,
 
 Requires the [API and Webhooks](https://freescout.net/module/api-webhooks/) module.
 
-- Full CRUD API for organizations, structural units, and customer memberships
+- Full CRUD API for organizations, structural units, customer memberships, and tags
+- **Organization fields:** `name`, `color`, `mailboxId`, `isActive` — all updatable via API
+- **Members sub-resource** — `GET/PUT/DELETE /api/organizations/{id}/members/{memberId}` — update role, unit, canManageOrg, and per-member `isActive` flag independently
+- **Tags sub-resource** — `GET/PUT /api/organizations/{id}/tags` — list or fully replace tag bindings (requires Tags module; returns `503` if inactive)
 - Authentication via `X-FreeScout-API-Key` header or `api_key` query parameter
 - Interactive **ReDoc documentation** available at **Manage → API & Webhooks → OrgPortal API Docs** (`/orgportal/admin/api-docs`)
 
@@ -265,7 +272,7 @@ When a new version is available, a banner appears on **Manage → Modules**. Cli
 | Kanban ≥ 1.0.23 | Optional | Badge on cards, org filter, State column |
 | Custom Fields | ✅ Compatible | — |
 | Workflows | ✅ Compatible | — |
-| Tags | ✅ Compatible | — |
+| Tags | ✅ Compatible | Tag bindings manageable via API (`/organizations/{id}/tags`) |
 
 ---
 
@@ -289,7 +296,7 @@ Overrides global values for the specific mailbox.
 | Show badge on ticket page | Enable/disable badge for this mailbox |
 | Show badge on Kanban cards | Enable/disable badge for this mailbox |
 | Show organization block in customer profile | Toggle org info in the ticket sidebar |
-| Company ticket status filters | Map Kanban columns to named filters visible in the portal |
+| Company ticket status filters | Map Kanban columns to named filters visible in the portal; supports per-language labels with a locale switcher — drag to reorder |
 
 ---
 
