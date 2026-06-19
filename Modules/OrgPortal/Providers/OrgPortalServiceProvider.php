@@ -32,6 +32,12 @@ class OrgPortalServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
 
+        // Register Georgian locale in FreeScout's core Helper so EUP shows
+        // the native name 'ქართული' instead of an empty string or 'KA'.
+        if (!isset(\App\Misc\Helper::$locales['ka'])) {
+            \App\Misc\Helper::$locales['ka'] = ['name' => 'ქართული', 'name_en' => 'Georgian'];
+        }
+
         if (!app()->routesAreCached()) {
             require __DIR__ . '/../Http/routes.php';
         }
