@@ -226,11 +226,46 @@
                             '{reply_text}'       => __('orgportal::messages.macro_reply_text'),
                             '{ticket_text}'      => __('orgportal::messages.macro_ticket_text'),
                         ];
+                        $localeNames = [
+                            'en' => 'English', 'uk' => 'Українська', 'de' => 'Deutsch',
+                            'fr' => 'Français', 'es' => 'Español', 'it' => 'Italiano',
+                            'nl' => 'Nederlands', 'pl' => 'Polski', 'ru' => 'Русский',
+                            'cs' => 'Čeština', 'sk' => 'Slovenčina', 'ro' => 'Română',
+                            'da' => 'Dansk', 'no' => 'Norsk', 'sv' => 'Svenska',
+                            'fi' => 'Suomi', 'pt-BR' => 'Português (BR)',
+                            'pt-PT' => 'Português (PT)', 'zh-CN' => '中文 (简体)',
+                            'ka' => 'ქართული',
+                        ];
+                        $activeTplLocale = session('orgportal_tpl_locale', $tplLocales[0] ?? 'en');
+                        if (!in_array($activeTplLocale, $tplLocales)) {
+                            $activeTplLocale = $tplLocales[0] ?? 'en';
+                        }
                     @endphp
 
-                    <form method="POST" action="{{ route('orgportal.admin.settings.save') }}">
+                    <form method="POST" action="{{ route('orgportal.admin.settings.save') }}" id="tpl-form">
                         {{ csrf_field() }}
+                        <input type="hidden" name="tpl_locale" id="tpl-locale-input" value="{{ $activeTplLocale }}">
 
+                        {{-- Locale selector --}}
+                        @if(count($tplLocales) > 1)
+                        <div class="form-group" style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+                            <label for="tpl-locale-select" style="margin:0;white-space:nowrap;font-weight:600;">
+                                {{ __('orgportal::messages.tpl_locale_label') }}:
+                            </label>
+                            <select id="tpl-locale-select" class="form-control" style="width:auto;min-width:180px;">
+                                @foreach($tplLocales as $loc)
+                                    <option value="{{ $loc }}" {{ $loc === $activeTplLocale ? 'selected' : '' }}>
+                                        {{ $localeNames[$loc] ?? $loc }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <span class="text-muted" style="font-size:12px;">
+                                {{ __('orgportal::messages.tpl_locale_hint') }}
+                            </span>
+                        </div>
+                        @endif
+
+                        {{-- Template panels (fields always visible, JS swaps values on locale change) --}}
                         @foreach($tplEvents as $eKey => $eLabel)
                         <div class="panel panel-default">
                             <div class="panel-heading"
@@ -256,7 +291,7 @@
                                                    id="tpl_{{ $eKey }}_subject"
                                                    name="tpl_{{ $eKey }}_subject"
                                                    class="form-control"
-                                                   value="{{ $tplTemplates[$eKey]['subject'] }}"
+                                                   value="{{ $tplTemplates[$activeTplLocale][$eKey]['subject'] ?? '' }}"
                                                    placeholder="{{ __('orgportal::messages.tpl_subject_placeholder') }}">
                                             <select class="form-control orgportal-macro-subject"
                                                     data-target="tpl_{{ $eKey }}_subject"
@@ -295,7 +330,7 @@
                                         <textarea id="tpl_{{ $eKey }}_body"
                                                   name="tpl_{{ $eKey }}_body"
                                                   class="form-control orgportal-editor"
-                                                  rows="6">{{ $tplTemplates[$eKey]['body'] }}</textarea>
+                                                  rows="6">{{ $tplTemplates[$activeTplLocale][$eKey]['body'] ?? '' }}</textarea>
                                     </div>
 
                                 </div>
@@ -568,10 +603,17 @@
     </div>
 </div>
 
-<div id="orgportal-defaults-data" data-defaults='{!! json_encode($tplDefaults ?? [], JSON_HEX_QUOT | JSON_HEX_TAG | JSON_UNESCAPED_SLASHES) !!}'></div>
+<div id="orgportal-defaults-data"
+     data-defaults='{!! json_encode($tplDefaults ?? [], JSON_HEX_QUOT | JSON_HEX_TAG | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}'
+     data-saved='{!! json_encode($tplTemplates ?? [], JSON_HEX_QUOT | JSON_HEX_TAG | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}'
+     data-locale="{{ $activeTplLocale ?? 'en' }}">
+</div>
 
 <script {!! \Helper::cspNonceAttr() !!}>
-window.orgportalDefaults = JSON.parse(document.getElementById('orgportal-defaults-data').getAttribute('data-defaults') || '{}');
+var _tplEl = document.getElementById('orgportal-defaults-data');
+window.orgportalDefaults = JSON.parse(_tplEl.getAttribute('data-defaults') || '{}');
+window.orgportalSaved    = JSON.parse(_tplEl.getAttribute('data-saved')    || '{}');
+window.orgportalLocale   = _tplEl.getAttribute('data-locale') || 'en';
 (function () {
     document.addEventListener('DOMContentLoaded', function () {
         if (typeof $ === 'undefined' || typeof $.fn.summernote === 'undefined') return;
@@ -713,11 +755,65 @@ window.orgportalDefaults = JSON.parse(document.getElementById('orgportal-default
             $(this).val('');
         });
 
+        // ── Locale selector ─────────────────────────────────────────────────
+        // All locale data is pre-loaded in JS; switching just swaps field values.
+        var tplEvents = @json(array_keys($tplEvents ?? []));
+
+        function tplGetCurrentValues() {
+            var vals = {};
+            tplEvents.forEach(function (eKey) {
+                var $ta = $('#tpl_' + eKey + '_body');
+                vals[eKey] = {
+                    subject: $('#tpl_' + eKey + '_subject').val(),
+                    body:    $ta.data('summernote-inited') ? $ta.summernote('code') : $ta.val(),
+                };
+            });
+            return vals;
+        }
+
+        function tplApplyValues(locale, values) {
+            // values: { event: { subject, body } }
+            tplEvents.forEach(function (eKey) {
+                var tpl = (values[locale] && values[locale][eKey]) ? values[locale][eKey] : { subject: '', body: '' };
+                var $subj = $('#tpl_' + eKey + '_subject');
+                var $ta   = $('#tpl_' + eKey + '_body');
+                $subj.val(tpl.subject || '');
+                if ($ta.data('summernote-inited')) {
+                    $ta.summernote('code', tpl.body || '');
+                    $ta.val(tpl.body || '');
+                } else {
+                    $ta.val(tpl.body || '');
+                }
+            });
+        }
+
+        // In-memory store: locale → { event → { subject, body } }
+        // Starts from server-saved data
+        var tplMemory = $.extend(true, {}, window.orgportalSaved || {});
+
+        $('#tpl-locale-select').on('change', function () {
+            var newLocale = $(this).val();
+            var oldLocale = $('#tpl-locale-input').val();
+
+            // Save current editor values for old locale
+            tplMemory[oldLocale] = tplGetCurrentValues();
+
+            // Switch locale input
+            $('#tpl-locale-input').val(newLocale);
+            window.orgportalLocale = newLocale;
+
+            // Apply saved values for new locale (fallback to empty)
+            tplApplyValues(newLocale, tplMemory);
+        });
+
         // Load default template
         $(document).on('click', '.orgportal-load-default', function () {
             var eKey    = $(this).data('event');
+            var locale  = window.orgportalLocale || 'en';
             var defs    = window.orgportalDefaults || {};
-            var tpl     = defs[eKey];
+            // Prefer locale-specific default, fallback to 'en'
+            var localeDefs = defs[locale] || defs['en'] || {};
+            var tpl = localeDefs[eKey];
             if (!tpl) return;
             var $subjectInput = $('#tpl_' + eKey + '_subject');
             var $bodyTa       = $('#tpl_' + eKey + '_body');

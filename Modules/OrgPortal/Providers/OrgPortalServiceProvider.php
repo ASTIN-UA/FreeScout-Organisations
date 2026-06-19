@@ -892,11 +892,15 @@ class OrgPortalServiceProvider extends ServiceProvider
      */
     protected function renderNotificationTemplate(string $event, $manager, $authorMember, $conversation, $thread): array
     {
-        $subjectKey = 'orgportal.tpl_' . $event . '_subject';
-        $bodyKey    = 'orgportal.tpl_' . $event . '_body';
+        $locale     = app()->getLocale();
+        $subject    = \Option::get('orgportal.tpl_' . $locale . '_' . $event . '_subject', '');
+        $body       = \Option::get('orgportal.tpl_' . $locale . '_' . $event . '_body', '');
 
-        $subject = \Option::get($subjectKey, '');
-        $body    = \Option::get($bodyKey, '');
+        // Fallback to 'en' locale template if no locale-specific one is saved
+        if ($subject === '' || $body === '') {
+            $subject = \Option::get('orgportal.tpl_en_' . $event . '_subject', '');
+            $body    = \Option::get('orgportal.tpl_en_' . $event . '_body', '');
+        }
 
         // Build ticket URL once.
         $ticketUrl = null;

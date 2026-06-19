@@ -179,6 +179,8 @@ return [
     'tpl_body'                   => 'Message body',
     'tpl_insert_macro'           => 'Insert variable…',
     'tpl_load_default'           => 'Load default template',
+    'tpl_locale_label'           => 'Template language',
+    'tpl_locale_hint'            => 'Select the language to edit. Only languages enabled in the portal language switcher are shown.',
 
     // Macros
     'macro_manager_name'     => 'Recipient name',

@@ -73,17 +73,24 @@ class OrgPortalAdminController extends Controller
 
         $tplEvents    = [];
         $tplTemplates = [];
+        $tplDefaults  = [];
+        $tplLocales   = [];
         if ($canManageTemplates) {
             $tplEvents = [
                 'new_ticket'     => __('orgportal::messages.notif_event_new_ticket'),
                 'reply_agent'    => __('orgportal::messages.notif_event_reply_agent'),
                 'reply_customer' => __('orgportal::messages.notif_event_reply_customer'),
             ];
-            foreach (array_keys($tplEvents) as $event) {
-                $tplTemplates[$event] = [
-                    'subject' => \Option::get('orgportal.tpl_' . $event . '_subject', ''),
-                    'body'    => \Option::get('orgportal.tpl_' . $event . '_body', ''),
-                ];
+            // Locales shown in template editor = 'en' + enabled portal locales
+            $tplLocales = array_unique(array_merge(['en'], $langSwitcherLocales));
+            foreach ($tplLocales as $locale) {
+                foreach (array_keys($tplEvents) as $event) {
+                    $tplTemplates[$locale][$event] = [
+                        'subject' => \Option::get('orgportal.tpl_' . $locale . '_' . $event . '_subject', ''),
+                        'body'    => \Option::get('orgportal.tpl_' . $locale . '_' . $event . '_body', ''),
+                    ];
+                }
+                $tplDefaults[$locale] = self::defaultTemplates($locale);
             }
         }
 
@@ -101,7 +108,8 @@ class OrgPortalAdminController extends Controller
             'organizations'       => $organizations,
             'tplEvents'           => $tplEvents,
             'tplTemplates'        => $tplTemplates,
-            'tplDefaults'         => $canManageTemplates ? self::defaultTemplates() : [],
+            'tplDefaults'         => $tplDefaults,
+            'tplLocales'          => $tplLocales,
             'canManageTemplates'  => $canManageTemplates,
             'isAdmin'             => $isAdmin,
             'systemStats'         => $systemStats,
@@ -532,10 +540,20 @@ class OrgPortalAdminController extends Controller
     {
         $this->authorizeTemplates();
 
+        $locale = $request->input('tpl_locale', 'en');
+        // Allowlist: only locales that exist as template files
+        $validLocales = array_map(
+            fn ($f) => basename($f, '.php'),
+            glob(__DIR__ . '/../../Resources/templates/*.php') ?: []
+        );
+        if (!in_array($locale, $validLocales, true)) {
+            $locale = 'en';
+        }
+
         foreach (['new_ticket', 'reply_agent', 'reply_customer'] as $event) {
-            \Option::set('orgportal.tpl_' . $event . '_subject',
+            \Option::set('orgportal.tpl_' . $locale . '_' . $event . '_subject',
                 strip_tags((string) $request->input('tpl_' . $event . '_subject', '')));
-            \Option::set('orgportal.tpl_' . $event . '_body',
+            \Option::set('orgportal.tpl_' . $locale . '_' . $event . '_body',
                 self::sanitizeHtml((string) $request->input('tpl_' . $event . '_body', '')));
         }
 
@@ -546,129 +564,21 @@ class OrgPortalAdminController extends Controller
     public static function defaultTemplates(?string $locale = null): array
     {
         $locale = $locale ?? app()->getLocale();
-        $isUk   = ($locale === 'uk');
+        $dir    = __DIR__ . '/../../Resources/templates/';
 
-        $wrap = function (string $content) use ($isUk): string {
-            $footer = $isUk
-                ? 'Ви отримали цей лист, оскільки увімкнули сповіщення для вашої організації в Клієнтському порталі.'
-                : 'You received this email because you enabled notifications for your organization in the Customer Portal.';
-            return '<div style="font-family:Arial,sans-serif;font-size:14px;color:#333;max-width:600px;">'
-                . $content
-                . '<p style="margin-top:32px;font-size:12px;color:#999;">' . $footer . '</p>'
-                . '</div>';
-        };
-
-        $btn = '<p><a href="{ticket_url}" style="display:inline-block;padding:10px 22px;background:#3b82f6;color:#fff;text-decoration:none;border-radius:4px;font-weight:bold;">'
-            . ($isUk ? 'Переглянути заявку' : 'View Ticket')
-            . '</a></p>';
-
-        $authorCell = '<strong>{author_name}</strong> <span style="color:#999;font-size:12px;">({unit_name})</span>';
-
-        $row = fn (string $l, string $v) =>
-            '<tr><td style="color:#666;width:140px;padding:6px 0;">' . $l . ':</td>'
-            . '<td style="padding:6px 0;">' . $v . '</td></tr>';
-
-        $table = fn (array $rows) =>
-            '<table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;">'
-            . implode('', $rows) . '</table>';
-
-        if ($isUk) {
-            return [
-                'new_ticket' => [
-                    'subject' => 'Нова заявка {ticket_number} від {author_name}',
-                    'body'    => $wrap(
-                        '<p>Доброго дня, <strong>{manager_name}</strong>!</p>'
-                        . '<p>Учасник вашої організації <strong>{org_name}</strong> відкрив нову заявку:</p>'
-                        . $table([
-                            $row('Від', $authorCell),
-                            $row('Тема', '<strong>{subject}</strong>'),
-                            $row('Заявка №', '{ticket_number}'),
-                            $row('Дата', '{created_datetime}'),
-                        ])
-                        . '<div style="border-left:3px solid #d1d5db;padding:8px 16px;margin:16px 0;color:#374151;">{ticket_text}</div>'
-                        . $btn
-                    ),
-                ],
-                'reply_agent' => [
-                    'subject' => 'Re: {ticket_number} — {subject}',
-                    'body'    => $wrap(
-                        '<p>Доброго дня, <strong>{manager_name}</strong>!</p>'
-                        . '<p>Агент підтримки відповів на заявку у вашій організації <strong>{org_name}</strong>:</p>'
-                        . $table([
-                            $row('Клієнт', $authorCell),
-                            $row('Тема', '<strong>{subject}</strong>'),
-                            $row('Заявка №', '{ticket_number}'),
-                            $row('Час відповіді', '{reply_datetime}'),
-                        ])
-                        . '<div style="border-left:3px solid #d1d5db;padding:8px 16px;margin:16px 0;color:#374151;">{reply_text}</div>'
-                        . $btn
-                    ),
-                ],
-                'reply_customer' => [
-                    'subject' => 'Re: {ticket_number} — {subject}',
-                    'body'    => $wrap(
-                        '<p>Доброго дня, <strong>{manager_name}</strong>!</p>'
-                        . '<p>Клієнт відповів на заявку у вашій організації <strong>{org_name}</strong>:</p>'
-                        . $table([
-                            $row('Від', $authorCell),
-                            $row('Тема', '<strong>{subject}</strong>'),
-                            $row('Заявка №', '{ticket_number}'),
-                            $row('Час відповіді', '{reply_datetime}'),
-                        ])
-                        . '<div style="border-left:3px solid #d1d5db;padding:8px 16px;margin:16px 0;color:#374151;">{reply_text}</div>'
-                        . $btn
-                    ),
-                ],
-            ];
+        $path = $dir . $locale . '.php';
+        if (file_exists($path)) {
+            return require $path;
         }
 
-        return [
-            'new_ticket' => [
-                'subject' => 'New ticket {ticket_number} from {author_name}',
-                'body'    => $wrap(
-                    '<p>Hello, <strong>{manager_name}</strong>!</p>'
-                    . '<p>A new support ticket has been submitted by a member of your organization <strong>{org_name}</strong>:</p>'
-                    . $table([
-                        $row('From', $authorCell),
-                        $row('Subject', '<strong>{subject}</strong>'),
-                        $row('Ticket #', '{ticket_number}'),
-                        $row('Date', '{created_datetime}'),
-                    ])
-                    . '<div style="border-left:3px solid #d1d5db;padding:8px 16px;margin:16px 0;color:#374151;">{ticket_text}</div>'
-                    . $btn
-                ),
-            ],
-            'reply_agent' => [
-                'subject' => 'Re: {ticket_number} — {subject}',
-                'body'    => $wrap(
-                    '<p>Hello, <strong>{manager_name}</strong>!</p>'
-                    . '<p>A support agent has replied to a ticket in your organization <strong>{org_name}</strong>:</p>'
-                    . $table([
-                        $row('Customer', $authorCell),
-                        $row('Subject', '<strong>{subject}</strong>'),
-                        $row('Ticket #', '{ticket_number}'),
-                        $row('Replied at', '{reply_datetime}'),
-                    ])
-                    . '<div style="border-left:3px solid #d1d5db;padding:8px 16px;margin:16px 0;color:#374151;">{reply_text}</div>'
-                    . $btn
-                ),
-            ],
-            'reply_customer' => [
-                'subject' => 'Re: {ticket_number} — {subject}',
-                'body'    => $wrap(
-                    '<p>Hello, <strong>{manager_name}</strong>!</p>'
-                    . '<p>A customer has replied to a ticket in your organization <strong>{org_name}</strong>:</p>'
-                    . $table([
-                        $row('From', $authorCell),
-                        $row('Subject', '<strong>{subject}</strong>'),
-                        $row('Ticket #', '{ticket_number}'),
-                        $row('Replied at', '{reply_datetime}'),
-                    ])
-                    . '<div style="border-left:3px solid #d1d5db;padding:8px 16px;margin:16px 0;color:#374151;">{reply_text}</div>'
-                    . $btn
-                ),
-            ],
-        ];
+        // Language-family fallback: pt-BR → pt-PT → en
+        $base = explode('-', $locale)[0];
+        foreach (glob($dir . $base . '*.php') ?: [] as $candidate) {
+            return require $candidate;
+        }
+
+        $enPath = $dir . 'en.php';
+        return file_exists($enPath) ? require $enPath : [];
     }
 
     protected static function sanitizeHtml(string $html): string
