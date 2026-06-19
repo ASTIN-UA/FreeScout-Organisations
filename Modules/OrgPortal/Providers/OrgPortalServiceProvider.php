@@ -139,7 +139,7 @@ class OrgPortalServiceProvider extends ServiceProvider
             'no' => 'Norsk', 'pl' => 'Polski', 'pt-BR' => 'Português (BR)',
             'pt-PT' => 'Português (PT)', 'ro' => 'Română', 'ru' => 'Русский',
             'sk' => 'Slovenčina', 'sv' => 'Svenska', 'uk' => 'Українська',
-            'zh-CN' => '中文(简体)',
+            'zh-CN' => '中文(简体)', 'ka' => 'ქართული',
         ];
         return $names[$code] ?? strtoupper($code);
     }
