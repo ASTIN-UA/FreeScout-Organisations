@@ -149,8 +149,6 @@ class OrgPortalAdminController extends Controller
 
         if (mb_strlen($q) >= 2) {
             $query->where('name', 'like', '%' . $q . '%');
-        } else {
-            $query->limit(500);
         }
 
         $isAdmin        = auth()->user() && auth()->user()->isAdmin();
