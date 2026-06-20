@@ -222,9 +222,14 @@ A dedicated **Company Tickets** section in portal navigation with a full-feature
 | **State** | Kanban column name in the current portal language (only when Kanban module is active) |
 | **Updated** | Date and time of last reply |
 
-**Two independent read indicators per row:**
-- **Bold row** — manager has unread notifications for this conversation
-- **👁 Eye icon** — the ticket author has not yet opened the latest agent reply
+**Two independent read status indicators per row** — these track two different people and are shown simultaneously:
+
+| Indicator | Whose read status | What it means |
+|-----------|-------------------|---------------|
+| **Bold row** | The manager viewing the portal | Manager has unread notifications for this conversation — something happened that they haven't seen yet |
+| **👁 Eye icon** | The ticket author (the customer who submitted it) | The author has not yet opened the latest agent reply — useful for knowing whether a client actually saw the response |
+
+These two states are completely independent: a row can be bold (manager hasn't read) while the eye is absent (author already read), or vice versa. The manager sees both at the same time, giving a complete picture of what's happening on both sides of the ticket without opening it.
 
 **Author filter** — clicking an author name activates a filter; a banner appears at the top of the table showing the active author's name with a × link to clear the filter.
 
