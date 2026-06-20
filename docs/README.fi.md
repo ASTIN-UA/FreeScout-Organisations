@@ -1,108 +1,383 @@
-# OrgPortal — Organisaatioportaali FreeScout-sovellukselle
+# OrgPortal — B2B-organisaationhallintamoduuli FreeScoutille
 
-<img src="../Modules/OrgPortal/logo.png" alt="OrgPortal" width="140" align="right">
+[← Takaisin README:hen](../README.md)
 
-FreeScout-moduuli, joka lisää **Organisaatiot**-käsitteen (yritykset/tiimit) asiakkaisiin, laajentaa End-User Portalia johtajille ja näyttää organisaatiomallin avulla niitä lippuissa ja Kanban-korteissa.
+<img src="Modules/OrgPortal/logo.png" alt="OrgPortal — FreeScout B2B -moduuli" width="140" align="right">
 
-**Vähimmäis-FreeScout-versio:** 1.8.147  
-**Riippuvuudet:** ei vaadittuja  
-**Valinnainen:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API ja webhookit](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
+**OrgPortal** on FreeScout-moduuli, joka lisää täyden **B2B-organisaationhallinnan** tukipalveluusi: ryhmittele asiakkaat yrityksiin, määritä osastohierarkiat, anna yrityspäälliköille itsepalveluportaali ja automatisoi ilmoitukset — kaikki FreeScoutin sisällä, ilman ulkoisia työkaluja.
 
----
+> Etsitkö tapaa hallita yritystilejä FreeScoutissa? Antaa yrityksille oma tukiportaali? Hallita, mitä tikettejä kukin B2B-yhteyshenkilö näkee roolinsa ja osastonsa perusteella? OrgPortal ratkaisee kaiken tämän.
 
-🌐 **Kieli:** [English](../README.md) · [Українська](README.uk.md) · [Deutsch](README.de.md) · [Français](README.fr.md) · [Español](README.es.md) · [Italiano](README.it.md) · [Polski](README.pl.md) · [Čeština](README.cs.md) · [Slovenčina](README.sk.md) · [Nederlands](README.nl.md) · [Norsk](README.no.md) · [Dansk](README.da.md) · [Svenska](README.sv.md) · [Suomi](README.fi.md) · [Português (BR)](README.pt-BR.md) · [Português (PT)](README.pt-PT.md) · [Română](README.ro.md) · [中文 (简体)](README.zh-CN.md)
-
----
-
-## Ominaisuudet
-
-### Organisaatioiden hallinta (admin)
-- **Hallinta → Organisaatiot** — täydellinen CRUD: luo, muokkaa, poista organisaatioita
-- **Postilaatikon sitominen** — organisaatio voi olla **yleinen** (näkyvä kaikissa postilaatikoissa) tai **sidottu tiettyyn postilaatikkoon**; vastaava tunniste näytetään organisaatioiden luettelossa
-- Asiakkaiden määritys organisaatioihin roolin valinnalla: `jäsen` tai `johtaja`
-- **Muuta jäsenen roolia** suoraan taulukossa (poistamatta ja lisäämättä uudelleen)
-- Asiakashaku automaattisen täydennyksen kanssa nimen tai sähköpostin perusteella; jo organisaatiossa olevat asiakkaat on jätetty pois tuloksista
-- Jäsenen sähköposti näytetään nimen alla jäsenen taulukossa
-- Yksi asiakas — yksi organisaatio (pakotettu tietokanta- ja API-tasolla)
-- **Merkin väri** — visuaalinen paletissa 12 väriä organisaation muokkauslomakkeessa; oletus on harmaa
-
-### Käyttäjäoikeudet
-- Uusi oikeus **"Salli organisaatioiden hallinta"** — ei-pääkäyttäjät, joilla on tämä oikeus, saavat pääsyn luettelon, luonti- ja muokkaa-organisaatiosivuille
-- Organisaatioiden poistaminen jää yksinomaan pääkäyttäjille
-
-### Asiakaskortti
-- **Organisaatio**-kenttä asiakkaan muokkauslomakkeessa — valitse organisaatio ja rooli
-- **Organisaation liput**-painike — avaa hakua kaikkiin organisaation lipuille
-
-### Organisaatiomallia lipuissa
-- Näytetään lippusivun otsikon alapuolella ja ennen nimeä keskustelun luettelossa
-- Voidaan napsauttaa — avaa haun kaikkiin tämän organisaation lipuille
-- Merkin väri määräytyy organisaation asetuksesta (oletus harmaa)
-- Ota käyttöön/poista käytöstä **postilaatikko kerrallaan** via **Postilaatikon asetukset → OrgPortal**; yleistä arvoa käytetään varamenetelmänä
-
-### Organisaatiomallia Kanban-korteissa
-- Näytetään viestittelylaskurin jälkeen jokaisella kortilla
-- Voidaan napsauttaa — johtaa organisaatiohakuun
-- Väri vastaa organisaation asetusta
-- **Organisaatio**-suodatin on sisäänrakennettu standardi Kanban-suodattimen avattavaan luetteloon: modaali, jossa on valintaruudut, samankaltainen kuin tunnisteiden suodatin; tila säilyy navigoinnin välillä
-- Ota käyttöön/poista käytöstä **postilaatikko kerrallaan** via **Postilaatikon asetukset → OrgPortal**
-
-### Organisaatiohaun suodatin
-- Laajentaa FreeScout-haun **Organisaatio**-suodattimella
-- Näyttää kaikki liput valittuun organisaatioon kuuluvista asiakkaista
-
-### End-User Portal — johtajien pääsy *(valinnainen)*
-
-Organisaation johtaja saa laajennettua pääsyä EUP:n kautta:
-
-- **Yrityksen liput** -kohta portaalin navigoinnissa
-- Yrityksen liput -taulukko sarakkeilla:
-  - **#** ja **Aihe** ellipsin lyhennyksellä ja työkaluvihjeen vierityksessä
-  - **Vastuuhenkilö** — määritetty agentti
-  - **Kirjoittaja** — asiakas, joka avasi lipun; napsauta suodattaa lippuja kirjoittajan mukaan organisaatiossa
-  - **Tila** — Aktiivinen / Odottava / Suljettu / Roskaposti kuvakkeella
-  - **Asema** — Kanban-sarakkeen nimi (mukautetulla tunnisteen, jos määritetty); näytetään vain, jos Kanban-moduuli on aktiivinen
-  - **Päivitetty** — viimeisen vastauksen päivämäärä ja aika
-- Hae lippujen aiheella
-- Suodata Kanban-tilojen mukaan (mukautettavissa via **Postilaatikon asetukset → OrgPortal**)
-- Vastaa lippuun **liitteen tuella** (vedä ja pudota, useita tiedostoja)
-- **Sulje lippu** — johtaja voi sulkea lipun; uusi vastaus avaa sen uudelleen automaattisesti
-- Muuta lipun tekijää — määritä lippu uudelleen toiselle organisaation jäsenelle
-- **Organisaation asetukset** -sivu sähköpostilmoitusten konfigurointiin
-- Lipun pääsy on **tiukasti rajoitettu nykyiseen postilaatikkoon** (organisaatio kopioitu toiseen postilaatikkoon — portaali 403)
-
-### Sähköpostilmoitukset *(valinnainen)*
-- Johtajat, joilla on vaihtoehto käytössä, saavat sähköpostiviestin, kun organisaation jäsen luo uuden lipun
-- **Jäsenkohtaiset tilaukset:** jokainen yksikön rivi on laajennettavissa — napsauta sitä paljastaaksesi kyseisen yksikön jokaisen jäsenen ja vaihda heidän yksittäisiä tilauksia suoraan. Yleinen johtaja hallinnoi kaikkien yksiköiden jäseniä; yksikköjohtaja vain omansa.
-- **Täysin transitiivinen kaskadi:** "Koko organisaatio" ohjaa jokaista yksikköä ja jokaista jäsentä; yksikön valintaruutu ohjaa kaikkia sen jäseniä; jäsenen valitsemisen poistaminen sovittaa sen yksikön (ja organisaation) automaattisesti — molempiin suuntiin, tapahtumastakkeittain.
-- Käyttää vastaavan postilaatikon postin ohjaimia
-
-### Postilaatikon asetukset
-
-**Postilaatikon asetukset → OrgPortal** (postilaatikko kerrallaan):
-
-| Vaihtoehto | Kuvaus |
-|-----------|-------------|
-| Näytä merkki lippusivulla | Ota käyttöön/poista käytöstä merkki tässä postilaatikossa |
-| Näytä merkki Kanban-korteissa | Ota käyttöön/poista käytöstä merkki tässä postilaatikossa |
-| Yrityksen lippujen tilasuodattimet | Valitse Kanban-sarakkeet, jotka näytetään valintaruutuina liput-sivulla; mukautettu tunniste jokaiselle suodattimelle |
+**Toimii:** FreeScout 1.8.147+  
+**Valinnaiset integraatiot:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
 
 ---
 
-### REST API *(valinnainen, vaatii API:n ja webhookit)*
+🌐 **Saatavilla myös:**
+[Українська](docs/README.uk.md) · [Deutsch](docs/README.de.md) · [Français](docs/README.fr.md) · [Español](docs/README.es.md) · [Italiano](docs/README.it.md) · [Polski](docs/README.pl.md) · [Čeština](docs/README.cs.md) · [Slovenčina](docs/README.sk.md) · [Nederlands](docs/README.nl.md) · [Norsk](docs/README.no.md) · [Dansk](docs/README.da.md) · [Svenska](docs/README.sv.md) · [Suomi](docs/README.fi.md) · [Português (BR)](docs/README.pt-BR.md) · [Português (PT)](docs/README.pt-PT.md) · [Română](docs/README.ro.md) · [中文 (简体)](docs/README.zh-CN.md)
 
-OrgPortal tarjoaa täydellisen REST API:n organisaatioiden, rakenneyksiköiden ja asiakasjäsenyyksien hallintaan — todennus `X-FreeScout-API-Key`-otsakkeella tai `api_key`-kyselyparametrilla.
+---
 
-📖 **Täydellinen API-viite → [docs/api/README.fi.md](api/README.fi.md)** (kaikki päätepisteet, pyyntö-/vastausesimerkit, virhekoodit)
+## Mitä OrgPortal lisää FreeScoutiin
 
-Interaktiivinen ReDoc-dokumentaatio on saatavilla myös kohdassa **Manage → API & Webhooks → OrgPortal API Docs** (`/orgportal/admin/api-docs`).
+FreeScout on rakennettu yksittäisten asiakkaiden ympärille — jokainen sähköposti on henkilöltä, eikä järjestelmässä ole sisäänrakennettua käsitettä yrityksestä, jolle henkilö työskentelee. Tämä toimii hyvin B2C-tukipalveluissa. B2B:lle se ei riitä.
+
+OrgPortal täyttää tämän aukon:
+
+- **Yritystilit** — ryhmittele asiakkaat organisaatioihin nimen, väritunnisteen, postilaatikon laajuuden ja aktiivisen/passiivisen tilan avulla
+- **Osastohierarkiat** — jaa organisaatiot rakenteellisiin yksiköihin (osastot, toimipisteet, tiimit); jokainen jäsen kuuluu omaan yksikköönsä
+- **Roolipohjainen pääsynhallinta** — `member` näkee vain omat tikettinsä; `unit_manager` näkee koko yksikön; `manager` näkee koko organisaation
+- **Yrityksen itsepalveluportaali** — päälliköt näkevät kaikki yrityksen tiketit, voivat vastata, sulkea, siirtää tekijöitä ja hallita ilmoitusasetuksia ilman tukitiimin kontaktointia
+- **Pysyvä tikettien attribuointi** — jokainen tiketti rekisteröidään organisaatiolle luontihetkellä; historiaraportointi säilyy vaikka asiakasluettelo muuttuu
+- **Monikieliset ilmoitukset** — automaattiset sähköposti-ilmoitukset jokaisen päällikön omalla kielellä, lokalisoiduilla mallineilla ja sisäänrakennetulla WYSIWYG-editorilla
+- **REST API** — synkronoi jäsenyydet CRM:stä, automatisoi käyttöönotto, hallitse tunnisteita ohjelmallisesti
+
+---
+
+## Organisaatiot
+
+*Yksi paikka kaikelle yritystilin tiedoille.*
+
+**Manage → Organizations** avaa välilehtipohjaisen käyttöliittymän, jossa on kolme osiota: Organizations, Templates ja System.
+
+### Organisaatiolista
+
+- **Luo, muokkaa, poista, aktivoi/deaktivoi** organisaatioita
+- **Tilasuodatin** — vaihda Aktiivinen / Passiivinen / Kaikki radio-ryhmällä; suodattaa taulukon välittömästi asiakaspuolella
+- **Reaaliaikahaku** — suodatus alkaa 2+ merkin jälkeen, ei sivun uudelleenlatausta
+- **Värikoodatut tunnisteet** — interaktiivinen värinvalitsin 12 sävyllä ja reaaliaikainen tunniste-esikatselu; tunniste näkyy jokaisessa tiketissä ja Kanban-kortissa
+- Tunnisteen tai tikettimäärän klikkaaminen avaa FreeScout-haun kyseiselle organisaatiolle suodatettuna
+- **Postilaatikon sidonta** — organisaatiot voivat olla globaaleja (kaikki postilaatikot) tai rajattuja tiettyyn postilaatikkoon
+- **Tunnisteet-sarake** — näyttää ✓/✗ onko FreeScout-tunnisteita sidottu organisaatioon (vaatii Tags-moduulin); tunnisteet määritetään muokkauslomakkeessa sirumaisella widgetillä ja automaattisella haulla
+- **Tikettimäärä-sarake** — organisaation kokonaisviestit; klikattava linkki hakutuloksiin
+- **Jäsenmäärä**-sarake
+- **Aktivoi / deaktivoi** — jäädytä tili menettämättä historiaa; vaatii Org Snapshot -toiminnon käyttöön (painike on poistettu käytöstä työkaluvihjeellä jos ei ole)
+- **Poista** — saatavilla vain kun organisaatiolla on 0 jäsentä ja 0 tikettejä (turvaesto)
+- Kaikki poisto- ja deaktivointitoiminnot vaativat vahvistuksen
+
+![Organisaatiolista — tilasuodatin, reaaliaikahaku, väritunnisteet, tunnisteet, tikettimäärät](docs/screenshots/org-list.png)
+
+### Organisaation muokkauslomake
+
+- **Nimi** ja **postilaatikon sidonta**
+- **Värinvalitsin** — 12 sävy reaaliaikaisella tunniste-esikatselulla
+- **Tunnisteet** — sirupohjainen widget: hae olemassa olevia FreeScout-tunnisteita, klikkaa lisätäksesi, × poistaaksesi
+- **Jäsentaulukko** — jäsenkohtaisesti: nimi, rooli, rakenteellinen yksikkö, `can_manage_org`-valintaruutu (myöntää ylläpitäjäoikeudet organisaatioihin ilman täysiä ylläpitäjäoikeuksia), aktiivinen/passiivinen-kytkin
+- **Rakenteelliset yksiköt -paneeli** — luo ja nimeä uudelleen yksiköitä suoraan muokkauslomakkeesta; jäsenet liitetään yksiköihin samassa näkymässä
+- **Jäsenen lisääminen** — täydentää automaattisesti asiakkaan olemassa olevat attribuoimattomat viestit
+
+![Organisaation muokkaus — värinvalitsin, tunnistesirut, jäsentaulukko rooleilla ja yksiköillä](docs/screenshots/org-edit.png)
+
+### Asiakasprofiilin integraatio
+
+- **Organisaatiokenttä FreeScoutin asiakkaan muokkauslomakkeessa** — reaaliaikainen automaattinen haku organisaatioille; roolivalikko ilmestyy organisaation valinnan jälkeen; × -painike poistamiseen
+- **"Näytä org-tiketit"** -pikaylinkki asiakkaanlomakkeessa
+- **Org-tietojen lohko hallinta-tiketin sivupalkissa** — organisaation nimi (klikattava linkki org-muokkaussivulle), rakenteellinen yksikkö ja jäsenen rooli; vaihda näkyvyyttä postilaatikkokohtaisesti asetuksissa
+- **Yksi aktiivinen jäsenyys asiakkaalle** — asiakasta ei voi lisätä toiseen organisaatioon aktiivisen jäsenyyden aikana; passiiviset/arkistoidut jäsenyydet ovat sallittuja
+
+![Asiakkaan muokkaus — organisaatiokenttä automaattisella haulla ja roolivalitsimella](docs/screenshots/customer-org-field.png)
+
+---
+
+## Rakenteelliset yksiköt — Osastotason pääsynhallinta
+
+*Tuki suurille yrityksille, joilla on monimutkaiset sisäiset hierarkiat.*
+
+Organisaatiot voidaan jakaa rajattomaan määrään **rakenteellisia yksiköitä** (osastot, toimipisteet, aluetoimistot, projektitiimit):
+
+- Luo, nimeä uudelleen ja poista yksiköitä hallinta-org-muokkauslomakkeesta tai suoraan portaalista (vain globaalit päälliköt)
+- Liitä jäsenet yksiköihin — jokainen jäsen kuuluu yhteen yksikköön
+- **Yksikön poistaminen** alentaa automaattisesti sen `unit_manager`-jäsenet `member`-tasolle
+
+**Kolme roolisoa:**
+
+| Rooli | Pääsyn laajuus |
+|-------|----------------|
+| `member` | Vain omat tiketit |
+| `unit_manager` | Kaikki tiketit rakenteellisen yksikön sisällä |
+| `manager` (globaali) | Kaikki tiketit koko organisaatiossa |
+
+- Yksikköpäälliköillä on täydet portaalin ominaisuudet — vastaukset, liitteet, tekijän siirto, sulkeminen/avaaminen, ilmoitushallinta — rajattuna tiukasti omaan yksikköönsä
+- Tikettien pääsy ja ilmoitusten toimitus noudattavat yksikkörajoja
+
+![Organisaation muokkaus — jäsenet rooleilla ja yksiköillä, yksikönhallintapaneeli](docs/screenshots/org-edit.png)
+
+---
+
+## Org Snapshot — Pysyvä tikettien attribuointi
+
+*Luotettava historiaraportointi vaikka asiakasluettelosi muuttuu.*
+
+Kun tiketti luodaan, OrgPortal tallentaa organisaatiokontekstin pysyvänä tilannekuvana:
+
+- `org_id`, `org_unit_id` ja `org_attributed_at` kirjoitetaan viestiin luontihetkellä
+- **Muuttumaton** — jos asiakas myöhemmin poistuu organisaatiosta, hänen historialliset tikettinsä pysyvät kyseisen organisaation attribuoimina; raportointi ei koskaan katkea
+- **Jäsenen lisääminen** käynnistää automaattisen täydennyksen asiakkaan olemassa oleville attribuoimattomille viesteille
+
+### Attribuointilähde — kolme tilaa
+
+Määritetään kohdassa **Manage → Organizations → System tab**:
+
+| Tila | Toiminta |
+|------|----------|
+| `member` | Attribuoi tiketti sille organisaatiolle, jonka jäsen tiketin tekijä on |
+| `tag` | Attribuoi ensin FreeScout-tunnisteen perusteella; siirry jäsenyyteen jos tunniste ei täsmää |
+| `tag_only` | Attribuoi yksinomaan tunnisteen perusteella; jäsenyyttä ei käytetä |
+
+`tag`- ja `tag_only`-tilat ovat poistettu käytöstä kun Tags-moduuli ei ole aktiivinen.
+
+### Täydennystyökalut
+
+- **Edistymispalkki** — näyttää X / Y attribuoitujen tikettien määrän (%) "valmis"-ilmaisimella
+- **Ennakkotilastot** — ennen täydennyksen suorittamista eritellään kuinka monta tikettia attribuoidaan tunnisteen, jäsenyyden tai ei lainkaan perusteella
+- **Suorita täydennys** -painike — käsittelee enintään 2000 tikettia klikkauksella; tulossummary (by_tag / by_member / unmatched) näytetään jälkeenpäin
+- **Automaattinen cron** (`attribution_cron_enabled`) — ajastaa täydennyksen 5 minuutin välein, 1000 tikettia per ajo, ilman päällekkäisyyksiä
+- **Nollaa attribuointi** — tyhjentää kaikki org-tilannekuvat (vaarallinen toiminto, vaatii vahvistuksen)
+- Komentorivi: `php artisan orgportal:backfill-attribution`
+
+![Järjestelmävälilehti — attribuointilähde, edistymispalkki, ennakkotilastot, täydennystyökalut](docs/screenshots/attribution-settings.png)
+
+---
+
+## Kanban-integraatio
+
+*Pidä visuaalinen työnkulkusi linjassa B2B-tiliesi kanssa.*
+
+- Organisaation tunnisteväri jokaisessa Kanban-kortissa
+- **Organisaatiosuodatin** Kanban-suodatinpaneelissa — monivalintamodaali valintaruuduilla; suodatintila säilyy navigoinnin välillä
+- **Monikieliset Kanban-tilasuodatintunnisteet** — anna jokaiselle Kanban-sarakkeelle mukautettu nimi portaalin kielellä; vaihda lokaalia postilaatikkokohtaisissa asetuksissa olevalla kielenvalitsimella; järjestä vetämällä
+- Käännetyt tunnisteet näkyvät sekä portaalin suodatinpalkissa että yritystikettitaulukon **Tila**-sarakkeessa; varajärjestys: tallennettu lokaalikieli → tallennettu englanti → alkuperäinen sarakkeen nimi
+
+![Kanban — organisaatiotunnisteet korteissa ja organisaatiosuodatinmodaali](docs/screenshots/kanban-org.png)
+
+---
+
+## Pääsynhallinta ja käyttöoikeudet
+
+*Delegoi organisaationhallinta ilman ylläpitäjäoikeuksien myöntämistä.*
+
+- **"Salli organisaatioiden hallinta"** (`can_manage_org`) — kaksi tasoa:
+  - **Käyttäjäoikeutena** agentin asetuksissa — sallii tukitiimin vetäjän hallita kaikkia organisaatioita ilman ylläpitäjäoikeuksia
+  - **Jäsenkohtaisena merkintänä** organisaation muokkauslomakkeessa — sallii tietyn org-jäsenen hallita kyseistä yhtä organisaatiota hallintapaneelista
+- **"Salli ilmoitusmallien hallinta"** — erillinen yksityiskohtainen käyttöoikeus mallien muokkaukseen
+- Organisaatioiden poistaminen on yksinomaan ylläpitäjän oikeus
+- Portaalin pääsy on tiukasti rajattu postilaatikkokohtaisesti: organisaation A päällikkö ei pääse organisaation B tietoihin
+
+![Yksityiskohtaiset käyttöoikeudet — salli organisaatioiden ja ilmoitusmallien hallinta](docs/screenshots/user-permissions.png)
+
+---
+
+## Järjestelmäasetukset — Manage → Organizations → System tab
+
+*Vain ylläpitäjille tarkoitetut ohjaimet attribuointia, täydennystä ja portaalin kielenvalitsinta varten.*
+
+**System**-välilehti näkyy vain FreeScoutin ylläpitäjille.
+
+### Paneeli 1: Tikettien attribuointi
+
+Katso [Org Snapshot](#org-snapshot--pysyvä-tikettien-attribuointi) yllä saadaksesi täyden kuvauksen attribuointitiloista, täydennystyökaluista ja automaattisesta cronista.
+
+### Paneeli 2: Portaalin kielenvalitsin
+
+- **Ota käyttöön/poista käytöstä** kielenvalitsin End-User Portal -navigaatiopalkissa
+- **Valitse mitkä 19:stä lokaaleista** tarjotaan (valintaruutukehikko); kaikki ovat oletuksena käytössä
+- Kun käytössä, päälliköt voivat vaihtaa portaalin kieltä; heidän valintansa tallennetaan ja käytetään ilmoitussähköposteissa
+- Tämä on OrgPortalin sisäänrakennettu kielenvalitsin — se toimii riippumattomasti kolmannen osapuolen kielenvaihtomoduuleista; molemmat voivat olla aktiivisina samanaikaisesti
+
+![Järjestelmävälilehti — portaalin kielenvalitsinpaneeli lokaaliruudukoilla](docs/screenshots/system-settings.png)
+
+---
+
+## End-User Portal — Itsepalvelu yrityspäälliköille *(valinnainen)*
+
+*Anna B2B-asiakkaillesi portaali, jossa he hallitsevat yrityksensä tukisuhdetta — ilman että he joutuvat ottamaan tiimiisi yhteyttä jokaisen tilannetiedon takia.*
+
+Vaatii [End-User Portal](https://freescout.net/module/end-user-portal/) -moduulin.
+
+### Yritystikettien hallintapaneeli
+
+Omistettu **Yritystiketit**-osio portaalin navigoinnissa täysiominaisella tikettitaulukolla:
+
+| Sarake | Kuvaus |
+|--------|--------|
+| **#** | Tiketin tunniste |
+| **Aihe** | Lyhennetty, työkaluvihje hoveroitaessa |
+| **Vastuuhenkilö** | Määritetty tukiagent |
+| **Tekijä** | Asiakas, joka avasi tiketin; klikkaa suodattaaksesi tekijän mukaan |
+| **Tila** | Aktiivinen / Odottaa / Suljettu / Roskaposti kuvakkeilla |
+| **Tila (Kanban)** | Kanban-sarakkeen nimi nykyisellä portaalin kielellä (vain kun Kanban-moduuli on aktiivinen) |
+| **Päivitetty** | Viimeisimmän vastauksen päivämäärä ja aika |
+
+**Kaksi riippumatonta lukutilaindikaattoria rivissä** — nämä seuraavat kahta eri henkilöä ja näytetään samanaikaisesti:
+
+| Indikaattori | Kenen lukutila | Mitä tarkoittaa |
+|-------------|----------------|-----------------|
+| **Lihavoitu rivi** | Portaalia selaileva päällikkö | Päälliköllä on lukemattomia ilmoituksia tästä viestistä — jotain on tapahtunut mitä hän ei ole vielä nähnyt |
+| **👁 Silmäkuvake** | Tiketin tekijä (asiakas, joka lähetti sen) | Tekijä ei ole vielä avannut agentin viimeisintä vastausta — hyödyllinen tietämään onko asiakas todella nähnyt vastauksen |
+
+Nämä kaksi tilaa ovat täysin riippumattomia: rivi voi olla lihavoitu (päällikkö ei ole lukenut) samalla kun silmä puuttuu (tekijä on jo lukenut), tai päinvastoin. Päällikkö näkee molemmat samanaikaisesti, saaden täydellisen kuvan mitä tapahtuu tiketin molemmilla puolilla avaamatta sitä.
+
+**Tekijäsuodatin** — tekijän nimen klikkaaminen aktivoi suodattimen; banneri ilmestyy taulukon yläosaan näyttäen aktiivisen tekijän nimen × -linkillä suodattimen tyhjentämiseksi.
+
+Sekä pöytätietokoneelle tarkoitettu taulukko että reagoiva **mobiilikorttinäkymä** ovat mukana; ne vaihtuvat automaattisesti näytön leveyden mukaan.
+
+Suodatinpalkin malline tukee **ohitusta** kohteella `enduserportal::partials.tickets_filters` — sijoita mukautettu näkymä siihen polkuun korvataksesi OrgPortalin oletussuodatinpalkin säilyttäen kaikki muut toiminnot.
+
+![Yritystiketit — täysi taulukko lukuindikaattoreilla, tekijäsuodatinbannerilla, tilasuodattimilla](docs/screenshots/portal-tickets.png)
+
+### Tikettitoiminnot portaalissa
+
+Päälliköt voivat toimia suoraan — tukeen ei tarvitse ottaa yhteyttä:
+
+- **Vastaa liitteillä** — vedä ja pudota, useita tiedostoja vastausta kohti; liitteiden nimet ja koot näkyvät jokaisessa viestissä
+- **Sulje tiketti** — uusi vastaus avaa sen automaattisesti uudelleen; banneri informoi päällikköä tästä kun tiketti on suljettu
+- **Vaihda tiketin tekijää** — siirrä tiketti toiselle organisaation jäsenelle
+- **Suodata yksiköllä** — globaalit päälliköt suodattavat tikettilistan rakenteellisen yksikön mukaan
+- **Suodata Kanban-tilalla** — postilaatikkokohtaisesti konfiguroitavissa, tunnisteet näytetään nykyisellä portaalin kielellä
+
+![Portaalin tikettinäkymä — vastauslomake vedä-ja-pudota-liitteillä ja suljettu-tiketti-banneri](docs/screenshots/portal-reply.png)
+
+### Päällikön katselun seuranta
+
+- **"Katsottu"**-merkintä ilmestyy agentin vastausten alle hallinta-tikettinäkymässä kun päällikkö avaa tiketin portaalissa
+- Näyttää päällikön nimen, roolin (Organisaation päällikkö / Yksikköpäällikkö) ja kuluneen ajan
+- Globaalin päällikön ja yksikköpäällikön katselut seurataan ja näytetään erikseen — sama UX kuin FreeScoutin natiivi "Asiakas katsoi"
+
+![Päällikön katselun seuranta — 'katsottu'-merkintä ilmestyy agentin vastauksen alle hallinta-tikettinäkymässä](docs/screenshots/manager-viewed.png)
+
+---
+
+## Reaaliaikaiset ilmoituskellot *(valinnainen)*
+
+*Pidä päälliköt ajan tasalla heti kun jotain tapahtuu heidän yritystiketeissään.*
+
+Vaatii [End-User Portal](https://freescout.net/module/end-user-portal/) -moduulin.
+
+- 🔔 Kellokuvake reaaliaikaisella lukemattomien määrä -merkinnällä EUP-navigaatiopalkissa — sijoittuu automaattisesti uudelleen mobiilissa (hampurilaisvalikon viereen)
+- Ilmoitukset: **uusi tiketti**, **agentin vastaus**, **asiakkaan vastaus** — kaikille päällikkörooleille
+- Pudotuspaneeli ilmoituksineen ryhmiteltynä päivämäärän mukaan: toimijan nimi, tapahtumatyyppi, tiketin numero, viestiesikatselu, aikaleima
+- **Automaattinen merkitseminen luetuksi** kun päällikkö avaa tiketin
+- Merkitse yksittäiset ilmoitukset luetuksi × -painikkeella; **Merkitse kaikki luetuksi** paneelin otsikossa
+- Pollaa 15 sekunnin välein; päivittyy selaimen eteen/taakse-navigoinnissa (bfcache-tietoinen)
+
+![Reaaliaikaiset ilmoituskellot — pudotuspaneeli ryhmitellyillä lukemattomilla ilmoituksilla](docs/screenshots/portal-bell.png)
+
+---
+
+## Ilmoitustilaukset *(valinnainen)*
+
+*Anna päälliköiden päättää mistä he kuulevat — ei enempää, ei vähempää.*
+
+- **Visuaalinen tilausmatriisi** portaalin organisaatioasetusten "Notifications"-välilehdellä
+- **Kolme tapahtumatyyppiä:** Uusi tiketti · Agentin vastaus · Asiakkaan vastaus
+- **Kaksi laajuustasoa:** Koko organisaatio (globaalit päälliköt) · Yksittäiset rakenteelliset yksiköt
+- Ilman yksikköä olevat jäsenet ryhmitellään erilliseen **"Ei yksikköä"** -laajennettavaan riviin
+- **Jäsenkohtaiset ohitukset** — laajenna yksikön rivi paljastaaksesi yksittäiset jäsenet ja vaihda heidän tilauksiaan inline-toiminnolla; yksikköpäälliköt rajatulla roolilla merkitään vastaavasti
+- **Kaskadoitu logiikka molempiin suuntiin:**
+  - "Koko organisaatio" käyttöön ottaminen → ottaa kaikki yksiköt ja jäsenet käyttöön
+  - Yksikön käyttöön ottaminen → ottaa kaikki sen jäsenet käyttöön
+  - Jäsenen poistaminen käytöstä → täsmäyttää automaattisesti yksikön ja organisaation valintaruudut
+- Globaalit päälliköt hallitsevat kaikkia jäseniä; yksikköpäälliköt hallitsevat vain omaa yksikköään
+- Ilmoitukset käyttävät vastaavan postilaatikon sähköpostiajuria
+
+![Ilmoitustilausmatriisi — yksikkö- ja jäsenkohtaiset kytkimet](docs/screenshots/portal-subscriptions.png)
+
+---
+
+## Portaalin organisaatioasetukset
+
+*Päälliköt konfiguroivat organisaationsa rakenteen ilman ylläpitäjäoikeuksia.*
+
+Portaalin navigoinnin **Organization Settings** -osiossa on kolme välilehteä:
+
+### Notifications-välilehti
+
+Yllä kuvattu tilausmatriisi.
+
+### Units-välilehti *(vain globaalit päälliköt)*
+
+- **Luo yksikkö** — inline-lomake nimikentällä
+- **Nimeä yksikkö uudelleen** — inline-muokkaus suoraan taulukkorivissä
+- **Poista yksikkö** — painike vahvistuksella; yksikköpäälliköt alennetaan automaattisesti jäseniksi
+- Jäsenmäärä näytetään yksikköä kohti
+
+### Members-välilehti
+
+- Taulukko kaikista organisaation jäsenistä: nimi, rakenteellinen yksikkö, rooli, aktiivinen/passiivinen-tilamerkintä
+- **"Globaali päällikkö"** -merkintä jäsenen nimen vieressä tarvittaessa
+- **Näytä deaktivoituneet** -valintaruutu — näkyy vain kun passiivisia jäseniä on; piilotettu oletuksena
+- **Globaalit päälliköt** voivat päivittää minkä tahansa jäsenen yksikköä ja roolia inline-lomakkeella (yksikkövalinta + roolivalinta + Käytä)
+- **Globaalit päälliköt eivät voi ylentää jäsentä globaaliksi päälliköksi** portaalista — tämä vaatii ylläpitäjän oikeudet
+- **Aktivoi / deaktivoi** -painike jäsentä kohti deaktivoinnin vahvistuksella
+
+![Portaalin organisaatioasetukset — Units- ja Members-välilehdet](docs/screenshots/portal-settings.png)
+
+---
+
+## Monikieliset ilmoitussähköpostimallit *(valinnainen)*
+
+*Yrityksesi asiakkaat saavat tukisähköposteja omalla kielellään — automaattisesti, ilman manuaalista vaivaa.*
+
+Määritetään kohdassa **Manage → Organizations → Templates tab** (näkyy käyttäjille, joilla on "hallitse malleja" -käyttöoikeus).
+
+- **Lokaalikohdisteisia malleja** — erillinen aihe ja sisältö jokaiselle portaalin kielelle; vaihda lokaalivaroivalitsimella; arvot vaihdetaan muistissa ilman sivun uudelleenlatausta
+- **Kokoontaitettavat paneelityyppeittäin** (Uusi tiketti / Agentin vastaus / Asiakkaan vastaus) — Summernote-editori alustetaan laiskasti kun paneeli avataan
+- **Lataa oletus** -painike jokaisessa paneelissa — palauttaa sisäänrakennetun mallin nykyiselle lokaalille (käyttää englanninkielistä sisäänrakennettua jos lokaalikohtaista oletusta ei ole)
+- **Summernote WYSIWYG -editori** rikasta HTML-sähköpostia varten
+- **Makromuuttujan valitsin** — lisää paikkamerkkejä aiheeseen tai sisältöön yhdellä klikkauksella; kursorin sijainti säilyy aihe-kentässä
+- **19 sisäänrakennettua oletusmallia** — käyttövalmis heti; ei konfigurointia tarvita
+
+**Käytettävissä olevat makromuuttujat:**
+
+| Muuttuja | Kuvaus |
+|----------|--------|
+| `{manager_name}` | Ilmoituksen vastaanottavan päällikön nimi |
+| `{author_name}` | Asiakas, joka loi tiketin tai vastasi siihen |
+| `{org_name}` | Organisaation nimi |
+| `{unit_name}` | Rakenteellisen yksikön nimi |
+| `{subject}` | Tiketin aihe |
+| `{ticket_number}` | Tiketin tunniste |
+| `{ticket_url}` | Suora linkki tikettiin portaalissa |
+| `{ticket_text}` | Alkuperäisen viestin koko teksti (HTML) |
+| `{reply_text}` | Viimeisimmän vastauksen koko teksti (HTML) |
+| `{created_date}` | Tiketin luontipäivämäärä |
+| `{created_time}` | Tiketin luontiaika |
+| `{created_datetime}` | Tiketin luontipäivämäärä ja -aika |
+| `{reply_date}` | Vastauksen päivämäärä |
+| `{reply_time}` | Vastauksen aika |
+| `{reply_datetime}` | Vastauksen päivämäärä ja aika |
+
+**Varajärjestys:** tallennettu lokaalimalli → sisäänrakennettu lokaalimalli → tallennettu englanninkielinen malli → sisäänrakennettu englanninkielinen malli
+
+Ilmoituskieli määräytyy jokaisen päällikön portaalin kielivalinnasta, tallennetaan automaattisesti kun he käyttävät kielenvalitsinta.
+
+![Sähköpostimallit — lokaalikohdisteinen kokoontaittuva paneeli, Lataa oletus -painike, Summernote-editori](docs/screenshots/admin-templates.png)
+
+---
+
+## REST API *(valinnainen)*
+
+*Integroi OrgPortal CRM:ään, ERP:iin tai asiakkaan käyttöönottoprosessiin.*
+
+Vaatii [API and Webhooks](https://freescout.net/module/api-webhooks/) -moduulin.
+
+- Täysi CRUD organisaatioille, rakenteellisille yksiköille, asiakkaiden jäsenyyksille ja tunnisteille
+- **Organisaatiokentät:** `name`, `color`, `mailboxId`, `isActive` — kaikki luettavissa ja päivitettävissä API:n kautta
+- **Members-aliresurssi** — `GET/PUT/DELETE /api/organizations/{id}/members/{memberId}` — päivitä rooli, yksikkö, `canManageOrg` ja jäsenkohtainen `isActive`-merkintä riippumattomasti koskematta muuhun jäsenyyteen
+- **Tags-aliresurssi** — `GET/PUT /api/organizations/{id}/tags` — listaa tai korvaa tunnistesidokset kokonaan (vaatii Tags-moduulin; palauttaa `503` jos ei aktiivinen)
+- Todennus `X-FreeScout-API-Key`-otsikon tai `api_key`-kyselyparametrin avulla
+- Interaktiivinen **ReDoc-dokumentaatio** kohdassa **Manage → API & Webhooks → OrgPortal API Docs** (`/orgportal/admin/api-docs`)
+
+📖 **Täysi API-viite → [docs/api/README.md](docs/api/README.md)**
+
+![Interaktiivinen API-dokumentaatio — ReDoc kaikilla OrgPortal-päätepisteillä](docs/screenshots/api-docs.png)
 
 ---
 
 ## Asennus
 
-1. Kopioi `OrgPortal`-kansio FreeScoutin `Modules/`-kansioon
-2. Hallintapaneelissa: **Hallinta → Moduulit → OrgPortal → Aktivoi**
+1. Kopioi `OrgPortal`-kansio FreeScout-asennuksesi `Modules/`-hakemistoon
+2. Siirry kohtaan **Manage → Modules → OrgPortal → Activate**
 3. Suorita migraatiot:
    ```bash
    php artisan module:migrate OrgPortal
@@ -112,70 +387,113 @@ Interaktiivinen ReDoc-dokumentaatio on saatavilla myös kohdassa **Manage → AP
    php artisan cache:clear && php artisan config:clear
    ```
 
----
-
-## Päivitykset
-
-OrgPortal tukee **automaattisia päivityksiä** FreeScout-ohjelmiston sisäänrakennetun moduulin päivitysmekanismin kautta.
-
-> **Requires FreeScout 1.8.170 or later.** On older versions the update banner will not appear — update the module manually by replacing the `OrgPortal` folder with the latest release ZIP.
-
-Kun uusi versio on saatavilla, banderolli ilmestyy sivulle **Hallinta → Moduulit**. Napsauta **Päivitä nyt** — FreeScout lataa ja asentaa uusimman version automaattisesti.
-
-Manuaalista tiedostojen kopiointia ei tarvita.
+> **Georgian kielen tuki** otetaan käyttöön automaattisesti ensimmäisellä käynnistyskerralla — ei tarvita manuaalista tiedostojen kopiointia.
 
 ---
 
-## Moduulin yhteensopivuus
+## Automaattiset päivitykset
 
-| Moduuli | Tila |
-|--------|--------|
-| End-User Portal ≥ 1.0.85 | Valinnainen — portaalin ominaisuudet johtajille |
-| API ja webhookit ≥ 1.0.80 | Valinnainen — REST API-päätepisteet |
-| Kanban ≥ 1.0.23 | Valinnainen — merkki, suodatin, "Asema"-sarake yrityksen lipuissa |
-| Mukautetut kentät | Yhteensopiva |
-| Työnkulut | Yhteensopiva |
-| Tunnisteet | Yhteensopiva |
+OrgPortal tukee **yhden klikkauksen päivityksiä** FreeScoutin sisäänrakennetun moduulin päivitysmekanismin kautta.
+
+> **Vaatii FreeScout 1.8.170 tai uudemman.** Vanhemmissa versioissa päivitä manuaalisesti korvaamalla `OrgPortal`-kansio uusimmalla julkaisun ZIP-tiedostolla.
+
+Kun uusi versio on saatavilla, banneri ilmestyy kohtaan **Manage → Modules**. Klikkaa **Update now** — FreeScout lataa ja asentaa uusimman version automaattisesti.
 
 ---
 
-## Konfiguraatio
+## Moduuliyhteensopivuus
 
-### Yleinen (**Hallinta → OrgPortal-asetukset**)
+| Moduuli | Tila | Huomiot |
+|---------|------|---------|
+| End-User Portal ≥ 1.0.85 | Valinnainen | Päällikköportaali, ilmoituskello, tilaukset |
+| API and Webhooks ≥ 1.0.80 | Valinnainen | REST API -päätepisteet |
+| Kanban ≥ 1.0.23 | Valinnainen | Tunnisteväri korteissa, org-suodatin, monikieliset Tila-sarakkeen tunnisteet |
+| Custom Fields | ✅ Yhteensopiva | — |
+| Workflows | ✅ Yhteensopiva | — |
+| Tags | ✅ Yhteensopiva | Tunnistesirut org-muokkauslomakkeessa; tunnistesidokset API:n kautta (`/organizations/{id}/tags`); tunnistepohjainen tikettien attribuointi |
 
-| Vaihtoehto | Oletus |
-|---------|---------|
-| Näytä merkki lippusivulla | ✅ |
-| Näytä merkki Kanban-korteissa | ✅ |
+---
 
-### Postilaatikko kerrallaan (**Postilaatikon asetukset → OrgPortal**)
+## Konfigurointi
 
-Ohittaa globaalit arvot tietylle postilaatikolle.
+### Globaalit asetukset — **Manage → Organizations → System tab**
 
 | Vaihtoehto | Kuvaus |
-|---------|-------------|
-| Näytä merkki lippusivulla | Merkki keskustelun luettelossa ja lippusivulla |
-| Näytä merkki Kanban-korteissa | Merkki Kanban-korteissa |
-| Yrityksen lippujen tilasuodattimet | Kanban-sarakkeet valintaruutuina yrityksen liput-sivulla; jokaisella suodattimella on portaalin käyttäjille näkyvä mukautettu tunniste |
+|------------|--------|
+| Näytä tunnisteväri tikettisivulla | Org-tunnisteväri viestilistauksessa ja tikettinäkymässä |
+| Näytä tunnisteväri Kanban-korteissa | Org-tunnisteväri Kanban-taulun korteissa |
+| Attribuointilähde | `member` / `tag` / `tag_only` — kuinka tiketit attribuoidaan organisaatioille |
+| Automaattinen cron-täydennys | Suorita täydennys 5 minuutin välein automaattisesti |
+| Tilannekuvan näkyvyys | Näytä/piilota attribuointitiedot tiketin sivupalkissa |
+| Portaalin kielenvalitsin | Ota kielenvalitsin käyttöön EUP-navigaatiopalkissa; valitse mitkä 19 lokaalista tarjotaan |
+
+### Postilaatikkokohtaiset asetukset — **Mailbox Settings → OrgPortal**
+
+Ohittaa globaalit arvot tietyn postilaatikon osalta.
+
+| Vaihtoehto | Kuvaus |
+|------------|--------|
+| Näytä tunnisteväri tikettisivulla | Ota käyttöön/poista käytöstä tunnisteväri tässä postilaatikossa |
+| Näytä tunnisteväri Kanban-korteissa | Ota käyttöön/poista käytöstä tunnisteväri tässä postilaatikossa |
+| Näytä organisaatiolohko asiakasprofiilissa | Vaihda org-tietolohkon näkyvyyttä tiketin sivupalkissa |
+| Yritystikettien tilasuodattimet | Kartoita Kanban-sarakkeet nimettyihin suodattimiin portaalissa; kielikohtaiset tunnisteet lokaalikytkimellä; järjestä vetämällä |
+
+![Postilaatikkokohtaiset asetukset — tunnistevärin näkyvyys ja Kanban-tilasuodattimet monikielisillä tunnisteilla](docs/screenshots/mailbox-settings.png)
 
 ---
 
 ## Käännökset
 
-Tuetut kielet: **Englanti** (`en`), **Ukraina** (`uk`), **Romania** (`ro`), **Georgia** (`ka`), **Saksa** (`de`), **Ranska** (`fr`), **Espanja** (`es`), **Italia** (`it`), **Tšekki** (`cs`), **Slovakia** (`sk`), **Puola** (`pl`), **Venäjä** (`ru`), **Alankomaat** (`nl`), **Norja** (`no`), **Tanska** (`da`), **Ruotsi** (`sv`), **Suomi** (`fi`), **Portugali BR** (`pt-BR`), **Portugali PT** (`pt-PT`), **Yksinkertainen kiina** (`zh-CN`).
+OrgPortal on täysin lokalisoitu **19 kielelle**:
 
-Tiedostot: `Modules/OrgPortal/Resources/lang/{locale}/messages.php`
+| Kieli | Koodi | Kieli | Koodi |
+|-------|-------|-------|-------|
+| Englanti | `en` | Hollanti | `nl` |
+| Ukraina | `uk` | Norja | `no` |
+| Saksa | `de` | Tanska | `da` |
+| Ranska | `fr` | Ruotsi | `sv` |
+| Espanja | `es` | Suomi | `fi` |
+| Italia | `it` | Portugali (BR) | `pt-BR` |
+| Tšekki | `cs` | Portugali (PT) | `pt-PT` |
+| Slovakia | `sk` | Romania | `ro` |
+| Puola | `pl` | Yksinkertaistettu kiina | `zh-CN` |
+| Georgia | `ka` | | |
 
-### EUPSWLANG-integraatio
+Käännöstiedostot: `Modules/OrgPortal/Resources/lang/{locale}/messages.php`
 
-Moduuli toimii oikein [EUP Switch Language](https://freescout.net/module/eup-sw-lang/) kanssa: portaalissa valittu kieli koskee myös OrgPortal-merkkijonoja.
+Ilmoitussähköpostimalleilla on sisäänrakennetut oletukset kaikille 19 kielelle.
 
-Jotta kieli ilmestyy EUPSWLANG-luetteloon, vastaava `Modules/EndUserPortal/Resources/lang/{locale}.json`-tiedosto on oltava olemassa. **Romaanian** (`ro`) tiedostot sisältyvät pakettiin; **Georgian** (`ka`) tuetaan vain hallintaosiossa (ei järjestelmän tukea FreeScout core -ohjelmassa).
+### Kielenvalitsimen integraatio
 
-> **Tekninen yksityiskohta:** `ReapplyEupLocale`-middleware (rekisteröity viimeksi portaalin reititysryhmässä) palauttaa alueinstansen FreeScoutin `Localize`-middlewaren jälkeen, mikä muuten nollaisi portaalin kielivalinnan järjestelmän oletusarvoon.
+OrgPortal sisältää sisäänrakennetun portaalin kielenvalitsimen (ota käyttöön kohdassa **System tab → Portal Language Switcher**). Se integroituu myös [EUP Switch Language](https://freescout.net/module/eup-sw-lang/) -moduuliin — molemmat voivat olla aktiivisina samanaikaisesti.
+
+Päällikön valitsema kieli koskee kaikkia OrgPortalin käyttöliittymämerkkijonoja ja tallennetaan heidän ilmoituskielenään — sähköpostit lähetetään automaattisesti heidän valitsemallaan kielellä.
+
+> **Tekninen huomio:** `OrgPortalSetLocale`-väliohjelmisto soveltaa portaalin lokaalia uudelleen FreeScoutin `Localize`-väliohjelmiston jälkeen estääkseen sen nollautumisen järjestelmäoletukseen jokaisessa pyynnössä.
+
+---
+
+## Kuvakaappaukset
+
+| | |
+|---|---|
+| ![Organisaatiolista](docs/screenshots/org-list.png) | ![Organisaation muokkaus](docs/screenshots/org-edit.png) |
+| *Organisaatiolista — tilasuodatin, reaaliaikahaku, väritunnisteet* | *Organisaation muokkaus — värinvalitsin, tunnistesirut, jäsentaulukko* |
+| ![Järjestelmävälilehti](docs/screenshots/system-settings.png) | ![Asiakkaan muokkaus](docs/screenshots/customer-org-field.png) |
+| *Järjestelmävälilehti — attribuointitilat, täydennys, kielenvalitsin* | *Asiakkaan muokkaus — org-kenttä automaattisella haulla* |
+| ![Yritystiketit portaali](docs/screenshots/portal-tickets.png) | ![Portaalin vastaus](docs/screenshots/portal-reply.png) |
+| *Yritystiketit — taulukko, tekijäsuodatin, lukuindikaattorit* | *Portaalin tiketti — vastaus liitteillä, suljettu-banneri* |
+| ![Portaalin organisaatioasetukset](docs/screenshots/portal-settings.png) | ![Ilmoituskello](docs/screenshots/portal-bell.png) |
+| *Portaalin org-asetukset — Units- ja Members-välilehdet* | *Reaaliaikaiset ilmoituskellot pudotuspaneelilla* |
+| ![Tilausmatriisi](docs/screenshots/portal-subscriptions.png) | ![Sähköpostimallit](docs/screenshots/admin-templates.png) |
+| *Ilmoitustilausmatriisi — yksikkö- ja jäsenkohtainen* | *Sähköpostimallit — lokaalivalitsin, Lataa oletus, Summernote* |
+| ![Kanban-integraatio](docs/screenshots/kanban-org.png) | ![Postilaatikkoasetukset](docs/screenshots/mailbox-settings.png) |
+| *Kanban — org-tunnisteet ja org-suodatinmodaali* | *Postilaatikkoasetukset — Kanban-suodattimet monikielisillä tunnisteilla* |
+| ![API-dokumentaatio](docs/screenshots/api-docs.png) | |
+| *Interaktiivinen API-dokumentaatio — ReDoc* | |
 
 ---
 
 ## Lisenssi
 
-[MIT](../LICENSE) — © 2026 ASTIN-UA
+[MIT](LICENSE) — © 2026 ASTIN-UA

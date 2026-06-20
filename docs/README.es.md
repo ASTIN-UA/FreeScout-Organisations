@@ -1,181 +1,499 @@
-# OrgPortal — Portal de Organizaciones para FreeScout
+# OrgPortal — Módulo de Gestión de Organizaciones B2B para FreeScout
 
-<img src="../Modules/OrgPortal/logo.png" alt="OrgPortal" width="140" align="right">
+[← Volver al README](../README.md)
 
-Un módulo de FreeScout que añade el concepto de **Organizaciones** (empresas/equipos) a los clientes, extiende el Portal del Usuario Final para administradores y muestra un distintivo de organización en tickets y tarjetas Kanban.
+<img src="Modules/OrgPortal/logo.png" alt="OrgPortal — módulo B2B de FreeScout" width="140" align="right">
 
-**Versión mínima de FreeScout:** 1.8.147  
-**Dependencias:** ninguna requerida  
-**Opcional:** [Portal del Usuario Final](https://freescout.net/module/end-user-portal/), [API y Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
+**OrgPortal** es un módulo de FreeScout que añade **gestión completa de organizaciones B2B** a tu servicio de asistencia: agrupa clientes en empresas, define jerarquías de departamentos, da a los gerentes corporativos un portal de autoservicio y automatiza notificaciones — todo dentro de FreeScout, sin herramientas externas requeridas.
+
+> ¿Buscas una forma de gestionar cuentas de empresas en FreeScout? ¿Quieres dar a tus clientes corporativos su propio portal de soporte? ¿Controlar qué tickets puede ver cada contacto B2B según su rol y departamento? OrgPortal resuelve todo eso.
+
+**Compatible con:** FreeScout 1.8.147+  
+**Integraciones opcionales:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
 
 ---
 
-🌐 **Idioma:** [English](../README.md) · [Українська](README.uk.md) · [Deutsch](README.de.md) · [Français](README.fr.md) · [Español](README.es.md) · [Italiano](README.it.md) · [Polski](README.pl.md) · [Čeština](README.cs.md) · [Slovenčina](README.sk.md) · [Nederlands](README.nl.md) · [Norsk](README.no.md) · [Dansk](README.da.md) · [Svenska](README.sv.md) · [Suomi](README.fi.md) · [Português (BR)](README.pt-BR.md) · [Português (PT)](README.pt-PT.md) · [Română](README.ro.md) · [中文 (简体)](README.zh-CN.md)
+🌐 **También disponible en:**
+[Українська](docs/README.uk.md) · [Deutsch](docs/README.de.md) · [Français](docs/README.fr.md) · [Español](docs/README.es.md) · [Italiano](docs/README.it.md) · [Polski](docs/README.pl.md) · [Čeština](docs/README.cs.md) · [Slovenčina](docs/README.sk.md) · [Nederlands](docs/README.nl.md) · [Norsk](docs/README.no.md) · [Dansk](docs/README.da.md) · [Svenska](docs/README.sv.md) · [Suomi](docs/README.fi.md) · [Português (BR)](docs/README.pt-BR.md) · [Português (PT)](docs/README.pt-PT.md) · [Română](docs/README.ro.md) · [中文 (简体)](docs/README.zh-CN.md)
 
 ---
 
-## Características
+## Qué añade OrgPortal a FreeScout
 
-### Gestión de organizaciones (admin)
-- **Gestionar → Organizaciones** — CRUD completo: crear, editar, eliminar organizaciones
-- **Vinculación de buzón** — una organización puede ser **global** (visible en todos los buzones) o **vinculada a un buzón específico**; la etiqueta correspondiente se muestra en la lista de organizaciones
-- Asignar clientes a organizaciones con selección de rol: `member` o `manager`
-- **Cambiar rol de miembro** directamente en la tabla (sin eliminar y volver a añadir)
-- Búsqueda automática de clientes por nombre o correo electrónico; los clientes que ya pertenecen a cualquier organización se excluyen de los resultados
-- El correo electrónico del miembro se muestra debajo del nombre en la tabla de miembros
-- Un cliente — una organización (aplicado a nivel de BD y API)
-- **Color de distintivo** — paleta visual con 12 colores en el formulario de edición de organización; el predeterminado es gris
+FreeScout está construido alrededor de clientes individuales — cada correo electrónico proviene de una persona, y no hay concepto integrado de empresa en la que esa persona trabaja. Esto funciona bien para servicio al cliente B2C. Para B2B, se queda corto.
 
-### Permisos de usuario
-- Nuevo permiso **"Permitir gestionar organizaciones"** — los usuarios sin derechos de administrador con este permiso obtienen acceso a las páginas de lista, creación y edición de organizaciones
-- Eliminar organizaciones sigue siendo exclusivo de los administradores
+OrgPortal cierra esa brecha:
 
-### Tarjeta del cliente
-- Campo **Organización** en el formulario de edición de cliente — seleccione organización y rol
-- Botón **Tickets de Organización** — abre una búsqueda de todos los tickets de la organización
+- **Cuentas de empresas** — agrupa clientes en organizaciones con nombre, insignia de color, alcance de buzón y estado activo/inactivo
+- **Jerarquías de departamentos** — divide organizaciones en unidades estructurales (departamentos, sucursales, equipos); cada miembro está limitado a su unidad
+- **Acceso basado en roles** — `member` ve solo sus propios tickets; `unit_manager` ve toda la unidad; `manager` ve toda la organización
+- **Portal de autoservicio corporativo** — los gerentes ven todos los tickets de la empresa, responden, cierran, reasignan autores y gestionar preferencias de notificación sin contactar a tu equipo
+- **Atribución permanente de tickets** — cada ticket se captura en su organización en el momento de la creación; los informes históricos persisten a cambios en la lista de clientes
+- **Notificaciones multilingües** — alertas de correo automatizadas en el idioma de cada gerente, con plantillas por idioma y un editor WYSIWYG incorporado
+- **API REST** — sincroniza membresías desde tu CRM, automatiza incorporación, gestiona etiquetas programáticamente
 
-### Distintivo de organización en tickets
-- Se muestra debajo del asunto en la página del ticket y antes del nombre en la lista de conversaciones
-- Se puede hacer clic — abre una búsqueda de todos los tickets de esta organización
-- El color del distintivo está determinado por la configuración de la organización (predeterminado gris)
-- Activar/desactivar **por buzón** mediante **Configuración del Buzón → OrgPortal**; se usa el valor global como respaldo
+---
 
-### Distintivo de organización en tarjetas Kanban
-- Se muestra después del contador de mensajes en cada tarjeta
-- Se puede hacer clic — conduce a la búsqueda de organización
-- El color coincide con la configuración de la organización
-- Filtro **Organización** integrado en el menú desplegable de filtros de Kanban estándar: modal con casillas de verificación, similar al filtro de etiquetas; el estado se conserva entre navegaciones
-- Activar/desactivar **por buzón** mediante **Configuración del Buzón → OrgPortal**
+## Organizaciones
 
-### Filtro de búsqueda de organización
-- Extiende la búsqueda de FreeScout con un filtro de **Organización**
-- Muestra todos los tickets de clientes que pertenecen a la organización seleccionada
+*Un único lugar para todo sobre una cuenta corporativa.*
 
-### Portal del Usuario Final — acceso gestor *(opcional)*
+**Manage → Organizations** abre una interfaz con pestañas y tres secciones: Organizations, Templates y System.
 
-Un gestor de organización obtiene acceso extendido a través de EUP:
+### Lista de organizaciones
 
-- Elemento **Tickets de Empresa** en la navegación del portal
-- Tabla de tickets de empresa con columnas:
-  - **#** y **Asunto** con truncamiento de elipsis y tooltip al pasar el ratón
-  - **Responsable** — agente asignado
-  - **Autor** — el cliente que abrió el ticket; hacer clic filtra tickets por autor dentro de la organización
-  - **Estado** — Activo / Pendiente / Cerrado / Spam con iconos
-  - **Fase** — nombre de la columna Kanban (con etiqueta personalizada si se configura); se muestra solo si el módulo Kanban está activo
-  - **Actualizado** — fecha y hora de la última respuesta
-- Buscar por asunto del ticket
-- Filtros por estados de Kanban (configurables mediante **Configuración del Buzón → OrgPortal**)
-- Responder a ticket con soporte de **adjuntos** (arrastrar y soltar, múltiples archivos)
-- **Cerrar ticket** — el gestor puede cerrar un ticket; una nueva respuesta lo reabre automáticamente
-- Cambiar autor del ticket — reasignar un ticket a otro miembro de la organización
-- Página **Configuración de Org** para configurar notificaciones por correo electrónico
-- El acceso a tickets está **estrictamente limitado al buzón actual** (organización copiada a otro buzón — portal 403)
+- **Crear, editar, eliminar, activar/desactivar** organizaciones
+- **Filtro de estado** — alterna entre Active / Inactive / All con un grupo de opciones; filtra la tabla instantáneamente del lado del cliente
+- **Búsqueda en directo** — comienza a filtrar con 2+ caracteres, sin recarga de página
+- **Insignias con código de color** — selector de color interactivo con 12 muestras y vista previa de insignia en directo junto al selector; la insignia aparece en cada ticket y tarjeta Kanban
+- Hacer clic en la insignia o en el número de tickets abre una búsqueda de FreeScout filtrada a esa organización
+- **Vinculación de buzones** — las organizaciones pueden ser globales (todos los buzones) o limitadas a un buzón específico
+- **Columna de etiquetas** — muestra ✓/✗ si hay etiquetas de FreeScout vinculadas a la organización (se requiere módulo Tags); las etiquetas se asignan en el formulario de edición con un widget basado en fichas y búsqueda con autocompletado
+- **Columna de número de tickets** — total de conversaciones por organización; enlace clickeable a resultados de búsqueda completos
+- **Columna de número de miembros**
+- **Activar / desactivar** — suspende una cuenta sin perder historial; requiere que Org Snapshot esté habilitado (el botón está deshabilitado con una información flotante cuando no lo está)
+- **Eliminar** — disponible solo cuando la organización tiene 0 miembros y 0 tickets (protección de seguridad)
+- Todas las acciones de eliminar y desactivar requieren confirmación
 
-### Notificaciones por correo electrónico *(opcional)*
-- Los gestores con la opción habilitada reciben un correo electrónico cuando se crea un nuevo ticket de cualquier miembro de la organización
-- **Suscripciones por miembro:** cada fila de unidad es expandible — haz clic para revelar cada miembro de esa unidad y cambiar sus suscripciones individuales en línea. Un gestor global gestiona miembros de todas las unidades; un gestor de unidad solo de su propia unidad.
-- **Cascada completamente transitiva:** "Organización completa" impulsa cada unidad y cada miembro; una casilla de verificación de unidad impulsa todos sus miembros; desactivar un miembro reconcilia su unidad (y la organización) automáticamente — en ambas direcciones, por columna de evento.
-- Utiliza el controlador de correo del buzón correspondiente
+![Lista de organizaciones — filtro de estado, búsqueda en directo, insignias de color, etiquetas, números de tickets](docs/screenshots/org-list.png)
 
-### Configuración de buzón
+### Formulario de edición de organización
 
-**Configuración del Buzón → OrgPortal** (por buzón):
+- **Nombre** y **vinculación de buzón**
+- **Selector de color** — 12 muestras con vista previa de insignia en directo
+- **Etiquetas** — widget basado en fichas: escribe para buscar etiquetas existentes de FreeScout, haz clic para añadir, × para eliminar
+- **Tabla de miembros** — por miembro: nombre, rol, unidad estructural, casilla de verificación `can_manage_org` (otorga acceso administrativo a organizaciones sin derechos administrativos completos), alternador activo/inactivo
+- **Panel de unidades estructurales** — crea y renombra unidades directamente en el formulario de edición; los miembros se asignan a unidades en la misma vista
+- **Añadir un miembro** — rellena automáticamente conversaciones existentes no atribuidas para ese cliente
 
-| Opción | Descripción |
+![Edición de organización — selector de color, fichas de etiquetas, tabla de miembros con roles y unidades](docs/screenshots/org-edit.png)
+
+### Integración de perfil de cliente
+
+- **Campo de organización en el formulario de edición de cliente de FreeScout** — búsqueda con autocompletado en directo para organizaciones; el menú desplegable de rol aparece después de seleccionar una org; botón × para eliminar
+- **Enlace de acceso directo "Ver tickets de org"** en el formulario de cliente
+- **Bloque de información de org en la barra lateral del ticket del administrador** — nombre de la organización (enlace clickeable a la página de edición de org), unidad estructural y rol de miembro; alterna visibilidad por buzón en configuración
+- **Un miembro activo por cliente** — un cliente no puede añadirse a una segunda organización mientras tenga una membresía activa; se permiten membresías inactivas/archivadas
+
+![Edición de cliente — campo de organización con autocompletado y selector de rol](docs/screenshots/customer-org-field.png)
+
+---
+
+## Unidades Estructurales — Control de Acceso a Nivel de Departamento
+
+*Apoya a grandes empresas con jerarquías internas complejas.*
+
+Las organizaciones pueden dividirse en **unidades estructurales** ilimitadas (departamentos, sucursales, oficinas regionales, equipos de proyecto):
+
+- Crea, renombra y elimina unidades en el formulario de edición de org del administrador, o directamente desde el portal (solo gerentes globales)
+- Asigna miembros a unidades — cada miembro pertenece a una unidad
+- **Eliminar una unidad** degrada automáticamente sus miembros `unit_manager` a `member`
+
+**Tres niveles de rol:**
+
+| Rol | Alcance de acceso |
+|------|-------------|
+| `member` | Solo sus propios tickets |
+| `unit_manager` | Todos los tickets dentro de su unidad estructural |
+| `manager` (global) | Todos los tickets en toda la organización |
+
+- Los gerentes de unidad tienen capacidades completas del portal — respuestas, adjuntos, reasignación de autor, cerrar/reabrir, gestión de notificaciones — limitadas estrictamente a su unidad
+- El acceso a tickets y la entrega de notificaciones se aplican en los límites de unidades
+
+![Edición de organización — miembros con roles y unidades, panel de gestión de unidades](docs/screenshots/org-edit.png)
+
+---
+
+## Org Snapshot — Atribución Permanente de Tickets
+
+*Informes históricos confiables incluso mientras cambia tu cartera de clientes.*
+
+Cuando se crea un ticket, OrgPortal registra el contexto de la organización como captura permanente:
+
+- `org_id`, `org_unit_id` y `org_attributed_at` se escriben en la conversación en el momento de la creación
+- **Inmutable** — si un cliente luego abandona una organización, sus tickets históricos siguen atribuidos a esa org; los informes nunca se rompen
+- **Añadir un miembro** desencadena relleno automático de conversaciones existentes no atribuidas de ese cliente
+
+### Fuente de atribución — tres modos
+
+Configurado en **Manage → Organizations → System tab**:
+
+| Modo | Comportamiento |
+|------|----------|
+| `member` | Atribuye el ticket a la organización de la que es miembro el autor del ticket |
+| `tag` | Atribuye por etiqueta de FreeScout vinculada a una org primero; retrocede a membresía si no hay coincidencia de etiqueta |
+| `tag_only` | Atribuye exclusivamente por etiqueta; la membresía no se usa |
+
+Los modos `tag` y `tag_only` están deshabilitados cuando el módulo Tags está inactivo.
+
+### Herramientas de relleno
+
+- **Barra de progreso** — muestra X / Y tickets atribuidos (%) con un indicador "complete" cuando se hace
+- **Estadísticas previas** — antes de ejecutar el relleno, un desglose muestra cuántos tickets se atribuirán por etiqueta vs. por membresía vs. no coincidentes
+- **Botón Run backfill** — procesa hasta 2000 tickets por clic; el resumen de resultados (by_tag / by_member / unmatched) se muestra después
+- **Auto-cron** (`attribution_cron_enabled`) — programa relleno cada 5 minutos, 1000 tickets por ejecución, sin solapamiento
+- **Restablecer atribución** — borra todas las capturas de org (acción peligrosa, requiere confirmación)
+- Línea de comandos: `php artisan orgportal:backfill-attribution`
+
+![Pestaña System — fuente de atribución, barra de progreso, estadísticas previas, controles de relleno](docs/screenshots/attribution-settings.png)
+
+---
+
+## Integración Kanban
+
+*Mantén tu flujo de trabajo visual alineado con tus cuentas B2B.*
+
+- Insignia de organización en cada tarjeta Kanban con el color asignado de la cuenta
+- **Filtro de organización** en el panel de filtros Kanban — modal multiselecta con casillas de verificación; el estado del filtro persiste en la navegación
+- **Etiquetas de filtro de estado Kanban multilingües** — asigna un nombre personalizado a cada columna Kanban por idioma del portal; cambia idiomas con el selector de idioma en configuración por buzón; arrastra para reordenar filtros
+- Las etiquetas traducidas aparecen tanto en la barra de filtros del portal como en la columna **State** de la tabla de tickets de la empresa; cadena de retroceso: idioma guardado → idioma inglés guardado → nombre de columna original
+
+![Kanban — insignias de organización en tarjetas y modal de filtro de org](docs/screenshots/kanban-org.png)
+
+---
+
+## Control de Acceso y Permisos
+
+*Delega gestión de organizaciones sin otorgar acceso administrativo.*
+
+- **"Permitir gestión de organizaciones"** (`can_manage_org`) — dos niveles:
+  - Como **permiso de usuario** en configuración de agente — permite a un líder de equipo de soporte gestionar todas las organizaciones sin derechos administrativos
+  - Como **indicador por miembro** en el formulario de edición de organización — permite a un miembro específico de org gestionar esa organización desde el panel administrativo
+- **"Permitir gestión de plantillas de notificación"** — permiso granular separado para edición de plantillas
+- La eliminación de organizaciones sigue siendo exclusivamente solo para administrador
+- El acceso al portal está estrictamente limitado por buzón: un gerente de la Organización A no puede acceder a la Organización B
+
+![Permisos granulares — permitir gestión de organizaciones y plantillas de notificación](docs/screenshots/user-permissions.png)
+
+---
+
+## Configuración del Sistema — Manage → Organizations → System tab
+
+*Controles solo para administrador para atribución, relleno e interruptor de idioma del portal.*
+
+La pestaña **System** es visible solo para administradores de FreeScout.
+
+### Panel 1: Atribución de Tickets
+
+Consulta [Org Snapshot](#org-snapshot--atribución-permanente-de-tickets) arriba para la descripción completa de modos de atribución, herramientas de relleno y auto-cron.
+
+### Panel 2: Interruptor de Idioma del Portal
+
+- **Habilitar/deshabilitar** el interruptor de idioma en la barra de navegación de End-User Portal
+- **Elige cuál de los 19 idiomas** ofrecer (cuadrícula de casillas de verificación); todos están habilitados por defecto
+- Cuando está habilitado, los gerentes pueden cambiar el idioma del portal; su elección se guarda y se usa para correos de notificación
+- Este es el interruptor de idioma integrado de OrgPortal — funciona independientemente de cualquier módulo de cambio de idioma de terceros; ambos pueden coexistir
+
+![Pestaña System — panel de interruptor de idioma del portal con casillas de verificación de idiomas](docs/screenshots/system-settings.png)
+
+---
+
+## End-User Portal — Autoservicio para Gerentes Corporativos *(opcional)*
+
+*Da a tus clientes B2B un portal donde gestionen su relación de soporte con la empresa — sin contactar a tu equipo para cada actualización de estado.*
+
+Requiere el módulo [End-User Portal](https://freescout.net/module/end-user-portal/).
+
+### Panel de Tickets de Empresa
+
+Una sección dedicada de **Company Tickets** en la navegación del portal con una tabla de tickets con todas las características:
+
+| Columna | Descripción |
 |--------|-------------|
-| Mostrar distintivo en la página del ticket | Activar/desactivar distintivo dentro de este buzón |
-| Mostrar distintivo en tarjetas Kanban | Activar/desactivar distintivo dentro de este buzón |
-| Filtros de estado de tickets de empresa | Seleccione columnas Kanban mostradas como casillas de verificación en la página de tickets; etiqueta personalizada para cada filtro |
+| **#** | ID de Ticket |
+| **Subject** | Truncado con información flotante al pasar el ratón |
+| **Responsible** | Agente de soporte asignado |
+| **Author** | Cliente que abrió el ticket; haz clic para filtrar por este autor |
+| **Status** | Active / Pending / Closed / Spam con iconos |
+| **State** | Nombre de columna Kanban en el idioma actual del portal (solo cuando el módulo Kanban está activo) |
+| **Updated** | Fecha y hora de la última respuesta |
+
+**Dos indicadores de estado de lectura independientes por fila** — estos rastrean dos personas diferentes y se muestran simultáneamente:
+
+| Indicador | Estado de lectura de | Qué significa |
+|-----------|-------------------|---------------|
+| **Fila en negrita** | El gerente que ve el portal | El gerente tiene notificaciones no leídas para esta conversación — algo pasó que no han visto aún |
+| **👁 Icono de ojo** | El autor del ticket (el cliente que lo envió) | El autor no ha abierto la última respuesta del agente — útil para saber si un cliente realmente vio la respuesta |
+
+Estos dos estados son completamente independientes: una fila puede estar en negrita (el gerente no ha leído) mientras el ojo está ausente (el autor ya leyó), o viceversa. El gerente ve ambos al mismo tiempo, dando una imagen completa de lo que está sucediendo en ambos lados del ticket sin abrirlo.
+
+**Filtro de autor** — hacer clic en un nombre de autor activa un filtro; un banner aparece en la parte superior de la tabla mostrando el nombre del autor activo con un enlace × para limpiar el filtro.
+
+Tanto la tabla de escritorio como un **diseño de tarjeta receptivo para móvil** se incluyen; cambian automáticamente según el ancho de pantalla.
+
+La plantilla de barra de filtros soporta **anulación** vía `enduserportal::partials.tickets_filters` — coloca una vista personalizada en esa ruta para reemplazar la barra de filtros predeterminada de OrgPortal mientras mantienes toda la demás funcionalidad.
+
+![Tickets de empresa — tabla completa con indicadores de lectura, banner de filtro de autor, filtros de estado](docs/screenshots/portal-tickets.png)
+
+### Acciones de Ticket en el Portal
+
+Los gerentes pueden tomar acción directamente — no hay necesidad de contactar a soporte:
+
+- **Responder con adjuntos** — arrastra y suelta, múltiples archivos por respuesta; nombres de adjuntos y tamaños de archivo mostrados en cada hilo
+- **Cerrar ticket** — una nueva respuesta lo reabre automáticamente; un banner informa al gerente de esto cuando el ticket está cerrado
+- **Cambiar autor del ticket** — reasigna un ticket a otro miembro de la organización
+- **Filtrar por unidad** — gerentes globales filtran la lista de tickets por unidad estructural
+- **Filtrar por estado Kanban** — configurable por buzón, etiquetas mostradas en el idioma actual del portal
+
+![Vista de ticket del portal — formulario de respuesta con adjuntos arrastra y suelta y banner de ticket cerrado](docs/screenshots/portal-reply.png)
+
+### Rastreo de Visualización de Gerente
+
+- Una nota **"viewed"** aparece bajo respuestas del agente en la vista de ticket del administrador cuando un gerente abre el ticket en el portal
+- Muestra nombre del gerente, rol (Gerente de organización / Gerente de unidad) y tiempo transcurrido
+- Vistas de gerente global y gerente de unidad rastreadas y mostradas independientemente — misma UX que el "Cliente visto" nativo de FreeScout
+
+![Rastreo de visualización de gerente — la nota 'viewed' aparece bajo la respuesta del agente en la vista de ticket del administrador](docs/screenshots/manager-viewed.png)
 
 ---
 
-### REST API *(opcional, requiere API y Webhooks)*
+## Campana de Notificación en Tiempo Real *(opcional)*
 
-OrgPortal ofrece una API REST completa para gestionar organizaciones, unidades estructurales y membresías de clientes — autenticación mediante el encabezado `X-FreeScout-API-Key` o el parámetro de consulta `api_key`.
+*Mantén a los gerentes informados en el momento en que algo sucede con los tickets de su empresa.*
 
-📖 **Referencia completa de la API → [docs/api/README.es.md](api/README.es.md)** (todos los endpoints, ejemplos de solicitud/respuesta, códigos de error)
+Requiere el módulo [End-User Portal](https://freescout.net/module/end-user-portal/).
 
-La documentación interactiva ReDoc también está disponible en **Manage → API & Webhooks → OrgPortal API Docs** (`/orgportal/admin/api-docs`).
+- 🔔 Icono de campana con insignia de número no leído en directo en la barra de navegación de EUP — se reposiciona automáticamente en móvil (junto al menú de hamburguesa)
+- Notificaciones para: **nuevo ticket**, **respuesta del agente**, **respuesta del cliente** — para todos los roles de gerente
+- Panel desplegable con notificaciones agrupadas por fecha: nombre del actor, tipo de evento, número de ticket, vista previa de mensaje, marca de tiempo
+- **Auto-marcar como leído** cuando el gerente abre el ticket
+- Marcar notificaciones individuales como leídas vía ×; **Marcar todo como leído** en el encabezado del panel
+- Sondea cada 15 segundos; se actualiza en la navegación hacia atrás/adelante del navegador (consciente de bfcache)
+
+![Campana de notificación en tiempo real — desplegable con notificaciones no leídas agrupadas](docs/screenshots/portal-bell.png)
+
+---
+
+## Suscripciones de Notificación *(opcional)*
+
+*Permite que los gerentes decidan qué escuchan — nada más, nada menos.*
+
+- **Matriz de suscripción visual** en la pestaña "Notifications" en Configuración de Organización del portal
+- **Tres tipos de eventos:** Nuevo ticket · Respuesta del agente · Respuesta del cliente
+- **Dos niveles de alcance:** Organización completa (gerentes globales) · Unidades estructurales individuales
+- Miembros sin unidad se agrupan en una fila expandible separada **"No unit"**
+- **Anulaciones por miembro** — expande cualquier fila de unidad para revelar miembros individuales y alterna sus suscripciones en línea; gerentes de unidad con rol limitado están etiquetados en consecuencia
+- **Lógica en cascada en ambas direcciones:**
+  - Habilitar "Organización completa" → habilita todas las unidades y todos los miembros
+  - Habilitar una unidad → habilita todos sus miembros
+  - Deshabilitar un miembro → auto-reconcilia las casillas de verificación de unidad y organización
+- Los gerentes globales gestionar todos los miembros; los gerentes de unidad gestionan solo su propia unidad
+- Las notificaciones usan el controlador de correo del buzón correspondiente
+
+![Matriz de suscripción de notificación — alternadores por unidad y por miembro](docs/screenshots/portal-subscriptions.png)
+
+---
+
+## Configuración de Organización del Portal
+
+*Los gerentes configuran su estructura organizacional sin acceso administrativo.*
+
+**Organization Settings** en la navegación del portal tiene tres pestañas:
+
+### Pestaña Notifications
+
+La matriz de suscripción descrita arriba.
+
+### Pestaña Units *(solo gerentes globales)*
+
+- **Crear unidad** — formulario en línea con campo de nombre
+- **Renombrar unidad** — edición en línea directamente en la fila de la tabla
+- **Eliminar unidad** — botón con confirmación; los gerentes de unidad se degradan automáticamente a miembro
+- Número de miembros mostrado por unidad
+
+### Pestaña Members
+
+- Tabla de todos los miembros de la organización: nombre, unidad estructural, rol, insignia de estado activo/inactivo
+- **Etiqueta "Gerente global"** mostrada junto al nombre del miembro donde sea aplicable
+- **Mostrar desactivados** casilla de verificación — aparece solo cuando existen miembros inactivos; oculto por defecto
+- **Gerentes globales** pueden actualizar la unidad y rol de cualquier miembro con un formulario en línea (seleccione unidad + seleccione rol + Apply)
+- **Los gerentes globales no pueden promover a un miembro a gerente global** desde el portal — esto requiere acceso administrativo
+- **Activar / desactivar** botón por miembro con confirmación para desactivación
+
+![Configuración de Organización del Portal — pestañas Units y Members](docs/screenshots/portal-settings.png)
+
+---
+
+## Plantillas de Correo de Notificación Multilingües *(opcional)*
+
+*Tus clientes corporativos reciben correos de soporte en su propio idioma — automáticamente, sin esfuerzo manual.*
+
+Configurado en **Manage → Organizations → Templates tab** (visible para usuarios con permiso de "manage templates").
+
+- **Plantillas por idioma** — asunto y cuerpo separados para cada idioma del portal; cambia entre ellos con el menú desplegable de idioma; los valores se intercambian en memoria sin recarga de página
+- **Paneles colapsables** por tipo de evento (Nuevo ticket / Respuesta del agente / Respuesta del cliente) — el editor Summernote se inicializa de manera perezosa cuando se abre un panel
+- **Botón Load Default** en cada panel — restaura la plantilla integrada para el idioma actualmente seleccionado (retrocede al integrado en inglés si no existe un predeterminado específico de idioma)
+- **Editor WYSIWYG Summernote** para composición de correo HTML enriquecido
+- **Selector de variable macro** — inserta placeholders en asunto o cuerpo con un clic; la posición del cursor se preserva en el campo de asunto
+- **19 plantillas integradas predeterminadas** — listas para usar del cuadro; no se requiere configuración
+
+**Variables macro disponibles:**
+
+| Variable | Descripción |
+|----------|-------------|
+| `{manager_name}` | Nombre del gerente que recibe la notificación |
+| `{author_name}` | Cliente que creó o respondió al ticket |
+| `{org_name}` | Nombre de la organización |
+| `{unit_name}` | Nombre de la unidad estructural |
+| `{subject}` | Asunto del ticket |
+| `{ticket_number}` | ID del ticket |
+| `{ticket_url}` | Enlace directo al ticket en el portal |
+| `{ticket_text}` | Texto completo del mensaje inicial (HTML) |
+| `{reply_text}` | Texto completo de la última respuesta (HTML) |
+| `{created_date}` | Fecha de creación del ticket |
+| `{created_time}` | Hora de creación del ticket |
+| `{created_datetime}` | Fecha y hora de creación del ticket |
+| `{reply_date}` | Fecha de respuesta |
+| `{reply_time}` | Hora de respuesta |
+| `{reply_datetime}` | Fecha y hora de respuesta |
+
+**Cadena de retroceso:** plantilla de idioma guardada → plantilla de idioma integrada → plantilla en inglés guardada → plantilla integrada en inglés
+
+El idioma de la notificación se determina por la selección de idioma del portal de cada gerente, guardado automáticamente cuando usan el interruptor de idioma.
+
+![Plantillas de correo — paneles colapsables por idioma, botón Load Default, editor Summernote](docs/screenshots/admin-templates.png)
+
+---
+
+## API REST *(opcional)*
+
+*Integra OrgPortal en tu CRM, ERP o flujo de trabajo de incorporación de clientes.*
+
+Requiere el módulo [API and Webhooks](https://freescout.net/module/api-webhooks/).
+
+- CRUD completo para organizaciones, unidades estructurales, membresías de clientes y etiquetas
+- **Campos de organización:** `name`, `color`, `mailboxId`, `isActive` — todos legibles y actualizables vía API
+- **Sub-recurso Members** — `GET/PUT/DELETE /api/organizations/{id}/members/{memberId}` — actualiza rol, unidad, `canManageOrg` e indicador `isActive` por miembro independientemente sin tocar el resto de la membresía
+- **Sub-recurso Tags** — `GET/PUT /api/organizations/{id}/tags` — lista o reemplaza completamente vinculaciones de etiquetas (requiere módulo Tags; retorna `503` si está inactivo)
+- Autenticación vía encabezado `X-FreeScout-API-Key` o parámetro de consulta `api_key`
+- Documentación interactiva **ReDoc** en **Manage → API & Webhooks → OrgPortal API Docs** (`/orgportal/admin/api-docs`)
+
+📖 **Referencia completa de API → [docs/api/README.md](docs/api/README.md)**
+
+![Documentación API interactiva — ReDoc con todos los puntos finales de OrgPortal](docs/screenshots/api-docs.png)
 
 ---
 
 ## Instalación
 
-1. Copie la carpeta `OrgPortal` en `Modules/` de su FreeScout
-2. En el panel de administración: **Gestionar → Módulos → OrgPortal → Activar**
-3. Ejecute las migraciones:
+1. Copia la carpeta `OrgPortal` en `Modules/` de tu instalación de FreeScout
+2. Ve a **Manage → Modules → OrgPortal → Activate**
+3. Ejecuta migraciones:
    ```bash
    php artisan module:migrate OrgPortal
    ```
-4. Limpie el caché:
+4. Borra caché:
    ```bash
    php artisan cache:clear && php artisan config:clear
    ```
 
----
-
-## Actualizaciones
-
-OrgPortal admite **actualizaciones automáticas** a través del mecanismo de actualización de módulos integrado de FreeScout.
-
-> **Requires FreeScout 1.8.170 or later.** On older versions the update banner will not appear — update the module manually by replacing the `OrgPortal` folder with the latest release ZIP.
-
-Cuando hay una nueva versión disponible, aparece un banner en la página **Gestionar → Módulos**. Haga clic en **Actualizar ahora** — FreeScout descargará e instalará la última versión automáticamente.
-
-No se requiere copia manual de archivos.
+> **El soporte del idioma georgiano** se implementa automáticamente en el primer inicio — no se requiere copia manual de archivos.
 
 ---
 
-## Compatibilidad de módulos
+## Actualizaciones Automáticas
 
-| Módulo | Estado |
-|--------|--------|
-| Portal del Usuario Final ≥ 1.0.85 | Opcional — características del portal para gestores |
-| API y Webhooks ≥ 1.0.80 | Opcional — puntos finales de API REST |
-| Kanban ≥ 1.0.23 | Opcional — distintivo, filtro, columna "Fase" en tickets de empresa |
-| Campos Personalizados | Compatible |
-| Flujos de Trabajo | Compatible |
-| Etiquetas | Compatible |
+OrgPortal soporta **actualizaciones de un clic** vía el mecanismo integrado de actualización de módulos de FreeScout.
+
+> **Requiere FreeScout 1.8.170 o posterior.** En versiones anteriores, actualiza manualmente reemplazando la carpeta `OrgPortal` con el ZIP de lanzamiento más reciente.
+
+Cuando una nueva versión está disponible, un banner aparece en **Manage → Modules**. Haz clic en **Update now** — FreeScout descarga e instala la última versión automáticamente.
+
+---
+
+## Compatibilidad de Módulos
+
+| Módulo | Estado | Notas |
+|--------|--------|-------|
+| End-User Portal ≥ 1.0.85 | Opcional | Portal del gerente, campana de notificación, suscripciones |
+| API and Webhooks ≥ 1.0.80 | Opcional | Puntos finales de API REST |
+| Kanban ≥ 1.0.23 | Opcional | Insignia en tarjetas, filtro de org, etiquetas de columna State multilingües |
+| Custom Fields | ✅ Compatible | — |
+| Workflows | ✅ Compatible | — |
+| Tags | ✅ Compatible | Fichas de etiquetas en formulario de edición de org; vinculaciones de etiquetas vía API (`/organizations/{id}/tags`); atribución de tickets basada en etiquetas |
 
 ---
 
 ## Configuración
 
-### Global (**Gestionar → Configuración de OrgPortal**)
-
-| Opción | Por defecto |
-|--------|------------|
-| Mostrar distintivo en la página del ticket | ✅ |
-| Mostrar distintivo en tarjetas Kanban | ✅ |
-
-### Por buzón (**Configuración del Buzón → OrgPortal**)
-
-Anula los valores globales para el buzón específico.
+### Configuración Global — **Manage → Organizations → System tab**
 
 | Opción | Descripción |
 |--------|-------------|
-| Mostrar distintivo en la página del ticket | Distintivo en lista de conversaciones y en página de ticket |
-| Mostrar distintivo en tarjetas Kanban | Distintivo en tarjetas Kanban |
-| Filtros de estado de tickets de empresa | Columnas Kanban como casillas de verificación en la página de tickets de empresa; etiqueta personalizada visible para usuarios del portal |
+| Show badge on ticket page | Insignia de org en lista de conversaciones y vista de ticket |
+| Show badge on Kanban cards | Insignia de org en tarjetas del tablero Kanban |
+| Attribution source | `member` / `tag` / `tag_only` — cómo se atribuyen los tickets a organizaciones |
+| Auto-cron backfill | Ejecuta relleno cada 5 minutos automáticamente |
+| Snapshot visibility | Mostrar/ocultar datos de atribución en barra lateral del ticket |
+| Portal Language Switcher | Habilita interruptor de idioma en barra de navegación de EUP; elige cuál de 19 idiomas ofrecer |
+
+### Configuración Por Buzón — **Mailbox Settings → OrgPortal**
+
+Anula valores globales para el buzón específico.
+
+| Opción | Descripción |
+|--------|-------------|
+| Show badge on ticket page | Habilitar/deshabilitar insignia para este buzón |
+| Show badge on Kanban cards | Habilitar/deshabilitar insignia para este buzón |
+| Show organization block in customer profile | Alterna bloque de información de org en la barra lateral del ticket |
+| Company ticket status filters | Asigna columnas Kanban a filtros nombrados en el portal; etiquetas por idioma con selector de idioma; arrastra para reordenar |
+
+![Configuración por buzón — visibilidad de insignia y filtros de estado Kanban con etiquetas multilingües](docs/screenshots/mailbox-settings.png)
 
 ---
 
 ## Traducciones
 
-Idiomas admitidos: **English** (`en`), **Українська** (`uk`), **Română** (`ro`), **Georgian** (`ka`), **Deutsch** (`de`), **Français** (`fr`), **Español** (`es`), **Italiano** (`it`), **Čeština** (`cs`), **Slovenčina** (`sk`), **Polski** (`pl`), **Nederlands** (`nl`), **Norsk** (`no`), **Dansk** (`da`), **Svenska** (`sv`), **Suomi** (`fi`), **Português BR** (`pt-BR`), **Português PT** (`pt-PT`), **中文 (简体)** (`zh-CN`).
+OrgPortal está completamente localizado en **19 idiomas**:
 
-Archivos: `Modules/OrgPortal/Resources/lang/{locale}/messages.php`
+| Idioma | Código | Idioma | Código |
+|----------|------|----------|------|
+| English | `en` | Dutch | `nl` |
+| Ukrainian | `uk` | Norwegian | `no` |
+| German | `de` | Danish | `da` |
+| French | `fr` | Swedish | `sv` |
+| Spanish | `es` | Finnish | `fi` |
+| Italian | `it` | Portuguese (BR) | `pt-BR` |
+| Czech | `cs` | Portuguese (PT) | `pt-PT` |
+| Slovak | `sk` | Romanian | `ro` |
+| Polish | `pl` | Chinese Simplified | `zh-CN` |
+| Georgian | `ka` | | |
 
-### Integración EUPSWLANG
+Archivos de traducción: `Modules/OrgPortal/Resources/lang/{locale}/messages.php`
 
-El módulo funciona correctamente con [Cambio de Idioma EUP](https://freescout.net/module/eup-sw-lang/): el idioma seleccionado en el portal también se aplica a las cadenas de OrgPortal.
+Las plantillas de correo de notificación tienen predeterminados integrados para los 19 idiomas.
 
-Para que un idioma aparezca en la lista EUPSWLANG, el archivo correspondiente `Modules/EndUserPortal/Resources/lang/{locale}.json` debe existir. Los archivos para **Română** (`ro`) se incluyen en el paquete; **Georgian** (`ka`) solo se admite en la sección de administración (sin soporte del sistema en el núcleo de FreeScout).
+### Integración de Interruptor de Idioma
 
-> **Detalle técnico:** middleware `ReapplyEupLocale` (registrado último en el grupo de rutas del portal) restaura la configuración regional después del middleware `Localize` de FreeScout, que de otro modo restablecería el idioma del portal al valor predeterminado del sistema.
+OrgPortal incluye un interruptor de idioma del portal integrado (habilita en **System tab → Portal Language Switcher**). También se integra con [EUP Switch Language](https://freescout.net/module/eup-sw-lang/) — ambos pueden estar activos simultáneamente.
+
+El idioma que selecciona un gerente se aplica a todas las cadenas de UI de OrgPortal y se guarda como su idioma de notificación — los correos se envían en su idioma elegido automáticamente.
+
+> **Nota técnica:** El middleware `OrgPortalSetLocale` re-aplica la configuración regional del portal después del middleware `Localize` de FreeScout para evitar que se restablezca al predeterminado del sistema en cada solicitud.
+
+---
+
+## Capturas de pantalla
+
+| | |
+|---|---|
+| ![Lista de organizaciones](docs/screenshots/org-list.png) | ![Edición de organización](docs/screenshots/org-edit.png) |
+| *Lista de organizaciones — filtro de estado, búsqueda en directo, insignias de color* | *Edición de organización — selector de color, fichas de etiquetas, tabla de miembros* |
+| ![Pestaña System](docs/screenshots/system-settings.png) | ![Edición de cliente](docs/screenshots/customer-org-field.png) |
+| *Pestaña System — modos de atribución, relleno, interruptor de idioma* | *Edición de cliente — campo de org con autocompletado* |
+| ![Portal de tickets de empresa](docs/screenshots/portal-tickets.png) | ![Respuesta del portal](docs/screenshots/portal-reply.png) |
+| *Tickets de empresa — tabla, filtro de autor, indicadores de lectura* | *Portal de ticket — respuesta con adjuntos, banner de ticket cerrado* |
+| ![Configuración de organización del portal](docs/screenshots/portal-settings.png) | ![Campana de notificación](docs/screenshots/portal-bell.png) |
+| *Configuración de Org del Portal — pestañas Units y Members* | *Campana de notificación en tiempo real con desplegable* |
+| ![Matriz de suscripción](docs/screenshots/portal-subscriptions.png) | ![Plantillas de correo](docs/screenshots/admin-templates.png) |
+| *Matriz de suscripción de notificación — por unidad, por miembro* | *Plantillas de correo — selector de idioma, Load Default, Summernote* |
+| ![Integración Kanban](docs/screenshots/kanban-org.png) | ![Configuración de buzón](docs/screenshots/mailbox-settings.png) |
+| *Kanban — insignias de org y modal de filtro de org* | *Configuración por buzón — filtros Kanban con etiquetas multilingües* |
+| ![Documentación de API](docs/screenshots/api-docs.png) | |
+| *Documentación de API interactiva — ReDoc* | |
 
 ---
 
 ## Licencia
 
-[MIT](../LICENSE) — © 2026 ASTIN-UA
+[MIT](LICENSE) — © 2026 ASTIN-UA

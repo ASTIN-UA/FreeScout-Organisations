@@ -1,187 +1,499 @@
-# OrgPortal — Portal organizacji dla FreeScout
+# OrgPortal — Moduł zarządzania organizacjami B2B dla FreeScout
 
-<img src="../Modules/OrgPortal/logo.png" alt="OrgPortal" width="140" align="right">
+[← Powrót do README](../README.md)
 
-Moduł FreeScout, który dodaje koncepcję **Organizacji** (firmy/zespoły) do klientów, rozszerza Portal End-User dla menedżerów i wyświetla odznakę organizacji na zgłoszeniach i kartach Kanban.
+<img src="Modules/OrgPortal/logo.png" alt="OrgPortal — moduł B2B dla FreeScout" width="140" align="right">
 
-**Minimalna wersja FreeScout:** 1.8.147  
-**Zależności:** brak wymaganych  
-**Opcjonalne:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API i Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
+**OrgPortal** to moduł FreeScout, który dodaje pełne **zarządzanie organizacjami B2B** do Twojego helpdesku: grupuj klientów w firmy, definiuj hierarchie działów, daj menedżerom korporacyjnym portal samoobsługowy i automatyzuj powiadomienia — wszystko wewnątrz FreeScout, bez żadnych zewnętrznych narzędzi.
 
-🌐 **Język:** [English](../README.md) · [Українська](README.uk.md) · [Deutsch](README.de.md) · [Français](README.fr.md) · [Español](README.es.md) · [Italiano](README.it.md) · [Polski](README.pl.md) · [Čeština](README.cs.md) · [Slovenčina](README.sk.md) · [Nederlands](README.nl.md) · [Norsk](README.no.md) · [Dansk](README.da.md) · [Svenska](README.sv.md) · [Suomi](README.fi.md) · [Português (BR)](README.pt-BR.md) · [Português (PT)](README.pt-PT.md) · [Română](README.ro.md) · [中文 (简体)](README.zh-CN.md)
+> Szukasz sposobu na zarządzanie kontami firmowymi w FreeScout? Na zapewnienie klientom korporacyjnym własnego portalu wsparcia? Na kontrolowanie, które zgłoszenia może widzieć każdy kontakt B2B na podstawie jego roli i działu? OrgPortal rozwiązuje to wszystko.
 
----
-
-## Funkcje
-
-### Zarządzanie organizacjami (admin)
-- **Zarządzanie → Organizacje** — pełny CRUD: tworzenie, edycja, usuwanie organizacji
-- **Powiązanie ze skrzynką** — organizacja może być **globalna** (widoczna we wszystkich skrzynkach) lub **powiązana z konkretną skrzynką**; odpowiednia etykieta wyświetla się na liście organizacji
-- Przypisz klientów do organizacji z wyborem roli: `Członek` lub `Menedżer`
-- **Zmiana roli członka** bezpośrednio w tabeli (bez usuwania i ponownego dodawania)
-- Wyszukiwanie klienta z autouzupełnianiem według nazwy lub e-maila; klienci już w organizacji są wykluczeni z wyników
-- E-mail członka wyświetla się pod nazwą w tabeli członków
-- Jeden klient — jedna organizacja (wymuszane na poziomie bazy danych i API)
-- **Kolor odznaki** — wizualna paleta z 12 kolorami w formularzu edycji organizacji; kolor domyślny to szary
-
-### Uprawnienia użytkownika
-- Nowe uprawnienie **"Zezwól na zarządzanie organizacjami"** — nie-administratorzy z tym uprawnieniem mają dostęp do stron listy, tworzenia i edycji organizacji
-- Usuwanie organizacji pozostaje zastrzeżone dla administratorów
-
-### Karta klienta
-- Pole **Organizacja** w formularzu edycji klienta — wybierz organizację i rolę
-- Przycisk **Zgłoszenia organizacji** — otwiera wyszukiwanie wszystkich zgłoszeń organizacji
-
-### Odznaka organizacji na zgłoszeniach
-- Wyświetlana pod tematem na stronie zgłoszenia i na liście rozmów
-- Klikalna — otwiera wyszukiwanie wszystkich zgłoszeń tej organizacji
-- Kolor odznaki określony jest ustawieniami organizacji (domyślnie szary)
-- Włączenie/wyłączenie **na skrzynkę** za pośrednictwem **Ustawienia skrzynki → OrgPortal**; wartość globalna jest używana jako zapaśnik
-
-### Odznaka organizacji na kartach Kanban
-- Wyświetlana za licznikiem wiadomości na każdej karcie
-- Klikalna — prowadzi do wyszukiwania organizacji
-- Kolor odpowiada ustawieniom organizacji
-- Filtr **Organizacja** wbudowany w standardowe rozwijane menu filtrów Kanban: modal z polami wyboru, podobnie do filtru Tagi; stan jest zachowywany podczas nawigacji
-- Włączenie/wyłączenie **na skrzynkę** za pośrednictwem **Ustawienia skrzynki → OrgPortal**
-
-### Filtr wyszukiwania organizacji
-- Rozszerza standardowe wyszukiwanie FreeScout o filtr **Organizacja**
-- Wyświetla wszystkie zgłoszenia klientów należących do wybranej organizacji
-
-### Portal End-User — dostęp menedżerów *(opcjonalny)*
-
-Menedżer organizacji ma rozszerzony dostęp poprzez EUP:
-
-- Pozycja **Zgłoszenia firmy** w nawigacji portalu
-- Tabela zgłoszeń firmy z kolumnami:
-  - **#** i **Temat** z obcięciem elipsy i tooltipem po najechaniu myszą
-  - **Odpowiedzialny** — przydzielony agent
-  - **Autor** — klient, który otworzył zgłoszenie; kliknięcie filtruje zgłoszenia po autorze w organizacji
-  - **Stan** — Aktywny / Oczekujący / Zamknięty / Spam z ikonami
-  - **Status** — nazwa kolumny Kanban (z niestandardową etykietą, jeśli skonfigurowana); wyświetlane tylko gdy moduł Kanban jest aktywny
-  - **Zaktualizowano** — data i godzina ostatniej odpowiedzi
-- Wyszukiwanie w temacie zgłoszenia
-- Filtrowanie po statusie Kanban (konfigurowalne za pośrednictwem **Ustawienia skrzynki → OrgPortal**)
-- Odpowiedź na zgłoszenie z obsługą **Załączników** (Drag & Drop, wiele plików)
-- **Zamknij zgłoszenie** — menedżer może zamknąć zgłoszenie; nowa odpowiedź je automatycznie otworzy
-- Zmiana autora zgłoszenia — przypisanie zgłoszenia innemu członkowi organizacji
-- Strona **Ustawienia org.** do konfiguracji powiadomień e-mail
-- Dostęp do zgłoszeń jest **ściśle ograniczony do bieżącej skrzynki** (organizacja skopiowana do innej skrzynki — portal 403)
-
-### Powiadomienia e-mail *(opcjonalne)*
-- Menedżerowie z włączoną opcją otrzymują e-mail, gdy członek organizacji utworzy nowe zgłoszenie
-
-### Subskrypcje powiadomień *(opcjonalne)*
-
-Menedżerowie portalu mogą dostosować, które zdarzenia i zakresy wyzwalają powiadomienia e-mail:
-
-- **Macierz subskrypcji** na karcie "Powiadomienia" w Ustawieniach organizacji portalu
-- **Zdarzenia:** Nowe zgłoszenie, Odpowiedź agenta, Odpowiedź klienta
-- **Zakresy:** Cała organizacja (tylko menedżerowie globalni) lub konkretne jednostki strukturalne
-- **Subskrypcje na członka:** każdy wiersz jednostki można rozwinąć — kliknij, aby wyświetlić wszystkich członków tej jednostki i przełączać ich indywidualne subskrypcje na miejscu. Menedżer globalny zarządza członkami wszystkich jednostek; menedżer jednostki tylko swoją jednostką.
-- **W pełni przechodni kaskada:** „Cała organizacja" steruje każdą jednostką i każdym członkiem; pole jednostki steruje wszystkimi jej członkami; odznaczenie członka automatycznie uzgadnia jego jednostkę (i organizację) — w obu kierunkach, w kolumnie każdego zdarzenia.
-- Powiadomienia używają sterownika poczty odpowiadającej skrzynce
-
-### Ustawienia skrzynki
-
-**Ustawienia skrzynki → OrgPortal** (na skrzynkę):
-
-| Opcja | Opis |
-|-------|------|
-| Pokaż odznaką na stronie zgłoszenia | Włączenie/wyłączenie odznaki w tej skrzynce |
-| Pokaż odznaką na kartach Kanban | Włączenie/wyłączenie odznaki w tej skrzynce |
-| Filtry statusu zgłoszeń firmy | Wybierz kolumny Kanban wyświetlane jako pola wyboru na stronie zgłoszeń; niestandardowa etykieta dla każdego filtru |
+**Współpracuje z:** FreeScout 1.8.147+  
+**Opcjonalne integracje:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
 
 ---
 
-### REST API *(opcjonalne, wymaga API i Webhooks)*
+🌐 **Dostępne również w:**
+[Українська](docs/README.uk.md) · [Deutsch](docs/README.de.md) · [Français](docs/README.fr.md) · [Español](docs/README.es.md) · [Italiano](docs/README.it.md) · [Polski](docs/README.pl.md) · [Čeština](docs/README.cs.md) · [Slovenčina](docs/README.sk.md) · [Nederlands](docs/README.nl.md) · [Norsk](docs/README.no.md) · [Dansk](docs/README.da.md) · [Svenska](docs/README.sv.md) · [Suomi](docs/README.fi.md) · [Português (BR)](docs/README.pt-BR.md) · [Português (PT)](docs/README.pt-PT.md) · [Română](docs/README.ro.md) · [中文 (简体)](docs/README.zh-CN.md)
 
-OrgPortal udostępnia pełne REST API do zarządzania organizacjami, jednostkami strukturalnymi i członkostwami klientów — uwierzytelnianie za pomocą nagłówka `X-FreeScout-API-Key` lub parametru zapytania `api_key`.
+---
 
-📖 **Pełna dokumentacja API → [docs/api/README.pl.md](api/README.pl.md)** (wszystkie punkty końcowe, przykłady żądań/odpowiedzi, kody błędów)
+## Co OrgPortal dodaje do FreeScout
 
-Interaktywna dokumentacja ReDoc jest również dostępna w **Manage → API & Webhooks → OrgPortal API Docs** (`/orgportal/admin/api-docs`).
+FreeScout jest zbudowany wokół indywidualnych klientów — każda wiadomość e-mail pochodzi od osoby i nie ma wbudowanej koncepcji firmy, w której ta osoba pracuje. Sprawdza się to dobrze w helpdesku B2C. W B2B zawodzi.
+
+OrgPortal wypełnia tę lukę:
+
+- **Konta firmowe** — grupuj klientów w organizacje z nazwą, kolorową odznaką, powiązaniem ze skrzynką i statusem aktywny/nieaktywny
+- **Hierarchie działów** — dziel organizacje na jednostki strukturalne (działy, oddziały, zespoły); każdy członek jest przypisany do swojej jednostki
+- **Dostęp oparty na rolach** — `member` widzi tylko własne zgłoszenia; `unit_manager` widzi całą jednostkę; `manager` widzi całą organizację
+- **Korporacyjny portal samoobsługowy** — menedżerowie przeglądają wszystkie zgłoszenia firmy, odpowiadają, zamykają, zmieniają autorów i zarządzają preferencjami powiadomień bez kontaktowania się z Twoim zespołem
+- **Trwałe przypisanie zgłoszeń** — każde zgłoszenie jest trwale przypisane do organizacji w momencie utworzenia; historyczne raporty przeżywają zmiany w składzie klientów
+- **Wielojęzyczne powiadomienia** — automatyczne alerty e-mail w języku każdego menedżera, z szablonami dla każdego języka i wbudowanym edytorem WYSIWYG
+- **REST API** — synchronizuj członkostwo z Twoim CRM, automatyzuj wdrożenia, zarządzaj tagami programowo
+
+---
+
+## Organizacje
+
+*Jedno miejsce dla wszystkiego o koncie korporacyjnym.*
+
+**Manage → Organizations** otwiera interfejs z zakładkami z trzema sekcjami: Organizations, Templates i System.
+
+### Lista organizacji
+
+- **Tworzenie, edycja, usuwanie, aktywacja/dezaktywacja** organizacji
+- **Filtr statusu** — przełączaj między Active / Inactive / All za pomocą grupy przycisków radiowych; natychmiastowe filtrowanie tabeli po stronie klienta
+- **Wyszukiwanie na żywo** — filtrowanie zaczyna się od 2+ znaków, bez przeładowania strony
+- **Kolorowe odznaki** — interaktywny wybór koloru z 12 próbkami i podglądem odznaki na żywo obok selektora; odznaka pojawia się na każdym zgłoszeniu i karcie Kanban
+- Kliknięcie odznaki lub liczby zgłoszeń otwiera wyszukiwanie FreeScout przefiltrowane dla tej organizacji
+- **Powiązanie ze skrzynką** — organizacje mogą być globalne (wszystkie skrzynki) lub przypisane do konkretnej skrzynki
+- **Kolumna Tags** — pokazuje ✓/✗ czy jakiekolwiek tagi FreeScout są powiązane z organizacją (wymagany moduł Tags); tagi są przypisywane w formularzu edycji za pomocą widgetu z chipami i wyszukiwaniem z podpowiedziami
+- **Kolumna liczby zgłoszeń** — łączna liczba rozmów na organizację; klikalny link do pełnych wyników wyszukiwania
+- **Kolumna liczby członków**
+- **Aktywacja / dezaktywacja** — zawieś konto bez utraty historii; wymaga włączenia Org Snapshot (przycisk jest wyłączony z podpowiedzią, gdy nie jest)
+- **Usuwanie** — dostępne tylko gdy organizacja ma 0 członków i 0 zgłoszeń (zabezpieczenie)
+- Wszystkie akcje usuwania i dezaktywacji wymagają potwierdzenia
+
+![Lista organizacji — filtr statusu, wyszukiwanie na żywo, kolorowe odznaki, tagi, liczby zgłoszeń](docs/screenshots/org-list.png)
+
+### Formularz edycji organizacji
+
+- **Nazwa** i **powiązanie ze skrzynką**
+- **Wybór koloru** — 12 próbek z podglądem odznaki na żywo
+- **Tagi** — widget z chipami: wpisz, aby wyszukać istniejące tagi FreeScout, kliknij, aby dodać, × aby usunąć
+- **Tabela członków** — dla każdego członka: nazwa, rola, jednostka strukturalna, pole wyboru `can_manage_org` (przyznaje dostęp administracyjny do organizacji bez pełnych praw administratora), przełącznik aktywny/nieaktywny
+- **Panel jednostek strukturalnych** — tworzenie i zmiana nazw jednostek bezpośrednio w formularzu edycji; członkowie są przypisywani do jednostek w tym samym widoku
+- **Dodawanie członka** — automatycznie wypełnia istniejące nieprzypisane rozmowy dla tego klienta
+
+![Edycja organizacji — wybór koloru, chipy tagów, tabela członków z rolami i jednostkami](docs/screenshots/org-edit.png)
+
+### Integracja z profilem klienta
+
+- **Pole organizacji w formularzu edycji klienta FreeScout** — wyszukiwanie z podpowiedziami organizacji na żywo; lista rozwijana roli pojawia się po wybraniu organizacji; przycisk × do usunięcia
+- **Skrót "View org tickets"** w formularzu klienta
+- **Blok informacji o organizacji na pasku bocznym zgłoszenia administratora** — nazwa organizacji (klikalny link do strony edycji organizacji), jednostka strukturalna i rola członka; przełączanie widoczności dla każdej skrzynki w ustawieniach
+- **Jedno aktywne członkostwo na klienta** — klient nie może być dodany do drugiej organizacji, gdy ma aktywne członkostwo; nieaktywne/zarchiwizowane członkostwa są dozwolone
+
+![Edycja klienta — pole organizacji z podpowiedziami i selektorem roli](docs/screenshots/customer-org-field.png)
+
+---
+
+## Jednostki strukturalne — Kontrola dostępu na poziomie działu
+
+*Obsługa dużych przedsiębiorstw ze złożonymi wewnętrznymi hierarchiami.*
+
+Organizacje mogą być podzielone na nieograniczoną liczbę **jednostek strukturalnych** (działy, oddziały, biura regionalne, zespoły projektowe):
+
+- Tworzenie, zmiana nazw i usuwanie jednostek w formularzu edycji organizacji administratora lub bezpośrednio z portalu (tylko globalni menedżerowie)
+- Przypisywanie członków do jednostek — każdy członek należy do jednej jednostki
+- **Usunięcie jednostki** automatycznie obniża rolę jej członków `unit_manager` do `member`
+
+**Trzy poziomy ról:**
+
+| Rola | Zakres dostępu |
+|------|----------------|
+| `member` | Tylko własne zgłoszenia |
+| `unit_manager` | Wszystkie zgłoszenia w swojej jednostce strukturalnej |
+| `manager` (globalny) | Wszystkie zgłoszenia w całej organizacji |
+
+- Menedżerowie jednostek mają pełne możliwości portalu — odpowiedzi, załączniki, zmiana autora, zamykanie/otwieranie, zarządzanie powiadomieniami — ograniczone ściśle do swojej jednostki
+- Dostęp do zgłoszeń i dostarczanie powiadomień są egzekwowane na granicach jednostek
+
+![Edycja organizacji — członkowie z rolami i jednostkami, panel zarządzania jednostkami](docs/screenshots/org-edit.png)
+
+---
+
+## Org Snapshot — Trwałe przypisanie zgłoszeń
+
+*Niezawodne historyczne raportowanie nawet gdy skład klientów się zmienia.*
+
+Gdy zgłoszenie jest tworzone, OrgPortal rejestruje kontekst organizacji jako trwały snapshot:
+
+- `org_id`, `org_unit_id` i `org_attributed_at` są zapisywane do rozmowy w momencie utworzenia
+- **Niezmienne** — jeśli klient później opuści organizację, jego historyczne zgłoszenia pozostają przypisane do tej organizacji; raportowanie nigdy nie zostaje przerwane
+- **Dodanie członka** wyzwala automatyczne uzupełnienie istniejących nieprzypisanych rozmów tego klienta
+
+### Źródło przypisania — trzy tryby
+
+Konfigurowane w **Manage → Organizations → System tab**:
+
+| Tryb | Zachowanie |
+|------|------------|
+| `member` | Przypisz zgłoszenie do organizacji, której członkiem jest autor zgłoszenia |
+| `tag` | Przypisz najpierw według tagu FreeScout powiązanego z organizacją; użyj członkostwa jako rezerwy jeśli żaden tag nie pasuje |
+| `tag_only` | Przypisuj wyłącznie według tagów; członkostwo nie jest używane |
+
+Tryby `tag` i `tag_only` są wyłączone gdy moduł Tags jest nieaktywny.
+
+### Narzędzia uzupełniania
+
+- **Pasek postępu** — pokazuje X / Y przypisanych zgłoszeń (%) ze wskaźnikiem "complete" po zakończeniu
+- **Statystyki wstępne** — przed uruchomieniem uzupełniania pokazuje ile zgłoszeń zostanie przypisanych przez tag vs. przez członkostwo vs. nieprzypisanych
+- Przycisk **Uruchom uzupełnianie** — przetwarza do 2000 zgłoszeń na kliknięcie; po zakończeniu wyświetlane jest podsumowanie wyników (by_tag / by_member / unmatched)
+- **Auto-cron** (`attribution_cron_enabled`) — planuje uzupełnianie co 5 minut, 1000 zgłoszeń na uruchomienie, bez nakładania się
+- **Reset przypisania** — czyści wszystkie snapshoty organizacji (niebezpieczna akcja, wymaga potwierdzenia)
+- Wiersz poleceń: `php artisan orgportal:backfill-attribution`
+
+![Zakładka System — źródło przypisania, pasek postępu, statystyki wstępne, kontrolki uzupełniania](docs/screenshots/attribution-settings.png)
+
+---
+
+## Integracja z Kanban
+
+*Utrzymuj wizualny przepływ pracy zgodny z kontami B2B.*
+
+- Odznaka organizacji na każdej karcie Kanban z przypisanym kolorem konta
+- **Filtr organizacji** w panelu filtrów Kanban — modal wielokrotnego wyboru z polami wyboru; stan filtra jest zachowywany podczas nawigacji
+- **Wielojęzyczne etykiety filtrów statusu Kanban** — nadaj każdej kolumnie Kanban niestandardową nazwę dla każdego języka portalu; przełączaj języki za pomocą selektora języka w ustawieniach skrzynki; przeciągaj, aby zmienić kolejność filtrów
+- Przetłumaczone etykiety pojawiają się zarówno na pasku filtrów portalu, jak i w kolumnie **State** tabeli zgłoszeń firmy; łańcuch rezerwy: zapisany język → zapisany angielski → oryginalna nazwa kolumny
+
+![Kanban — odznaki organizacji na kartach i modal filtra organizacji](docs/screenshots/kanban-org.png)
+
+---
+
+## Kontrola dostępu i uprawnienia
+
+*Deleguj zarządzanie organizacją bez przyznawania dostępu administratora.*
+
+- **"Allow managing organizations"** (`can_manage_org`) — dwa poziomy:
+  - Jako **uprawnienie użytkownika** w ustawieniach agenta — pozwala liderowi zespołu wsparcia zarządzać wszystkimi organizacjami bez praw administratora
+  - Jako **flaga dla członka** w formularzu edycji organizacji — pozwala konkretnym członkom organizacji zarządzać tą jedną organizacją z panelu administracyjnego
+- **"Allow managing notification templates"** — oddzielne szczegółowe uprawnienie do edycji szablonów
+- Usuwanie organizacji pozostaje wyłącznie dla administratorów
+- Dostęp do portalu jest ściśle ograniczony do skrzynki: menedżer z Organizacji A nie może uzyskać dostępu do Organizacji B
+
+![Szczegółowe uprawnienia — zezwolenie na zarządzanie organizacjami i szablonami powiadomień](docs/screenshots/user-permissions.png)
+
+---
+
+## Ustawienia systemowe — Manage → Organizations → System tab
+
+*Kontrolki tylko dla administratorów dotyczące przypisania, uzupełniania i przełącznika języka portalu.*
+
+Zakładka **System** jest widoczna tylko dla administratorów FreeScout.
+
+### Panel 1: Przypisanie zgłoszeń
+
+Zobacz [Org Snapshot](#org-snapshot--trwałe-przypisanie-zgłoszeń) powyżej, aby uzyskać pełny opis trybów przypisania, narzędzi uzupełniania i auto-cron.
+
+### Panel 2: Przełącznik języka portalu
+
+- **Włączanie/wyłączanie** przełącznika języka na pasku nawigacyjnym End-User Portal
+- **Wybierz, które z 19 języków** oferować (siatka pól wyboru); wszystkie są domyślnie włączone
+- Gdy włączone, menedżerowie mogą przełączać język portalu; ich wybór jest zapisywany i używany do powiadomień e-mail
+- Jest to wbudowany przełącznik języka OrgPortal — działa niezależnie od zewnętrznych modułów do przełączania języka; oba mogą współistnieć
+
+![Zakładka System — panel przełącznika języka portalu z polami wyboru języka](docs/screenshots/system-settings.png)
+
+---
+
+## End-User Portal — Samoobsługa dla menedżerów korporacyjnych *(opcjonalne)*
+
+*Daj swoim klientom B2B portal, gdzie zarządzają relacją wsparcia swojej firmy — bez konieczności kontaktowania się z Twoim zespołem przy każdej aktualizacji statusu.*
+
+Wymaga modułu [End-User Portal](https://freescout.net/module/end-user-portal/).
+
+### Panel zgłoszeń firmy
+
+Dedykowana sekcja **Company Tickets** w nawigacji portalu z pełnowartościową tabelą zgłoszeń:
+
+| Kolumna | Opis |
+|---------|------|
+| **#** | ID zgłoszenia |
+| **Subject** | Skrócony z podpowiedzią po najechaniu myszą |
+| **Responsible** | Przypisany agent wsparcia |
+| **Author** | Klient, który otworzył zgłoszenie; kliknij, aby filtrować według tego autora |
+| **Status** | Active / Pending / Closed / Spam z ikonami |
+| **State** | Nazwa kolumny Kanban w bieżącym języku portalu (tylko gdy moduł Kanban jest aktywny) |
+| **Updated** | Data i czas ostatniej odpowiedzi |
+
+**Dwa niezależne wskaźniki statusu odczytu w każdym wierszu** — śledzą dwie różne osoby i są wyświetlane jednocześnie:
+
+| Wskaźnik | Czyj status odczytu | Co oznacza |
+|----------|---------------------|------------|
+| **Pogrubiony wiersz** | Menedżer przeglądający portal | Menedżer ma nieprzeczytane powiadomienia dla tej rozmowy — coś się wydarzyło, czego jeszcze nie widział |
+| **Ikona 👁 oka** | Autor zgłoszenia (klient, który je przesłał) | Autor nie otworzył jeszcze ostatniej odpowiedzi agenta — przydatne do sprawdzenia, czy klient faktycznie zobaczył odpowiedź |
+
+Te dwa stany są całkowicie niezależne: wiersz może być pogrubiony (menedżer nie przeczytał) gdy brakuje oka (autor już przeczytał) lub odwrotnie. Menedżer widzi oba jednocześnie, co daje pełny obraz tego, co dzieje się po obu stronach zgłoszenia bez jego otwierania.
+
+**Filtr autora** — kliknięcie nazwy autora aktywuje filtr; na górze tabeli pojawia się baner z nazwą aktywnego autora i linkiem × do wyczyszczenia filtra.
+
+Zarówno tabela desktopowa, jak i responsywny **układ kart mobilnych** są dostępne; przełączają się automatycznie w zależności od szerokości ekranu.
+
+Szablon paska filtrów obsługuje **zastąpienie** przez `enduserportal::partials.tickets_filters` — umieść niestandardowy widok pod tą ścieżką, aby zastąpić domyślny pasek filtrów OrgPortal zachowując wszystkie inne funkcje.
+
+![Zgłoszenia firmy — pełna tabela ze wskaźnikami odczytu, banerem filtra autora, filtrami statusu](docs/screenshots/portal-tickets.png)
+
+### Akcje na zgłoszeniach w portalu
+
+Menedżerowie mogą działać bezpośrednio — bez konieczności kontaktowania się z pomocą techniczną:
+
+- **Odpowiedź z załącznikami** — przeciągnij i upuść, wiele plików na odpowiedź; nazwy załączników i rozmiary plików pokazywane przy każdym wątku
+- **Zamknięcie zgłoszenia** — nowa odpowiedź automatycznie je otwiera ponownie; baner informuje menedżera o tym gdy zgłoszenie jest zamknięte
+- **Zmiana autora zgłoszenia** — przypisz zgłoszenie do innego członka organizacji
+- **Filtrowanie według jednostki** — globalni menedżerowie filtrują listę zgłoszeń według jednostki strukturalnej
+- **Filtrowanie według statusu Kanban** — konfigurowalne dla każdej skrzynki, etykiety wyświetlane w bieżącym języku portalu
+
+![Widok zgłoszenia w portalu — formularz odpowiedzi z przeciągnij i upuść załączniki i baner zamkniętego zgłoszenia](docs/screenshots/portal-reply.png)
+
+### Śledzenie wyświetleń przez menedżera
+
+- Adnotacja **"viewed"** pojawia się pod odpowiedziami agentów w widoku zgłoszenia administratora, gdy menedżer otwiera zgłoszenie w portalu
+- Pokazuje nazwę menedżera, rolę (Organization manager / Unit manager) i czas, który upłynął
+- Wyświetlenia globalnego menedżera i menedżera jednostki są śledzone i wyświetlane niezależnie — taki sam UX jak natywne "Customer viewed" w FreeScout
+
+![Śledzenie wyświetleń przez menedżera — adnotacja 'viewed' pojawia się pod odpowiedzią agenta w widoku zgłoszenia administratora](docs/screenshots/manager-viewed.png)
+
+---
+
+## Dzwonek powiadomień w czasie rzeczywistym *(opcjonalne)*
+
+*Informuj menedżerów na bieżąco gdy cokolwiek dzieje się ze zgłoszeniami ich firmy.*
+
+Wymaga modułu [End-User Portal](https://freescout.net/module/end-user-portal/).
+
+- Ikona 🔔 dzwonka z odznaką liczby nieprzeczytanych na żywo na pasku nawigacyjnym EUP — automatycznie repozycjonuje się na urządzeniach mobilnych (obok przycisku hamburgera)
+- Powiadomienia dla: **nowe zgłoszenie**, **odpowiedź agenta**, **odpowiedź klienta** — dla wszystkich ról menedżerskich
+- Panel rozwijany z powiadomieniami pogrupowanymi według daty: nazwa aktora, typ zdarzenia, numer zgłoszenia, podgląd wiadomości, znacznik czasu
+- **Automatyczne oznaczanie jako przeczytane** gdy menedżer otwiera zgłoszenie
+- Oznaczanie poszczególnych powiadomień jako przeczytane przez ×; **Mark all as read** w nagłówku panelu
+- Odpytuje co 15 sekund; odświeża się przy nawigacji wstecz/do przodu w przeglądarce (świadome bfcache)
+
+![Dzwonek powiadomień w czasie rzeczywistym — panel rozwijany z pogrupowanymi nieprzeczytanymi powiadomieniami](docs/screenshots/portal-bell.png)
+
+---
+
+## Subskrypcje powiadomień *(opcjonalne)*
+
+*Pozwól menedżerom decydować, o czym chcą być informowani — nic więcej, nic mniej.*
+
+- **Wizualna macierz subskrypcji** na zakładce "Notifications" w ustawieniach organizacji portalu
+- **Trzy typy zdarzeń:** New ticket · Agent reply · Customer reply
+- **Dwa poziomy zakresu:** Cała organizacja (globalni menedżerowie) · Indywidualne jednostki strukturalne
+- Członkowie bez jednostki są grupowani w oddzielnym rozszerzalnym wierszu **"No unit"**
+- **Nadpisania dla poszczególnych członków** — rozwiń dowolny wiersz jednostki, aby pokazać poszczególnych członków i przełączać ich subskrypcje inline; menedżerowie jednostek z ograniczoną rolą są odpowiednio oznaczeni
+- **Kaskadowa logika w obu kierunkach:**
+  - Włączenie "Entire organization" → włącza wszystkie jednostki i wszystkich członków
+  - Włączenie jednostki → włącza wszystkich jej członków
+  - Wyłączenie członka → automatycznie uzgadnia pola wyboru jednostki i organizacji
+- Globalni menedżerowie zarządzają wszystkimi członkami; menedżerowie jednostek zarządzają tylko własną jednostką
+- Powiadomienia używają sterownika poczty odpowiedniej skrzynki
+
+![Macierz subskrypcji powiadomień — przełączniki dla jednostek i poszczególnych członków](docs/screenshots/portal-subscriptions.png)
+
+---
+
+## Ustawienia organizacji w portalu
+
+*Menedżerowie konfigurują strukturę organizacji bez dostępu administratora.*
+
+**Organization Settings** w nawigacji portalu ma trzy zakładki:
+
+### Zakładka Notifications
+
+Macierz subskrypcji opisana powyżej.
+
+### Zakładka Units *(tylko globalni menedżerowie)*
+
+- **Tworzenie jednostki** — formularz inline z polem nazwy
+- **Zmiana nazwy jednostki** — edycja inline bezpośrednio w wierszu tabeli
+- **Usunięcie jednostki** — przycisk z potwierdzeniem; menedżerowie jednostek są automatycznie obniżani do roli member
+- Liczba członków pokazywana dla każdej jednostki
+
+### Zakładka Members
+
+- Tabela wszystkich członków organizacji: nazwa, jednostka strukturalna, rola, odznaka statusu aktywny/nieaktywny
+- Etykieta **"Global manager"** pokazywana obok nazwy członka tam gdzie ma zastosowanie
+- Pole wyboru **Show deactivated** — pojawia się tylko gdy istnieją nieaktywni członkowie; domyślnie ukryte
+- **Globalni menedżerowie** mogą aktualizować jednostkę i rolę dowolnego członka za pomocą formularza inline (wybór jednostki + wybór roli + Apply)
+- **Globalni menedżerowie nie mogą promować członka do globalnego menedżera** z portalu — wymaga to dostępu administratora
+- Przycisk **Aktywacja / dezaktywacja** dla każdego członka z potwierdzeniem dezaktywacji
+
+![Ustawienia organizacji w portalu — zakładki Units i Members](docs/screenshots/portal-settings.png)
+
+---
+
+## Wielojęzyczne szablony e-mail powiadomień *(opcjonalne)*
+
+*Twoi klienci korporacyjni otrzymują wiadomości e-mail wsparcia we własnym języku — automatycznie, bez żadnego ręcznego wysiłku.*
+
+Konfigurowane w **Manage → Organizations → Templates tab** (widoczne dla użytkowników z uprawnieniem "manage templates").
+
+- **Szablony dla każdego języka** — oddzielny temat i treść dla każdego języka portalu; przełączaj między nimi za pomocą listy rozwijanej języka; wartości są zamieniane w pamięci bez przeładowania strony
+- **Zwijalne panele** dla każdego typu zdarzenia (New ticket / Agent reply / Customer reply) — edytor Summernote inicjalizuje się leniwie gdy panel jest otwierany
+- Przycisk **Load Default** w każdym panelu — przywraca wbudowany szablon dla aktualnie wybranego języka (używa angielskiego wbudowanego jeśli nie istnieje domyślny dla konkretnego języka)
+- **Edytor WYSIWYG Summernote** do tworzenia bogatych wiadomości e-mail HTML
+- **Selektor zmiennych makro** — wstawiaj symbole zastępcze do tematu lub treści jednym kliknięciem; pozycja kursora jest zachowywana w polu tematu
+- **19 wbudowanych domyślnych szablonów** — gotowych do użycia od razu; nie wymagają konfiguracji
+
+**Dostępne zmienne makro:**
+
+| Zmienna | Opis |
+|---------|------|
+| `{manager_name}` | Nazwa menedżera otrzymującego powiadomienie |
+| `{author_name}` | Klient, który stworzył lub odpowiedział na zgłoszenie |
+| `{org_name}` | Nazwa organizacji |
+| `{unit_name}` | Nazwa jednostki strukturalnej |
+| `{subject}` | Temat zgłoszenia |
+| `{ticket_number}` | ID zgłoszenia |
+| `{ticket_url}` | Bezpośredni link do zgłoszenia w portalu |
+| `{ticket_text}` | Pełna treść wiadomości początkowej (HTML) |
+| `{reply_text}` | Pełna treść najnowszej odpowiedzi (HTML) |
+| `{created_date}` | Data utworzenia zgłoszenia |
+| `{created_time}` | Czas utworzenia zgłoszenia |
+| `{created_datetime}` | Data i czas utworzenia zgłoszenia |
+| `{reply_date}` | Data odpowiedzi |
+| `{reply_time}` | Czas odpowiedzi |
+| `{reply_datetime}` | Data i czas odpowiedzi |
+
+**Łańcuch rezerwy:** zapisany szablon języka → wbudowany szablon języka → zapisany szablon angielski → wbudowany szablon angielski
+
+Język powiadomień jest określany przez wybór języka portalu każdego menedżera, zapisywany automatycznie gdy używają przełącznika języka.
+
+![Szablony e-mail — zwijalne panele dla języków, przycisk Load Default, edytor Summernote](docs/screenshots/admin-templates.png)
+
+---
+
+## REST API *(opcjonalne)*
+
+*Zintegruj OrgPortal ze swoim CRM, ERP lub przepływem pracy onboardingu klientów.*
+
+Wymaga modułu [API and Webhooks](https://freescout.net/module/api-webhooks/).
+
+- Pełne CRUD dla organizacji, jednostek strukturalnych, członkostw klientów i tagów
+- **Pola organizacji:** `name`, `color`, `mailboxId`, `isActive` — wszystkie dostępne do odczytu i aktualizacji przez API
+- **Podzasób members** — `GET/PUT/DELETE /api/organizations/{id}/members/{memberId}` — aktualizuj rolę, jednostkę, `canManageOrg` i flagę `isActive` dla poszczególnych członków niezależnie bez dotykania reszty członkostwa
+- **Podzasób tags** — `GET/PUT /api/organizations/{id}/tags` — wylistuj lub całkowicie zastąp powiązania tagów (wymaga modułu Tags; zwraca `503` jeśli nieaktywny)
+- Uwierzytelnianie przez nagłówek `X-FreeScout-API-Key` lub parametr zapytania `api_key`
+- Interaktywna **dokumentacja ReDoc** w **Manage → API & Webhooks → OrgPortal API Docs** (`/orgportal/admin/api-docs`)
+
+📖 **Pełna dokumentacja API → [docs/api/README.md](docs/api/README.md)**
+
+![Interaktywna dokumentacja API — ReDoc ze wszystkimi endpointami OrgPortal](docs/screenshots/api-docs.png)
 
 ---
 
 ## Instalacja
 
-1. Skopiuj folder `OrgPortal` do `Modules/` twojego FreeScout
-2. W panelu admin: **Zarządzanie → Moduły → OrgPortal → Aktywuj**
+1. Skopiuj folder `OrgPortal` do `Modules/` swojej instalacji FreeScout
+2. Przejdź do **Manage → Modules → OrgPortal → Activate**
 3. Uruchom migracje:
    ```bash
    php artisan module:migrate OrgPortal
    ```
-4. Wyczyść pamięć cache:
+4. Wyczyść pamięć podręczną:
    ```bash
    php artisan cache:clear && php artisan config:clear
    ```
 
+> **Obsługa języka gruzińskiego** jest wdrażana automatycznie przy pierwszym uruchomieniu — nie wymaga ręcznego kopiowania plików.
+
 ---
 
-## Aktualizacje
+## Automatyczne aktualizacje
 
-OrgPortal obsługuje **automatyczne aktualizacje** poprzez wbudowany mechanizm aktualizacji modułów FreeScout.
+OrgPortal obsługuje **aktualizacje jednym kliknięciem** przez wbudowany mechanizm aktualizacji modułów FreeScout.
 
-> **Requires FreeScout 1.8.170 or later.** On older versions the update banner will not appear — update the module manually by replacing the `OrgPortal` folder with the latest release ZIP.
+> **Wymaga FreeScout 1.8.170 lub nowszego.** W starszych wersjach aktualizuj ręcznie, zastępując folder `OrgPortal` najnowszym plikiem ZIP z wydania.
 
-Gdy dostępna jest nowa wersja, banner pojawia się na stronie **Zarządzanie → Moduły**. Kliknij **Zaktualizuj teraz** — FreeScout automatycznie pobierze i zainstaluje najnowszą wersję.
-
-Nie jest wymagane ręczne kopiowanie plików.
+Gdy dostępna jest nowa wersja, na stronie **Manage → Modules** pojawia się baner. Kliknij **Update now** — FreeScout automatycznie pobiera i instaluje najnowszą wersję.
 
 ---
 
 ## Kompatybilność modułów
 
-| Moduł | Status |
-|-------|--------|
-| End-User Portal ≥ 1.0.85 | Opcjonalny — funkcje portalu dla menedżerów |
-| API i Webhooks ≥ 1.0.80 | Opcjonalny — punkty końcowe REST API |
-| Kanban ≥ 1.0.23 | Opcjonalny — odznaka, filtr, kolumna "Status" w zgłoszeniach firmy |
-| Niestandardowe pola | Kompatybilne |
-| Przepływy pracy | Kompatybilne |
-| Tagi | Kompatybilne |
+| Moduł | Status | Uwagi |
+|-------|--------|-------|
+| End-User Portal ≥ 1.0.85 | Opcjonalne | Portal menedżera, dzwonek powiadomień, subskrypcje |
+| API and Webhooks ≥ 1.0.80 | Opcjonalne | Endpointy REST API |
+| Kanban ≥ 1.0.23 | Opcjonalne | Odznaka na kartach, filtr organizacji, wielojęzyczne etykiety kolumny State |
+| Custom Fields | ✅ Kompatybilne | — |
+| Workflows | ✅ Kompatybilne | — |
+| Tags | ✅ Kompatybilne | Chipy tagów w formularzu edycji organizacji; powiązania tagów przez API (`/organizations/{id}/tags`); przypisanie zgłoszeń oparte na tagach |
 
 ---
 
 ## Konfiguracja
 
-### Globalna (**Zarządzanie → Ustawienia OrgPortal**)
-
-| Opcja | Domyślnie |
-|-------|----------|
-| Pokaż odznaką na stronie zgłoszenia | ✅ |
-| Pokaż odznaką na kartach Kanban | ✅ |
-
-### Na skrzynkę (**Ustawienia skrzynki → OrgPortal**)
-
-Zastępuje wartości globalne dla konkretnej skrzynki.
+### Ustawienia globalne — **Manage → Organizations → System tab**
 
 | Opcja | Opis |
 |-------|------|
-| Pokaż odznaką na stronie zgłoszenia | Odznaka na liście rozmów i na stronie zgłoszenia |
-| Pokaż odznaką na kartach Kanban | Odznaka na kartach Kanban |
-| Filtry statusu zgłoszeń firmy | Kolumny Kanban jako pola wyboru na stronie Zgłoszenia firmy; każdy filtr ma niestandardową etykietę widoczną dla użytkowników portalu |
+| Show badge on ticket page | Odznaka organizacji na liście rozmów i widoku zgłoszenia |
+| Show badge on Kanban cards | Odznaka organizacji na kartach tablicy Kanban |
+| Attribution source | `member` / `tag` / `tag_only` — jak zgłoszenia są przypisywane do organizacji |
+| Auto-cron backfill | Uruchamiaj uzupełnianie co 5 minut automatycznie |
+| Snapshot visibility | Pokaż/ukryj dane przypisania na pasku bocznym zgłoszenia |
+| Portal Language Switcher | Włącz przełącznik języka na pasku nawigacyjnym EUP; wybierz które z 19 języków oferować |
+
+### Ustawienia dla skrzynki — **Mailbox Settings → OrgPortal**
+
+Nadpisuje wartości globalne dla konkretnej skrzynki.
+
+| Opcja | Opis |
+|-------|------|
+| Show badge on ticket page | Włącz/wyłącz odznakę dla tej skrzynki |
+| Show badge on Kanban cards | Włącz/wyłącz odznakę dla tej skrzynki |
+| Show organization block in customer profile | Przełącz blok informacji o organizacji na pasku bocznym zgłoszenia |
+| Company ticket status filters | Mapuj kolumny Kanban na nazwane filtry w portalu; etykiety dla każdego języka z selektorem języka; przeciągaj, aby zmienić kolejność |
+
+![Ustawienia skrzynki — widoczność odznak i filtry statusu Kanban z wielojęzycznymi etykietami](docs/screenshots/mailbox-settings.png)
 
 ---
 
 ## Tłumaczenia
 
-Obsługiwane języki: **English** (`en`), **Українська** (`uk`), **Română** (`ro`), **Georgian** (`ka`), **Deutsch** (`de`), **Français** (`fr`), **Español** (`es`), **Italiano** (`it`), **Čeština** (`cs`), **Slovenčina** (`sk`), **Polski** (`pl`), **Русский** (`ru`), **Nederlands** (`nl`), **Norsk** (`no`), **Dansk** (`da`), **Svenska** (`sv`), **Suomi** (`fi`), **Português BR** (`pt-BR`), **Português PT** (`pt-PT`), **中文 (简体)** (`zh-CN`).
+OrgPortal jest w pełni zlokalizowany w **19 językach**:
 
-Pliki: `Modules/OrgPortal/Resources/lang/{locale}/messages.php`
+| Język | Kod | Język | Kod |
+|-------|-----|-------|-----|
+| Angielski | `en` | Niderlandzki | `nl` |
+| Ukraiński | `uk` | Norweski | `no` |
+| Niemiecki | `de` | Duński | `da` |
+| Francuski | `fr` | Szwedzki | `sv` |
+| Hiszpański | `es` | Fiński | `fi` |
+| Włoski | `it` | Portugalski (BR) | `pt-BR` |
+| Czeski | `cs` | Portugalski (PT) | `pt-PT` |
+| Słowacki | `sk` | Rumuński | `ro` |
+| Polski | `pl` | Chiński uproszczony | `zh-CN` |
+| Gruziński | `ka` | | |
 
-### Integracja EUPSWLANG
+Pliki tłumaczeń: `Modules/OrgPortal/Resources/lang/{locale}/messages.php`
 
-Moduł prawidłowo pracuje z [EUP Switch Language](https://freescout.net/module/eup-sw-lang/): język wybrany w portalu stosuje się również do ciągów OrgPortal.
+Szablony e-mail powiadomień mają wbudowane domyślne wartości dla wszystkich 19 języków.
 
-Aby język pojawił się na liście EUPSWLANG, musi istnieć plik `Modules/EndUserPortal/Resources/lang/{locale}.json`. Pliki dla **Română** (`ro`) znajdują się w pakiecie; **Georgian** (`ka`) jest obsługiwany tylko w strefie administracyjnej (bez wsparcia systemowego w rdzeniu FreeScout).
+### Integracja przełącznika języka
 
-> **Szczegół techniczny:** Middleware `ReapplyEupLocale` (zarejestrowany ostatni w grupie tras portalu) przywraca ustawienie lokalne po tym, jak middleware `Localize` FreeScout w przeciwnym razie resetowałby je do domyślnego języka systemowego.
+OrgPortal zawiera wbudowany przełącznik języka portalu (włącz w **System tab → Portal Language Switcher**). Integruje się również z [EUP Switch Language](https://freescout.net/module/eup-sw-lang/) — oba mogą być aktywne jednocześnie.
+
+Język wybrany przez menedżera dotyczy wszystkich ciągów interfejsu OrgPortal i jest zapisywany jako język powiadomień — wiadomości e-mail są automatycznie wysyłane w wybranym języku.
+
+> **Uwaga techniczna:** Middleware `OrgPortalSetLocale` ponownie stosuje język portalu po middleware `Localize` FreeScout, aby zapobiec jego resetowaniu do domyślnego systemowego przy każdym żądaniu.
+
+---
+
+## Zrzuty ekranu
+
+| | |
+|---|---|
+| ![Lista organizacji](docs/screenshots/org-list.png) | ![Edycja organizacji](docs/screenshots/org-edit.png) |
+| *Lista organizacji — filtr statusu, wyszukiwanie na żywo, kolorowe odznaki* | *Edycja organizacji — wybór koloru, chipy tagów, tabela członków* |
+| ![Zakładka System](docs/screenshots/system-settings.png) | ![Edycja klienta](docs/screenshots/customer-org-field.png) |
+| *Zakładka System — tryby przypisania, uzupełnianie, przełącznik języka* | *Edycja klienta — pole organizacji z podpowiedziami* |
+| ![Portal zgłoszeń firmy](docs/screenshots/portal-tickets.png) | ![Odpowiedź w portalu](docs/screenshots/portal-reply.png) |
+| *Zgłoszenia firmy — tabela, filtr autora, wskaźniki odczytu* | *Zgłoszenie w portalu — odpowiedź z załącznikami, baner zamknięcia* |
+| ![Ustawienia organizacji w portalu](docs/screenshots/portal-settings.png) | ![Dzwonek powiadomień](docs/screenshots/portal-bell.png) |
+| *Ustawienia organizacji w portalu — zakładki Units i Members* | *Dzwonek powiadomień w czasie rzeczywistym z panelem rozwijanym* |
+| ![Macierz subskrypcji](docs/screenshots/portal-subscriptions.png) | ![Szablony e-mail](docs/screenshots/admin-templates.png) |
+| *Macierz subskrypcji powiadomień — dla jednostek i poszczególnych członków* | *Szablony e-mail — przełącznik języka, Load Default, Summernote* |
+| ![Integracja Kanban](docs/screenshots/kanban-org.png) | ![Ustawienia skrzynki](docs/screenshots/mailbox-settings.png) |
+| *Kanban — odznaki organizacji i modal filtra organizacji* | *Ustawienia skrzynki — filtry Kanban z wielojęzycznymi etykietami* |
+| ![Dokumentacja API](docs/screenshots/api-docs.png) | |
+| *Interaktywna dokumentacja API — ReDoc* | |
 
 ---
 
 ## Licencja
 
-[MIT](../LICENSE) — © 2026 ASTIN-UA
+[MIT](LICENSE) — © 2026 ASTIN-UA
