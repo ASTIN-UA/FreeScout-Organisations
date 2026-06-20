@@ -42,9 +42,13 @@ class AddOrgSnapshotToConversationsTable extends Migration
             try { $table->dropIndex(['org_id', 'org_unit_id']); } catch (\Exception $e) {}
             try { $table->dropIndex(['org_attributed_at']); } catch (\Exception $e) {}
         });
-        if (Schema::hasColumn('conversations', 'org_id')) {
-            Schema::table('conversations', function (Blueprint $table) {
-                $table->dropColumn(['org_id', 'org_unit_id', 'org_attributed_at']);
+        $toDrop = array_filter(
+            ['org_id', 'org_unit_id', 'org_attributed_at'],
+            fn ($col) => Schema::hasColumn('conversations', $col)
+        );
+        if ($toDrop) {
+            Schema::table('conversations', function (Blueprint $table) use ($toDrop) {
+                $table->dropColumn(array_values($toDrop));
             });
         }
     }

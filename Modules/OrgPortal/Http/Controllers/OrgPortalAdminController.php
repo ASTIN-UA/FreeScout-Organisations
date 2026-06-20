@@ -56,6 +56,8 @@ class OrgPortalAdminController extends Controller
         $tagsActive = OrgAttribution::tagsModuleActive()
             && \Illuminate\Support\Facades\Schema::hasTable('organization_tags');
 
+        $searchQuery = trim((string) request()->input('q', ''));
+
         $orgQuery = Organization::withCount(['members', 'conversations'])
             ->with('mailbox')
             ->orderBy('name');
@@ -66,7 +68,11 @@ class OrgPortalAdminController extends Controller
             }]);
         }
 
-        $organizations = $orgQuery->paginate(20);
+        if (mb_strlen($searchQuery) >= 2) {
+            $orgQuery->where('name', 'like', '%' . $searchQuery . '%');
+        }
+
+        $organizations = $orgQuery->paginate(20)->appends(array_filter(['q' => $searchQuery]));
 
         $SP = \Modules\OrgPortal\Providers\OrgPortalServiceProvider::class;
         $canManageTemplates = $SP::userCanManageTemplates(auth()->user());
@@ -105,6 +111,7 @@ class OrgPortalAdminController extends Controller
 
         return view('orgportal::admin.index', [
             'organizations'       => $organizations,
+            'searchQuery'         => $searchQuery,
             'tplEvents'           => $tplEvents,
             'tplTemplates'        => $tplTemplates,
             'tplDefaults'         => $tplDefaults,
@@ -120,6 +127,56 @@ class OrgPortalAdminController extends Controller
             'langSwitcherEnabled' => $langSwitcherEnabled,
             'langSwitcherLocales' => $langSwitcherLocales,
         ]);
+    }
+
+    public function listOrganizationsJson(Request $request)
+    {
+        $this->authorizeManage();
+
+        $q = trim((string) $request->input('q', ''));
+        $tagsActive = OrgAttribution::tagsModuleActive()
+            && \Illuminate\Support\Facades\Schema::hasTable('organization_tags');
+
+        $query = Organization::withCount(['members', 'conversations'])
+            ->with('mailbox')
+            ->orderBy('name');
+
+        if ($tagsActive) {
+            $query->withCount(['organizationTags as has_tags' => function ($qb) {
+                $qb->select(\DB::raw('count(*)'));
+            }]);
+        }
+
+        if (mb_strlen($q) >= 2) {
+            $query->where('name', 'like', '%' . $q . '%');
+        } else {
+            $query->limit(500);
+        }
+
+        $isAdmin        = auth()->user() && auth()->user()->isAdmin();
+        $snapshotEnabled = OrgAttribution::snapshotEnabled();
+        $searchBase     = url(\Helper::getSubdirectory() . 'search');
+
+        $orgs = $query->get()->map(function ($org) use ($isAdmin, $snapshotEnabled, $searchBase, $tagsActive) {
+            return [
+                'id'                 => $org->id,
+                'name'               => $org->name,
+                'mailbox_name'       => $org->mailbox ? $org->mailbox->name : null,
+                'members_count'      => (int) $org->members_count,
+                'conversations_count'=> (int) $org->conversations_count,
+                'has_tags'           => $tagsActive ? (bool) $org->has_tags : null,
+                'is_active'          => (bool) $org->is_active,
+                'edit_url'           => route('orgportal.admin.edit', $org->id),
+                'tickets_url'        => $searchBase . '?' . http_build_query(['f' => ['organization' => $org->id]]),
+                'deactivate_url'     => route('orgportal.admin.deactivate', $org->id),
+                'delete_url'         => route('orgportal.admin.destroy', $org->id),
+                'is_admin'           => $isAdmin,
+                'snapshot_enabled'   => $snapshotEnabled,
+                'can_delete'         => $org->members_count === 0 && $org->conversations_count === 0,
+            ];
+        });
+
+        return response()->json(['organizations' => $orgs, 'tags_active' => $tagsActive]);
     }
 
     public function runBackfill()

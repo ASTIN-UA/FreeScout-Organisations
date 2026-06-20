@@ -39,7 +39,7 @@ class CreateOrgNotificationSubscriptionsTable extends Migration
             foreach ($members as $m) {
                 \DB::statement(
                     'INSERT IGNORE INTO org_notification_subscriptions (member_id, event, scope_type, scope_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
-                    [$m->id, 'new_ticket', 'org', null, now(), now()]
+                    [$m->id, 'new_ticket', 'org', null, now()->toDateTimeString(), now()->toDateTimeString()]
                 );
             }
         }

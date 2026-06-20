@@ -23,6 +23,9 @@ Route::group([
     Route::get('organizations/search', 'OrgPortalAdminController@searchOrganizations')
         ->name('orgportal.admin.organizations.search');
 
+    Route::get('organizations/list-json', 'OrgPortalAdminController@listOrganizationsJson')
+        ->name('orgportal.admin.organizations.list-json');
+
     Route::post('organizations', 'OrgPortalAdminController@store')
         ->name('orgportal.admin.store');
 

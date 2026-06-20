@@ -62,13 +62,16 @@
                                 <input type="radio" name="org-status" value="all"> {{ __('orgportal::messages.filter_all') }}
                             </label>
                         </div>
-                        <div style="flex:1;min-width:180px;max-width:320px;">
+                        <form method="GET" action="{{ route('orgportal.admin.index') }}" id="orgportal-search-form" style="flex:1;min-width:180px;max-width:320px;margin:0;">
+                            <input type="hidden" name="tab" value="organizations">
                             <input type="text"
                                    id="orgportal-org-search"
+                                   name="q"
                                    class="form-control input-sm"
                                    placeholder="{{ __('orgportal::messages.search_organizations') }}"
+                                   value="{{ $searchQuery ?? '' }}"
                                    autocomplete="off">
-                        </div>
+                        </form>
                     </div>
 
                     @if($organizations->count())
@@ -604,62 +607,178 @@
 </div>
 
 <div id="orgportal-defaults-data"
-     data-defaults='{!! json_encode($tplDefaults ?? [], JSON_HEX_QUOT | JSON_HEX_TAG | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}'
-     data-saved='{!! json_encode($tplTemplates ?? [], JSON_HEX_QUOT | JSON_HEX_TAG | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}'
+     data-defaults='{!! json_encode($tplDefaults ?? [], JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_APOS | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}'
+     data-saved='{!! json_encode($tplTemplates ?? [], JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_APOS | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}'
      data-locale="{{ $activeTplLocale ?? 'en' }}">
 </div>
 
 <script {!! \Helper::cspNonceAttr() !!}>
+var orgportalListCfg = {
+    searchUrl:          '{{ route('orgportal.admin.organizations.list-json') }}',
+    csrfToken:          '{{ csrf_token() }}',
+    isAdmin:            {{ $isAdmin ? 'true' : 'false' }},
+    snapshotEnabled:    {{ \Modules\OrgPortal\Services\OrgAttribution::snapshotEnabled() ? 'true' : 'false' }},
+    tagsActive:         {{ $tagsModuleActive ? 'true' : 'false' }},
+    hasSearchQuery:     {{ isset($searchQuery) && $searchQuery !== '' ? 'true' : 'false' }},
+    globalScope:        @json(__('orgportal::messages.global_scope')),
+    statusActive:       @json(__('orgportal::messages.org_status_active')),
+    statusInactive:     @json(__('orgportal::messages.org_status_inactive')),
+    btnTickets:         @json(__('orgportal::messages.btn_tickets')),
+    btnEdit:            @json(__('orgportal::messages.edit')),
+    btnDeactivate:      @json(__('orgportal::messages.btn_deactivate')),
+    btnActivate:        @json(__('orgportal::messages.btn_activate')),
+    btnDelete:          @json(__('orgportal::messages.delete')),
+    confirmDeactivate:  @json(__('orgportal::messages.confirm_deactivate_org')),
+    confirmActivate:    @json(__('orgportal::messages.confirm_activate_org')),
+    confirmDelete:      @json(__('orgportal::messages.confirm_delete_org')),
+    noSnapshotTip:      @json(__('orgportal::messages.deactivate_no_snapshot')),
+    noResults:          @json(__('orgportal::messages.no_organizations')),
+};
 var _tplEl = document.getElementById('orgportal-defaults-data');
 window.orgportalDefaults = JSON.parse(_tplEl.getAttribute('data-defaults') || '{}');
 window.orgportalSaved    = JSON.parse(_tplEl.getAttribute('data-saved')    || '{}');
 window.orgportalLocale   = _tplEl.getAttribute('data-locale') || 'en';
 (function () {
     document.addEventListener('DOMContentLoaded', function () {
-        if (typeof $ === 'undefined' || typeof $.fn.summernote === 'undefined') return;
+        if (typeof $ === 'undefined') return;
 
         // Tooltip init (system tab + disabled deactivate btn)
         $('[data-toggle="tooltip"]').tooltip();
 
-        // Organizations list — live search + status filter
+        // Organizations list — AJAX live search + client-side status filter
+        var cfg        = orgportalListCfg;
         var $orgSearch = $('#orgportal-org-search');
         var $orgTable  = $('#orgportal-org-table');
+        var $orgTbody  = $orgTable.find('tbody');
         var $noResults = $('#orgportal-org-no-results');
-        var orgStatus  = 'active'; // default
+        var $pagination= $orgTable.closest('div').next('.pagination').parent();
+        var orgStatus  = 'active';
+        var searchTimer = null;
+        var ajaxMode   = false; // true while search query is active
+        var $origRows  = $orgTbody.children().clone(true);
 
-        function applyOrgFilters() {
-            var q = $orgSearch.length ? $orgSearch.val().trim().toLowerCase() : '';
+        function esc(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function buildRow(org) {
+            var tr = '<tr data-org-name="' + esc(org.name.toLowerCase()) + '" data-is-active="' + (org.is_active ? '1' : '0') + '">';
+            // Name
+            tr += '<td><a href="' + esc(org.edit_url) + '">' + esc(org.name) + '</a></td>';
+            // Mailbox
+            tr += '<td>' + (org.mailbox_name
+                ? '<span class="label label-default">' + esc(org.mailbox_name) + '</span>'
+                : '<span class="text-muted">' + esc(cfg.globalScope) + '</span>') + '</td>';
+            // Members
+            tr += '<td>' + org.members_count + '</td>';
+            // Tickets
+            tr += '<td>' + (org.conversations_count > 0
+                ? '<a href="' + esc(org.tickets_url) + '" target="_blank">' + org.conversations_count + '</a>'
+                : '<span class="text-muted">0</span>') + '</td>';
+            // Tags
+            if (cfg.tagsActive) {
+                tr += '<td>' + (org.has_tags
+                    ? '<span class="text-success"><i class="glyphicon glyphicon-ok"></i></span>'
+                    : '<span class="text-danger"><i class="glyphicon glyphicon-remove"></i></span>') + '</td>';
+            }
+            // Status badge
+            tr += '<td>' + (org.is_active
+                ? '<span class="label label-success">' + esc(cfg.statusActive) + '</span>'
+                : '<span class="label label-default">' + esc(cfg.statusInactive) + '</span>') + '</td>';
+            // Actions
+            tr += '<td class="text-right" style="white-space:nowrap;">';
+            // Tickets btn
+            tr += '<a href="' + esc(org.tickets_url) + '" target="_blank" class="btn btn-xs btn-default" title="' + esc(cfg.btnTickets) + '">'
+                + '<i class="glyphicon glyphicon-list-alt"></i> ' + esc(cfg.btnTickets) + '</a> ';
+            // Edit btn
+            tr += '<a href="' + esc(org.edit_url) + '" class="btn btn-xs btn-default">' + esc(cfg.btnEdit) + '</a> ';
+            if (org.is_admin) {
+                // Deactivate/Activate
+                if (org.snapshot_enabled) {
+                    var confirmMsg = org.is_active ? cfg.confirmDeactivate : cfg.confirmActivate;
+                    var btnClass   = org.is_active ? 'btn-warning' : 'btn-success';
+                    var btnLabel   = org.is_active ? cfg.btnDeactivate : cfg.btnActivate;
+                    tr += '<form method="POST" action="' + esc(org.deactivate_url) + '" style="display:inline;" onsubmit="return confirm(\'' + esc(confirmMsg).replace(/'/g,"\\'") + '\')">'
+                        + '<input type="hidden" name="_token" value="' + esc(cfg.csrfToken) + '">'
+                        + '<button type="submit" class="btn btn-xs ' + btnClass + '">' + esc(btnLabel) + '</button></form> ';
+                } else {
+                    tr += '<button type="button" class="btn btn-xs btn-default" disabled title="' + esc(cfg.noSnapshotTip) + '" data-toggle="tooltip">'
+                        + esc(cfg.btnDeactivate) + '</button> ';
+                }
+                // Delete (only when 0 members & 0 tickets)
+                if (org.can_delete) {
+                    tr += '<form method="POST" action="' + esc(org.delete_url) + '" style="display:inline;" onsubmit="return confirm(\'' + esc(cfg.confirmDelete).replace(/'/g,"\\'") + '\')">'
+                        + '<input type="hidden" name="_token" value="' + esc(cfg.csrfToken) + '">'
+                        + '<input type="hidden" name="_method" value="DELETE">'
+                        + '<button type="submit" class="btn btn-xs btn-danger">' + esc(cfg.btnDelete) + '</button></form>';
+                }
+            }
+            tr += '</td></tr>';
+            return tr;
+        }
+
+        function applyStatusFilter() {
             var visibleCount = 0;
-            $orgTable.find('tbody tr').each(function () {
-                var name     = $(this).data('org-name') || '';
+            $orgTbody.find('tr').each(function () {
                 var isActive = $(this).data('is-active') === 1 || $(this).data('is-active') === '1';
-                var matchSearch = q.length < 2 || name.indexOf(q) !== -1;
-                var matchStatus = orgStatus === 'all' ||
-                                  (orgStatus === 'active' && isActive) ||
-                                  (orgStatus === 'inactive' && !isActive);
-                var show = matchSearch && matchStatus;
-                $(this).toggle(show);
-                if (show) visibleCount++;
+                var match = orgStatus === 'all' ||
+                            (orgStatus === 'active' && isActive) ||
+                            (orgStatus === 'inactive' && !isActive);
+                $(this).toggle(match);
+                if (match) visibleCount++;
             });
             $noResults.toggle(visibleCount === 0);
             $orgTable.toggle(visibleCount > 0);
         }
 
-        if ($orgSearch.length && $orgTable.length) {
+        function doSearch(q) {
+            $.getJSON(cfg.searchUrl, { q: q }, function (data) {
+                var orgs = data.organizations;
+                $orgTbody.empty();
+                if (orgs.length === 0) {
+                    $noResults.show();
+                    $orgTable.hide();
+                } else {
+                    $.each(orgs, function (i, org) { $orgTbody.append(buildRow(org)); });
+                    $noResults.hide();
+                    $orgTable.show();
+                    applyStatusFilter();
+                    $('[data-toggle="tooltip"]').tooltip();
+                }
+                // hide Laravel pagination while in AJAX search mode
+                $orgTable.closest('div').nextAll().filter(':has(.pagination)').hide();
+            });
+        }
+
+        if ($orgSearch.length) {
             $orgSearch.on('input', function () {
                 var q = $(this).val().trim();
-                if (q.length > 0 && q.length < 2) return;
-                applyOrgFilters();
+                clearTimeout(searchTimer);
+                if (q.length === 1) return;
+                searchTimer = setTimeout(function () {
+                    var q2 = $orgSearch.val().trim();
+                    if (q2.length === 0) {
+                        $orgTbody.empty().append($origRows.clone(true));
+                        $noResults.hide();
+                        $orgTable.show();
+                        $pagination.show();
+                        ajaxMode = false;
+                        applyStatusFilter();
+                        $('[data-toggle="tooltip"]').tooltip();
+                        return;
+                    }
+                    doSearch(q2);
+                }, 300);
             });
         }
 
         $('#orgportal-status-filter input[type=radio]').on('change', function () {
             orgStatus = $(this).val();
-            applyOrgFilters();
+            applyStatusFilter();
         });
 
-        // Apply default filter on load
-        applyOrgFilters();
+        // Apply default status filter on load (existing server-rendered rows)
+        applyStatusFilter();
 
         $('#lang_switcher_enabled').on('change', function () {
             $('#lang-locales-block').toggle(this.checked);
