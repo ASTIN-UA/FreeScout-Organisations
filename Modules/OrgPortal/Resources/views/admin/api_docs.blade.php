@@ -354,7 +354,7 @@
           "delete": {
             "tags": ["Organizations"],
             "summary": "Delete an organization",
-            "description": "Deletes the organization and cascades to all its members.",
+            "description": "Deletes the organization. Blocked when the organization still has active members or tickets — remove all members and reassign/delete all tickets first.",
             "operationId": "deleteOrganization",
             "parameters": [
               { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" }, "description": "Organization ID" },
@@ -368,6 +368,13 @@
               "404": {
                 "description": "Organization not found",
                 "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NotFound" } } }
+              },
+              "422": {
+                "description": "Organization has members or tickets and cannot be deleted",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ValidationError" }, "examples": {
+                  "has_members": { "summary": "Organization has members", "value": { "message": "Cannot delete an organization that has members. Remove all members first.", "_embedded": { "errors": [{ "members_count": 3 }] } } },
+                  "has_tickets": { "summary": "Organization has tickets", "value": { "message": "Cannot delete an organization that has tickets. Reassign or delete all tickets first.", "_embedded": { "errors": [{ "conversations_count": 12 }] } } }
+                } } }
               }
             }
           }
