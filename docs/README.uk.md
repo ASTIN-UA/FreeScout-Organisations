@@ -2,7 +2,7 @@
 
 [← Back to README](../README.md)
 
-<img src="Modules/OrgPortal/logo.png" alt="OrgPortal — модуль FreeScout B2B" width="140" align="right">
+<img src="https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/refs/heads/main/Modules/OrgPortal/logo.png"  alt="OrgPortal — модуль FreeScout B2B" width="140" align="right">
 
 **OrgPortal** — це модуль FreeScout, який додає повне **управління B2B організаціями** до вашої служби підтримки: групує клієнтів у компанії, визначає ієрархію відділів, надає корпоративним менеджерам портал самообслуговування та автоматизує сповіщення — все всередині FreeScout без зовнішніх інструментів.
 
