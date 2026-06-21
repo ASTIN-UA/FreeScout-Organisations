@@ -63,6 +63,7 @@
 | `401` | 无效或缺失 API 密钥 |
 | `404` | 资源未找到 |
 | `409` | 冲突 — 客户已在另一个组织中有活跃会员资格 |
+| `422` | 业务规则违规 — 例如删除仍有成员或工单的组织 |
 | `503` | 所需模块（例如 Tags）未激活 |
 
 ---
@@ -218,9 +219,21 @@ curl -X PUT "https://your-freescout.com/api/organizations/1" \
 
 ### DELETE /api/organizations/{id}
 
-**200 OK** *(所有成员级联删除)*
+当组织仍有活跃成员或工单时被阻止。首先移除所有成员并重新分配/删除所有工单。
+
+**200 OK**
 ```json
 {"success": true, "message": "Organization deleted."}
+```
+
+**422 Unprocessable Entity** *(organization has members)*
+```json
+{"message": "Cannot delete an organization that has members. Remove all members first.", "_embedded": {"errors": [{"members_count": 3}]}}
+```
+
+**422 Unprocessable Entity** *(organization has tickets)*
+```json
+{"message": "Cannot delete an organization that has tickets. Reassign or delete all tickets first.", "_embedded": {"errors": [{"conversations_count": 12}]}}
 ```
 
 ---

@@ -63,6 +63,7 @@ Autentisering — `X-FreeScout-API-Key`-header eller `api_key`-spørringsparamet
 | `401` | Ugyldig eller manglende API-nøkkel |
 | `404` | Ressurs ikke funnet |
 | `409` | Konflikt — kunde har allerede aktivt medlemskap i en annen organisasjon |
+| `422` | Brudd på forretningsregel — f.eks. sletting av en organisasjon som fortsatt har medlemmer eller billetter |
 | `503` | Påkrevd modul (f.eks. Tags) er ikke aktiv |
 
 ---
@@ -218,9 +219,21 @@ curl -X PUT "https://your-freescout.com/api/organizations/1" \
 
 ### DELETE /api/organizations/{id}
 
-**200 OK** *(alle medlemmer slettes)*
+Blokkert når organisasjonen har aktive medlemmer eller billetter. Fjern først alle medlemmer og tildel/slett alle billetter på nytt.
+
+**200 OK**
 ```json
 {"success": true, "message": "Organization deleted."}
+```
+
+**422 Unprocessable Entity** *(organization has members)*
+```json
+{"message": "Cannot delete an organization that has members. Remove all members first.", "_embedded": {"errors": [{"members_count": 3}]}}
+```
+
+**422 Unprocessable Entity** *(organization has tickets)*
+```json
+{"message": "Cannot delete an organization that has tickets. Reassign or delete all tickets first.", "_embedded": {"errors": [{"conversations_count": 12}]}}
 ```
 
 ---

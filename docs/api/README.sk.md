@@ -63,6 +63,7 @@ Autentifikácia — hlavička `X-FreeScout-API-Key` alebo parameter dotazu `api_
 | `401` | Neplatný alebo chýbajúci kľúč API |
 | `404` | Zdroj nenájdený |
 | `409` | Konflikt — zákazník už má aktívne členstvo v inej organizácii |
+| `422` | Porušenie obchodného pravidla — napr. odstránenie organizácie, ktorá stále má členov alebo lístkov |
 | `503` | Požadovaný modul (napr. Tags) nie je aktívny |
 
 ---
@@ -218,9 +219,21 @@ curl -X PUT "https://your-freescout.com/api/organizations/1" \
 
 ### DELETE /api/organizations/{id}
 
-**200 OK** *(všetci členovia sú kaskádovo odstránení)*
+Blokované, keď má organizácia aktívnych členov alebo lístky. Najprv odstrante všetkých členov a prideľte/odstránte všetky lístky.
+
+**200 OK**
 ```json
 {"success": true, "message": "Organization deleted."}
+```
+
+**422 Unprocessable Entity** *(organization has members)*
+```json
+{"message": "Cannot delete an organization that has members. Remove all members first.", "_embedded": {"errors": [{"members_count": 3}]}}
+```
+
+**422 Unprocessable Entity** *(organization has tickets)*
+```json
+{"message": "Cannot delete an organization that has tickets. Reassign or delete all tickets first.", "_embedded": {"errors": [{"conversations_count": 12}]}}
 ```
 
 ---

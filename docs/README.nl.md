@@ -14,7 +14,23 @@
 ---
 
 🌐 **Ook beschikbaar in:**
-[Українська](docs/README.uk.md) · [Deutsch](docs/README.de.md) · [Français](docs/README.fr.md) · [Español](docs/README.es.md) · [Italiano](docs/README.it.md) · [Polski](docs/README.pl.md) · [Čeština](docs/README.cs.md) · [Slovenčina](docs/README.sk.md) · [Nederlands](docs/README.nl.md) · [Norsk](docs/README.no.md) · [Dansk](docs/README.da.md) · [Svenska](docs/README.sv.md) · [Suomi](docs/README.fi.md) · [Português (BR)](docs/README.pt-BR.md) · [Português (PT)](docs/README.pt-PT.md) · [Română](docs/README.ro.md) · [中文 (简体)](docs/README.zh-CN.md)
+[Українська](docs/README.uk.md) ·
+[Deutsch](docs/README.de.md) ·
+[Français](docs/README.fr.md) ·
+[Español](docs/README.es.md) ·
+[Italiano](docs/README.it.md) ·
+[Polski](docs/README.pl.md) ·
+[Čeština](docs/README.cs.md) ·
+[Slovenčina](docs/README.sk.md) ·
+[Nederlands](docs/README.nl.md) ·
+[Norsk](docs/README.no.md) ·
+[Dansk](docs/README.da.md) ·
+[Svenska](docs/README.sv.md) ·
+[Suomi](docs/README.fi.md) ·
+[Português (BR)](docs/README.pt-BR.md) ·
+[Português (PT)](docs/README.pt-PT.md) ·
+[Română](docs/README.ro.md) ·
+[中文 (简体)](docs/README.zh-CN.md)
 
 ---
 

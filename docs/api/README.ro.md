@@ -63,6 +63,7 @@ Autentificare — antetul `X-FreeScout-API-Key` sau parametrul de interogare `ap
 | `401` | Cheie API nevalidă sau lipsă |
 | `404` | Resursa nu a fost găsită |
 | `409` | Conflict — clientul are deja o asociere activă în altă organizație |
+| `422` | Încălcare de regulă de afaceri — ex. ștergerea unei organizații care are încă membri sau ticheți |
 | `503` | Modulul necesar (ex. Tags) nu este activ |
 
 ---
@@ -218,9 +219,21 @@ curl -X PUT "https://your-freescout.com/api/organizations/1" \
 
 ### DELETE /api/organizations/{id}
 
-**200 OK** *(toți membrii sunt șterși în cascadă)*
+Blocat atunci când organizația are membri activi sau ticheți. Eliminați mai întâi toți membrii și reatribuiți/ștergeți toți ticheții.
+
+**200 OK**
 ```json
 {"success": true, "message": "Organization deleted."}
+```
+
+**422 Unprocessable Entity** *(organization has members)*
+```json
+{"message": "Cannot delete an organization that has members. Remove all members first.", "_embedded": {"errors": [{"members_count": 3}]}}
+```
+
+**422 Unprocessable Entity** *(organization has tickets)*
+```json
+{"message": "Cannot delete an organization that has tickets. Reassign or delete all tickets first.", "_embedded": {"errors": [{"conversations_count": 12}]}}
 ```
 
 ---

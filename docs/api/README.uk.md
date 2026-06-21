@@ -63,6 +63,7 @@
 | `401` | Недійсний або відсутній ключ API |
 | `404` | Ресурс не знайдено |
 | `409` | Конфлікт — клієнт уже має активне членство в іншій організації |
+| `422` | Порушення бізнес-правила — наприклад видалення організації, яка все ще має членів або квитків |
 | `503` | Необхідний модуль (наприклад Tags) не активний |
 
 ---
@@ -218,9 +219,21 @@ curl -X PUT "https://your-freescout.com/api/organizations/1" \
 
 ### DELETE /api/organizations/{id}
 
-**200 OK** *(усі члени видалені каскадно)*
+Заблоковано, коли організація має активних членів або квитки. Спочатку видаліть усіх членів і переприпишіть/видаліть усі квитки.
+
+**200 OK**
 ```json
 {"success": true, "message": "Organization deleted."}
+```
+
+**422 Unprocessable Entity** *(organization has members)*
+```json
+{"message": "Cannot delete an organization that has members. Remove all members first.", "_embedded": {"errors": [{"members_count": 3}]}}
+```
+
+**422 Unprocessable Entity** *(organization has tickets)*
+```json
+{"message": "Cannot delete an organization that has tickets. Reassign or delete all tickets first.", "_embedded": {"errors": [{"conversations_count": 12}]}}
 ```
 
 ---

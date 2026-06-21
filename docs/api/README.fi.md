@@ -63,6 +63,7 @@ Todentaminen — `X-FreeScout-API-Key`-otsikko tai `api_key`-kyselyparametri.
 | `401` | Virheellinen tai puuttuva API-avain |
 | `404` | Resurssia ei löytynyt |
 | `409` | Ristiriita — asiakas on jo aktiivinen jäsen toisessa organisaatiossa |
+| `422` | Liiketoimintasäännön rikkominen — esim. organisaation poistaminen, jolla on vielä jäseniä tai lippuja |
 | `503` | Vaadittu moduuli (esim. Tags) ei ole aktiivinen |
 
 ---
@@ -218,9 +219,21 @@ curl -X PUT "https://your-freescout.com/api/organizations/1" \
 
 ### DELETE /api/organizations/{id}
 
-**200 OK** *(kaikki jäsenet poistetaan kaskadilla)*
+Estetty, kun organisaatiolla on aktiivisia jäseniä tai lippuja. Poista ensin kaikki jäsenet ja osoita/poista kaikki liput.
+
+**200 OK**
 ```json
 {"success": true, "message": "Organization deleted."}
+```
+
+**422 Unprocessable Entity** *(organization has members)*
+```json
+{"message": "Cannot delete an organization that has members. Remove all members first.", "_embedded": {"errors": [{"members_count": 3}]}}
+```
+
+**422 Unprocessable Entity** *(organization has tickets)*
+```json
+{"message": "Cannot delete an organization that has tickets. Reassign or delete all tickets first.", "_embedded": {"errors": [{"conversations_count": 12}]}}
 ```
 
 ---

@@ -63,6 +63,7 @@ Authenticatie — `X-FreeScout-API-Key` header of `api_key` queryparameter.
 | `401` | Ongeldige of ontbrekende API-sleutel |
 | `404` | Bron niet gevonden |
 | `409` | Conflict — klant heeft al een actief lidmaatschap in een andere organisatie |
+| `422` | Bedrijfsregelovertreding — bijv. het verwijderen van een organisatie die nog leden of kaarten heeft |
 | `503` | Vereiste module (bijv. Tags) is niet actief |
 
 ---
@@ -218,9 +219,21 @@ curl -X PUT "https://your-freescout.com/api/organizations/1" \
 
 ### DELETE /api/organizations/{id}
 
-**200 OK** *(alle leden worden verwijderd)*
+Geblokkeerd wanneer de organisatie actieve leden of kaarten heeft. Verwijder eerst alle leden en wijs alle kaarten opnieuw toe/verwijder deze.
+
+**200 OK**
 ```json
 {"success": true, "message": "Organization deleted."}
+```
+
+**422 Unprocessable Entity** *(organization has members)*
+```json
+{"message": "Cannot delete an organization that has members. Remove all members first.", "_embedded": {"errors": [{"members_count": 3}]}}
+```
+
+**422 Unprocessable Entity** *(organization has tickets)*
+```json
+{"message": "Cannot delete an organization that has tickets. Reassign or delete all tickets first.", "_embedded": {"errors": [{"conversations_count": 12}]}}
 ```
 
 ---

@@ -63,6 +63,7 @@ Uwierzytelnianie — nagłówek `X-FreeScout-API-Key` lub parametr zapytania `ap
 | `401` | Nieprawidłowy lub brakujący klucz API |
 | `404` | Nie znaleziono zasobu |
 | `409` | Konflikt — klient ma już aktywną przynależność w innej organizacji |
+| `422` | Naruszenie reguły biznesowej — np. usunięcie organizacji, która wciąż ma członków lub bilety |
 | `503` | Wymagany moduł (np. Tags) nie jest aktywny |
 
 ---
@@ -218,9 +219,21 @@ curl -X PUT "https://your-freescout.com/api/organizations/1" \
 
 ### DELETE /api/organizations/{id}
 
-**200 OK** *(wszyscy członkowie są kaskadowo usuwani)*
+Zablokowany, gdy organizacja ma aktywnych członków lub bilety. Najpierw usuń wszystkich członków i przypisz ponownie/usuń wszystkie bilety.
+
+**200 OK**
 ```json
 {"success": true, "message": "Organization deleted."}
+```
+
+**422 Unprocessable Entity** *(organization has members)*
+```json
+{"message": "Cannot delete an organization that has members. Remove all members first.", "_embedded": {"errors": [{"members_count": 3}]}}
+```
+
+**422 Unprocessable Entity** *(organization has tickets)*
+```json
+{"message": "Cannot delete an organization that has tickets. Reassign or delete all tickets first.", "_embedded": {"errors": [{"conversations_count": 12}]}}
 ```
 
 ---
