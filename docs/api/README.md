@@ -184,8 +184,8 @@ Returns the organization with its embedded **members** and **units**.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `unitId` | integer\|null | Structural unit the member belongs to, or `null` for the whole organization |
-| `role` | string | `member` or `manager` |
+| `unitId` | integer\|null | Structural unit the member belongs to, or `null` for a global (org-wide) role |
+| `role` | string | `"member"` or `"manager"`. A **unit manager** is `role: "manager"` with a non-null `unitId`; a **global manager** is `role: "manager"` with `unitId: null`. The string `"unit_manager"` does not exist in the API — passing it returns 400. |
 | `canManageOrg` | boolean | Whether this manager may promote others to global manager from the portal |
 | `isActive` | boolean | Active membership; inactive members receive no ticket assignments or notifications |
 | `notifyOnNewTicket` | boolean | Per-member new-ticket notification flag |
@@ -298,7 +298,7 @@ Update a member's role, unit assignment, canManageOrg flag, or active status. On
 
 | Field | Type | Required | Description |
 |-------|------|:--------:|-------------|
-| `role` | string | — | `"member"` or `"manager"` |
+| `role` | string | — | `"member"` or `"manager"`. To create a **unit manager**: `role: "manager"` + `unitId: <id>`. To create a **global manager**: `role: "manager"` + `unitId: null`. |
 | `unitId` | integer\|null | — | Structural unit (must belong to this organization), or `null` to unassign |
 | `canManageOrg` | boolean | — | Grant global manager rights in the portal |
 | `isActive` | boolean | — | `false` to deactivate without removing |

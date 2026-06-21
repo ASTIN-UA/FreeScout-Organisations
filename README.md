@@ -110,8 +110,10 @@ Organizations can be divided into unlimited **structural units** (departments, b
 | Role | Access scope |
 |------|-------------|
 | `member` | Own tickets only |
-| `unit_manager` | All tickets within their structural unit |
+| `unit_manager` ¹ | All tickets within their structural unit |
 | `manager` (global) | All tickets across the entire organization |
+
+> ¹ **API note:** the API uses only two `role` values — `"member"` and `"manager"`. A unit manager is represented as `role: "manager"` with a non-null `unitId`. The string `"unit_manager"` does not exist in the API.
 
 - Unit managers have full portal capabilities — replies, attachments, author reassignment, close/reopen, notification management — scoped strictly to their unit
 - Ticket access and notification delivery are enforced at unit boundaries

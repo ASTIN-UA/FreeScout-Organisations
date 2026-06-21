@@ -96,7 +96,7 @@
               "organizationId":    { "type": "integer", "example": 1 },
               "unitId":            { "type": "integer", "nullable": true, "example": 7, "description": "Structural unit this member belongs to. `null` = no unit. A manager with `unitId = null` is a global manager (sees the whole organization); a manager with a `unitId` only sees that unit's tickets." },
               "customerId":        { "type": "integer", "example": 42 },
-              "role":              { "type": "string", "enum": ["member", "manager"], "example": "manager" },
+              "role":              { "type": "string", "enum": ["member", "manager"], "example": "manager", "description": "Two values only: `member` or `manager`. A **unit manager** is `role: manager` with a non-null `unitId`; a **global manager** is `role: manager` with `unitId: null`. The value `unit_manager` does not exist — passing it returns 400." },
               "canManageOrg":      { "type": "boolean", "example": false, "description": "Whether this (global) manager may promote others to global manager from the portal. Admin-granted only." },
               "isActive":          { "type": "boolean", "example": true, "description": "Deactivated (`false`) members keep their ticket history but can no longer be assigned as a ticket author." },
               "notifyOnNewTicket": { "type": "boolean", "example": true },
@@ -112,7 +112,7 @@
               "organizationName":  { "type": "string",  "example": "Acme Corp" },
               "unitId":            { "type": "integer", "nullable": true, "example": 7 },
               "unitName":          { "type": "string",  "nullable": true, "example": "Sales department" },
-              "role":              { "type": "string", "enum": ["member", "manager"], "example": "manager" },
+              "role":              { "type": "string", "enum": ["member", "manager"], "example": "manager", "description": "`member` or `manager`. Unit manager = `manager` + non-null `unitId`. Global manager = `manager` + `unitId: null`." },
               "canManageOrg":      { "type": "boolean", "example": false },
               "isActive":          { "type": "boolean", "example": true },
               "notifyOnNewTicket": { "type": "boolean", "example": true }
