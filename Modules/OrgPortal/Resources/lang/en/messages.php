@@ -28,6 +28,25 @@ return [
     'org_created'            => 'Organization created.',
     'org_updated'            => 'Organization updated.',
     'org_deleted'            => 'Organization deleted.',
+    'org_deactivated'        => 'Organization deactivated.',
+    'org_activated'          => 'Organization activated.',
+
+    // Admin — organizations list columns & actions
+    'col_tickets'            => 'Tickets',
+    'col_tags'               => 'Tags',
+    'col_status'             => 'Status',
+    'org_status_active'      => 'Active',
+    'org_status_inactive'    => 'Inactive',
+    'filter_active'          => 'Active',
+    'filter_inactive'        => 'Inactive',
+    'filter_all'             => 'All',
+    'btn_tickets'            => 'Tickets',
+    'btn_deactivate'         => 'Deactivate',
+    'btn_activate'           => 'Activate',
+    'deactivate_no_snapshot' => 'Enable snapshot visibility in System settings to deactivate organizations.',
+    'confirm_deactivate_org' => 'Deactivate this organization? It will no longer be accessible on the portal.',
+    'confirm_activate_org'   => 'Activate this organization?',
+    'search_organizations'   => 'Search organizations…',
 
     // Admin — badge color
     'badge_color'            => 'Badge color',
@@ -43,6 +62,7 @@ return [
     'manager'                => 'Manager',
     'deleted_customer'       => 'Deleted customer',
     'no_members'             => 'No members yet.',
+    'select_member'          => 'Select member',
     'remove'                 => 'Remove',
     'confirm_remove_member'  => 'Remove this member?',
 
@@ -91,12 +111,101 @@ return [
 
     // Portal — settings
     'org_notification_settings' => 'Organization Notification Settings',
+    'org_settings_title'     => 'Organization Settings',
     'organization'           => 'Organization',
     'notify_new_ticket_label'=> 'Receive email notification when a member of my organization opens a new ticket',
     'settings_saved'         => 'Settings saved.',
 
+    // Portal — settings tabs
+    'tab_notifications'      => 'Notifications',
+    'tab_units'              => 'Structural Units',
+
+    // Portal — structural units
+    'unit_name'              => 'Structural unit name',
+    'unit_name_placeholder'  => 'e.g. Sales department',
+    'add_unit'               => 'Add structural unit',
+    'rename'                 => 'Rename',
+    'no_units'               => 'No units yet.',
+    'unit_created'           => 'Unit created.',
+    'unit_updated'           => 'Unit updated.',
+    'unit_deleted'           => 'Unit deleted.',
+    'unit_exists'            => 'A unit with this name already exists.',
+    'unit_not_found'         => 'Unit not found in this organization.',
+    'confirm_delete_unit'    => 'Delete this unit? Its members will be unassigned and unit managers demoted to members.',
+
+    // Portal — member management
+    'member_unit'            => 'Structural unit',
+    'no_unit'                => 'Entire organization',
+    'apply'                  => 'Apply',
+    'role_member'            => 'Member',
+    'role_manager_scoped'    => 'Manager',
+    'role_unit_manager'      => 'Unit manager',
+    'role_global_manager'    => 'Global manager',
+    'global_grant_hint'      => 'Set a unit to make a unit manager. Promoting to global manager requires admin permission.',
+    'member_updated'         => 'Member updated.',
+    'cannot_grant_global'    => 'You are not allowed to assign global managers.',
+    'can_manage_org'         => 'Manages entire organization',
+    'can_manage_org_hint'    => 'Allows this global manager to promote other members to global manager from the portal.',
+    'member_status'          => 'Status',
+    'status_member_active'   => 'Active',
+    'status_member_inactive' => 'Deactivated',
+    'deactivate'             => 'Deactivate',
+    'activate'               => 'Activate',
+    'member_deactivated'     => 'Member deactivated.',
+    'member_activated'       => 'Member reactivated.',
+    'show_deactivated'       => 'Show deactivated',
+    'confirm_deactivate'     => 'Deactivate this member? They will no longer receive ticket assignments.',
+    'cannot_deactivate_self' => 'You cannot deactivate yourself.',
+
+    // Notification subscriptions (portal)
+    'notif_scope'                => 'Scope',
+    'notif_scope_org'            => 'Entire organization',
+    'notif_scope_no_unit'        => 'No unit',
+    'notif_event_new_ticket'     => 'New ticket',
+    'notif_event_reply_agent'    => 'Agent reply',
+    'notif_event_reply_customer' => 'Customer reply',
+    'notif_hint'                 => 'Check the box to receive email notifications for tickets from the selected scope.',
+
+    // Notification template settings (admin)
+    'notif_reply_triggers'       => 'Reply notification triggers',
+    'notif_trigger_agent'        => 'Notify on agent replies',
+    'notif_trigger_customer'     => 'Notify on customer replies',
+    'notif_trigger_hint'         => 'These settings apply globally. Managers subscribe to specific scopes on the portal settings page.',
+    'tpl_tab_title'              => 'Notification Templates',
+    'tpl_heading'                => 'Email template',
+    'tpl_fallback_hint'          => '(leave empty to use the built-in template)',
+    'tpl_subject'                => 'Subject',
+    'tpl_subject_placeholder'    => 'Leave empty to use default',
+    'tpl_body'                   => 'Message body',
+    'tpl_insert_macro'           => 'Insert variable…',
+    'tpl_load_default'           => 'Load default template',
+    'tpl_locale_label'           => 'Template language',
+    'tpl_locale_hint'            => 'Select the language to edit. Only languages enabled in the portal language switcher are shown.',
+
+    // Macros
+    'macro_manager_name'     => 'Recipient name',
+    'macro_author_name'      => 'Ticket author name',
+    'macro_org_name'         => 'Organization name',
+    'macro_unit_name'        => 'Unit name',
+    'macro_subject'          => 'Ticket subject',
+    'macro_ticket_number'    => 'Ticket number',
+    'macro_ticket_url'       => 'Ticket URL',
+    'macro_created_date'     => 'Creation date',
+    'macro_created_time'     => 'Creation time',
+    'macro_created_datetime' => 'Creation date & time',
+    'macro_reply_date'       => 'Reply date',
+    'macro_reply_time'       => 'Reply time',
+    'macro_reply_datetime'   => 'Reply date & time',
+    'macro_reply_text'       => 'Reply text',
+    'macro_ticket_text'      => 'Ticket text',
+
+    // Notification email fallback strings
+    'email_reply_agent_intro'    => 'A new agent reply was added to a ticket in your organization:',
+    'email_reply_customer_intro' => 'A customer replied to a ticket in your organization:',
+    'email_reply_subject'        => 'Re: :number — :subject',
+
     // EUP nav
-    'org_settings_nav'       => 'Org Settings',
+    'org_settings_nav'       => 'Organization Settings',
 
     // Conversation badge & search
     'filter_by_org'          => 'Show all tickets from this organization',
@@ -115,21 +224,85 @@ return [
     'display_settings'       => 'Display Settings',
     'show_badge_conversation'=> 'Show organization badge on ticket page (near tags)',
     'show_badge_kanban'      => 'Show organization badge on Kanban cards',
+    'show_org_in_profile'   => 'Show organization block in customer profile in tickets',
 
     // Kanban filter
     'kanban_filter_org'           => 'Organization',
 
     // Company tickets filters (settings)
     'company_filters_heading'     => 'Company Tickets Status Filters',
-    'company_filters_hint'        => 'Select which Kanban columns appear as filter checkboxes on the Company Tickets page. You can customise the label shown to portal users.',
+    'company_filters_hint'        => 'Select which Kanban columns appear as filter checkboxes on the Company Tickets page. Drag rows to reorder. Set a label per portal language — portal users see the label in their chosen language.',
     'filter_column_id'            => 'Column ID',
-    'filter_label'                => 'Label',
+    'filter_original_name'        => 'Kanban column',
+    'filter_label'                => 'Portal label',
+    'filter_label_language'       => 'Language',
     'filter_add'                  => 'Add filter',
     'filter_board'                => 'Board',
     'company_filters_no_boards'   => 'No Kanban boards found. Create a board first.',
 
     // User permission
     'perm_manage_organizations' => 'Allow managing organizations',
+    'perm_manage_templates'     => 'Allow managing notification templates',
+
+    // Admin — system tab (Phase 7 attribution)
+    'system_tab_title'          => 'System',
+    'system_attribution_heading'=> 'Ticket Attribution',
+    'system_attribution_more'   => 'details',
+    'system_attribution_desc'   => 'By default the portal decides which tickets a manager can see by looking at the current member list of the organisation — if a customer is in the org, their tickets are visible. This works well until customers move between organisations or leave: a customer transferred to another org would suddenly lose all their old tickets, and a customer who left would pull their tickets out of the portal entirely. Ticket Attribution solves this by storing a snapshot of the organisation and unit directly on each ticket at the moment it is created. The ticket stays visible in the original org even after the customer moves. Example: John submitted 10 tickets while in "Acme Corp". He was later moved to "Beta LLC". With attribution enabled, all 10 tickets remain visible in "Acme Corp" portal — and future tickets appear in "Beta LLC". Without attribution, all 10 tickets would disappear from "Acme Corp" the moment John is moved. The background job runs every 5 minutes and processes up to 1 000 tickets per pass to attribute the existing history.',
+    'system_tickets_attributed' => 'tickets attributed',
+    'system_tickets_pending'    => ':count tickets still pending attribution',
+    'system_backfill_complete'  => 'All tickets attributed — ready to enable snapshot visibility.',
+    'system_run_backfill'       => 'Run backfill now',
+    'system_cron_hint'          => 'Processes up to 2 000 tickets immediately (cron runs every 5 min automatically).',
+    'system_backfill_done'        => 'Backfill complete: :count tickets processed.',
+    // Preflight stats
+    'system_preflight_heading'          => 'What will happen when you run the backfill:',
+    'system_preflight_pending'          => 'Tickets awaiting attribution',
+    'system_preflight_orgs_with_tags'   => ':n of :total organizations have tag bindings configured',
+    'system_preflight_orgs_no_tags'     => ':n organizations have no tag bindings',
+    'system_preflight_will_tag'         => 'will be attributed via tag',
+    'system_preflight_will_member'      => 'will fall back to membership / remain unmatched',
+
+    // Backfill result summary
+    'system_backfill_summary_heading'   => 'Backfill batch complete:',
+    'system_backfill_summary_processed' => ':n tickets processed in this pass.',
+    'system_backfill_summary_by_tag'    => 'attributed via tag binding',
+    'system_backfill_summary_by_member' => 'attributed via active membership',
+    'system_backfill_summary_unmatched' => 'no match found (org_id left empty)',
+
+    'system_save_settings'        => 'Save settings',
+    'system_reset_attribution'    => 'Reset all attribution',
+    'system_reset_confirm'        => 'This will clear org_id, org_unit_id and org_attributed_at on ALL tickets and restart attribution from scratch. Are you sure?',
+    'system_reset_done'           => 'Attribution reset. All tickets will be re-attributed on the next backfill run.',
+    'system_snapshot_warning'   => 'There are still unattributed tickets. We recommend enabling snapshot visibility only after the counter reaches 0 — otherwise those tickets may temporarily disappear from the portal.',
+    'system_attr_cron_enabled'      => 'Automatically attribute tickets via scheduler',
+    'system_attr_cron_enabled_hint' => 'When enabled, the scheduler runs a backfill every 5 minutes to attribute unprocessed tickets. Disable if you prefer to run attribution manually.',
+    'system_snapshot_label'     => 'Enable snapshot-based ticket visibility',
+    'system_snapshot_hint'      => 'When enabled, the portal shows tickets by stored org_id snapshot instead of the live member list. A safe fallback for un-attributed tickets remains active at all times.',
+
+    // Admin — system tab: attribution source
+    'system_attr_source_heading'  => 'Attribution Source',
+    'system_attr_source_desc'     => 'Controls how tickets are linked to an organization. When the Tags module is inactive, only member-based attribution is available.',
+    'system_attr_member'          => 'By membership',
+    'system_attr_member_hint'     => 'Default. Tickets are attributed to the organization the customer belongs to at the time of creation.',
+    'system_attr_tag'             => 'By tag, fall back to membership',
+    'system_attr_tag_hint'        => 'If a ticket has a tag bound to an organization, that binding wins. Otherwise membership is used. Requires the Tags module.',
+    'system_attr_tag_only'        => 'By tag only',
+    'system_attr_tag_only_hint'   => 'Tickets are attributed only via tag bindings. Tickets without a matching tag get no attribution. Requires the Tags module.',
+    'system_attr_tags_inactive'   => 'Tag-based options are disabled because the Tags module is not active.',
+
+    // Admin — org edit: tag bindings
+    'org_tags_heading'  => 'Tag Bindings',
+    'org_tags_hint'     => 'Select which tags identify tickets belonging to this organization. Optionally assign a structural unit per tag.',
+    'org_tags_search_placeholder' => 'Search tag…',
+
+    // Admin — system tab: language switcher
+    'system_lang_heading'       => 'Portal Language Switcher',
+    'system_lang_desc'          => 'Adds a language switcher dropdown to the customer portal navbar. The chosen language is saved to the customer\'s profile and used when sending email notifications. Has no effect when the EupSwLang module is active (use EupSwLang settings instead).',
+    'system_lang_enable'        => 'Enable language switcher on portal',
+    'system_lang_enable_hint'   => 'Shows a globe icon in the portal navbar that lets customers switch the portal language.',
+    'system_lang_locales'       => 'Available languages',
+    'system_lang_locales_hint'  => 'Only the checked languages appear in the switcher. Leave all checked to show every available language.',
 
     // ApiWebhooks settings page
     'api_docs_link'          => 'OrgPortal API Docs',
@@ -157,4 +330,20 @@ return [
     'email_subject'          => 'Subject',
     'email_ticket_number'    => 'Ticket #',
     'view_ticket'            => 'View Ticket',
+
+    'author_not_read'        => 'Author has not read this reply yet',
+
+    // Manager viewed (admin thread meta)
+    'manager_org_label'    => 'Organization manager',
+    'manager_viewed_when'  => 'viewed :when',
+
+    // Portal in-app notifications
+    'notifications'          => 'Notifications',
+    'no_notifications'       => 'No new notifications',
+    'notif_new_ticket'       => 'created a ticket',
+    'notif_new_reply'        => 'replied to conversation',
+    'notif_customer_reply'   => 'replied to conversation',
+    'notif_mark_all_read'    => 'Mark all as read',
+    'notif_today'            => 'Today',
+    'notif_yesterday'        => 'Yesterday',
 ];

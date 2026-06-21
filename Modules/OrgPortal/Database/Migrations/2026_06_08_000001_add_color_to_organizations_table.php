@@ -8,6 +8,7 @@ class AddColorToOrganizationsTable extends Migration
 {
     public function up()
     {
+        if (Schema::hasColumn('organizations', 'color')) return;
         Schema::table('organizations', function (Blueprint $table) {
             $table->string('color', 20)->nullable()->default(null)->after('name');
         });
@@ -15,6 +16,7 @@ class AddColorToOrganizationsTable extends Migration
 
     public function down()
     {
+        if (!Schema::hasColumn('organizations', 'color')) return;
         Schema::table('organizations', function (Blueprint $table) {
             $table->dropColumn('color');
         });

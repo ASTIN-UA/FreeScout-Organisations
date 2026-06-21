@@ -34,7 +34,7 @@
       "openapi": "3.0.3",
       "info": {
         "title": "OrgPortal API",
-        "version": "1.1.0",
+        "version": "1.2.0",
         "description": "REST API for managing organizations in FreeScout via the **OrgPortal** module.\n\n## Authentication\n\nPass your API key using **one** of these methods:\n\n| Method | Example |\n|--------|---------|\n| Header | `X-FreeScout-API-Key: YOUR_KEY` |\n| Query param | `?api_key=YOUR_KEY` |\n\nYour API key is available at **Manage → API & Webhooks**.\n\n## Response conventions\n\n| Code | Meaning |\n|------|---------|\n| `200` | Success — response body always present |\n| `201` | Resource created — body contains the new object, `Resource-ID` header contains its ID |\n| `400` | Validation error — see `_embedded.errors` for field-level details |\n| `401` | Invalid or missing API key |\n| `404` | Resource not found |\n| `409` | Conflict — e.g. customer already belongs to another organization |"
       },
       "servers": [
@@ -70,20 +70,35 @@
                   "_embedded": {
                     "type": "object",
                     "properties": {
-                      "members": { "type": "array", "items": { "$ref": "#/components/schemas/Member" } }
+                      "members": { "type": "array", "items": { "$ref": "#/components/schemas/Member" } },
+                      "units":   { "type": "array", "items": { "$ref": "#/components/schemas/Unit" } }
                     }
                   }
                 }
               }
             ]
           },
+          "Unit": {
+            "type": "object",
+            "description": "A structural subdivision within an organization (level-2 grouping).",
+            "properties": {
+              "id":             { "type": "integer", "example": 7 },
+              "organizationId": { "type": "integer", "example": 1 },
+              "name":           { "type": "string",  "example": "Sales department" },
+              "createdAt":      { "type": "string", "format": "date-time" },
+              "updatedAt":      { "type": "string", "format": "date-time" }
+            }
+          },
           "Member": {
             "type": "object",
             "properties": {
               "id":                { "type": "integer", "example": 5 },
               "organizationId":    { "type": "integer", "example": 1 },
+              "unitId":            { "type": "integer", "nullable": true, "example": 7, "description": "Structural unit this member belongs to. `null` = no unit. A manager with `unitId = null` is a global manager (sees the whole organization); a manager with a `unitId` only sees that unit's tickets." },
               "customerId":        { "type": "integer", "example": 42 },
-              "role":              { "type": "string", "enum": ["member", "manager"], "example": "manager" },
+              "role":              { "type": "string", "enum": ["member", "manager"], "example": "manager", "description": "Two values only: `member` or `manager`. A **unit manager** is `role: manager` with a non-null `unitId`; a **global manager** is `role: manager` with `unitId: null`. The value `unit_manager` does not exist — passing it returns 400." },
+              "canManageOrg":      { "type": "boolean", "example": false, "description": "Whether this (global) manager may promote others to global manager from the portal. Admin-granted only." },
+              "isActive":          { "type": "boolean", "example": true, "description": "Deactivated (`false`) members keep their ticket history but can no longer be assigned as a ticket author." },
               "notifyOnNewTicket": { "type": "boolean", "example": true },
               "createdAt":         { "type": "string", "format": "date-time" },
               "updatedAt":         { "type": "string", "format": "date-time" }
@@ -95,7 +110,11 @@
               "customerId":        { "type": "integer", "example": 42 },
               "organizationId":    { "type": "integer", "example": 1 },
               "organizationName":  { "type": "string",  "example": "Acme Corp" },
-              "role":              { "type": "string", "enum": ["member", "manager"], "example": "manager" },
+              "unitId":            { "type": "integer", "nullable": true, "example": 7 },
+              "unitName":          { "type": "string",  "nullable": true, "example": "Sales department" },
+              "role":              { "type": "string", "enum": ["member", "manager"], "example": "manager", "description": "`member` or `manager`. Unit manager = `manager` + non-null `unitId`. Global manager = `manager` + `unitId: null`." },
+              "canManageOrg":      { "type": "boolean", "example": false },
+              "isActive":          { "type": "boolean", "example": true },
               "notifyOnNewTicket": { "type": "boolean", "example": true }
             }
           },
@@ -193,6 +212,7 @@
       },
       "tags": [
         { "name": "Organizations",         "description": "Create and manage organizations" },
+        { "name": "Units",                 "description": "Create and manage structural subdivisions (units) within an organization" },
         { "name": "Customer Membership",   "description": "Assign customers to organizations and manage their roles" },
         { "name": "Customers (FreeScout)", "description": "Standard FreeScout endpoints for looking up customers. Use these to obtain a `customerId` before membership operations." },
         { "name": "Mailboxes (FreeScout)", "description": "Standard FreeScout endpoints for listing mailboxes. Use these to obtain a `mailboxId` for scoping organizations or filtering results." }
@@ -334,7 +354,7 @@
           "delete": {
             "tags": ["Organizations"],
             "summary": "Delete an organization",
-            "description": "Deletes the organization and cascades to all its members.",
+            "description": "Deletes the organization. Blocked when the organization still has active members or tickets — remove all members and reassign/delete all tickets first.",
             "operationId": "deleteOrganization",
             "parameters": [
               { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" }, "description": "Organization ID" },
@@ -347,6 +367,112 @@
               },
               "404": {
                 "description": "Organization not found",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NotFound" } } }
+              },
+              "422": {
+                "description": "Organization has members or tickets and cannot be deleted",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ValidationError" }, "examples": {
+                  "has_members": { "summary": "Organization has members", "value": { "message": "Cannot delete an organization that has members. Remove all members first.", "_embedded": { "errors": [{ "members_count": 3 }] } } },
+                  "has_tickets": { "summary": "Organization has tickets", "value": { "message": "Cannot delete an organization that has tickets. Reassign or delete all tickets first.", "_embedded": { "errors": [{ "conversations_count": 12 }] } } }
+                } } }
+              }
+            }
+          }
+        },
+
+        "/api/organizations/{id}/units": {
+          "get": {
+            "tags": ["Units"],
+            "summary": "List units",
+            "operationId": "listUnits",
+            "parameters": [
+              { "name": "id",      "in": "path",  "required": true, "schema": { "type": "integer" }, "description": "Organization ID" },
+              { "name": "api_key", "in": "query", "schema": { "type": "string" }, "description": "API key (alternative to header)" }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success",
+                "content": { "application/json": { "schema": { "type": "object", "properties": { "_embedded": { "type": "object", "properties": { "units": { "type": "array", "items": { "$ref": "#/components/schemas/Unit" } } } } } } } }
+              },
+              "404": {
+                "description": "Organization not found",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NotFound" } } }
+              }
+            }
+          },
+          "post": {
+            "tags": ["Units"],
+            "summary": "Create unit",
+            "operationId": "createUnit",
+            "parameters": [
+              { "name": "id",      "in": "path",  "required": true, "schema": { "type": "integer" }, "description": "Organization ID" },
+              { "name": "api_key", "in": "query", "schema": { "type": "string" }, "description": "API key (alternative to header)" }
+            ],
+            "requestBody": {
+              "required": true,
+              "content": { "application/json": { "schema": { "type": "object", "required": ["name"], "properties": { "name": { "type": "string", "example": "Sales department" } } } } }
+            },
+            "responses": {
+              "201": {
+                "description": "Unit created",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Unit" } } }
+              },
+              "400": {
+                "description": "Validation error",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ValidationError" } } }
+              },
+              "404": {
+                "description": "Organization not found",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NotFound" } } }
+              }
+            }
+          }
+        },
+
+        "/api/units/{unitId}": {
+          "put": {
+            "tags": ["Units"],
+            "summary": "Rename unit",
+            "operationId": "updateUnit",
+            "parameters": [
+              { "name": "unitId",  "in": "path",  "required": true, "schema": { "type": "integer" }, "description": "Unit ID" },
+              { "name": "api_key", "in": "query", "schema": { "type": "string" }, "description": "API key (alternative to header)" }
+            ],
+            "requestBody": {
+              "required": true,
+              "content": { "application/json": { "schema": { "type": "object", "required": ["name"], "properties": { "name": { "type": "string", "example": "Renamed unit" } } } } }
+            },
+            "responses": {
+              "200": {
+                "description": "Unit updated",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SuccessResponse" }, "example": { "success": true, "message": "Unit updated." } } }
+              },
+              "400": {
+                "description": "Validation error",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ValidationError" } } }
+              },
+              "404": {
+                "description": "Unit not found",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NotFound" } } }
+              }
+            }
+          },
+          "delete": {
+            "tags": ["Units"],
+            "summary": "Delete unit",
+            "description": "Deletes the unit. Its members are unassigned (`unitId` becomes `null`) and any unit managers are demoted to members.",
+            "operationId": "deleteUnit",
+            "parameters": [
+              { "name": "unitId",  "in": "path",  "required": true, "schema": { "type": "integer" }, "description": "Unit ID" },
+              { "name": "api_key", "in": "query", "schema": { "type": "string" }, "description": "API key (alternative to header)" }
+            ],
+            "responses": {
+              "200": {
+                "description": "Unit deleted",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SuccessResponse" }, "example": { "success": true, "message": "Unit deleted." } } }
+              },
+              "404": {
+                "description": "Unit not found",
                 "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NotFound" } } }
               }
             }
@@ -376,7 +502,7 @@
           "put": {
             "tags": ["Customer Membership"],
             "summary": "Assign / update customer membership",
-            "description": "Assigns a customer to an organization or updates their role within their current organization.\n\nEach customer can belong to **at most one** organization. If the customer is already a member of a **different** organization, the request is rejected with `409 Conflict`. Remove the existing membership first via `DELETE /api/customers/{customerId}/organization` before assigning to a new organization.",
+            "description": "Assigns a customer to an organization or updates their role/unit within an organization.\n\nEach customer can have **at most one active** membership. If the customer is already an **active** member of a **different** organization, the request is rejected with `409 Conflict`. Deactivate or remove the existing membership first via `DELETE /api/customers/{customerId}/organization`.\n\nSet `role = manager` with a `unitId` to create a **unit manager** (sees only that unit's tickets), or with `unitId = null` to create a **global manager** (sees the whole organization).",
             "operationId": "setCustomerOrganization",
             "parameters": [
               { "name": "customerId", "in": "path", "required": true, "schema": { "type": "integer" }, "description": "FreeScout customer ID" },
@@ -391,12 +517,14 @@
                     "required": ["organizationId"],
                     "properties": {
                       "organizationId": { "type": "integer", "example": 1, "description": "Target organization ID" },
+                      "unitId": { "type": "integer", "nullable": true, "example": 7, "description": "Structural unit within the organization, or `null` for none. Must belong to `organizationId`." },
                       "role": {
                         "type": "string",
                         "enum": ["member", "manager"],
                         "default": "member",
-                        "description": "`member` — regular member. `manager` — can view all organization tickets in the portal and receive new-ticket notifications."
-                      }
+                        "description": "`member` — regular member. `manager` — with a `unitId` sees that unit's tickets; with `unitId = null` is a global manager that sees all organization tickets and receives new-ticket notifications."
+                      },
+                      "canManageOrg": { "type": "boolean", "default": false, "description": "Grant a global manager the right to promote others to global manager from the portal." }
                     }
                   }
                 }

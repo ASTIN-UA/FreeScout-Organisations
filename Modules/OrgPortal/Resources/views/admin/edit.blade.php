@@ -35,6 +35,38 @@
                             @endif
                         </div>
 
+                        @if($tagsModuleActive && $allTags->count())
+                        <div class="form-group" id="org-tag-group">
+                            <label>{{ __('orgportal::messages.org_tags_heading') }}</label>
+
+                            {{-- Chips for already-selected tags --}}
+                            <div id="org-tag-chips" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;min-height:4px;">
+                                @foreach($allTags->whereIn('id', $boundTagIds) as $bt)
+                                <span class="label label-default org-tag-chip"
+                                      data-id="{{ $bt->id }}"
+                                      style="font-size:13px;padding:4px 8px;cursor:default;display:inline-flex;align-items:center;gap:4px;">
+                                    {{ $bt->name }}
+                                    <input type="hidden" name="tag_ids[]" value="{{ $bt->id }}">
+                                    <span class="org-tag-remove" style="cursor:pointer;opacity:.7;margin-left:2px;" title="{{ __('orgportal::messages.remove') }}">×</span>
+                                </span>
+                                @endforeach
+                            </div>
+
+                            {{-- Search input --}}
+                            <div style="position:relative;">
+                                <input type="text"
+                                       id="org-tag-search"
+                                       class="form-control"
+                                       placeholder="{{ __('orgportal::messages.org_tags_search_placeholder') }}"
+                                       autocomplete="off">
+                                <ul id="org-tag-suggestions"
+                                    class="list-group"
+                                    style="position:absolute;z-index:1000;width:100%;display:none;max-height:180px;overflow-y:auto;top:100%;left:0;margin-top:2px;box-shadow:0 4px 8px rgba(0,0,0,.15);"></ul>
+                            </div>
+                            <p class="text-muted" style="font-size:11px;margin-top:4px;margin-bottom:0;">{{ __('orgportal::messages.org_tags_hint') }}</p>
+                        </div>
+                        @endif
+
                         @php
                             $defaultColor = \Modules\OrgPortal\Models\Organization::DEFAULT_COLOR;
                             $currentColor = old('color', $organization->color ?: '');
@@ -115,6 +147,60 @@
                     </form>
                 </div>
             </div>
+
+            {{-- Structural units --}}
+            <div class="panel panel-default">
+                <div class="panel-heading"><strong>{{ __('orgportal::messages.tab_units') }}</strong></div>
+                <div class="panel-body">
+                    @if($units->count())
+                        <div class="orgportal-table-wrap">
+                        <table class="table table-condensed table-striped">
+                            <tbody>
+                                @foreach($units as $unit)
+                                <tr>
+                                    <td>
+                                        <form method="POST"
+                                              action="{{ route('orgportal.admin.units.rename', [$organization->id, $unit->id]) }}"
+                                              style="display:inline-flex;gap:4px;align-items:center">
+                                            {{ csrf_field() }}
+                                            {{ method_field('PUT') }}
+                                            <input type="text" name="name" class="form-control input-sm"
+                                                   value="{{ $unit->name }}" maxlength="255" required>
+                                            <button type="submit" class="btn btn-xs btn-primary" title="{{ __('orgportal::messages.save') }}">✓</button>
+                                        </form>
+                                    </td>
+                                    <td class="text-right">
+                                        <form method="POST"
+                                              action="{{ route('orgportal.admin.units.delete', [$organization->id, $unit->id]) }}"
+                                              onsubmit="return confirm('{{ __('orgportal::messages.confirm_delete_unit') }}')">
+                                            {{ csrf_field() }}
+                                            {{ method_field('DELETE') }}
+                                            <button type="submit" class="btn btn-xs btn-danger">
+                                                {{ __('orgportal::messages.delete') }}
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                        </div>{{-- orgportal-table-wrap --}}
+                    @else
+                        <p class="text-muted">{{ __('orgportal::messages.no_units') }}</p>
+                    @endif
+
+                    <form method="POST" action="{{ route('orgportal.admin.units.add', $organization->id) }}"
+                          style="display:flex;gap:4px;align-items:center;margin-top:8px;">
+                        {{ csrf_field() }}
+                        <input type="text" name="name" class="form-control input-sm"
+                               placeholder="{{ __('orgportal::messages.unit_name_placeholder') }}"
+                               maxlength="255" required>
+                        <button type="submit" class="btn btn-success btn-sm">
+                            {{ __('orgportal::messages.add_unit') }}
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
 
         {{-- Members --}}
@@ -124,17 +210,28 @@
                 <div class="panel-body">
 
                     @if($members->count())
+                        <div class="orgportal-table-wrap">
                         <table class="table table-condensed table-striped">
                             <thead>
                                 <tr>
                                     <th>{{ __('orgportal::messages.name') }}</th>
-                                    <th>{{ __('orgportal::messages.role') }}</th>
+                                    <th style="width:160px">{{ __('orgportal::messages.member_unit') }}</th>
+                                    <th style="width:120px">{{ __('orgportal::messages.role') }}</th>
+                                    <th style="width:1px;white-space:nowrap">{{ __('orgportal::messages.can_manage_org') }}</th>
+                                    <th style="width:80px">{{ __('orgportal::messages.member_status') }}</th>
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($members as $member)
-                                <tr>
+                                {{-- hidden form for role/unit update; inputs below use form="mf-{id}" --}}
+                                <form id="mf-{{ $member->id }}"
+                                      method="POST"
+                                      action="{{ route('orgportal.admin.members.role', [$organization->id, $member->id]) }}"
+                                      style="display:none">
+                                    {{ csrf_field() }}
+                                </form>
+                                <tr class="{{ $member->is_active ? '' : 'text-muted' }}">
                                     <td>
                                         @if($member->customer)
                                             {{ $member->customer->getFullName() }}
@@ -147,21 +244,46 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <form method="POST"
-                                              action="{{ route('orgportal.admin.members.role', [$organization->id, $member->id]) }}"
-                                              style="display:inline-flex;gap:4px;align-items:center">
-                                            {{ csrf_field() }}
-                                            <select name="role" class="form-control input-sm" style="width:auto">
-                                                <option value="member"  {{ $member->role === 'member'  ? 'selected' : '' }}>{{ __('orgportal::messages.member') }}</option>
-                                                <option value="manager" {{ $member->role === 'manager' ? 'selected' : '' }}>{{ __('orgportal::messages.manager') }}</option>
-                                            </select>
-                                            <button type="submit" class="btn btn-xs btn-primary" title="{{ __('orgportal::messages.save') }}">✓</button>
-                                        </form>
+                                        <select name="unit_id" form="mf-{{ $member->id }}" class="form-control input-sm" style="width:100%">
+                                            <option value="">{{ __('orgportal::messages.no_unit') }}</option>
+                                            @foreach($units as $unit)
+                                                <option value="{{ $unit->id }}" {{ $member->unit_id === $unit->id ? 'selected' : '' }}>{{ $unit->name }}</option>
+                                            @endforeach
+                                        </select>
                                     </td>
-                                    <td class="text-right">
+                                    <td>
+                                        <select name="role" form="mf-{{ $member->id }}" class="form-control input-sm" style="width:100%">
+                                            <option value="member"  {{ $member->role === 'member'  ? 'selected' : '' }}>{{ __('orgportal::messages.member') }}</option>
+                                            <option value="manager" {{ $member->role === 'manager' ? 'selected' : '' }}>{{ __('orgportal::messages.manager') }}</option>
+                                        </select>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" name="can_manage_org" value="1"
+                                               form="mf-{{ $member->id }}"
+                                               {{ $member->can_manage_org ? 'checked' : '' }}
+                                               title="{{ __('orgportal::messages.can_manage_org_hint') }}">
+                                    </td>
+                                    <td>
+                                        @if($member->is_active)
+                                            <span class="label label-success">{{ __('orgportal::messages.status_member_active') }}</span>
+                                        @else
+                                            <span class="label label-default">{{ __('orgportal::messages.status_member_inactive') }}</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-right" style="white-space:nowrap">
+                                        <button type="submit" form="mf-{{ $member->id }}" class="btn btn-xs btn-primary" title="{{ __('orgportal::messages.save') }}">✓</button>
+                                        <form method="POST"
+                                              action="{{ route('orgportal.admin.members.toggle', [$organization->id, $member->id]) }}"
+                                              style="display:inline">
+                                            {{ csrf_field() }}
+                                            <button type="submit" class="btn btn-xs btn-default">
+                                                {{ $member->is_active ? __('orgportal::messages.deactivate') : __('orgportal::messages.activate') }}
+                                            </button>
+                                        </form>
                                         <form method="POST"
                                               action="{{ route('orgportal.admin.members.remove', [$organization->id, $member->id]) }}"
-                                              onsubmit="return confirm('{{ __('orgportal::messages.confirm_remove_member') }}')">
+                                              onsubmit="return confirm('{{ __('orgportal::messages.confirm_remove_member') }}')"
+                                              style="display:inline">
                                             {{ csrf_field() }}
                                             {{ method_field('DELETE') }}
                                             <button type="submit" class="btn btn-xs btn-danger">
@@ -173,6 +295,7 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        </div>{{-- orgportal-table-wrap --}}
                     @else
                         <p class="text-muted">{{ __('orgportal::messages.no_members') }}</p>
                     @endif
@@ -196,11 +319,26 @@
                             </div>
                         </div>
                         <div class="form-group">
+                            <label>{{ __('orgportal::messages.member_unit') }}</label>
+                            <select name="unit_id" class="form-control">
+                                <option value="">{{ __('orgportal::messages.no_unit') }}</option>
+                                @foreach($units as $unit)
+                                    <option value="{{ $unit->id }}">{{ $unit->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label>{{ __('orgportal::messages.role') }}</label>
                             <select name="role" class="form-control">
                                 <option value="member">{{ __('orgportal::messages.member') }}</option>
                                 <option value="manager">{{ __('orgportal::messages.manager') }}</option>
                             </select>
+                        </div>
+                        <div class="checkbox">
+                            <label title="{{ __('orgportal::messages.can_manage_org_hint') }}">
+                                <input type="checkbox" name="can_manage_org" value="1">
+                                {{ __('orgportal::messages.can_manage_org') }}
+                            </label>
                         </div>
                         <button type="submit" class="btn btn-success btn-sm" id="add_member_btn" disabled>
                             {{ __('orgportal::messages.add_member') }}
@@ -338,6 +476,71 @@
             swatch.addEventListener('click', function () { select(swatch); });
         })(swatches[i]);
     }
+})();
+
+// Tag search widget
+(function () {
+    var allTags = {!! json_encode($allTags->map(fn($t) => ['id' => $t->id, 'name' => $t->name])->values(), JSON_HEX_TAG | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) !!};
+    var chips   = document.getElementById('org-tag-chips');
+    var search  = document.getElementById('org-tag-search');
+    var suggest = document.getElementById('org-tag-suggestions');
+    if (!search) return;
+
+    function selectedIds() {
+        return Array.from(chips.querySelectorAll('input[name="tag_ids[]"]'))
+                    .map(function (i) { return parseInt(i.value); });
+    }
+
+    function addChip(tag) {
+        if (selectedIds().indexOf(tag.id) !== -1) return;
+        var span = document.createElement('span');
+        span.className = 'label label-default org-tag-chip';
+        span.setAttribute('data-id', tag.id);
+        span.style.cssText = 'font-size:13px;padding:4px 8px;cursor:default;display:inline-flex;align-items:center;gap:4px;';
+        span.innerHTML = tag.name +
+            '<input type="hidden" name="tag_ids[]" value="' + tag.id + '">' +
+            '<span class="org-tag-remove" style="cursor:pointer;opacity:.7;margin-left:2px;" title="×">×</span>';
+        chips.appendChild(span);
+    }
+
+    chips.addEventListener('click', function (e) {
+        if (e.target.classList.contains('org-tag-remove')) {
+            e.target.closest('.org-tag-chip').remove();
+        }
+    });
+
+    search.addEventListener('input', function () {
+        var q = this.value.trim().toLowerCase();
+        suggest.innerHTML = '';
+        if (!q) { suggest.style.display = 'none'; return; }
+        var sel = selectedIds();
+        var matches = allTags.filter(function (t) {
+            return t.name.toLowerCase().indexOf(q) !== -1 && sel.indexOf(t.id) === -1;
+        }).slice(0, 10);
+        if (!matches.length) { suggest.style.display = 'none'; return; }
+        matches.forEach(function (tag) {
+            var li = document.createElement('li');
+            li.className = 'list-group-item';
+            li.style.cursor = 'pointer';
+            li.textContent = tag.name;
+            li.addEventListener('mouseenter', function () { this.style.backgroundColor = '#f5f5f5'; });
+            li.addEventListener('mouseleave', function () { this.style.backgroundColor = ''; });
+            li.addEventListener('click', function () {
+                addChip(tag);
+                search.value = '';
+                suggest.style.display = 'none';
+                search.focus();
+            });
+            suggest.appendChild(li);
+        });
+        suggest.style.display = 'block';
+    });
+
+    document.addEventListener('click', function (e) {
+        if (e.target !== search && !suggest.contains(e.target)) {
+            suggest.style.display = 'none';
+        }
+    });
 })();
 </script>
 @endsection

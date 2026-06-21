@@ -41,6 +41,15 @@
                         </label>
                     </div>
                 </div>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="show_org_in_profile" value="1"
+                                {{ $show_org_in_profile ? 'checked' : '' }}>
+                            {{ __('orgportal::messages.show_org_in_profile') }}
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -50,37 +59,103 @@
             <div class="panel-body">
                 <p class="text-muted" style="font-size:13px;">{{ __('orgportal::messages.company_filters_hint') }}</p>
 
-                @php $savedById = collect($companyFilters)->keyBy('id'); @endphp
-
                 @if(!empty($kanbanColumns))
-                <table class="table table-condensed">
+                @php
+                    $savedById = collect($companyFilters)->keyBy('id');
+                    $orderedRows = [];
+                    foreach ($companyFilters as $cf) {
+                        $colId = $cf['id'];
+                        if (isset($savedById[$colId])) {
+                            $col = collect($kanbanColumns)->firstWhere('id', $colId) ?? ['id' => $colId, 'name' => $cf['name'] ?? '', 'board_name' => ''];
+                            $orderedRows[] = ['col' => $col, 'saved' => $cf, 'checked' => true];
+                        }
+                    }
+                    foreach ($kanbanColumns as $col) {
+                        if (!isset($savedById[$col['id']])) {
+                            $orderedRows[] = ['col' => $col, 'saved' => null, 'checked' => false];
+                        }
+                    }
+                    $activeLocale = $filterLocales[0] ?? 'en';
+
+                    // Build JS memory store: { colId: { locale: label } }
+                    $cfMemory = [];
+                    foreach ($orderedRows as $row) {
+                        $cid = $row['col']['id'];
+                        $cfMemory[$cid] = $row['saved']['labels'] ?? [];
+                    }
+                @endphp
+
+                {{-- Data carrier for JS (picked up by @section('javascript') below) --}}
+                <div id="cf-data"
+                     data-saved="{{ e(json_encode($cfMemory)) }}"
+                     data-locale="{{ e($activeLocale) }}"
+                     style="display:none;"></div>
+
+                {{-- Locale selector (only when more than one locale) --}}
+                @if(count($filterLocales) > 1)
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+                    <label for="cf-locale-select" style="margin:0;font-weight:normal;">
+                        {{ __('orgportal::messages.filter_label_language') }}:
+                    </label>
+                    <select id="cf-locale-select" class="form-control" style="width:auto;min-width:160px;">
+                        @foreach($filterLocales as $loc)
+                        <option value="{{ $loc }}" {{ $loc === $activeLocale ? 'selected' : '' }}>
+                            {{ $localeNames[$loc] ?? $loc }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+                @endif
+
+                {{-- Hidden inputs that carry all locale labels on submit --}}
+                <div id="cf-hidden-labels"></div>
+
+                <table class="table table-condensed" id="cf-sortable-table">
                     <thead>
                         <tr>
-                            <th style="width:36px;"></th>
+                            <th style="width:24px;"></th>
+                            <th style="width:32px;"></th>
+                            <th style="color:#999;">{{ __('orgportal::messages.filter_original_name') }}</th>
                             <th>{{ __('orgportal::messages.filter_label') }}</th>
-                            <th style="width:160px; color:#999;">{{ __('orgportal::messages.filter_board') }}</th>
+                            <th style="width:150px;color:#999;">{{ __('orgportal::messages.filter_board') }}</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach($kanbanColumns as $col)
+                    <tbody id="cf-tbody">
+                        @foreach($orderedRows as $row)
                         @php
-                            $checked    = isset($savedById[$col['id']]);
-                            $savedLabel = $checked ? $savedById[$col['id']]['label'] : $col['name'];
+                            $col     = $row['col'];
+                            $colId   = $col['id'];
+                            $checked = $row['checked'];
+                            $saved   = $row['saved'];
+                            $labelsMap = $saved['labels'] ?? [];
                         @endphp
-                        <tr>
-                            <td>
+                        <tr class="cf-row" data-col-id="{{ $colId }}">
+                            <td style="cursor:move;color:#ccc;vertical-align:middle;">
+                                <span class="cf-drag-handle glyphicon glyphicon-menu-hamburger"></span>
+                                <input type="hidden" name="company_filter_sort[{{ $colId }}]"
+                                       class="cf-sort-input" value="0">
+                            </td>
+                            <td style="vertical-align:middle;">
                                 <input type="checkbox"
                                        name="company_filter_ids[]"
-                                       value="{{ $col['id'] }}"
+                                       value="{{ $colId }}"
                                        {{ $checked ? 'checked' : '' }}>
+                                <input type="hidden"
+                                       name="company_filter_names[{{ $colId }}]"
+                                       value="{{ e($col['name']) }}">
+                            </td>
+                            <td style="color:#555;vertical-align:middle;font-size:13px;">
+                                {{ $col['name'] }}
                             </td>
                             <td>
+                                {{-- Single visible input — JS loads/saves value for active locale --}}
                                 <input type="text"
-                                       name="company_filter_labels[{{ $col['id'] }}]"
-                                       class="form-control input-sm"
-                                       value="{{ $savedLabel }}">
+                                       class="form-control input-sm cf-label-input"
+                                       data-col-id="{{ $colId }}"
+                                       placeholder="{{ $col['name'] }}"
+                                       value="{{ $labelsMap[$activeLocale] ?? '' }}">
                             </td>
-                            <td style="color:#999; font-size:12px; vertical-align:middle;">
+                            <td style="color:#999;font-size:12px;vertical-align:middle;">
                                 {{ $col['board_name'] }}
                             </td>
                         </tr>
@@ -92,6 +167,7 @@
                 @endif
             </div>
         </div>
+
         @endif
 
         <div class="form-group">
@@ -101,4 +177,70 @@
         </div>
     </form>
 </div>
+@endsection
+
+@section('javascript')
+if ($('#cf-data').length) {
+    var cfSaved  = JSON.parse($('#cf-data').attr('data-saved') || '{}');
+    var cfLocale = $('#cf-data').attr('data-locale') || 'en';
+    // Normalize: PHP [] serializes as JSON array, but we need plain objects.
+    var cfMemory = {};
+    $.each(cfSaved, function(colId, labels) {
+        cfMemory[String(colId)] = (labels && !Array.isArray(labels)) ? labels : {};
+    });
+
+    console.log('[CF] cfSaved:', cfSaved, '| cfLocale:', cfLocale);
+
+    function cfSaveCurrentToMemory() {
+        $('#cf-tbody .cf-row').each(function() {
+            var colId = String($(this).attr('data-col-id'));
+            var val   = $(this).find('.cf-label-input').val();
+            if (!cfMemory[colId]) cfMemory[colId] = {};
+            cfMemory[colId][cfLocale] = val;
+        });
+    }
+
+    function cfLoadFromMemory(locale) {
+        $('#cf-tbody .cf-row').each(function() {
+            var colId = String($(this).attr('data-col-id'));
+            var saved = cfMemory[colId];
+            $(this).find('.cf-label-input').val(saved && saved[locale] ? saved[locale] : '');
+        });
+    }
+
+    function cfBuildHiddenInputs() {
+        var $c = $('#cf-hidden-labels').empty();
+        $.each(cfMemory, function(colId, labels) {
+            $.each(labels, function(loc, lbl) {
+                if (lbl && lbl.trim() !== '') {
+                    $('<input>').attr({ type: 'hidden', name: 'company_filter_labels[' + colId + '][' + loc + ']', value: lbl.trim() }).appendTo($c);
+                }
+            });
+        });
+    }
+
+    $('#cf-locale-select').on('change', function() {
+        var newLocale = $(this).val();
+        cfSaveCurrentToMemory();
+        console.log('[CF] switch', cfLocale, '->', newLocale, cfMemory);
+        cfLocale = newLocale;
+        cfLoadFromMemory(newLocale);
+    });
+
+    $('form').on('submit', function() {
+        cfSaveCurrentToMemory();
+        cfBuildHiddenInputs();
+    });
+
+    if ($.fn.sortable) {
+        $('#cf-tbody').sortable({
+            handle: '.cf-drag-handle',
+            axis: 'y',
+            update: function() {
+                $('#cf-tbody .cf-row').each(function(i) { $(this).find('.cf-sort-input').val(i); });
+            }
+        });
+        $('#cf-tbody .cf-row').each(function(i) { $(this).find('.cf-sort-input').val(i); });
+    }
+}
 @endsection

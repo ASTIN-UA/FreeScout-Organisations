@@ -9,7 +9,7 @@ class Organization extends Model
 {
     protected $table = 'organizations';
 
-    protected $fillable = ['name', 'color', 'mailbox_id'];
+    protected $fillable = ['name', 'color', 'mailbox_id', 'is_active'];
 
     protected $casts = ['mailbox_id' => 'integer'];
 
@@ -66,10 +66,15 @@ class Organization extends Model
         return $this->hasMany(OrganizationMember::class);
     }
 
+    public function units()
+    {
+        return $this->hasMany(OrganizationUnit::class);
+    }
+
     public function customers()
     {
         return $this->belongsToMany(Customer::class, 'organization_members', 'organization_id', 'customer_id')
-            ->withPivot('role', 'notify_on_new_ticket')
+            ->withPivot('role', 'notify_on_new_ticket', 'unit_id', 'is_active')
             ->withTimestamps();
     }
 
@@ -79,11 +84,34 @@ class Organization extends Model
     }
 
     /**
-     * Find the organization a customer belongs to (first match).
+     * Global managers: managers not scoped to any unit.
+     */
+    public function conversations()
+    {
+        return $this->hasMany(\App\Conversation::class, 'org_id');
+    }
+
+    public function organizationTags()
+    {
+        return $this->hasMany(\Modules\OrgPortal\Models\OrganizationTag::class, 'organization_id');
+    }
+
+    public function globalManagers()
+    {
+        return $this->managers()->whereNull('unit_id');
+    }
+
+    /**
+     * Find the organization a customer belongs to via their active membership.
+     * Falls back to any membership when no active one exists (historical).
      */
     public static function forCustomer(int $customerId): ?self
     {
-        $member = OrganizationMember::where('customer_id', $customerId)->first();
+        $member = OrganizationMember::where('customer_id', $customerId)
+            ->orderByDesc('is_active')
+            ->orderByDesc('id')
+            ->first();
+
         return $member ? $member->organization : null;
     }
 }

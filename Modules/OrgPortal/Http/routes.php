@@ -20,6 +20,12 @@ Route::group([
     Route::get('organizations/create', 'OrgPortalAdminController@create')
         ->name('orgportal.admin.create');
 
+    Route::get('organizations/search', 'OrgPortalAdminController@searchOrganizations')
+        ->name('orgportal.admin.organizations.search');
+
+    Route::get('organizations/list-json', 'OrgPortalAdminController@listOrganizationsJson')
+        ->name('orgportal.admin.organizations.list-json');
+
     Route::post('organizations', 'OrgPortalAdminController@store')
         ->name('orgportal.admin.store');
 
@@ -32,6 +38,9 @@ Route::group([
     Route::delete('organizations/{id}', 'OrgPortalAdminController@destroy')
         ->name('orgportal.admin.destroy');
 
+    Route::post('organizations/{id}/deactivate', 'OrgPortalAdminController@deactivateOrg')
+        ->name('orgportal.admin.deactivate');
+
     Route::post('organizations/{id}/members', 'OrgPortalAdminController@addMember')
         ->name('orgportal.admin.members.add');
 
@@ -41,6 +50,18 @@ Route::group([
     Route::post('organizations/{id}/members/{memberId}/role', 'OrgPortalAdminController@updateMemberRole')
         ->name('orgportal.admin.members.role');
 
+    Route::post('organizations/{id}/members/{memberId}/toggle-active', 'OrgPortalAdminController@toggleMemberActive')
+        ->name('orgportal.admin.members.toggle');
+
+    Route::post('organizations/{id}/units', 'OrgPortalAdminController@addUnit')
+        ->name('orgportal.admin.units.add');
+
+    Route::put('organizations/{id}/units/{unitId}', 'OrgPortalAdminController@renameUnit')
+        ->name('orgportal.admin.units.rename');
+
+    Route::delete('organizations/{id}/units/{unitId}', 'OrgPortalAdminController@deleteUnit')
+        ->name('orgportal.admin.units.delete');
+
     Route::get('customers/search', 'OrgPortalAdminController@searchCustomers')
         ->name('orgportal.admin.customers.search');
 
@@ -49,6 +70,21 @@ Route::group([
 
     Route::get('api-docs', 'OrgPortalAdminController@apiDocs')
         ->name('orgportal.admin.api-docs');
+
+    Route::get('settings', 'OrgPortalAdminController@globalSettings')
+        ->name('orgportal.admin.settings');
+
+    Route::post('settings', 'OrgPortalAdminController@saveGlobalSettings')
+        ->name('orgportal.admin.settings.save');
+
+    Route::post('system/backfill', 'OrgPortalAdminController@runBackfill')
+        ->name('orgportal.admin.system.backfill');
+
+    Route::post('system/reset-attribution', 'OrgPortalAdminController@resetAttribution')
+        ->name('orgportal.admin.system.reset-attribution');
+
+    Route::post('system', 'OrgPortalAdminController@saveSystemSettings')
+        ->name('orgportal.admin.system.save');
 });
 
 // ─── Per-mailbox admin routes ─────────────────────────────────────────────────
@@ -85,6 +121,36 @@ if (\Module::isActive('apiwebhooks')) {
 
         Route::delete('organizations/{id}', 'OrgPortalApiController@deleteOrganization')
             ->name('orgportal.api.organizations.delete');
+
+        Route::get('organizations/{id}/members', 'OrgPortalApiController@listMembers')
+            ->name('orgportal.api.members.list');
+
+        Route::get('organizations/{id}/members/{memberId}', 'OrgPortalApiController@getMember')
+            ->name('orgportal.api.members.get');
+
+        Route::put('organizations/{id}/members/{memberId}', 'OrgPortalApiController@updateMember')
+            ->name('orgportal.api.members.update');
+
+        Route::delete('organizations/{id}/members/{memberId}', 'OrgPortalApiController@deleteMember')
+            ->name('orgportal.api.members.delete');
+
+        Route::get('organizations/{id}/tags', 'OrgPortalApiController@listTags')
+            ->name('orgportal.api.tags.list');
+
+        Route::put('organizations/{id}/tags', 'OrgPortalApiController@setTags')
+            ->name('orgportal.api.tags.set');
+
+        Route::get('organizations/{id}/units', 'OrgPortalApiController@listUnits')
+            ->name('orgportal.api.units.list');
+
+        Route::post('organizations/{id}/units', 'OrgPortalApiController@createUnit')
+            ->name('orgportal.api.units.create');
+
+        Route::put('units/{unitId}', 'OrgPortalApiController@updateUnit')
+            ->name('orgportal.api.units.update');
+
+        Route::delete('units/{unitId}', 'OrgPortalApiController@deleteUnit')
+            ->name('orgportal.api.units.delete');
 
         Route::get('customers/{customerId}/organization', 'OrgPortalApiController@getCustomerOrganization')
             ->name('orgportal.api.customer.org.get');
@@ -139,5 +205,30 @@ Route::group([
 
     Route::post('settings', 'OrgPortalFrontController@saveSettings')
         ->name('orgportal.portal.settings.save');
+
+    // Structure management (global manager only — enforced in controller)
+    Route::post('units', 'OrgPortalFrontController@createUnit')
+        ->name('orgportal.portal.units.create');
+
+    Route::put('units/{unit_id}', 'OrgPortalFrontController@renameUnit')
+        ->name('orgportal.portal.units.rename');
+
+    Route::delete('units/{unit_id}', 'OrgPortalFrontController@deleteUnit')
+        ->name('orgportal.portal.units.delete');
+
+    Route::post('members/{member_id}', 'OrgPortalFrontController@updateMember')
+        ->name('orgportal.portal.members.update');
+
+    Route::post('members/{member_id}/toggle-active', 'OrgPortalFrontController@toggleMemberActive')
+        ->name('orgportal.portal.members.toggle');
+
+    // In-portal notifications
+    Route::get('notifications', 'OrgPortalNotificationController@index')
+        ->name('orgportal.portal.notifications.index');
+    Route::post('notifications/read-all', 'OrgPortalNotificationController@markAllRead')
+        ->name('orgportal.portal.notifications.read-all');
+    Route::post('notifications/{conversation_id}/read', 'OrgPortalNotificationController@markRead')
+        ->name('orgportal.portal.notifications.read')
+        ->where('conversation_id', '[0-9]+');
 });
 endif;

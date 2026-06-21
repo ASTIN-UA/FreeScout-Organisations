@@ -8,6 +8,7 @@ class AddMailboxIdToOrganizationsTable extends Migration
 {
     public function up()
     {
+        if (Schema::hasColumn('organizations', 'mailbox_id')) return;
         Schema::table('organizations', function (Blueprint $table) {
             $table->unsignedInteger('mailbox_id')->nullable()->default(null)->after('id');
             $table->index('mailbox_id');
@@ -16,6 +17,7 @@ class AddMailboxIdToOrganizationsTable extends Migration
 
     public function down()
     {
+        if (!Schema::hasColumn('organizations', 'mailbox_id')) return;
         Schema::table('organizations', function (Blueprint $table) {
             $table->dropIndex(['mailbox_id']);
             $table->dropColumn('mailbox_id');

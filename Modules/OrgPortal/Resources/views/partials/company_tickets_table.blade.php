@@ -32,6 +32,12 @@
         \App\Conversation::STATUS_CLOSED  => 'text-muted',
         \App\Conversation::STATUS_SPAM    => 'text-danger',
     ];
+    $statusIcon = [
+        \App\Conversation::STATUS_ACTIVE  => 'glyphicon-ok-circle',
+        \App\Conversation::STATUS_PENDING => 'glyphicon-time',
+        \App\Conversation::STATUS_CLOSED  => 'glyphicon-lock',
+        \App\Conversation::STATUS_SPAM    => 'glyphicon-ban-circle',
+    ];
 
     // Kanban: load card column IDs + column name map (one query each, no N+1)
     $kanbanActive   = \Module::isActive('kanban');
@@ -62,9 +68,16 @@
             $cfRaw = \Option::get('orgportal.company_filters', '[]');
         }
         $companyFilters = is_array($cfRaw) ? $cfRaw : (json_decode($cfRaw, true) ?: []);
+        $cfLocale = app()->getLocale();
         foreach ($companyFilters as $cf) {
             $cfId = (int) ($cf['id'] ?? 0);
-            if ($cfId && !empty($cf['label'])) {
+            if (!$cfId) continue;
+            if (!empty($cf['labels'])) {
+                $knColumnNames[$cfId] = $cf['labels'][$cfLocale]
+                    ?? $cf['labels']['en']
+                    ?? $cf['name']
+                    ?? '';
+            } elseif (!empty($cf['label'])) {
                 $knColumnNames[$cfId] = $cf['label'];
             }
         }
@@ -72,7 +85,109 @@
 @endphp
 
 @if($conversations->count())
-<table class="table-conversations table eup-table-tickets" style="table-layout:fixed;width:100%">
+<style>
+/* Mobile/tablet cards vs desktop table toggle (inline — EUP layout does not load module.css) */
+@media (max-width: 991px) {
+    .otm-desktop-table { display: none !important; }
+}
+@media (min-width: 992px) {
+    .otm-mobile-list { display: none !important; }
+}
+
+.otm-mobile-list { margin-bottom: 16px; }
+.otm-card {
+    position: relative;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 11px 13px;
+    margin-bottom: 10px;
+    background: #fff;
+}
+.otm-card:hover { background: #f9fafb; }
+.otm-card.otm-unread { border-left: 4px solid #337ab7; padding-left: 10px; }
+
+/* Stretched link covers the whole card → click anywhere opens the ticket */
+.otm-card-link {
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    z-index: 1;
+}
+
+/* Interactive elements (author filter) sit above the stretched link */
+.otm-card-row1,
+.otm-subject,
+.otm-card-row3 { position: relative; }
+.otm-author-link { position: relative; z-index: 2; }
+
+.otm-card-row1 { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.otm-num { font-weight: 700; color: #6b7280; font-size: 12px; white-space: nowrap; }
+.otm-author {
+    color: #6b7280; font-size: 12px; flex: 1;
+    overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+.otm-author-link { color: #337ab7; }
+.otm-status { font-size: 12px; white-space: nowrap; margin-left: auto; }
+.otm-status .glyphicon { font-size: 11px; margin-right: 2px; }
+
+.otm-subject {
+    font-size: 15px; font-weight: 500; color: #111827;
+    line-height: 1.35; margin-bottom: 8px; word-break: break-word;
+}
+
+.otm-card-row3 { display: flex; justify-content: space-between; align-items: flex-end; }
+.otm-meta-left { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: #6b7280; }
+.otm-meta-left .glyphicon { font-size: 12px; margin-right: 3px; }
+.otm-meta-right { text-align: right; font-size: 12px; color: #9ca3af; line-height: 1.4; }
+.otm-meta-right .otm-time { display: block; }
+</style>
+
+{{-- ── Mobile card list ───────────────────────────────────────────── --}}
+<div class="otm-mobile-list">
+    @foreach($conversations as $conversation)
+    @php
+        $ticketUrl  = route('orgportal.portal.ticket', ['mailbox_id' => $mailbox_id, 'conversation_id' => $conversation->id]);
+        $subjectText = $conversation->getSubject() ?: __('orgportal::messages.no_subject');
+        $authorName  = $conversation->customer ? $conversation->customer->getFullName() : '';
+        $authorUrl   = $conversation->customer_id ? $authorBase . '&author_id=' . $conversation->customer_id : null;
+        $convStatusClass = $statusClass[$conversation->status] ?? 'text-success';
+        $convStatusKey   = $statusLangKey[$conversation->status] ?? 'status_active';
+        $convStatusIcon  = $statusIcon[$conversation->status] ?? 'glyphicon-ok-circle';
+    @endphp
+    <div class="otm-card @if($conversation->manager_has_unread ?? false) otm-unread @endif">
+        <a class="otm-card-link" href="{{ $ticketUrl }}" aria-label="#{{ $conversation->number }}"></a>
+        <div class="otm-card-row1">
+            <span class="otm-num">#{{ $conversation->number }}</span>
+            @if($authorName)
+                @if($authorUrl)
+                    <a class="otm-author otm-author-link" href="{{ $authorUrl }}"
+                       title="{{ __('orgportal::messages.filter_by_author') }}: {{ $authorName }}">{{ $authorName }}</a>
+                @else
+                    <span class="otm-author">{{ $authorName }}</span>
+                @endif
+            @endif
+            <span class="otm-status {{ $convStatusClass }}">
+                <i class="glyphicon {{ $convStatusIcon }}"></i>{{ __('orgportal::messages.' . $convStatusKey) }}
+            </span>
+        </div>
+        <div class="otm-subject">{{ $subjectText }}</div>
+        <div class="otm-card-row3">
+            <div class="otm-meta-left">
+                <span><i class="glyphicon glyphicon-comment"></i>{{ $conversation->threads_count }}</span>
+                @if($conversation->author_has_unread ?? false)
+                    <span title="{{ __('orgportal::messages.author_not_read') }}"><i class="glyphicon glyphicon-eye-close"></i></span>
+                @endif
+            </div>
+            <div class="otm-meta-right">
+                <span class="otm-date">{{ \EndUserPortal::dateFormat($conversation->last_reply_at, 'M j, Y') }}</span>
+                <span class="otm-time">{{ \EndUserPortal::dateFormat($conversation->last_reply_at, 'H:i') }}</span>
+            </div>
+        </div>
+    </div>
+    @endforeach
+</div>
+
+{{-- ── Desktop table ──────────────────────────────────────────────── --}}
+<table class="table-conversations table eup-table-tickets otm-desktop-table" style="table-layout:fixed;width:100%">
     <colgroup>
         <col style="width:6px">
         <col style="width:58px">
@@ -106,7 +221,7 @@
             <span>{{ __('orgportal::messages.responsible') }}</span>
         </th>
         <th class="conv-number" style="vertical-align:middle">&nbsp;</th>
-        <th style="vertical-align:middle;text-align:center">
+        <th class="conv-author" style="vertical-align:middle;text-align:center">
             <span>{{ __('orgportal::messages.author') }}</span>
         </th>
         <th style="vertical-align:middle;text-align:center">
@@ -142,7 +257,7 @@
             $convStatusKey   = $statusLangKey[$conversation->status]   ?? 'status_active';
             $convStatusClass = $statusClass[$conversation->status] ?? 'text-success';
         @endphp
-        <tr class="conv-row @if(\EndUserPortal::hasNewReplies($conversation)) conv-active @endif"
+        <tr class="conv-row @if($conversation->manager_has_unread ?? false) conv-active @endif"
             data-conversation_id="{{ $conversation->id }}">
             <td class="conv-current"></td>
             <td class="conver-number">#{{ $conversation->number }}</td>
@@ -180,7 +295,11 @@
                 <a href="{{ $ticketUrl }}"><span>{{ $conversation->threads_count }}</span></a>
             </td>
             <td class="conv-number">
-                <a href="{{ $ticketUrl }}">@if(\EndUserPortal::hasNewReplies($conversation))<span class="glyphicon glyphicon-envelope text-help"></span>@endif</a>
+                <a href="{{ $ticketUrl }}">
+                    @if($conversation->author_has_unread ?? false)
+                        <span class="glyphicon glyphicon-eye-close text-muted" title="{{ __('orgportal::messages.author_not_read') }}"></span>
+                    @endif
+                </a>
             </td>
             <td style="text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:0;"
                 title="{{ $authorName }}">

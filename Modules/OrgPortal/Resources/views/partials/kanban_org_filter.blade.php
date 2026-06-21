@@ -147,13 +147,16 @@
         // Re-apply filter after Kanban AJAX board reload
         var board = document.getElementById('kn-board');
         if (board) {
-            new MutationObserver(function () {
+            var observer = new MutationObserver(function () {
+                observer.disconnect();
                 setTimeout(function () {
                     repositionBadges();
                     var ids = getSelected();
                     if (ids.length) applyFilter(ids);
-                }, 80);
-            }).observe(board, { childList: true, subtree: false });
+                    observer.observe(board, { childList: true, subtree: true });
+                }, 150);
+            });
+            observer.observe(board, { childList: true, subtree: true });
         }
     }
 

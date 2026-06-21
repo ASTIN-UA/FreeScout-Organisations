@@ -1,338 +1,515 @@
-# OrgPortal — Portál organizace pro FreeScout
+# OrgPortal — B2B modul pro správu organizací ve FreeScoutu
 
-<img src="../Modules/OrgPortal/logo.png" alt="OrgPortal" width="140" align="right">
+[← Zpět na README](../README.md)
 
-Modul FreeScout, který přidává koncept **Organizací** (společnosti/týmy) ke zákazníkům, rozšiřuje End-User Portal pro manažery a zobrazuje odznak organizace na lístcích a kartách Kanban.
+<img src="Modules/OrgPortal/logo.png" alt="OrgPortal — FreeScout B2B modul" width="140" align="right">
 
-**Minimální verze FreeScout:** 1.8.147  
-**Závislosti:** žádné vyžadované  
-**Volitelné:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API a Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
+**OrgPortal** je modul pro FreeScout, který přidává kompletní **B2B správu organizací** do vašeho helpdesku: seskupte zákazníky do firem, definujte firemní hierarchie, dejte firemním manažerům samoobslužný portál a automatizujte notifikace — vše přímo ve FreeScoutu, bez externích nástrojů.
 
-🌐 **Jazyk:** [English](../README.md) · [Українська](README.uk.md) · [Deutsch](README.de.md) · [Français](README.fr.md) · [Español](README.es.md) · [Italiano](README.it.md) · [Polski](README.pl.md) · [Čeština](README.cs.md) · [Slovenčina](README.sk.md) · [Nederlands](README.nl.md) · [Norsk](README.no.md) · [Dansk](README.da.md) · [Svenska](README.sv.md) · [Suomi](README.fi.md) · [Português (BR)](README.pt-BR.md) · [Português (PT)](README.pt-PT.md) · [Română](README.ro.md) · [中文 (简体)](README.zh-CN.md)
+> Hledáte způsob, jak spravovat firemní účty ve FreeScoutu? Jak dát firemním klientům vlastní portál podpory? Jak řídit, které tickety může každý B2B kontakt vidět na základě své role a oddělení? OrgPortal to vše řeší.
+
+**Funguje s:** FreeScout 1.8.147+  
+**Volitelné integrace:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
 
 ---
 
-## Funkce
+🌐 **Také dostupné v:**
+[Українська](docs/README.uk.md) ·
+[Deutsch](docs/README.de.md) ·
+[Français](docs/README.fr.md) ·
+[Español](docs/README.es.md) ·
+[Italiano](docs/README.it.md) ·
+[Polski](docs/README.pl.md) ·
+[Čeština](docs/README.cs.md) ·
+[Slovenčina](docs/README.sk.md) ·
+[Nederlands](docs/README.nl.md) ·
+[Norsk](docs/README.no.md) ·
+[Dansk](docs/README.da.md) ·
+[Svenska](docs/README.sv.md) ·
+[Suomi](docs/README.fi.md) ·
+[Português (BR)](docs/README.pt-BR.md) ·
+[Português (PT)](docs/README.pt-PT.md) ·
+[Română](docs/README.ro.md) ·
+[中文 (简体)](docs/README.zh-CN.md)
 
-### Správa organizací (admin)
-- **Správa → Organizace** — kompletní CRUD: vytvoření, úprava, odstranění organizací
-- **Vazba na poštovní schránku** — organizace může být **globální** (viditelná ve všech poštovních schránkách) nebo **vázána na konkrétní schránku**; odpovídající popisek se zobrazí v seznamu organizací
-- Přiřaďte zákazníkům organizace s výběrem role: `Člen` nebo `Manažer`
-- **Změna role člena** přímo v tabulce (bez odebrání a opětovného přidání)
-- Vyhledávání zákazníka s automatickým doplňováním podle jména nebo e-mailu; zákazníci, již v organizaci, jsou vyloučeni z výsledků
-- E-mail člena se zobrazuje pod jménem v tabulce členů
-- Jeden zákazník — jedna organizace (vynuceno na úrovni databáze a API)
-- **Barva odznáku** — vizuální paleta s 12 barvami v editačním formuláři organizace; výchozí barva je šedá
+---
 
-### Uživatelská oprávnění
-- Nové oprávnění **"Povolení správy organizací"** — neadministrátoři s tímto oprávněním mají přístup na stránky seznamu, vytvoření a úpravy organizací
-- Mazání organizací zůstává vyhrazeno administrátorům
+## Co OrgPortal přidává do FreeScoutu
 
-### Karta zákazníka
-- Pole **Organizace** v editačním formuláři zákazníka — vyberte organizaci a roli
-- Tlačítko **Lístky organizace** — otevře vyhledávání všech lístků organizace
+FreeScout je postaven okolo jednotlivých zákazníků — každý e-mail je od konkrétní osoby a neexistuje žádný vestavěný koncept firmy, pro kterou tato osoba pracuje. Pro B2C helpdesky to funguje dobře. Pro B2B to nestačí.
 
-### Odznak organizace na lístcích
-- Zobrazen pod předmětem na stránce lístku a v seznamu konverzací
-- Kliknutelný — otevře vyhledávání všech lístků této organizace
-- Barva odznáku se určuje podle nastavení organizace (výchozí šedá)
-- Zapnutí/vypnutí **na poštovní schránku** přes **Nastavení poštovní schránky → OrgPortal**; globální hodnota se používá jako záloha
+OrgPortal tuto mezeru vyplňuje:
 
-### Odznak organizace na kartách Kanban
-- Zobrazen za čítačem zpráv na každé kartě
-- Kliknutelný — vede na vyhledávání organizace
-- Barva odpovídá nastavení organizace
-- Filtr **Organizace** vestavěný do standardního rozbalovacího seznamu Kanban filtrů: modální okno se zaškrtávacími poli, podobné filtru Značky; stav se zachovává mezi navigací
-- Zapnutí/vypnutí **na poštovní schránku** přes **Nastavení poštovní schránky → OrgPortal**
+- **Firemní účty** — seskupte zákazníky do organizací s názvem, barevným odznakem, vazbou na schránku a stavem aktivní/neaktivní
+- **Firemní hierarchie** — rozdělte organizace na strukturální jednotky (oddělení, pobočky, týmy); každý člen je přiřazen ke své jednotce
+- **Přístup podle rolí** — `member` vidí pouze vlastní tickety; `unit_manager` vidí celou jednotku; `manager` vidí celou organizaci
+- **Firemní samoobslužný portál** — manažeři vidí všechny firemní tickety, odpovídají, uzavírají, přeřazují autory a spravují notifikace bez nutnosti kontaktovat váš tým
+- **Trvalé přiřazení ticketů** — každý ticket je při vytvoření snapshotován do organizace; historické reporty přežijí změny v seznamu klientů
+- **Vícejazyčné notifikace** — automatické e-mailové upozornění v jazyce každého manažera, s šablonami pro jednotlivá jazyková nastavení a vestavěným WYSIWYG editorem
+- **REST API** — synchronizujte členství z vašeho CRM, automatizujte onboarding, spravujte tagy programaticky
 
-### Filtr vyhledávání organizace
-- Rozšiřuje standardní vyhledávání FreeScout o filtr **Organizace**
-- Zobrazuje všechny lístky zákazníků patřících do vybrané organizace
+---
 
-### End-User Portal — přístup manažerů *(volitelné)*
+## Organizace
 
-Manažer organizace má rozšířený přístup přes EUP:
+*Jedno místo pro vše, co se týká firemního účtu.*
 
-- Položka **Lístky společnosti** v navigaci portálu
-- Tabulka lístků společnosti se sloupci:
-  - **#** a **Předmět** s řezáním tří teček a tooltipem při najetí myší
-  - **Zodpovědný** — přidělený agent
-  - **Autor** — zákazník, který otevřel lístek; kliknutí filtruje lístky podle autora v organizaci
-  - **Stav** — Aktivní / Čekající / Uzavřeno / Spam se symboly
-  - **Stav** — název sloupce Kanban (s vlastním popiskem, je-li nakonfigurován); zobrazeno pouze při aktivním modulu Kanban
-  - **Aktualizováno** — datum a čas poslední odpovědi
-- Vyhledávání v předmětu lístku
-- Filtrování podle stavu Kanban (konfigurovatelné přes **Nastavení poštovní schránky → OrgPortal**)
-- Odpověď na lístek s podporou **Příloh** (Drag & Drop, více souborů)
-- **Zavřít lístek** — manažer může zavřít lístek; nová odpověď jej automaticky znovu otevře
-- Změna autora lístku — přiřazení lístku jinému členu organizace
-- Stránka **Nastavení org.** pro konfiguraci e-mailových oznámení
-- Přístup k lístků je **přísně omezen na aktuální poštovní schránku** (organizace zkopírovaná do jiné schránky — portál 403)
+**Manage → Organizations** otevírá rozhraní s kartami se třemi sekcemi: Organizations, Templates a System.
 
-### E-mailová oznámení *(volitelné)*
-- Manažeři s aktivovanou možností obdrží e-mail, když člen organizace vytvoří nový lístek
-- Používá poštovní driver odpovídající poštovní schránky
+### Seznam organizací
 
-### Nastavení poštovní schránky
+- **Vytváření, úprava, mazání, aktivace/deaktivace** organizací
+- **Filtr stavu** — přepínání mezi Active / Inactive / All pomocí skupiny přepínačů; okamžitě filtruje tabulku na straně klienta
+- **Živé vyhledávání** — filtrování začíná při 2+ znacích, bez obnovení stránky
+- **Barevně označené odznaky** — interaktivní výběr barev s 12 vzorky a živým náhledem odznaku vedle výběru; odznak se zobrazuje na každém ticketu a kartě Kanbanu
+- Kliknutím na odznak nebo počet ticketů se otevře vyhledávání ve FreeScoutu filtrované pro danou organizaci
+- **Vazba na schránku** — organizace mohou být globální (všechny schránky) nebo omezené na konkrétní schránku
+- **Sloupec Tags** — zobrazuje ✓/✗, zda jsou k organizaci přiřazeny nějaké FreeScout tagy (vyžaduje modul Tags); tagy se přiřazují ve formuláři pro úpravy pomocí widgetu s čipy a vyhledáváním s automatickým doplňováním
+- **Sloupec počtu ticketů** — celkový počet konverzací pro organizaci; klikací odkaz na úplné výsledky vyhledávání
+- **Sloupec počtu členů**
+- **Aktivovat / deaktivovat** — pozastavit účet bez ztráty historie; vyžaduje, aby byl povolen Org Snapshot (tlačítko je deaktivováno s popisem, pokud není)
+- **Smazat** — dostupné pouze tehdy, když má organizace 0 členů a 0 ticketů (ochranné opatření)
+- Všechny akce mazání a deaktivace vyžadují potvrzení
 
-**Nastavení poštovní schránky → OrgPortal** (na poštovní schránku):
+![Seznam organizací — filtr stavu, živé vyhledávání, barevné odznaky, tagy, počty ticketů](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-list.png)
 
-| Možnost | Popis |
+### Formulář pro úpravu organizace
+
+- **Název** a **vazba na schránku**
+- **Výběr barvy** — 12 vzorků s živým náhledem odznaku
+- **Tags** — widget s čipy: vyhledávejte stávající FreeScout tagy, klikněte pro přidání, × pro odebrání
+- **Tabulka členů** — pro každého člena: jméno, role, strukturální jednotka, zaškrtávací políčko `can_manage_org` (uděluje administrátorský přístup k organizacím bez plných administrátorských práv), přepínač aktivní/neaktivní
+- **Panel strukturálních jednotek** — vytvářejte a přejmenovávejte jednotky přímo ve formuláři pro úpravy; členové jsou přiřazováni k jednotkám ve stejném zobrazení
+- **Přidání člena** — automaticky doplní stávající nepřiřazené konverzace daného zákazníka
+
+![Úprava organizace — výběr barvy, čipy tagů, tabulka členů s rolemi a jednotkami](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png)
+
+### Integrace s profilem zákazníka
+
+- **Pole organizace ve formuláři pro úpravu zákazníka ve FreeScoutu** — živé vyhledávání s automatickým doplňováním pro organizace; po výběru organizace se zobrazí rozbalovací seznam rolí; tlačítko × pro odebrání
+- Zkratkový odkaz **„Zobrazit tickety organizace"** ve formuláři zákazníka
+- **Informační blok organizace v postranním panelu administrátorského ticketu** — název organizace (klikací odkaz na stránku úpravy organizace), strukturální jednotka a role člena; přepínání viditelnosti pro každou schránku v nastavení
+- **Jedno aktivní členství na zákazníka** — zákazníka nelze přidat do druhé organizace, pokud má aktivní členství; neaktivní/archivovaná členství jsou povolena
+
+![Úprava zákazníka — pole organizace s automatickým doplňováním a výběrem role](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/customer-org-field.png)
+
+---
+
+## Strukturální jednotky — Řízení přístupu na úrovni oddělení
+
+*Podpora velkých podniků se složitými interními hierarchiemi.*
+
+Organizace lze rozdělit na neomezený počet **strukturálních jednotek** (oddělení, pobočky, regionální kanceláře, projektové týmy):
+
+- Vytvářejte, přejmenovávejte a mažte jednotky ve formuláři pro úpravu administrátorské organizace nebo přímo z portálu (pouze globální manažeři)
+- Přiřazujte členy k jednotkám — každý člen patří do jedné jednotky
+- **Smazání jednotky** automaticky sníží roli jejích členů `unit_manager` na `member`
+
+**Tři úrovně rolí:**
+
+| Role | Rozsah přístupu |
+|------|----------------|
+| `member` | Pouze vlastní tickety |
+| `unit_manager` | Všechny tickety v rámci strukturální jednotky |
+| `manager` (globální) | Všechny tickety v celé organizaci |
+
+- Manažeři jednotek mají plné možnosti portálu — odpovědi, přílohy, přeřazení autora, uzavření/znovuotevření, správa notifikací — omezené striktně na jejich jednotku
+- Přístup k ticketům a doručování notifikací jsou vynuceny na hranicích jednotek
+
+![Úprava organizace — členové s rolemi a jednotkami, panel správy jednotek](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png)
+
+---
+
+## Org Snapshot — Trvalé přiřazení ticketů
+
+*Spolehlivé historické reporty i při změnách v seznamu klientů.*
+
+Když je vytvořen ticket, OrgPortal zaznamená kontext organizace jako trvalý snapshot:
+
+- `org_id`, `org_unit_id` a `org_attributed_at` jsou zapsány do konverzace v okamžiku vytvoření
+- **Neměnné** — pokud zákazník organizaci opustí, jeho historické tickety zůstanou přiřazeny k dané organizaci; reporty se nikdy nenaruší
+- **Přidání člena** spustí automatické doplnění stávajících nepřiřazených konverzací daného zákazníka
+
+### Zdroj přiřazení — tři režimy
+
+Konfigurováno v **Manage → Organizations → záložka System**:
+
+| Režim | Chování |
+|-------|---------|
+| `member` | Přiřadit ticket k organizaci, jejímž členem je autor ticketu |
+| `tag` | Přiřadit nejprve podle FreeScout tagu přiřazeného k organizaci; pokud se tag neshoduje, použít členství jako záložní možnost |
+| `tag_only` | Přiřazovat výhradně podle tagu; členství se nepoužívá |
+
+Režimy `tag` a `tag_only` jsou deaktivovány, pokud není aktivní modul Tags.
+
+### Nástroje pro doplnění
+
+- **Ukazatel průběhu** — zobrazuje X / Y přiřazených ticketů (%) s indikátorem „dokončeno" po skončení
+- **Předletové statistiky** — před spuštěním doplnění se zobrazí přehled počtu ticketů přiřazených podle tagu vs. podle členství vs. nepřiřazených
+- Tlačítko **Spustit doplnění** — zpracuje až 2000 ticketů na kliknutí; po dokončení se zobrazí souhrn výsledků (by_tag / by_member / unmatched)
+- **Auto-cron** (`attribution_cron_enabled`) — plánuje doplnění každých 5 minut, 1000 ticketů na spuštění, bez překrývání
+- **Resetovat přiřazení** — vymaže všechny snapshoty organizací (nebezpečná akce, vyžaduje potvrzení)
+- Příkazová řádka: `php artisan orgportal:backfill-attribution`
+
+![Záložka System — zdroj přiřazení, ukazatel průběhu, předletové statistiky, ovládací prvky doplnění](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/attribution-settings.png)
+
+---
+
+## Integrace s Kanbanem
+
+*Udržujte vizuální pracovní postup v souladu s vašimi B2B účty.*
+
+- Odznak organizace na každé kartě Kanbanu s přiřazenou barvou účtu
+- **Filtr organizace** v panelu filtrů Kanbanu — modální okno s vícenásobným výběrem a zaškrtávacími políčky; stav filtru se zachovává při navigaci
+- **Vícejazyčné štítky filtrů stavu Kanbanu** — pojmenujte každý sloupec Kanbanu vlastním názvem pro každý jazyk portálu; přepínejte jazyky pomocí výběru jazyka v nastavení schránky; přetažením změňte pořadí filtrů
+- Přeložené štítky se zobrazují jak v panelu filtrů portálu, tak ve sloupci **Stav** tabulky firemních ticketů; záložní řetězec: uložené nastavení jazyka → uložená angličtina → původní název sloupce
+
+![Kanban — odznaky organizací na kartách a modální okno filtru organizace](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
+
+---
+
+## Řízení přístupu a oprávnění
+
+*Delegujte správu organizace bez udělení administrátorského přístupu.*
+
+- **„Povolit správu organizací"** (`can_manage_org`) — dvě úrovně:
+  - Jako **uživatelské oprávnění** v nastavení agenta — umožní vedoucímu týmu podpory spravovat všechny organizace bez administrátorských práv
+  - Jako **příznak pro konkrétního člena** ve formuláři pro úpravu organizace — umožní konkrétnímu členu organizace spravovat tuto jednu organizaci z administrátorského panelu
+- **„Povolit správu šablon notifikací"** — oddělené granulární oprávnění pro úpravy šablon
+- Mazání organizací zůstává výhradně pro administrátory
+- Přístup k portálu je striktně omezen na schránku: manažer z organizace A nemůže přistupovat k organizaci B
+
+![Granulární oprávnění — povolení správy organizací a šablon notifikací](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/user-permissions.png)
+
+---
+
+## Systémová nastavení — Manage → Organizations → záložka System
+
+*Ovládací prvky pouze pro administrátory pro přiřazení, doplnění a přepínač jazyka portálu.*
+
+Záložka **System** je viditelná pouze administrátorům FreeScoutu.
+
+### Panel 1: Přiřazení ticketů
+
+Viz [Org Snapshot](#org-snapshot--trvalé-přiřazení-ticketů) výše pro úplný popis režimů přiřazení, nástrojů pro doplnění a auto-cronu.
+
+### Panel 2: Přepínač jazyka portálu
+
+- **Povolení/zakázání** přepínače jazyka v navigační liště End-User Portal
+- **Výběr, které z 19 jazykových nastavení** nabídnout (mřížka zaškrtávacích políček); ve výchozím nastavení jsou povolena všechna
+- Pokud je povoleno, manažeři mohou přepnout jazyk portálu; jejich volba se uloží a použije pro notifikační e-maily
+- Toto je vestavěný přepínač jazyka OrgPortalu — funguje nezávisle na jakémkoli modulu pro přepínání jazyka třetí strany; oba mohou koexistovat
+
+![Záložka System — panel přepínače jazyka portálu se zaškrtávacími políčky pro jazyková nastavení](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/system-settings.png)
+
+---
+
+## End-User Portal — Samoobsluha pro firemní manažery *(volitelné)*
+
+*Dejte svým B2B klientům portál, kde spravují podpůrný vztah své firmy — bez nutnosti kontaktovat váš tým při každé aktualizaci stavu.*
+
+Vyžaduje modul [End-User Portal](https://freescout.net/module/end-user-portal/).
+
+### Přehled firemních ticketů
+
+Vyhrazená sekce **Firemní tickety** v navigaci portálu s plně vybavenou tabulkou ticketů:
+
+| Sloupec | Popis |
 |---------|-------|
-| Zobrazit odznak na stránce lístku | Zapnutí/vypnutí odznáku v této schránce |
-| Zobrazit odznak na kartách Kanban | Zapnutí/vypnutí odznáku v této schránce |
-| Filtry stavu lístků společnosti | Vyberte sloupce Kanban zobrazené jako zaškrtávací pole na stránce lístků; vlastní popisek pro každý filtr |
+| **#** | ID ticketu |
+| **Předmět** | Zkráceno s popisem při najetí myší |
+| **Zodpovědný** | Přiřazený agent podpory |
+| **Autor** | Zákazník, který ticket otevřel; kliknutím filtrovat podle tohoto autora |
+| **Stav** | Aktivní / Čekající / Uzavřeno / Spam s ikonami |
+| **Stav Kanbanu** | Název sloupce Kanbanu v aktuálním jazyce portálu (pouze pokud je aktivní modul Kanban) |
+| **Aktualizováno** | Datum a čas poslední odpovědi |
+
+**Dva nezávislé indikátory stavu přečtení v každém řádku** — sledují dvě různé osoby a zobrazují se současně:
+
+| Indikátor | Čí stav přečtení | Co znamená |
+|-----------|------------------|------------|
+| **Tučný řádek** | Manažer prohlížející portál | Manažer má nepřečtené notifikace pro tuto konverzaci — něco se stalo, co ještě neviděl |
+| **Ikona 👁 oka** | Autor ticketu (zákazník, který ho podal) | Autor dosud neotevřel nejnovější odpověď agenta — užitečné pro zjištění, zda klient odpověď skutečně viděl |
+
+Tyto dva stavy jsou zcela nezávislé: řádek může být tučný (manažer nepřečetl), zatímco oko chybí (autor již přečetl), nebo naopak. Manažer vidí obě informace současně a získává tak úplný přehled o tom, co se děje na obou stranách ticketu, aniž by ho musel otevřít.
+
+**Filtr autora** — kliknutím na jméno autora se aktivuje filtr; v horní části tabulky se zobrazí banner se jménem aktivního autora s odkazem × pro zrušení filtru.
+
+Zahrnuje jak desktopovou tabulku, tak responzivní **mobilní rozložení karet**; automaticky se přepínají podle šířky obrazovky.
+
+Šablona panelu filtrů podporuje **přepsání** pomocí `enduserportal::partials.tickets_filters` — umístěte vlastní zobrazení na tuto cestu a nahraďte výchozí panel filtrů OrgPortalu při zachování veškeré ostatní funkčnosti.
+
+![Firemní tickety — úplná tabulka s indikátory přečtení, bannerem filtru autora, filtry stavu](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-tickets.png)
+
+### Akce s tickety v portálu
+
+Manažeři mohou jednat přímo — bez nutnosti kontaktovat podporu:
+
+- **Odpovědět s přílohami** — přetáhnout a pustit, více souborů na odpověď; názvy příloh a velikosti souborů zobrazeny v každém vláknu
+- **Uzavřít ticket** — nová odpověď ho automaticky znovu otevře; banner informuje manažera o tomto chování, když je ticket uzavřen
+- **Změnit autora ticketu** — přeřadit ticket na jiného člena organizace
+- **Filtrovat podle jednotky** — globální manažeři filtrují seznam ticketů podle strukturální jednotky
+- **Filtrovat podle stavu Kanbanu** — konfigurovatelné pro každou schránku, štítky zobrazeny v aktuálním jazyce portálu
+
+![Zobrazení ticketu v portálu — formulář odpovědi s přílohami metodou drag & drop a bannerem uzavřeného ticketu](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-reply.png)
+
+### Sledování zobrazení manažerem
+
+- Pod odpověďmi agentů v administrátorském zobrazení ticketu se zobrazí poznámka **„zobrazeno"**, když manažer otevře ticket v portálu
+- Zobrazuje jméno manažera, roli (Manažer organizace / Manažer jednotky) a uplynulý čas
+- Zobrazení globálního manažera a manažera jednotky jsou sledována a zobrazena nezávisle — stejné UX jako nativní „Zákazník zobrazil" ve FreeScoutu
+
+![Sledování zobrazení manažerem — poznámka „zobrazeno" se zobrazí pod odpovědí agenta v administrátorském zobrazení ticketu](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/manager-viewed.png)
 
 ---
 
-### REST API *(volitelné, vyžaduje API a Webhooks)*
+## Notifikační zvon v reálném čase *(volitelné)*
 
-Ověření — hlavička `X-FreeScout-API-Key` nebo parametr dotazu `api_key`.
+*Informujte manažery okamžitě, jakmile se něco stane s tickety jejich firmy.*
 
-> **Interaktivní dokumentace** (ReDoc) je dostupná na stránce **Správa → API a Webhooks** (odkaz "Dokumentace OrgPortal API") nebo přímo na `/orgportal/admin/api-docs`.
+Vyžaduje modul [End-User Portal](https://freescout.net/module/end-user-portal/).
 
-| Metoda | Koncový bod | Popis |
-|--------|-------------|-------|
-| `GET` | `/api/organizations` | Seznam organizací (stránkování, filtr poštovní schránky) |
-| `POST` | `/api/organizations` | Vytvoří organizaci |
-| `GET` | `/api/organizations/{id}` | Získá organizaci se členy |
-| `PUT` | `/api/organizations/{id}` | Aktualizuje organizaci |
-| `DELETE` | `/api/organizations/{id}` | Smaže organizaci |
-| `GET` | `/api/customers/{id}/organization` | Organizace zákazníka |
-| `PUT` | `/api/customers/{id}/organization` | Nastaví/aktualizuje členství zákazníka |
-| `DELETE` | `/api/customers/{id}/organization` | Odebere zákazníka z organizace |
+- 🔔 Ikona zvonu s živým odznakem počtu nepřečtených zpráv v navigační liště EUP — automaticky se přemístí na mobilních zařízeních (vedle tlačítka hamburger menu)
+- Notifikace pro: **nový ticket**, **odpověď agenta**, **odpověď zákazníka** — pro všechny manažerské role
+- Rozbalovací panel s notifikacemi seskupenými podle data: jméno aktéra, typ události, číslo ticketu, náhled zprávy, časové razítko
+- **Automatické označení jako přečtené** při otevření ticketu manažerem
+- Označit jednotlivé notifikace jako přečtené pomocí ×; **Označit vše jako přečtené** v záhlaví panelu
+- Dotazuje každých 15 sekund; obnovuje se při navigaci zpět/vpřed v prohlížeči (s podporou bfcache)
 
-#### Kódy odpovědí
-
-| Kód | Význam |
-|-----|---------|
-| `200` | Úspěch nebo No-Op (nic se nezměnilo) |
-| `201` | Zdroj vytvořen; hlavička `Resource-ID` obsahuje ID |
-| `400` | Chyba ověření — detaily v `_embedded.errors` |
-| `401` | Neplatný nebo chybějící klíč API |
-| `404` | Zdroj nenalezen |
-| `409` | Konflikt — zákazník již patří do jiné organizace |
+![Notifikační zvon v reálném čase — rozbalovací nabídka se skupinovými nepřečtenými notifikacemi](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-bell.png)
 
 ---
 
-#### GET /api/organizations
+## Odběry notifikací *(volitelné)*
 
-**Parametry dotazu**
+*Nechte manažery rozhodnout, o čem chtějí dostávat informace — nic více, nic méně.*
 
-| Parametr | Typ | Výchozí | Popis |
-|----------|-----|--------|-------|
-| `page` | integer | `1` | Číslo stránky |
-| `pageSize` | integer | `25` | Záznamů na stránku (max 100) |
-| `mailboxId` | integer | — | Filtr poštovní schránky: vrací globální organizace + vázané na tuto schránku |
+- **Vizuální matice odběrů** na záložce „Notifikace" v Nastavení organizace portálu
+- **Tři typy událostí:** Nový ticket · Odpověď agenta · Odpověď zákazníka
+- **Dvě úrovně rozsahu:** Celá organizace (globální manažeři) · Jednotlivé strukturální jednotky
+- Členové bez jednotky jsou seskupeni v samostatném rozbalitelném řádku **„Bez jednotky"**
+- **Přepsání pro jednotlivé členy** — rozbalte libovolný řádek jednotky a zobrazte jednotlivé členy a přepínejte jejich odběry inline; manažeři jednotek s omezenou rolí jsou odpovídajícím způsobem označeni
+- **Kaskádová logika v obou směrech:**
+  - Povolení „Celá organizace" → povolí všechny jednotky a všechny členy
+  - Povolení jednotky → povolí všechny její členy
+  - Zakázání člena → automaticky sladí zaškrtávací políčka jednotky a organizace
+- Globální manažeři spravují všechny členy; manažeři jednotek spravují pouze svou vlastní jednotku
+- Notifikace používají poštovní ovladač příslušné schránky
 
-**200 OK**
-```json
-{
-  "_embedded": {
-    "organizations": [
-      {
-        "id": 1,
-        "name": "Acme Corp",
-        "mailboxId": null,
-        "createdAt": "2026-06-01T10:00:00+00:00",
-        "updatedAt": "2026-06-01T10:00:00+00:00"
-      }
-    ]
-  },
-  "page": { "size": 25, "totalElements": 1, "totalPages": 1, "number": 1 }
-}
-```
+![Matice odběrů notifikací — přepínače pro jednotlivé jednotky a členy](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-subscriptions.png)
 
 ---
 
-#### POST /api/organizations
+## Nastavení organizace portálu
 
-**Tělo požadavku**
+*Manažeři konfigurují strukturu své organizace bez administrátorského přístupu.*
 
-| Pole | Typ | Povinné | Popis |
-|------|-----|--------|-------|
-| `name` | string | ✅ | Název organizace (max 255 znaků, jedinečný) |
-| `mailboxId` | integer\|null | — | ID poštovní schránky nebo `null` / vynechte pro globální organizaci |
+**Nastavení organizace** v navigaci portálu má tři záložky:
 
-**201 Created** *(hlavička `Resource-ID: 1`)*
-```json
-{
-  "id": 1,
-  "name": "Acme Corp",
-  "mailboxId": 3,
-  "createdAt": "2026-06-01T10:00:00+00:00",
-  "updatedAt": "2026-06-01T10:00:00+00:00"
-}
-```
+### Záložka Notifikace
 
----
+Výše popsaná matice odběrů.
 
-#### PUT /api/organizations/{id}
+### Záložka Jednotky *(pouze globální manažeři)*
 
-**Tělo požadavku**
+- **Vytvořit jednotku** — inline formulář s polem pro název
+- **Přejmenovat jednotku** — inline úprava přímo v řádku tabulky
+- **Smazat jednotku** — tlačítko s potvrzením; manažeři jednotek jsou automaticky degradováni na členy
+- Počet členů zobrazený pro každou jednotku
 
-| Pole | Typ | Povinné | Popis |
-|------|-----|--------|-------|
-| `name` | string | ✅ | Nový název organizace (max 255 znaků, jedinečný) |
-| `mailboxId` | integer\|null | — | Nová schránka; `null` — učinit globální; vynechte — ponechat nezměněno |
+### Záložka Členové
 
-**200 OK**
-```json
-{"success": true, "message": "Organization updated."}
-```
+- Tabulka všech členů organizace: jméno, strukturální jednotka, role, odznak aktivní/neaktivní stav
+- Štítek **„Globální manažer"** zobrazený vedle jména člena, kde je to relevantní
+- Zaškrtávací políčko **Zobrazit deaktivované** — zobrazí se pouze tehdy, když existují neaktivní členové; ve výchozím nastavení skryto
+- **Globální manažeři** mohou aktualizovat jednotku a roli libovolného člena pomocí inline formuláře (výběr jednotky + výběr role + Použít)
+- **Globální manažeři nemohou povýšit člena na globálního manažera** z portálu — to vyžaduje administrátorský přístup
+- Tlačítko **Aktivovat / deaktivovat** pro každého člena s potvrzením při deaktivaci
+
+![Nastavení organizace portálu — záložky Jednotky a Členové](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-settings.png)
 
 ---
 
-#### DELETE /api/organizations/{id}
+## Vícejazyčné šablony notifikačních e-mailů *(volitelné)*
 
-**200 OK** *(všichni členové budou vymazáni kaskádově)*
-```json
-{"success": true, "message": "Organization deleted."}
-```
+*Vaši firemní klienti dostávají e-maily podpory ve svém vlastním jazyce — automaticky, bez manuálního úsilí.*
 
----
+Konfigurováno v **Manage → Organizations → záložka Templates** (viditelné pro uživatele s oprávněním „správa šablon").
 
-#### GET /api/customers/{id}/organization
+- **Šablony pro jednotlivá jazyková nastavení** — samostatný předmět a tělo pro každý jazyk portálu; přepínejte mezi nimi pomocí rozbalovacího seznamu jazyka; hodnoty jsou přesouvány v paměti bez obnovení stránky
+- **Sbalitelné panely** pro každý typ události (Nový ticket / Odpověď agenta / Odpověď zákazníka) — editor Summernote se inicializuje líně při otevření panelu
+- Tlačítko **Načíst výchozí** v každém panelu — obnoví vestavěnou šablonu pro aktuálně vybrané jazykové nastavení (pokud neexistuje výchozí nastavení specifické pro jazyk, použije anglickou vestavěnou šablonu)
+- **WYSIWYG editor Summernote** pro vytváření bohatých HTML e-mailů
+- **Výběr maker** — vkládejte zástupné symboly do předmětu nebo těla jedním kliknutím; pozice kurzoru je zachována v poli předmětu
+- **19 vestavěných výchozích šablon** — připraveny k použití hned po vybalení; není potřeba žádná konfigurace
 
-**200 OK**
-```json
-{
-  "customerId": 42,
-  "organizationId": 1,
-  "organizationName": "Acme Corp",
-  "role": "manager",
-  "notifyOnNewTicket": true
-}
-```
+**Dostupné makro proměnné:**
 
----
+| Proměnná | Popis |
+|----------|-------|
+| `{manager_name}` | Jméno manažera přijímajícího notifikaci |
+| `{author_name}` | Zákazník, který ticket vytvořil nebo na něj odpověděl |
+| `{org_name}` | Název organizace |
+| `{unit_name}` | Název strukturální jednotky |
+| `{subject}` | Předmět ticketu |
+| `{ticket_number}` | ID ticketu |
+| `{ticket_url}` | Přímý odkaz na ticket v portálu |
+| `{ticket_text}` | Úplný text počáteční zprávy (HTML) |
+| `{reply_text}` | Úplný text nejnovější odpovědi (HTML) |
+| `{created_date}` | Datum vytvoření ticketu |
+| `{created_time}` | Čas vytvoření ticketu |
+| `{created_datetime}` | Datum a čas vytvoření ticketu |
+| `{reply_date}` | Datum odpovědi |
+| `{reply_time}` | Čas odpovědi |
+| `{reply_datetime}` | Datum a čas odpovědi |
 
-#### PUT /api/customers/{id}/organization
+**Záložní řetězec:** uložená šablona pro jazyk → vestavěná šablona pro jazyk → uložená anglická šablona → vestavěná anglická šablona
 
-Přiřadí zákazníka organizaci nebo aktualizuje jeho roli. **Jeden zákazník — jedna organizace**: Pokud zákazník již patří do *jiné* organizace, požadavek bude odmítnut s `409 Conflict`. K přesunu — nejdříve odeberte aktuální členství přes `DELETE`.
+Jazyk notifikací je určen výběrem jazyka portálu každého manažera, který se automaticky uloží při použití přepínače jazyka.
 
-**Tělo požadavku**
-
-| Pole | Typ | Povinné | Popis |
-|------|-----|--------|-------|
-| `organizationId` | integer | ✅ | ID organizace |
-| `role` | string | — | `"member"` (výchozí) nebo `"manager"` |
-
-**201 Created** *(nové členství)*
-```json
-{"success": true, "message": "Membership created."}
-```
-
-**200 OK** *(role aktualizována nebo No-Op)*
-```json
-{"success": true, "message": "Membership updated."}
-```
-
-**409 Conflict** *(zákazník již v jiné organizaci)*
-```json
-{
-  "message": "Customer already belongs to another organization.",
-  "errorCode": "CUSTOMER_ALREADY_BELONGS_TO_ANOTHER_ORGANIZATION.",
-  "_embedded": {
-    "errors": [
-      {
-        "path": "organizationId",
-        "message": "Customer is already a member of organization #3. Remove the existing membership first via DELETE /api/customers/42/organization.",
-        "source": "JSON"
-      }
-    ]
-  }
-}
-```
+![E-mailové šablony — sbalitelné panely pro jednotlivá jazyková nastavení, tlačítko Načíst výchozí, editor Summernote](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/admin-templates.png)
 
 ---
 
-#### DELETE /api/customers/{id}/organization
+## REST API *(volitelné)*
 
-**200 OK**
-```json
-{"success": true, "message": "Membership removed."}
-```
+*Integrujte OrgPortal do vašeho CRM, ERP nebo pracovního postupu pro onboarding zákazníků.*
+
+Vyžaduje modul [API and Webhooks](https://freescout.net/module/api-webhooks/).
+
+- Plné CRUD pro organizace, strukturální jednotky, členství zákazníků a tagy
+- **Pole organizace:** `name`, `color`, `mailboxId`, `isActive` — vše čitelné a aktualizovatelné přes API
+- **Dílčí zdroj Members** — `GET/PUT/DELETE /api/organizations/{id}/members/{memberId}` — aktualizujte roli, jednotku, `canManageOrg` a příznak `isActive` pro jednotlivé členy nezávisle bez dotýkání se zbytku členství
+- **Dílčí zdroj Tags** — `GET/PUT /api/organizations/{id}/tags` — vypsat nebo plně nahradit vazby tagů (vyžaduje modul Tags; vrací `503`, pokud není aktivní)
+- Autentizace pomocí hlavičky `X-FreeScout-API-Key` nebo parametru dotazu `api_key`
+- Interaktivní **dokumentace ReDoc** na **Manage → API & Webhooks → OrgPortal API Docs** (`/orgportal/admin/api-docs`)
+
+📖 **Úplná reference API → [docs/api/README.md](docs/api/README.md)**
+
+![Interaktivní dokumentace API — ReDoc se všemi koncovými body OrgPortalu](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/api-docs.png)
 
 ---
 
 ## Instalace
 
-1. Zkopírujte složku `OrgPortal` do `Modules/` vašeho FreeScout
-2. V admin panelu: **Správa → Moduly → OrgPortal → Aktivovat**
+1. Zkopírujte složku `OrgPortal` do `Modules/` vaší instalace FreeScoutu
+2. Přejděte na **Manage → Modules → OrgPortal → Activate**
 3. Spusťte migrace:
    ```bash
    php artisan module:migrate OrgPortal
    ```
-4. Vymažte mezipaměť:
+4. Vyčistěte cache:
    ```bash
    php artisan cache:clear && php artisan config:clear
    ```
 
+> **Podpora gruzínského jazyka** se nasadí automaticky při prvním spuštění — není potřeba žádné ruční kopírování souborů.
+
 ---
 
-## Aktualizace
+## Automatické aktualizace
 
-OrgPortal podporuje **automatické aktualizace** prostřednictvím integrovaného mechanismu aktualizace modulů FreeScout.
+OrgPortal podporuje **aktualizace jedním kliknutím** prostřednictvím vestavěného mechanismu aktualizace modulů FreeScoutu.
 
-> **Requires FreeScout 1.8.170 or later.** On older versions the update banner will not appear — update the module manually by replacing the `OrgPortal` folder with the latest release ZIP.
+> **Vyžaduje FreeScout 1.8.170 nebo novější.** U starších verzí aktualizujte ručně nahrazením složky `OrgPortal` nejnovějším ZIP souborem vydání.
 
-Když je dostupná nová verze, na stránce **Správa → Moduly** se zobrazí banner. Kliknutím na **Aktualizovat nyní** — FreeScout automaticky stáhne a nainstaluje nejnovější verzi.
-
-Není vyžadováno ruční kopírování souborů.
+Když je k dispozici nová verze, na stránce **Manage → Modules** se zobrazí banner. Klikněte na **Aktualizovat nyní** — FreeScout automaticky stáhne a nainstaluje nejnovější verzi.
 
 ---
 
 ## Kompatibilita modulů
 
-| Modul | Stav |
-|-------|------|
-| End-User Portal ≥ 1.0.85 | Volitelný — funkce portálu pro manažery |
-| API a Webhooks ≥ 1.0.80 | Volitelný — koncové body REST API |
-| Kanban ≥ 1.0.23 | Volitelný — odznak, filtr, sloupec "Stav" v lístcích společnosti |
-| Vlastní pole | Kompatibilní |
-| Workflows | Kompatibilní |
-| Značky | Kompatibilní |
+| Modul | Stav | Poznámky |
+|-------|------|----------|
+| End-User Portal ≥ 1.0.85 | Volitelné | Manažerský portál, notifikační zvon, odběry |
+| API and Webhooks ≥ 1.0.80 | Volitelné | Koncové body REST API |
+| Kanban ≥ 1.0.23 | Volitelné | Odznak na kartách, filtr organizace, vícejazyčné štítky sloupce Stav |
+| Custom Fields | ✅ Kompatibilní | — |
+| Workflows | ✅ Kompatibilní | — |
+| Tags | ✅ Kompatibilní | Čipy tagů ve formuláři pro úpravu organizace; vazby tagů přes API (`/organizations/{id}/tags`); přiřazení ticketů podle tagů |
 
 ---
 
 ## Konfigurace
 
-### Globální (**Správa → Nastavení OrgPortal**)
-
-| Možnost | Výchozí |
-|---------|---------|
-| Zobrazit odznak na stránce lístku | ✅ |
-| Zobrazit odznak na kartách Kanban | ✅ |
-
-### Na poštovní schránku (**Nastavení poštovní schránky → OrgPortal**)
-
-Přepíše globální hodnoty pro konkrétní schránku.
+### Globální nastavení — **Manage → Organizations → záložka System**
 
 | Možnost | Popis |
 |---------|-------|
-| Zobrazit odznak na stránce lístku | Odznak v seznamu konverzací a na stránce lístku |
-| Zobrazit odznak na kartách Kanban | Odznak na kartách Kanban |
-| Filtry stavu lístků společnosti | Sloupce Kanban jako zaškrtávací pole na stránce Lístky společnosti; každý filtr má vlastní popisek viditelný pro uživatele portálu |
+| Zobrazit odznak na stránce ticketu | Odznak organizace v seznamu konverzací a zobrazení ticketu |
+| Zobrazit odznak na kartách Kanbanu | Odznak organizace na kartách nástěnky Kanban |
+| Zdroj přiřazení | `member` / `tag` / `tag_only` — jak jsou tickety přiřazovány k organizacím |
+| Auto-cron doplnění | Spouštět doplnění každých 5 minut automaticky |
+| Viditelnost snapshotu | Zobrazit/skrýt data přiřazení v postranním panelu ticketu |
+| Přepínač jazyka portálu | Povolit přepínač jazyka v navigační liště EUP; vyberte, která z 19 jazykových nastavení nabídnout |
+
+### Nastavení pro jednotlivé schránky — **Mailbox Settings → OrgPortal**
+
+Přepisuje globální hodnoty pro konkrétní schránku.
+
+| Možnost | Popis |
+|---------|-------|
+| Zobrazit odznak na stránce ticketu | Povolit/zakázat odznak pro tuto schránku |
+| Zobrazit odznak na kartách Kanbanu | Povolit/zakázat odznak pro tuto schránku |
+| Zobrazit blok organizace v profilu zákazníka | Přepnout informační blok organizace v postranním panelu ticketu |
+| Filtry stavu firemních ticketů | Mapovat sloupce Kanbanu na pojmenované filtry v portálu; štítky pro jednotlivé jazyky s přepínačem jazyka; přetažením změnit pořadí |
+
+![Nastavení pro schránku — viditelnost odznaku a filtry stavu Kanbanu s vícejazyčnými štítky](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/mailbox-settings.png)
 
 ---
 
 ## Překlady
 
-Podporované jazyky: **English** (`en`), **Українська** (`uk`), **Română** (`ro`), **Georgian** (`ka`), **Deutsch** (`de`), **Français** (`fr`), **Español** (`es`), **Italiano** (`it`), **Čeština** (`cs`), **Slovenčina** (`sk`), **Polski** (`pl`), **Русский** (`ru`), **Nederlands** (`nl`), **Norsk** (`no`), **Dansk** (`da`), **Svenska** (`sv`), **Suomi** (`fi`), **Português BR** (`pt-BR`), **Português PT** (`pt-PT`), **中文 (简体)** (`zh-CN`).
+OrgPortal je plně lokalizován do **19 jazyků**:
 
-Soubory: `Modules/OrgPortal/Resources/lang/{locale}/messages.php`
+| Jazyk | Kód | Jazyk | Kód |
+|-------|-----|-------|-----|
+| Angličtina | `en` | Nizozemština | `nl` |
+| Ukrajinština | `uk` | Norština | `no` |
+| Němčina | `de` | Dánština | `da` |
+| Francouzština | `fr` | Švédština | `sv` |
+| Španělština | `es` | Finština | `fi` |
+| Italština | `it` | Portugalština (BR) | `pt-BR` |
+| Čeština | `cs` | Portugalština (PT) | `pt-PT` |
+| Slovenština | `sk` | Rumunština | `ro` |
+| Polština | `pl` | Zjednodušená čínština | `zh-CN` |
+| Gruzínština | `ka` | | |
 
-### Integrace EUPSWLANG
+Soubory překladů: `Modules/OrgPortal/Resources/lang/{locale}/messages.php`
 
-Modul správně funguje s [EUP Switch Language](https://freescout.net/module/eup-sw-lang/): jazyk vybraný v portálu platí i pro řetězce OrgPortal.
+Šablony notifikačních e-mailů mají vestavěné výchozí hodnoty pro všech 19 jazyků.
 
-Aby se jazyk objevil v seznamu EUPSWLANG, musí existovat odpovídající soubor `Modules/EndUserPortal/Resources/lang/{locale}.json`. Soubory pro **Română** (`ro`) jsou zahrnuty v balíčku; **Georgian** (`ka`) je podporován pouze v oblasti správy (žádná systémová podpora v jádru FreeScout).
+### Integrace přepínače jazyka
 
-> **Technický detail:** Middleware `ReapplyEupLocale` (registrován jako poslední ve skupině tras portálu) obnovuje místní nastavení poté, co by jej middleware `Localize` FreeScout jinak resetoval na výchozí systémový jazyk.
+OrgPortal zahrnuje vestavěný přepínač jazyka portálu (povolte v **záložce System → Přepínač jazyka portálu**). Také se integruje s [EUP Switch Language](https://freescout.net/module/eup-sw-lang/) — oba mohou být aktivní současně.
+
+Jazyk, který manažer vybere, se vztahuje na všechny řetězce uživatelského rozhraní OrgPortalu a je uložen jako jeho jazyk notifikací — e-maily jsou automaticky odesílány v jimi zvoleném jazyce.
+
+> **Technická poznámka:** Middleware `OrgPortalSetLocale` znovu použije jazyk portálu po middlewaru FreeScoutu `Localize`, aby zabránil jeho resetování na výchozí nastavení systému při každém požadavku.
+
+---
+
+## Snímky obrazovky
+
+| | |
+|---|---|
+| ![Seznam organizací](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-list.png) | ![Úprava organizace](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png) |
+| *Seznam organizací — filtr stavu, živé vyhledávání, barevné odznaky* | *Úprava organizace — výběr barvy, čipy tagů, tabulka členů* |
+| ![Záložka System](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/system-settings.png) | ![Úprava zákazníka](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/customer-org-field.png) |
+| *Záložka System — režimy přiřazení, doplnění, přepínač jazyka* | *Úprava zákazníka — pole organizace s automatickým doplňováním* |
+| ![Portál firemních ticketů](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-tickets.png) | ![Odpověď v portálu](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-reply.png) |
+| *Firemní tickety — tabulka, filtr autora, indikátory přečtení* | *Ticket v portálu — odpověď s přílohami, banner uzavřeného ticketu* |
+| ![Nastavení organizace portálu](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-settings.png) | ![Notifikační zvon](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-bell.png) |
+| *Nastavení organizace portálu — záložky Jednotky a Členové* | *Notifikační zvon v reálném čase s rozbalovací nabídkou* |
+| ![Matice odběrů](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-subscriptions.png) | ![E-mailové šablony](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/admin-templates.png) |
+| *Matice odběrů notifikací — pro jednotky a členy* | *E-mailové šablony — přepínač jazyka, Načíst výchozí, Summernote* |
+| ![Integrace Kanbanu](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png) | ![Nastavení schránky](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/mailbox-settings.png) |
+| *Kanban — odznaky organizací a modální okno filtru organizace* | *Nastavení schránky — filtry Kanbanu s vícejazyčnými štítky* |
+| ![Dokumentace API](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/api-docs.png) | |
+| *Interaktivní dokumentace API — ReDoc* | |
 
 ---
 
 ## Licence
 
-[MIT](../LICENSE) — © 2026 ASTIN-UA
+[MIT](LICENSE) — © 2026 ASTIN-UA
