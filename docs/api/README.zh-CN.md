@@ -185,7 +185,7 @@ curl -X POST "https://your-freescout.com/api/organizations" \
 | 字段 | 类型 | 描述 |
 |-------|------|-----------|
 | `unitId` | 整数\|null | 成员所属的结构化单位，或 `null` 表示整个组织 |
-| `role` | 字符串 | `member` 或 `manager` |
+| `role` | 字符串 | `"member"` 或 `"manager"`。**单位经理**是 `role: "manager"`（非空 `unitId`）；**全局经理**是 `role: "manager"`（`unitId: null`）。字符串 `"unit_manager"` 在 API 中不存在 — 传递它会返回 400。|
 | `canManageOrg` | 布尔值 | 此经理是否可以在门户中将其他人提升为全局经理 |
 | `isActive` | 布尔值 | 活跃会员资格；非活跃成员不接收工单分配或通知 |
 | `notifyOnNewTicket` | 布尔值 | 每个成员的新工单通知标志 |
@@ -298,7 +298,7 @@ curl -X PUT "https://your-freescout.com/api/organizations/1" \
 
 | 字段 | 类型 | 必需 | 描述 |
 |-------|------|:--------:|-----------|
-| `role` | 字符串 | — | `"member"` 或 `"manager"` |
+| `role` | 字符串 | — | `"member"` 或 `"manager"`。创建**单位经理**：`role: "manager"` + `unitId: <id>`。创建**全局经理**：`role: "manager"` + `unitId: null`。|
 | `unitId` | 整数\|null | — | 结构化单位（必须属于此组织），或 `null` 移除 |
 | `canManageOrg` | 布尔值 | — | 在门户中授予全局经理权限 |
 | `isActive` | 布尔值 | — | `false` 停用但不移除 |

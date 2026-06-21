@@ -185,7 +185,7 @@ Retourne l'organisation avec ses **membres** et **unités** embarqués.
 | Field | Type | Description |
 |-------|------|-------------|
 | `unitId` | integer\|null | Unité structurelle à laquelle appartient le membre, ou `null` pour l'ensemble de l'organisation |
-| `role` | string | `member` ou `manager` |
+| `role` | string | `"member"` ou `"manager"`. Un **responsable d'unité** est `role: "manager"` avec un `unitId` non-null ; un **gestionnaire global** est `role: "manager"` avec `unitId: null`. La chaîne `"unit_manager"` n'existe pas dans l'API — la passer retourne 400. |
 | `canManageOrg` | boolean | Si ce responsable peut promouvoir d'autres responsables globaux via le portail |
 | `isActive` | boolean | Adhésion active ; les membres inactifs ne reçoivent pas d'assignations ou de notifications de tickets |
 | `notifyOnNewTicket` | boolean | Indicateur de notification de nouveau ticket par membre |
@@ -298,7 +298,7 @@ Mettez à jour le rôle d'un membre, l'assignation à une unité, l'indicateur c
 
 | Field | Type | Required | Description |
 |-------|------|:--------:|-------------|
-| `role` | string | — | `"member"` ou `"manager"` |
+| `role` | string | — | `"member"` ou `"manager"`. Pour créer un **responsable d'unité**: `role: "manager"` + `unitId: <id>`. Pour créer un **gestionnaire global**: `role: "manager"` + `unitId: null`. |
 | `unitId` | integer\|null | — | Unité structurelle (doit appartenir à cette organisation), ou `null` pour annuler l'assignation |
 | `canManageOrg` | boolean | — | Accordez des droits de gestionnaire global dans le portail |
 | `isActive` | boolean | — | `false` pour désactiver sans supprimer |

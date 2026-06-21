@@ -185,7 +185,7 @@ Returnerar organisationen med inbäddade **medlemmar** och **enheter**.
 | Fält | Typ | Beskrivning |
 |------|------|-------------|
 | `unitId` | integer\|null | Strukturell enhet medlemmen tillhör, eller `null` för hela organisationen |
-| `role` | string | `member` eller `manager` |
+| `role` | string | `"member"` eller `"manager"`. En **enhetschef** är `role: "manager"` med icke-null `unitId`; en **global chef** är `role: "manager"` med `unitId: null`. Strängen `"unit_manager"` finns inte i API:t — att skicka den returnerar 400. |
 | `canManageOrg` | boolean | Om denna chef kan befordra andra till global chef från portalen |
 | `isActive` | boolean | Aktivt medlemskap; inaktiva medlemmar får ingen biljettilldelning eller meddelanden |
 | `notifyOnNewTicket` | boolean | Per-medlems flagga för ny-biljett notifiering |
@@ -298,7 +298,7 @@ Uppdatera medlemmens roll, enhetstilldelning, canManageOrg-flagga eller aktiv st
 
 | Fält | Typ | Obligatorisk | Beskrivning |
 |------|------|:-------:|-------------|
-| `role` | string | — | `"member"` eller `"manager"` |
+| `role` | string | — | `"member"` eller `"manager"`. För att skapa en **enhetschef**: `role: "manager"` + `unitId: <id>`. För att skapa en **global chef**: `role: "manager"` + `unitId: null`. |
 | `unitId` | integer\|null | — | Strukturell enhet (måste tillhöra denna organisation), eller `null` för att avlägsna |
 | `canManageOrg` | boolean | — | Bevilja global chefsbehörighet i portalen |
 | `isActive` | boolean | — | `false` för att inaktivera utan att ta bort |

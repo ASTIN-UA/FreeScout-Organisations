@@ -185,7 +185,7 @@ Zwraca organizację z wbudowanymi **członkami** i **jednostkami**.
 | Pole | Typ | Opis |
 |-------|------|-------------|
 | `unitId` | liczba całkowita\|null | Jednostka strukturalna, do której należy członek, lub `null` dla całej organizacji |
-| `role` | ciąg | `member` lub `manager` |
+| `role` | ciąg | `"member"` lub `"manager"`. **Menedżer jednostki** to `role: "manager"` z niezerowym `unitId`; **menedżer globalny** to `role: "manager"` z `unitId: null`. String `"unit_manager"` nie istnieje w API — jego przekazanie zwraca 400. |
 | `canManageOrg` | logiczny | Czy ten menedżer może promować innych do menedżera globalnego z portalu |
 | `isActive` | logiczny | Aktywne członkostwo; nieaktywni członkowie nie otrzymują przypisań biletów ani powiadomień |
 | `notifyOnNewTicket` | logiczny | Flaga powiadomienia o nowym bilecie na członka |
@@ -298,7 +298,7 @@ Zaktualizuj rolę, przypisanie jednostki, flagę canManageOrg lub status aktywny
 
 | Pole | Typ | Wymagane | Opis |
 |-------|------|:--------:|-------------|
-| `role` | ciąg | — | `"member"` lub `"manager"` |
+| `role` | ciąg | — | `"member"` lub `"manager"`. Aby utworzyć **menedżera jednostki**: `role: "manager"` + `unitId: <id>`. Aby utworzyć **menedżera globalnego**: `role: "manager"` + `unitId: null`. |
 | `unitId` | liczba całkowita\|null | — | Jednostka strukturalna (musi należeć do tej organizacji), lub `null` aby przypisać |
 | `canManageOrg` | logiczny | — | Udziel praw menedżera globalnego w portalu |
 | `isActive` | logiczny | — | `false` aby dezaktywować bez usuwania |

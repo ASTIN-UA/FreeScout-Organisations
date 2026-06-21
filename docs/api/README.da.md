@@ -185,7 +185,7 @@ Returnerer organisationen med indlejrede **medlemmer** og **enheder**.
 | Felt | Type | Beskrivelse |
 |------|------|-------------|
 | `unitId` | integer\|null | Strukturel enhed medlemmet tilhører, eller `null` for hele organisationen |
-| `role` | string | `member` eller `manager` |
+| `role` | string | `"member"` eller `"manager"`. En **enhedsleder** er `role: "manager"` med ikke-null `unitId`; en **global leder** er `role: "manager"` med `unitId: null`. Strengen `"unit_manager"` findes ikke i API'en — at sende den returnerer 400. |
 | `canManageOrg` | boolean | Om denne leder kan promovere andre til global leder fra portalen |
 | `isActive` | boolean | Aktivt medlemskab; inaktive medlemmer modtager ingen billetopgaver eller meddelelser |
 | `notifyOnNewTicket` | boolean | Flag for pr. medlem ny-billet notifikation |
@@ -298,7 +298,7 @@ Opdater medlemmets rolle, enhedstildeling, canManageOrg-flag eller aktiv status.
 
 | Felt | Type | Påkrævet | Beskrivelse |
 |------|------|:-------:|-------------|
-| `role` | string | — | `"member"` eller `"manager"` |
+| `role` | string | — | `"member"` eller `"manager"`. For at oprette en **enhedsleder**: `role: "manager"` + `unitId: <id>`. For at oprette en **global leder**: `role: "manager"` + `unitId: null`. |
 | `unitId` | integer\|null | — | Strukturel enhed (skal tilhøre denne organisation), eller `null` for at fjerne tildeling |
 | `canManageOrg` | boolean | — | Giv global ledelsesrettigheder i portalen |
 | `isActive` | boolean | — | `false` for at deaktivere uden at fjerne |

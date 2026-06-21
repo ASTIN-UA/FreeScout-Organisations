@@ -185,7 +185,7 @@ Returnează organizația cu **membrii** și **unitățile** sale încorporate.
 | Câmp | Tip | Descriere |
 |-------|------|-----------|
 | `unitId` | întreg\|null | Unitatea structurală căreia îi aparține membrul, sau `null` pentru întreaga organizație |
-| `role` | șir | `member` sau `manager` |
+| `role` | șir | `"member"` sau `"manager"`. Un **manager de unitate** este `role: "manager"` cu `unitId` non-nul; un **manager global** este `role: "manager"` cu `unitId: null`. Șirul `"unit_manager"` nu există în API — transmiterea lui returnează 400. |
 | `canManageOrg` | boolean | Dacă acest manager poate promova alții la manager global din portal |
 | `isActive` | boolean | Asociere activă; membrii inactivi nu primesc atribuiri de tichet sau notificări |
 | `notifyOnNewTicket` | boolean | Steag de notificare per membru pentru tichet nou |
@@ -298,7 +298,7 @@ Actualizează rolul, atribuția unității, steagul canManageOrg sau starea acti
 
 | Câmp | Tip | Necesar | Descriere |
 |-------|------|:--------:|-----------|
-| `role` | șir | — | `"member"` sau `"manager"` |
+| `role` | șir | — | `"member"` sau `"manager"`. Pentru a crea un **manager de unitate**: `role: "manager"` + `unitId: <id>`. Pentru a crea un **manager global**: `role: "manager"` + `unitId: null`. |
 | `unitId` | întreg\|null | — | Unitate structurală (trebuie să aparțină acestei organizații), sau `null` pentru a elimina |
 | `canManageOrg` | boolean | — | Acordă drepturi de manager global în portal |
 | `isActive` | boolean | — | `false` pentru dezactivare fără ștergere |

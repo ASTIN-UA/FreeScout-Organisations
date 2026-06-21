@@ -185,7 +185,7 @@ Retorna a organização com seus **membros** e **unidades** embutidos.
 | Campo | Tipo | Descrição |
 |-------|------|-----------|
 | `unitId` | inteiro\|null | Unidade estrutural à qual o membro pertence, ou `null` para toda a organização |
-| `role` | string | `member` ou `manager` |
+| `role` | string | `"member"` ou `"manager"`. Um **gerenciador de unidade** é `role: "manager"` com `unitId` não-nulo; um **gerenciador global** é `role: "manager"` com `unitId: null`. A string `"unit_manager"` não existe na API — passá-la retorna 400. |
 | `canManageOrg` | boolean | Se este gerenciador pode promover outros a gerenciador global no portal |
 | `isActive` | boolean | Associação ativa; membros inativos não recebem atribuições de tíquetes ou notificações |
 | `notifyOnNewTicket` | boolean | Sinalizador de notificação por membro para novo tíquete |
@@ -298,7 +298,7 @@ Atualiza o papel, atribuição de unidade, sinalizador canManageOrg ou status at
 
 | Campo | Tipo | Obrigatório | Descrição |
 |-------|------|:----------:|-----------|
-| `role` | string | — | `"member"` ou `"manager"` |
+| `role` | string | — | `"member"` ou `"manager"`. Para criar um **gerenciador de unidade**: `role: "manager"` + `unitId: <id>`. Para criar um **gerenciador global**: `role: "manager"` + `unitId: null`. |
 | `unitId` | inteiro\|null | — | Unidade estrutural (deve pertencer a esta organização), ou `null` para remover |
 | `canManageOrg` | boolean | — | Conceder direitos de gerenciador global no portal |
 | `isActive` | boolean | — | `false` para desativar sem remover |

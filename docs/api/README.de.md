@@ -185,7 +185,7 @@ Gibt die Organisation mit eingebetteten **Mitgliedern** und **Struktureinheiten*
 | Field | Type | Description |
 |-------|------|-------------|
 | `unitId` | integer\|null | Struktureinheit, zu der das Mitglied gehört, oder `null` für die gesamte Organisation |
-| `role` | string | `member` oder `manager` |
+| `role` | string | `"member"` oder `"manager"`. Ein **Unit-Manager** ist `role: "manager"` mit nicht-null `unitId`; ein **globaler Manager** ist `role: "manager"` mit `unitId: null`. Der String `"unit_manager"` existiert nicht in der API — das Übergeben gibt 400 zurück. |
 | `canManageOrg` | boolean | Ob dieser Manager andere im Portal zum globalen Manager befördern darf |
 | `isActive` | boolean | Aktive Mitgliedschaft; inaktive Mitglieder erhalten keine Ticketzuweisungen oder Benachrichtigungen |
 | `notifyOnNewTicket` | boolean | Flag für neue Ticket-Benachrichtigungen pro Mitglied |
@@ -298,7 +298,7 @@ Aktualisiert die Rolle eines Mitglieds, Struktureinheitenzuweisung, canManageOrg
 
 | Field | Type | Required | Description |
 |-------|------|:--------:|-------------|
-| `role` | string | — | `"member"` oder `"manager"` |
+| `role` | string | — | `"member"` oder `"manager"`. Zum Erstellen eines **Unit-Managers**: `role: "manager"` + `unitId: <id>`. Zum Erstellen eines **globalen Managers**: `role: "manager"` + `unitId: null`. |
 | `unitId` | integer\|null | — | Struktureinheit (muss zu dieser Organisation gehören), oder `null` zum Aufheben der Zuweisung |
 | `canManageOrg` | boolean | — | Gewähren Sie globale Manager-Rechte im Portal |
 | `isActive` | boolean | — | `false` um zu deaktivieren, ohne zu entfernen |

@@ -185,7 +185,7 @@ Vrátí organizaci s vloženými **členy** a **jednotkami**.
 | Pole | Typ | Popis |
 |-------|------|-------------|
 | `unitId` | celé číslo\|null | Strukturální jednotka, do které člen patří, nebo `null` pro celou organizaci |
-| `role` | řetězec | `member` nebo `manager` |
+| `role` | řetězec | `"member"` nebo `"manager"`. **Správce jednotky** je `role: "manager"` s nenulovým `unitId`; **globální správce** je `role: "manager"` s `unitId: null`. Řetězec `"unit_manager"` v API neexistuje — jeho předání vrací 400. |
 | `canManageOrg` | logická hodnota | Zda může tento správce povyšovat ostatní na globálního správce z portálu |
 | `isActive` | logická hodnota | Aktivní členství; neaktivní členové neobdrží přiřazení lístků ani oznámení |
 | `notifyOnNewTicket` | logická hodnota | Příznak oznámení o novém lístku na člena |
@@ -298,7 +298,7 @@ Aktualizujte roli člena, přiřazení jednotky, příznak canManageOrg nebo akt
 
 | Pole | Typ | Požadováno | Popis |
 |-------|------|:--------:|-------------|
-| `role` | řetězec | — | `"member"` nebo `"manager"` |
+| `role` | řetězec | — | `"member"` nebo `"manager"`. Chcete-li vytvořit **správce jednotky**: `role: "manager"` + `unitId: <id>`. Chcete-li vytvořit **globálního správce**: `role: "manager"` + `unitId: null`. |
 | `unitId` | celé číslo\|null | — | Strukturální jednotka (musí patřit do této organizace), nebo `null` pro nepřiřazení |
 | `canManageOrg` | logická hodnota | — | Udělit práva globálního správce v portálu |
 | `isActive` | logická hodnota | — | `false` pro deaktivaci bez odebrání |

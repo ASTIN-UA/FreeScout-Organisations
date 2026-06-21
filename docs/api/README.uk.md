@@ -185,7 +185,7 @@ curl -X POST "https://your-freescout.com/api/organizations" \
 | Field | Type | Description |
 |-------|------|-------------|
 | `unitId` | integer\|null | Структурна одиниця, до якої належить член, або `null` для всієї організації |
-| `role` | string | `member` або `manager` |
+| `role` | string | `"member"` або `"manager"`. **Менеджер одиниці** — це `role: "manager"` з ненульовим `unitId`; **глобальний менеджер** — це `role: "manager"` з `unitId: null`. Строка `"unit_manager"` не існує в API — передача її повертає 400. |
 | `canManageOrg` | boolean | Чи може цей менеджер просувати інших до глобального менеджера через портал |
 | `isActive` | boolean | Активне членство; неактивні члени не отримують призначення або сповіщення про квитки |
 | `notifyOnNewTicket` | boolean | Прапорець сповіщення про новий квиток для окремого члена |
@@ -298,7 +298,7 @@ curl -X PUT "https://your-freescout.com/api/organizations/1" \
 
 | Field | Type | Required | Description |
 |-------|------|:--------:|-------------|
-| `role` | string | — | `"member"` або `"manager"` |
+| `role` | string | — | `"member"` або `"manager"`. Щоб створити **менеджера одиниці**: `role: "manager"` + `unitId: <id>`. Щоб створити **глобального менеджера**: `role: "manager"` + `unitId: null`. |
 | `unitId` | integer\|null | — | Структурна одиниця (повинна належати цій організації), або `null` для скасування призначення |
 | `canManageOrg` | boolean | — | Надайте права глобального менеджера в портальному |
 | `isActive` | boolean | — | `false` щоб деактивувати без видалення |

@@ -185,7 +185,7 @@ Devuelve la organización con **miembros** y **unidades** incrustados.
 | Field | Type | Description |
 |-------|------|-------------|
 | `unitId` | integer\|null | Unidad estructural a la que pertenece el miembro, o `null` para toda la organización |
-| `role` | string | `member` o `manager` |
+| `role` | string | `"member"` o `"manager"`. Un **gestor de unidad** es `role: "manager"` con `unitId` no nulo; un **gestor global** es `role: "manager"` con `unitId: null`. La cadena `"unit_manager"` no existe en la API — pasarla devuelve 400. |
 | `canManageOrg` | boolean | Si este gestor puede promover a otros a gestor global desde el portal |
 | `isActive` | boolean | Pertenencia activa; los miembros inactivos no reciben asignaciones o notificaciones de tickets |
 | `notifyOnNewTicket` | boolean | Bandera de notificación de nuevo ticket por miembro |
@@ -298,7 +298,7 @@ Actualiza el rol del miembro, asignación de unidad, bandera canManageOrg o esta
 
 | Field | Type | Required | Description |
 |-------|------|:--------:|-------------|
-| `role` | string | — | `"member"` o `"manager"` |
+| `role` | string | — | `"member"` o `"manager"`. Para crear un **gestor de unidad**: `role: "manager"` + `unitId: <id>`. Para crear un **gestor global**: `role: "manager"` + `unitId: null`. |
 | `unitId` | integer\|null | — | Unidad estructural (debe pertenecer a esta organización), o `null` para anular asignación |
 | `canManageOrg` | boolean | — | Otorgue derechos de gestor global en el portal |
 | `isActive` | boolean | — | `false` para desactivar sin eliminar |

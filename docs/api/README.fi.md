@@ -185,7 +185,7 @@ Palauttaa organisaation sen sisältyvien **jäsenten** ja **yksiköiden** kanssa
 | Kenttä | Tyyppi | Kuvaus |
 |-------|------|-------------|
 | `unitId` | kokonaisluku\|null | Rakenteellinen yksikkö, johon jäsen kuuluu, tai `null` koko organisaatiolle |
-| `role` | merkkijono | `member` tai `manager` |
+| `role` | merkkijono | `"member"` tai `"manager"`. **Yksikön johtaja** on `role: "manager"` ei-nolla `unitId`:lla; **globaali johtaja** on `role: "manager"` `unitId: null`:lla. Merkkijono `"unit_manager"` ei ole API:ssa — sen välittäminen palauttaa 400. |
 | `canManageOrg` | looginen | Oikeuttaako tämä johtaja muita globaaleiksi johtajiksi portaalissa |
 | `isActive` | looginen | Aktiivinen jäsenyys; passiiviset jäsenet eivät saa lippujen tehtäviä tai ilmoituksia |
 | `notifyOnNewTicket` | looginen | Jäsenkohtainen uuden lipun ilmoituslippu |
@@ -298,7 +298,7 @@ Päivitä jäsenen rooli, yksikön sijoittelu, canManageOrg-merkki tai aktiivine
 
 | Kenttä | Tyyppi | Vaadittu | Kuvaus |
 |-------|------|:--------:|-------------|
-| `role` | merkkijono | — | `"member"` tai `"manager"` |
+| `role` | merkkijono | — | `"member"` tai `"manager"`. Luo **yksikön johtaja**: `role: "manager"` + `unitId: <id>`. Luo **globaali johtaja**: `role: "manager"` + `unitId: null`. |
 | `unitId` | kokonaisluku\|null | — | Rakenteellinen yksikkö (tulee kuulua tähän organisaatioon), tai `null` poistaaksesi |
 | `canManageOrg` | looginen | — | Anna globaalin johtajan oikeudet portaalissa |
 | `isActive` | looginen | — | `false` poistaaksesi käytöstä poistamatta |

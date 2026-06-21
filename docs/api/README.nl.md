@@ -185,7 +185,7 @@ Geeft de organisatie terug met ingebedde **leden** en **eenheden**.
 | Veld | Type | Beschrijving |
 |------|------|-------------|
 | `unitId` | integer\|null | Structurele eenheid waartoe het lid behoort, of `null` voor de hele organisatie |
-| `role` | string | `member` of `manager` |
+| `role` | string | `"member"` of `"manager"`. Een **eenheidsbeheerder** is `role: "manager"` met niet-null `unitId`; een **globale beheerder** is `role: "manager"` met `unitId: null`. De string `"unit_manager"` bestaat niet in de API — het doorgeven ervan retourneert 400. |
 | `canManageOrg` | boolean | Of deze manager anderen tot globale manager van het portaal kan bevorderen |
 | `isActive` | boolean | Actief lidmaatschap; inactieve leden ontvangen geen kaartoewijzingen of meldingen |
 | `notifyOnNewTicket` | boolean | Per-lid nieuw-kaartmelding vlag |
@@ -298,7 +298,7 @@ Werk de rol van een lid, eenheidsopdracht, canManageOrg-vlag of actieve status b
 
 | Veld | Type | Vereist | Beschrijving |
 |------|------|:-------:|-------------|
-| `role` | string | — | `"member"` of `"manager"` |
+| `role` | string | — | `"member"` of `"manager"`. Om een **eenheidsbeheerder** te maken: `role: "manager"` + `unitId: <id>`. Om een **globale beheerder** te maken: `role: "manager"` + `unitId: null`. |
 | `unitId` | integer\|null | — | Structurele eenheid (moet tot deze organisatie behoren), of `null` om toe te wijzen |
 | `canManageOrg` | boolean | — | Globale managerrechten in het portaal verlenen |
 | `isActive` | boolean | — | `false` om te deactiveren zonder te verwijderen |

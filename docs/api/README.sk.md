@@ -185,7 +185,7 @@ Vrátí organizáciu s vloženými **členmi** a **jednotkami**.
 | Pole | Typ | Popis |
 |-------|------|-------------|
 | `unitId` | celé číslo\|null | Štrukturálna jednotka, do ktorej člen patrí, alebo `null` pre celú organizáciu |
-| `role` | reťazec | `member` alebo `manager` |
+| `role` | reťazec | `"member"` alebo `"manager"`. **Vedúci jednotky** je `role: "manager"` s nenulovou `unitId`; **globálny vedúci** je `role: "manager"` s `unitId: null`. Reťazec `"unit_manager"` v API neexistuje — jeho odoslanie vráti 400. |
 | `canManageOrg` | logická hodnota | Či môže tento vedúci podporovať ostatných na globálneho vedúceho z portálu |
 | `isActive` | logická hodnota | Aktívne členstvo; neaktívni členovia nebudú dostávať priradenia lístkov ani upozornenia |
 | `notifyOnNewTicket` | logická hodnota | Príznak upozornenia na nový lístok na člena |
@@ -298,7 +298,7 @@ Aktualizujte rolu člena, priradenie jednotky, príznak canManageOrg alebo aktí
 
 | Pole | Typ | Povinné | Popis |
 |-------|------|:--------:|-------------|
-| `role` | reťazec | — | `"member"` alebo `"manager"` |
+| `role` | reťazec | — | `"member"` alebo `"manager"`. Ak chcete vytvoriť **vedúceho jednotky**: `role: "manager"` + `unitId: <id>`. Ak chcete vytvoriť **globálneho vedúceho**: `role: "manager"` + `unitId: null`. |
 | `unitId` | celé číslo\|null | — | Štrukturálna jednotka (musí patriť do tejto organizácie), alebo `null` na nepridelenie |
 | `canManageOrg` | logická hodnota | — | Prideliť práva globálneho vedúceho v portáli |
 | `isActive` | logická hodnota | — | `false` na deaktiváciu bez odstránenia |
