@@ -55,7 +55,7 @@ OrgPortal tuto mezeru vyplňuje:
 - **Smazat** — dostupné pouze tehdy, když má organizace 0 členů a 0 ticketů (ochranné opatření)
 - Všechny akce mazání a deaktivace vyžadují potvrzení
 
-![Seznam organizací — filtr stavu, živé vyhledávání, barevné odznaky, tagy, počty ticketů](docs/screenshots/org-list.png)
+![Seznam organizací — filtr stavu, živé vyhledávání, barevné odznaky, tagy, počty ticketů](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-list.png)
 
 ### Formulář pro úpravu organizace
 
@@ -66,7 +66,7 @@ OrgPortal tuto mezeru vyplňuje:
 - **Panel strukturálních jednotek** — vytvářejte a přejmenovávejte jednotky přímo ve formuláři pro úpravy; členové jsou přiřazováni k jednotkám ve stejném zobrazení
 - **Přidání člena** — automaticky doplní stávající nepřiřazené konverzace daného zákazníka
 
-![Úprava organizace — výběr barvy, čipy tagů, tabulka členů s rolemi a jednotkami](docs/screenshots/org-edit.png)
+![Úprava organizace — výběr barvy, čipy tagů, tabulka členů s rolemi a jednotkami](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png)
 
 ### Integrace s profilem zákazníka
 
@@ -75,7 +75,7 @@ OrgPortal tuto mezeru vyplňuje:
 - **Informační blok organizace v postranním panelu administrátorského ticketu** — název organizace (klikací odkaz na stránku úpravy organizace), strukturální jednotka a role člena; přepínání viditelnosti pro každou schránku v nastavení
 - **Jedno aktivní členství na zákazníka** — zákazníka nelze přidat do druhé organizace, pokud má aktivní členství; neaktivní/archivovaná členství jsou povolena
 
-![Úprava zákazníka — pole organizace s automatickým doplňováním a výběrem role](docs/screenshots/customer-org-field.png)
+![Úprava zákazníka — pole organizace s automatickým doplňováním a výběrem role](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/customer-org-field.png)
 
 ---
 
@@ -100,7 +100,7 @@ Organizace lze rozdělit na neomezený počet **strukturálních jednotek** (odd
 - Manažeři jednotek mají plné možnosti portálu — odpovědi, přílohy, přeřazení autora, uzavření/znovuotevření, správa notifikací — omezené striktně na jejich jednotku
 - Přístup k ticketům a doručování notifikací jsou vynuceny na hranicích jednotek
 
-![Úprava organizace — členové s rolemi a jednotkami, panel správy jednotek](docs/screenshots/org-edit.png)
+![Úprava organizace — členové s rolemi a jednotkami, panel správy jednotek](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png)
 
 ---
 
@@ -135,7 +135,7 @@ Režimy `tag` a `tag_only` jsou deaktivovány, pokud není aktivní modul Tags.
 - **Resetovat přiřazení** — vymaže všechny snapshoty organizací (nebezpečná akce, vyžaduje potvrzení)
 - Příkazová řádka: `php artisan orgportal:backfill-attribution`
 
-![Záložka System — zdroj přiřazení, ukazatel průběhu, předletové statistiky, ovládací prvky doplnění](docs/screenshots/attribution-settings.png)
+![Záložka System — zdroj přiřazení, ukazatel průběhu, předletové statistiky, ovládací prvky doplnění](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/attribution-settings.png)
 
 ---
 
@@ -148,7 +148,7 @@ Režimy `tag` a `tag_only` jsou deaktivovány, pokud není aktivní modul Tags.
 - **Vícejazyčné štítky filtrů stavu Kanbanu** — pojmenujte každý sloupec Kanbanu vlastním názvem pro každý jazyk portálu; přepínejte jazyky pomocí výběru jazyka v nastavení schránky; přetažením změňte pořadí filtrů
 - Přeložené štítky se zobrazují jak v panelu filtrů portálu, tak ve sloupci **Stav** tabulky firemních ticketů; záložní řetězec: uložené nastavení jazyka → uložená angličtina → původní název sloupce
 
-![Kanban — odznaky organizací na kartách a modální okno filtru organizace](docs/screenshots/kanban-org.png)
+![Kanban — odznaky organizací na kartách a modální okno filtru organizace](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
 
 ---
 
@@ -163,7 +163,7 @@ Režimy `tag` a `tag_only` jsou deaktivovány, pokud není aktivní modul Tags.
 - Mazání organizací zůstává výhradně pro administrátory
 - Přístup k portálu je striktně omezen na schránku: manažer z organizace A nemůže přistupovat k organizaci B
 
-![Granulární oprávnění — povolení správy organizací a šablon notifikací](docs/screenshots/user-permissions.png)
+![Granulární oprávnění — povolení správy organizací a šablon notifikací](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/user-permissions.png)
 
 ---
 
@@ -184,7 +184,7 @@ Viz [Org Snapshot](#org-snapshot--trvalé-přiřazení-ticketů) výše pro úpl
 - Pokud je povoleno, manažeři mohou přepnout jazyk portálu; jejich volba se uloží a použije pro notifikační e-maily
 - Toto je vestavěný přepínač jazyka OrgPortalu — funguje nezávisle na jakémkoli modulu pro přepínání jazyka třetí strany; oba mohou koexistovat
 
-![Záložka System — panel přepínače jazyka portálu se zaškrtávacími políčky pro jazyková nastavení](docs/screenshots/system-settings.png)
+![Záložka System — panel přepínače jazyka portálu se zaškrtávacími políčky pro jazyková nastavení](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/system-settings.png)
 
 ---
 
@@ -223,7 +223,7 @@ Zahrnuje jak desktopovou tabulku, tak responzivní **mobilní rozložení karet*
 
 Šablona panelu filtrů podporuje **přepsání** pomocí `enduserportal::partials.tickets_filters` — umístěte vlastní zobrazení na tuto cestu a nahraďte výchozí panel filtrů OrgPortalu při zachování veškeré ostatní funkčnosti.
 
-![Firemní tickety — úplná tabulka s indikátory přečtení, bannerem filtru autora, filtry stavu](docs/screenshots/portal-tickets.png)
+![Firemní tickety — úplná tabulka s indikátory přečtení, bannerem filtru autora, filtry stavu](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-tickets.png)
 
 ### Akce s tickety v portálu
 
@@ -235,7 +235,7 @@ Manažeři mohou jednat přímo — bez nutnosti kontaktovat podporu:
 - **Filtrovat podle jednotky** — globální manažeři filtrují seznam ticketů podle strukturální jednotky
 - **Filtrovat podle stavu Kanbanu** — konfigurovatelné pro každou schránku, štítky zobrazeny v aktuálním jazyce portálu
 
-![Zobrazení ticketu v portálu — formulář odpovědi s přílohami metodou drag & drop a bannerem uzavřeného ticketu](docs/screenshots/portal-reply.png)
+![Zobrazení ticketu v portálu — formulář odpovědi s přílohami metodou drag & drop a bannerem uzavřeného ticketu](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-reply.png)
 
 ### Sledování zobrazení manažerem
 
@@ -243,7 +243,7 @@ Manažeři mohou jednat přímo — bez nutnosti kontaktovat podporu:
 - Zobrazuje jméno manažera, roli (Manažer organizace / Manažer jednotky) a uplynulý čas
 - Zobrazení globálního manažera a manažera jednotky jsou sledována a zobrazena nezávisle — stejné UX jako nativní „Zákazník zobrazil" ve FreeScoutu
 
-![Sledování zobrazení manažerem — poznámka „zobrazeno" se zobrazí pod odpovědí agenta v administrátorském zobrazení ticketu](docs/screenshots/manager-viewed.png)
+![Sledování zobrazení manažerem — poznámka „zobrazeno" se zobrazí pod odpovědí agenta v administrátorském zobrazení ticketu](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/manager-viewed.png)
 
 ---
 
@@ -260,7 +260,7 @@ Vyžaduje modul [End-User Portal](https://freescout.net/module/end-user-portal/)
 - Označit jednotlivé notifikace jako přečtené pomocí ×; **Označit vše jako přečtené** v záhlaví panelu
 - Dotazuje každých 15 sekund; obnovuje se při navigaci zpět/vpřed v prohlížeči (s podporou bfcache)
 
-![Notifikační zvon v reálném čase — rozbalovací nabídka se skupinovými nepřečtenými notifikacemi](docs/screenshots/portal-bell.png)
+![Notifikační zvon v reálném čase — rozbalovací nabídka se skupinovými nepřečtenými notifikacemi](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-bell.png)
 
 ---
 
@@ -280,7 +280,7 @@ Vyžaduje modul [End-User Portal](https://freescout.net/module/end-user-portal/)
 - Globální manažeři spravují všechny členy; manažeři jednotek spravují pouze svou vlastní jednotku
 - Notifikace používají poštovní ovladač příslušné schránky
 
-![Matice odběrů notifikací — přepínače pro jednotlivé jednotky a členy](docs/screenshots/portal-subscriptions.png)
+![Matice odběrů notifikací — přepínače pro jednotlivé jednotky a členy](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-subscriptions.png)
 
 ---
 
@@ -310,7 +310,7 @@ Výše popsaná matice odběrů.
 - **Globální manažeři nemohou povýšit člena na globálního manažera** z portálu — to vyžaduje administrátorský přístup
 - Tlačítko **Aktivovat / deaktivovat** pro každého člena s potvrzením při deaktivaci
 
-![Nastavení organizace portálu — záložky Jednotky a Členové](docs/screenshots/portal-settings.png)
+![Nastavení organizace portálu — záložky Jednotky a Členové](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-settings.png)
 
 ---
 
@@ -351,7 +351,7 @@ Konfigurováno v **Manage → Organizations → záložka Templates** (viditeln�
 
 Jazyk notifikací je určen výběrem jazyka portálu každého manažera, který se automaticky uloží při použití přepínače jazyka.
 
-![E-mailové šablony — sbalitelné panely pro jednotlivá jazyková nastavení, tlačítko Načíst výchozí, editor Summernote](docs/screenshots/admin-templates.png)
+![E-mailové šablony — sbalitelné panely pro jednotlivá jazyková nastavení, tlačítko Načíst výchozí, editor Summernote](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/admin-templates.png)
 
 ---
 
@@ -370,7 +370,7 @@ Vyžaduje modul [API and Webhooks](https://freescout.net/module/api-webhooks/).
 
 📖 **Úplná reference API → [docs/api/README.md](docs/api/README.md)**
 
-![Interaktivní dokumentace API — ReDoc se všemi koncovými body OrgPortalu](docs/screenshots/api-docs.png)
+![Interaktivní dokumentace API — ReDoc se všemi koncovými body OrgPortalu](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/api-docs.png)
 
 ---
 
@@ -438,7 +438,7 @@ Přepisuje globální hodnoty pro konkrétní schránku.
 | Zobrazit blok organizace v profilu zákazníka | Přepnout informační blok organizace v postranním panelu ticketu |
 | Filtry stavu firemních ticketů | Mapovat sloupce Kanbanu na pojmenované filtry v portálu; štítky pro jednotlivé jazyky s přepínačem jazyka; přetažením změnit pořadí |
 
-![Nastavení pro schránku — viditelnost odznaku a filtry stavu Kanbanu s vícejazyčnými štítky](docs/screenshots/mailbox-settings.png)
+![Nastavení pro schránku — viditelnost odznaku a filtry stavu Kanbanu s vícejazyčnými štítky](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/mailbox-settings.png)
 
 ---
 
@@ -477,19 +477,19 @@ Jazyk, který manažer vybere, se vztahuje na všechny řetězce uživatelského
 
 | | |
 |---|---|
-| ![Seznam organizací](docs/screenshots/org-list.png) | ![Úprava organizace](docs/screenshots/org-edit.png) |
+| ![Seznam organizací](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-list.png) | ![Úprava organizace](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png) |
 | *Seznam organizací — filtr stavu, živé vyhledávání, barevné odznaky* | *Úprava organizace — výběr barvy, čipy tagů, tabulka členů* |
-| ![Záložka System](docs/screenshots/system-settings.png) | ![Úprava zákazníka](docs/screenshots/customer-org-field.png) |
+| ![Záložka System](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/system-settings.png) | ![Úprava zákazníka](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/customer-org-field.png) |
 | *Záložka System — režimy přiřazení, doplnění, přepínač jazyka* | *Úprava zákazníka — pole organizace s automatickým doplňováním* |
-| ![Portál firemních ticketů](docs/screenshots/portal-tickets.png) | ![Odpověď v portálu](docs/screenshots/portal-reply.png) |
+| ![Portál firemních ticketů](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-tickets.png) | ![Odpověď v portálu](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-reply.png) |
 | *Firemní tickety — tabulka, filtr autora, indikátory přečtení* | *Ticket v portálu — odpověď s přílohami, banner uzavřeného ticketu* |
-| ![Nastavení organizace portálu](docs/screenshots/portal-settings.png) | ![Notifikační zvon](docs/screenshots/portal-bell.png) |
+| ![Nastavení organizace portálu](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-settings.png) | ![Notifikační zvon](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-bell.png) |
 | *Nastavení organizace portálu — záložky Jednotky a Členové* | *Notifikační zvon v reálném čase s rozbalovací nabídkou* |
-| ![Matice odběrů](docs/screenshots/portal-subscriptions.png) | ![E-mailové šablony](docs/screenshots/admin-templates.png) |
+| ![Matice odběrů](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-subscriptions.png) | ![E-mailové šablony](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/admin-templates.png) |
 | *Matice odběrů notifikací — pro jednotky a členy* | *E-mailové šablony — přepínač jazyka, Načíst výchozí, Summernote* |
-| ![Integrace Kanbanu](docs/screenshots/kanban-org.png) | ![Nastavení schránky](docs/screenshots/mailbox-settings.png) |
+| ![Integrace Kanbanu](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png) | ![Nastavení schránky](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/mailbox-settings.png) |
 | *Kanban — odznaky organizací a modální okno filtru organizace* | *Nastavení schránky — filtry Kanbanu s vícejazyčnými štítky* |
-| ![Dokumentace API](docs/screenshots/api-docs.png) | |
+| ![Dokumentace API](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/api-docs.png) | |
 | *Interaktivní dokumentace API — ReDoc* | |
 
 ---

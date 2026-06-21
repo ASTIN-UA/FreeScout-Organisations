@@ -55,7 +55,7 @@ OrgPortal vult die leemte:
 - **Verwijderen** — alleen beschikbaar als de organisatie 0 leden en 0 tickets heeft (beveiliging)
 - Alle verwijder- en deactiveeringsacties vereisen bevestiging
 
-![Organisatielijst — statusfilter, live zoeken, kleurenbadges, tags, ticketaantallen](docs/screenshots/org-list.png)
+![Organisatielijst — statusfilter, live zoeken, kleurenbadges, tags, ticketaantallen](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-list.png)
 
 ### Organisatiebewerkingsformulier
 
@@ -66,7 +66,7 @@ OrgPortal vult die leemte:
 - **Structurele eenhedenpaneel** — maak eenheden aan en hernoem ze direct in het bewerkingsformulier; leden worden in dezelfde weergave aan eenheden toegewezen
 - **Lid toevoegen** — vult automatisch bestaande niet-gekoppelde gesprekken voor die klant aan
 
-![Organisatiebewerking — kleurenkiezer, tag-chips, ledentabel met rollen en eenheden](docs/screenshots/org-edit.png)
+![Organisatiebewerking — kleurenkiezer, tag-chips, ledentabel met rollen en eenheden](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png)
 
 ### Integratie klantprofiel
 
@@ -75,7 +75,7 @@ OrgPortal vult die leemte:
 - **Org-infoblok in de beheerderticket-zijbalk** — organisatienaam (klikbare link naar de organisatiebewerkingspagina), structurele eenheid en lidrol; zichtbaarheid per postvak in instellingen schakelen
 - **Één actief lidmaatschap per klant** — een klant kan niet worden toegevoegd aan een tweede organisatie terwijl hij een actief lidmaatschap heeft; inactieve/gearchiveerde lidmaatschappen zijn toegestaan
 
-![Klantbewerking — organisatieveld met autocomplete en rolkiezer](docs/screenshots/customer-org-field.png)
+![Klantbewerking — organisatieveld met autocomplete en rolkiezer](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/customer-org-field.png)
 
 ---
 
@@ -100,7 +100,7 @@ Organisaties kunnen worden verdeeld in onbeperkte **structurele eenheden** (afde
 - Eenheidsmanagers hebben volledige portaalmogelijkheden — antwoorden, bijlagen, herbestemming van auteurs, sluiten/heropenen, notificatiebeheer — strikt beperkt tot hun eenheid
 - Tickettoegang en notificatielevering worden gehandhaafd op eenheidsgrenzen
 
-![Organisatiebewerking — leden met rollen en eenheden, eenhedenbeheerpaneel](docs/screenshots/org-edit.png)
+![Organisatiebewerking — leden met rollen en eenheden, eenhedenbeheerpaneel](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png)
 
 ---
 
@@ -135,7 +135,7 @@ Geconfigureerd in **Beheer → Organisaties → Systeemtabblad**:
 - **Koppeling resetten** — wist alle org-momentopnamen (gevaarlijke actie, vereist bevestiging)
 - Opdrachtregel: `php artisan orgportal:backfill-attribution`
 
-![Systeemtabblad — koppelingsbron, voortgangsbalk, preflight-statistieken, backfill-besturingselementen](docs/screenshots/attribution-settings.png)
+![Systeemtabblad — koppelingsbron, voortgangsbalk, preflight-statistieken, backfill-besturingselementen](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/attribution-settings.png)
 
 ---
 
@@ -148,7 +148,7 @@ Geconfigureerd in **Beheer → Organisaties → Systeemtabblad**:
 - **Meertalige Kanban-statusfilterlabels** — geef elke Kanban-kolom een aangepaste naam per portaaltaal; schakel talen met de taalkiezer in per-postvak instellingen; sleep om filters te herordenen
 - Vertaalde labels verschijnen zowel in de portaalfilterbar als in de **Status**-kolom van de bedrijfstickets tabel; terugvalvolgorde: opgeslagen taal → opgeslagen Engels → originele kolomnaam
 
-![Kanban — organisatiebadges op kaarten en organisatiefiltermodaal](docs/screenshots/kanban-org.png)
+![Kanban — organisatiebadges op kaarten en organisatiefiltermodaal](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
 
 ---
 
@@ -163,7 +163,7 @@ Geconfigureerd in **Beheer → Organisaties → Systeemtabblad**:
 - Organisaties verwijderen blijft uitsluitend voorbehouden aan beheerders
 - Portaaltoegang is strikt beperkt per postvak: een manager van Organisatie A heeft geen toegang tot Organisatie B
 
-![Gedetailleerde machtigingen — organisaties en notificatiesjablonen beheren toestaan](docs/screenshots/user-permissions.png)
+![Gedetailleerde machtigingen — organisaties en notificatiesjablonen beheren toestaan](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/user-permissions.png)
 
 ---
 
@@ -184,7 +184,7 @@ Zie [Org Snapshot](#org-snapshot--permanente-ticketkoppeling) hierboven voor de 
 - Wanneer ingeschakeld kunnen managers de portaaltaal wisselen; hun keuze wordt opgeslagen en gebruikt voor notificatie-e-mails
 - Dit is de ingebouwde taalkiezer van OrgPortal — hij werkt onafhankelijk van elke externe taalschakelmodule; beide kunnen naast elkaar bestaan
 
-![Systeemtabblad — portaaltaalkiezerpaneel met taalvakjes](docs/screenshots/system-settings.png)
+![Systeemtabblad — portaaltaalkiezerpaneel met taalvakjes](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/system-settings.png)
 
 ---
 
@@ -223,7 +223,7 @@ Zowel de desktoptabel als een responsieve **mobiele kaartindeling** zijn inbegre
 
 De filterbalk sjabloon ondersteunt **overschrijving** via `enduserportal::partials.tickets_filters` — plaats een aangepaste weergave op dat pad om de standaard filterbalk van OrgPortal te vervangen terwijl alle andere functionaliteit behouden blijft.
 
-![Bedrijfstickets — volledige tabel met leesindicatoren, auteursfilterbanner, statusfilters](docs/screenshots/portal-tickets.png)
+![Bedrijfstickets — volledige tabel met leesindicatoren, auteursfilterbanner, statusfilters](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-tickets.png)
 
 ### Ticketacties in het Portaal
 
@@ -235,7 +235,7 @@ Managers kunnen direct actie ondernemen — geen contact met support nodig:
 - **Filteren op eenheid** — globale managers filteren de ticketlijst op structurele eenheid
 - **Filteren op Kanban-status** — configureerbaar per postvak, labels getoond in de huidige portaaltaal
 
-![Portaalticketweergave — antwoordformulier met drag & drop bijlagen en gesloten-ticket banner](docs/screenshots/portal-reply.png)
+![Portaalticketweergave — antwoordformulier met drag & drop bijlagen en gesloten-ticket banner](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-reply.png)
 
 ### Manager Bekeken Bijhouden
 
@@ -243,7 +243,7 @@ Managers kunnen direct actie ondernemen — geen contact met support nodig:
 - Toont naam van de manager, rol (Organisatiemanager / Eenheidsmanager) en verstreken tijd
 - Globale manager en eenheidsmanager weergaven worden onafhankelijk bijgehouden en weergegeven — zelfde UX als FreeScout's native "Klant bekeken"
 
-![Manager bekeken bijhouden — 'bekeken' notitie verschijnt onder agentantwoord in beheerdersticketweergave](docs/screenshots/manager-viewed.png)
+![Manager bekeken bijhouden — 'bekeken' notitie verschijnt onder agentantwoord in beheerdersticketweergave](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/manager-viewed.png)
 
 ---
 
@@ -260,7 +260,7 @@ Vereist de [End-User Portal](https://freescout.net/module/end-user-portal/) modu
 - Individuele notificaties als gelezen markeren via ×; **Alles als gelezen markeren** in paneelkoptekst
 - Pollt elke 15 seconden; ververst bij navigatie voor/achteruit in browser (bfcache-bewust)
 
-![Realtime notificatiebel — dropdown met gegroepeerde ongelezen notificaties](docs/screenshots/portal-bell.png)
+![Realtime notificatiebel — dropdown met gegroepeerde ongelezen notificaties](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-bell.png)
 
 ---
 
@@ -280,7 +280,7 @@ Vereist de [End-User Portal](https://freescout.net/module/end-user-portal/) modu
 - Globale managers beheren alle leden; eenheidsmanagers beheren alleen hun eigen eenheid
 - Notificaties gebruiken de maildriver van het betreffende postvak
 
-![Notificatieabonnementsmatrix — per-eenheid en per-lid schakelaars](docs/screenshots/portal-subscriptions.png)
+![Notificatieabonnementsmatrix — per-eenheid en per-lid schakelaars](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-subscriptions.png)
 
 ---
 
@@ -310,7 +310,7 @@ De hierboven beschreven abonnementsmatrix.
 - **Globale managers kunnen een lid niet promoveren tot globale manager** vanuit het portaal — dit vereist beheerderstoegang
 - **Activeren / deactiveren** knop per lid met bevestiging voor deactivering
 
-![Portaal Organisatie-instellingen — Eenheden- en Ledentabbladen](docs/screenshots/portal-settings.png)
+![Portaal Organisatie-instellingen — Eenheden- en Ledentabbladen](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-settings.png)
 
 ---
 
@@ -351,7 +351,7 @@ Geconfigureerd in **Beheer → Organisaties → Sjabloontabblad** (zichtbaar voo
 
 De notificatietaal wordt bepaald door de portaaltaalkeuze van elke manager, automatisch opgeslagen wanneer ze de taalkiezer gebruiken.
 
-![E-mailsjablonen — per-taal inklapbare panelen, Standaard laden knop, Summernote-editor](docs/screenshots/admin-templates.png)
+![E-mailsjablonen — per-taal inklapbare panelen, Standaard laden knop, Summernote-editor](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/admin-templates.png)
 
 ---
 
@@ -370,7 +370,7 @@ Vereist de [API and Webhooks](https://freescout.net/module/api-webhooks/) module
 
 📖 **Volledige API-referentie → [docs/api/README.md](docs/api/README.md)**
 
-![Interactieve API-documentatie — ReDoc met alle OrgPortal-eindpunten](docs/screenshots/api-docs.png)
+![Interactieve API-documentatie — ReDoc met alle OrgPortal-eindpunten](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/api-docs.png)
 
 ---
 
@@ -438,7 +438,7 @@ Overschrijft algemene waarden voor het specifieke postvak.
 | Organisatieblok tonen in klantprofiel | Org-infoblok in ticket-zijbalk schakelen |
 | Bedrijfsticket statusfilters | Wijs Kanban-kolommen toe aan benoemde filters in het portaal; per-taal labels met taalkiezer; sleep om te herordenen |
 
-![Per-postvak instellingen — badge zichtbaarheid en Kanban-statusfilters met meertalige labels](docs/screenshots/mailbox-settings.png)
+![Per-postvak instellingen — badge zichtbaarheid en Kanban-statusfilters met meertalige labels](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/mailbox-settings.png)
 
 ---
 
@@ -477,19 +477,19 @@ De taal die een manager selecteert is van toepassing op alle OrgPortal UI-tekste
 
 | | |
 |---|---|
-| ![Organisatielijst](docs/screenshots/org-list.png) | ![Organisatiebewerking](docs/screenshots/org-edit.png) |
+| ![Organisatielijst](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-list.png) | ![Organisatiebewerking](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png) |
 | *Organisatielijst — statusfilter, live zoeken, kleurenbadges* | *Organisatiebewerking — kleurenkiezer, tag-chips, ledentabel* |
-| ![Systeemtabblad](docs/screenshots/system-settings.png) | ![Klantbewerking](docs/screenshots/customer-org-field.png) |
+| ![Systeemtabblad](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/system-settings.png) | ![Klantbewerking](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/customer-org-field.png) |
 | *Systeemtabblad — koppelingmodi, backfill, taalkiezer* | *Klantbewerking — org-veld met autocomplete* |
-| ![Bedrijfstickets portaal](docs/screenshots/portal-tickets.png) | ![Portaalantwoord](docs/screenshots/portal-reply.png) |
+| ![Bedrijfstickets portaal](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-tickets.png) | ![Portaalantwoord](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-reply.png) |
 | *Bedrijfstickets — tabel, auteurfilter, leesindicatoren* | *Portaalticket — antwoord met bijlagen, gesloten banner* |
-| ![Portaal Organisatie-instellingen](docs/screenshots/portal-settings.png) | ![Notificatiebel](docs/screenshots/portal-bell.png) |
+| ![Portaal Organisatie-instellingen](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-settings.png) | ![Notificatiebel](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-bell.png) |
 | *Portaal Org-instellingen — Eenheden- en Ledentabbladen* | *Realtime notificatiebel met dropdown* |
-| ![Abonnementsmatrix](docs/screenshots/portal-subscriptions.png) | ![E-mailsjablonen](docs/screenshots/admin-templates.png) |
+| ![Abonnementsmatrix](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-subscriptions.png) | ![E-mailsjablonen](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/admin-templates.png) |
 | *Notificatieabonnementsmatrix — per-eenheid, per-lid* | *E-mailsjablonen — taalkiezer, Standaard laden, Summernote* |
-| ![Kanban-integratie](docs/screenshots/kanban-org.png) | ![Postvak instellingen](docs/screenshots/mailbox-settings.png) |
+| ![Kanban-integratie](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png) | ![Postvak instellingen](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/mailbox-settings.png) |
 | *Kanban — org-badges en org-filtermodaal* | *Per-postvak instellingen — Kanban-filters met meertalige labels* |
-| ![API-documentatie](docs/screenshots/api-docs.png) | |
+| ![API-documentatie](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/api-docs.png) | |
 | *Interactieve API-documentatie — ReDoc* | |
 
 ---

@@ -71,7 +71,7 @@ OrgPortal заповнює цю прогалину:
 - **Видалити** — доступно тільки коли організація має 0 членів та 0 квитків (механізм безпеки)
 - Всі дії видалення та деактивації вимагають підтвердження
 
-![Список організацій — фільтр статусу, пошук в реальному часі, кольорові піктограми, теги, кількість квитків](docs/screenshots/org-list.png)
+![Organizations list](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-list.png)
 
 ### Форма редагування організації
 
@@ -82,7 +82,7 @@ OrgPortal заповнює цю прогалину:
 - **Панель структурних одиниць** — створюйте та перейменовуйте одиниці безпосередньо у формі редагування; члени призначаються одиницям у тому ж представленні
 - **Додавання члена** — автоматично заповнює існуючі неатрибульовані розмови для цього клієнта
 
-![Редагування організації — палітра кольорів, мікросхеми тегів, таблиця членів з ролями та одиницями](docs/screenshots/org-edit.png)
+![Organization edit](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png)
 
 ### Інтеграція з профілем клієнта
 
@@ -91,7 +91,9 @@ OrgPortal заповнює цю прогалину:
 - **Блок інформації про організацію на бічній панелі адміністратора** — назва організації (посилання, яке можна клікати на сторінку редагування організації), структурна одиниця та роль члена; перемикання видимості для кожної поштової скрині в налаштуваннях
 - **Одне активне членство на клієнта** — клієнт не може бути доданий до другої організації поки має активне членство; неактивні/архівовані членства дозволені
 
-![Редагування клієнта — поле організації з автозаповненням та селектором ролей](docs/screenshots/customer-org-field.png)
+![Customer edit](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/customer-org-field.png)
+
+![Conversation — organization badge](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/conversation-org-badge.png)
 
 ---
 
@@ -116,7 +118,7 @@ OrgPortal заповнює цю прогалину:
 - Менеджери одиниці мають повні можливості портала — відповіді, вкладення, змінення авторів, закриття/повторне відкриття, управління сповіщеннями — обмежені суворо межами їх одиниці
 - Доступ до квитків та доставка сповіщень застосовуються на межах одиниці
 
-![Редагування організації — члени з ролями та одиницями, панель управління одиницями](docs/screenshots/org-edit.png)
+![Organization edit](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png)
 
 ---
 
@@ -151,7 +153,7 @@ OrgPortal заповнює цю прогалину:
 - **Скинути атрибуцію** — очищає усі знімки організацій (дія небезпеки вимагає підтвердження)
 - Командний рядок: `php artisan orgportal:backfill-attribution`
 
-![Вкладка Система — джерело атрибуції, смуга прогресу, статистика перевірки, контролі заповнення](docs/screenshots/attribution-settings.png)
+![Attribution settings](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/attribution-settings.png)
 
 ---
 
@@ -164,7 +166,7 @@ OrgPortal заповнює цю прогалину:
 - **Багатомовні мітки фільтра статусу Kanban** — дайте кожному стовпцю Kanban кастомну назву на кожну мову портала; переходьте між локалізаціями за допомогою селектора мови в налаштуваннях для кожної поштової скрині; перетягніть для переупорядкування фільтрів
 - Перекладені мітки з'являються як у смузі фільтра портала, так і в колоні **State** таблиці квитків компанії; ланцюжок повернення: збережена локалізація → збережена англійська → оригінальна назва стовпця
 
-![Kanban — піктограми організацій на карточках та модальне вікно фільтра організацій](docs/screenshots/kanban-org.png)
+![Kanban integration](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
 
 ---
 
@@ -179,7 +181,7 @@ OrgPortal заповнює цю прогалину:
 - Видалення організацій залишається виключно для адміністраторів
 - Доступ до портала суворо обмежений за поштовою скринею: менеджер з Організації A не може отримати доступ до Організації B
 
-![Гранульовані дозволи — дозволи керування організаціями та шаблонами сповіщень](docs/screenshots/user-permissions.png)
+![User permissions](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/user-permissions.png)
 
 ---
 
@@ -199,8 +201,6 @@ OrgPortal заповнює цю прогалину:
 - **Вибрати які з 19 локалізацій** пропонувати (сітка прапорців); усі активні за замовчуванням
 - Коли активовано, менеджери можуть переходити між мовами портала; їх вибір зберігається та використовується для електронних сповіщень
 - Це вбудований селектор мови OrgPortal — працює незалежно від будь-якого модуля перемикання мови третьої сторони; обидва можуть співіснувати
-
-![Вкладка Система — панель селектора мови портала з прапорцями локалізацій](docs/screenshots/system-settings.png)
 
 ---
 
@@ -239,7 +239,7 @@ OrgPortal заповнює цю прогалину:
 
 Шаблон смуги фільтра підтримує **перевизначення** через `enduserportal::partials.tickets_filters` — розмістіть кастомне представлення за цим шляхом щоб замінити мову OrgPortal за замовчуванням збереігаючи усю функціональність.
 
-![Company Tickets — повна таблиця з індикаторами прочитання, банер фільтра автора, фільтри статусу](docs/screenshots/portal-tickets.png)
+![Company Tickets](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-tickets.png)
 
 ### Дії з квитками у портала
 
@@ -251,7 +251,7 @@ OrgPortal заповнює цю прогалину:
 - **Фільтрувати по одиниці** — глобальні менеджери фільтрують список квитків за структурною одиницею
 - **Фільтрувати по статусу Kanban** — налаштовується для кожної поштової скрині, мітки показуються на поточній мові портала
 
-![Представлення квитка портала — форма відповіді з перетягуванням & розташуванням вкладень та банером про закритий квиток](docs/screenshots/portal-reply.png)
+![Portal ticket](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-reply.png)
 
 ### Відслідкування перегляду менеджером
 
@@ -259,24 +259,22 @@ OrgPortal заповнює цю прогалину:
 - Показує ім'я менеджера, роль (Менеджер організації / Менеджер одиниці) та час що пройшов
 - Представлення глобального менеджера та менеджера одиниці відслідковується та показується незалежно — такий же UX як рідна FreeScout "Клієнт переглянув"
 
-![Відслідкування перегляду менеджером — нотатка "переглянуто" з'являється під відповіддю агента в представленні адміністративного квитка](docs/screenshots/manager-viewed.png)
+![Manager viewed](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/manager-viewed.png)
 
 ---
 
-## Дзвіночок сповіщень в реальному часі *(опціонально)*
+## Real-Time Notification Bell *(optional)*
 
-*Тримайте менеджерів в курсі момент коли щось сталось з квитками їх компанії.*
+*Keep managers informed the moment something happens with their company's tickets.*
 
-Вимагає модуль [End-User Portal](https://freescout.net/module/end-user-portal/).
+Requires the [End-User Portal](https://freescout.net/module/end-user-portal/) module.
 
-- 🔔 Іконка дзвіночка з піктограмою живого непрочитаного числа у панелі навігації EUP — переміщується автоматично на мобільних (поруч з меню бургера)
-- Сповіщення для: **новий квиток**, **відповідь агента**, **відповідь клієнта** — для усіх ролей менеджерів
-- Панель випадаючого меню з сповіщеннями згрупованими за датою: ім'я актора, тип події, номер квитка, попередній перегляд повідомлення, мітка часу
-- **Автоматичне позначення як прочитане** коли менеджер відкриває квиток
-- Позначити окремі сповіщення як прочитане через ×; **Позначити усі як прочитане** у заголовку панелі
-- Опитує кожні 15 секунд; оновлює при навігації браузера назад/вперед (bfcache-aware)
-
-![Дзвіночок сповіщень в реальному часі — випадаюче меню з згрупованими непрочитаними сповіщеннями](docs/screenshots/portal-bell.png)
+- 🔔 Bell icon with live unread count badge in the EUP navbar — repositions automatically on mobile (next to the hamburger menu)
+- Notifications for: **new ticket**, **agent reply**, **customer reply** — for all manager roles
+- Dropdown panel with notifications grouped by date: actor name, event type, ticket number, message preview, timestamp
+- **Auto-mark as read** when the manager opens the ticket
+- Mark individual notifications read via ×; **Mark all as read** in panel header
+- Polls every 15 seconds; refreshes on browser back/forward navigation (bfcache-aware)
 
 ---
 
@@ -296,7 +294,7 @@ OrgPortal заповнює цю прогалину:
 - Глобальні менеджери керують усіма членами; менеджери одиниці керують тільки своєю одиницею
 - Сповіщення використовують драйвер пошти відповідної поштової скрині
 
-![Матриця підписки на сповіщення — перемикачи для кожної одиниці та для кожного члена](docs/screenshots/portal-subscriptions.png)
+![Notification subscriptions](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-subscriptions.png)
 
 ---
 
@@ -310,23 +308,25 @@ OrgPortal заповнює цю прогалину:
 
 Матриця підписки описана вище.
 
-### Вкладка одиниць *(тільки глобальні менеджери)*
+### Units tab *(global managers only)*
 
-- **Створити одиницю** — вбудована форма з полем назви
-- **Перейменувати одиницю** — вбудоване редагування безпосередньо в рядку таблиці
-- **Видалити одиницю** — кнопка з підтвердженням; менеджери одиниці автоматично понижуються до member
-- Кількість членів показується на одиницю
+- **Create unit** — inline form with name field
+- **Rename unit** — inline edit directly in the table row
+- **Delete unit** — button with confirmation; unit managers are automatically demoted to member
+- Member count shown per unit
 
-### Вкладка членів
+### Members tab
 
-- Таблиця усіх членів організації: ім'я, структурна одиниця, роль, значок активний/неактивний статус
-- **"Глобальний менеджер"** мітка показується поруч з ім'ям члена де доречно
-- **Показати деактивованих** прапорець — з'являється тільки коли існують неактивні члени; сховано за замовчуванням
-- **Глобальні менеджери** можуть оновити будь-якого члена одиниці та ролі з вбудованою формою (вибір одиниці + вибір ролі + Застосувати)
-- **Глобальні менеджери не можуть підвищити члена до глобального менеджера** з портала — це вимагає доступу адміністратора
-- Кнопка **Активувати / деактивувати** для кожного члена з підтвердженням для деактивації
+- Table of all organization members: name, structural unit, role, active/inactive status badge
+- **"Global manager"** label shown next to the member name where applicable
+- **Show deactivated** checkbox — appears only when inactive members exist; hidden by default
+- **Global managers** can update any member's unit and role with an inline form (unit select + role select + Apply)
+- **Global managers cannot promote a member to global manager** from the portal — this requires admin access
+- **Activate / deactivate** button per member with confirmation for deactivation
 
-![Налаштування організації портала — вкладки одиниці та членів](docs/screenshots/portal-settings.png)
+![Portal Settings — Units tab](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-settings-units.png)
+
+![Portal Settings — Members tab](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-settings-members.png)
 
 ---
 
@@ -367,7 +367,7 @@ OrgPortal заповнює цю прогалину:
 
 Мова сповіщення визначається вибором мови портала кожного менеджера, автоматично збережено коли вони використовують селектор мови.
 
-![Шаблони електронних сповіщень — панелі для кожної локалізації що схлопуються, кнопка завантажити за замовчуванням, редактор Summernote](docs/screenshots/admin-templates.png)
+![Email templates](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/admin-templates.png)
 
 ---
 
@@ -384,9 +384,11 @@ OrgPortal заповнює цю прогалину:
 - Автентифікація через заголовок `X-FreeScout-API-Key` або параметр запиту `api_key`
 - Інтерактивна **документація ReDoc** на **Керування → API & Webhooks → OrgPortal API Docs** (`/orgportal/admin/api-docs`)
 
-📖 **Повне довідник API → [docs/api/README.md](docs/api/README.md)**
+📖 **Full API reference → [docs/api/README.md](docs/api/README.md)**
 
-![Інтерактивна документація API — ReDoc з усіма кінцевими точками OrgPortal](docs/screenshots/api-docs.png)
+![API documentation](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/api-docs.png)
+
+![API Docs link](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/api-docs-link.png)
 
 ---
 
@@ -454,7 +456,7 @@ OrgPortal підтримує **оновлення одним кліком** че
 | Показати блок організації в профілі клієнта | Перемикання блоку інформації організації у бічній панелі квитка |
 | Фільтри статусу квитків компанії |映射 стовпців Kanban на названі фільтри у портала; мітки для кожної мови з селектором локалізації; перетягніть для переупорядкування |
 
-![Налаштування для кожної поштової скрині — видимість піктограми та фільтри статусу Kanban з багатомовними мітками](docs/screenshots/mailbox-settings.png)
+![Mailbox settings](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/mailbox-settings.png)
 
 ---
 
@@ -489,24 +491,26 @@ OrgPortal включає вбудований селектор мови порт
 
 ---
 
-## Скріншоти
+## Screenshots
 
 | | |
 |---|---|
-| ![Список організацій](docs/screenshots/org-list.png) | ![Редагування організації](docs/screenshots/org-edit.png) |
-| *Список організацій — фільтр статусу, пошук в реальному часі, кольорові піктограми* | *Редагування організації — палітра кольорів, мікросхеми тегів, таблиця членів* |
-| ![Вкладка Система](docs/screenshots/system-settings.png) | ![Редагування клієнта](docs/screenshots/customer-org-field.png) |
-| *Вкладка Система — режими атрибуції, заповнення, селектор мови* | *Редагування клієнта — поле організації з автозаповненням* |
-| ![Портал Company Tickets](docs/screenshots/portal-tickets.png) | ![Відповідь в портала](docs/screenshots/portal-reply.png) |
-| *Company Tickets — таблиця, фільтр автора, індикатори прочитання* | *Квиток портала — відповідь з вкладеннями, закритий банер* |
-| ![Налаштування організації портала](docs/screenshots/portal-settings.png) | ![Дзвіночок сповіщень](docs/screenshots/portal-bell.png) |
-| *Налаштування організації портала — вкладки одиниці та членів* | *Дзвіночок сповіщень в реальному часі з випадаючим меню* |
-| ![Матриця підписки](docs/screenshots/portal-subscriptions.png) | ![Шаблони електронних сповіщень](docs/screenshots/admin-templates.png) |
-| *Матриця підписки на сповіщення — для кожної одиниці, для кожного члена* | *Шаблони електронних сповіщень — селектор локалізації, завантажити за замовчуванням, Summernote* |
-| ![Інтеграція Kanban](docs/screenshots/kanban-org.png) | ![Налаштування для кожної поштової скрині](docs/screenshots/mailbox-settings.png) |
-| *Kanban — піктограми організацій та модальне вікно фільтра організацій* | *Налаштування для кожної поштової скрині — видимість піктограми та фільтри статусу Kanban з багатомовними мітками* |
-| ![Документація API](docs/screenshots/api-docs.png) | |
-| *Інтерактивна документація API — ReDoc* | |
+| ![Organizations list](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-list.png) | ![Organization edit](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png) |
+| *Organizations list* | *Organization edit* |
+| ![Attribution settings](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/attribution-settings.png) | ![Customer edit](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/customer-org-field.png) |
+| *Attribution settings* | *Customer edit* |
+| ![Conversation — organization badge](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/conversation-org-badge.png) | ![Kanban integration](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png) |
+| *Conversation — organization badge* | *Kanban integration* |
+| ![Company Tickets](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-tickets.png) | ![Portal ticket](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-reply.png) |
+| *Company Tickets* | *Portal ticket* |
+| ![Portal Settings — Units tab](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-settings-units.png) | ![Portal Settings — Members tab](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-settings-members.png) |
+| *Portal Settings — Units tab* | *Portal Settings — Members tab* |
+| ![Notification subscriptions](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-subscriptions.png) | ![Email templates](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/admin-templates.png) |
+| *Notification subscriptions* | *Email templates* |
+| ![Mailbox settings](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/mailbox-settings.png) | ![User permissions](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/user-permissions.png) |
+| *Mailbox settings* | *User permissions* |
+| ![API documentation](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/api-docs.png) | ![Manager viewed](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/manager-viewed.png) |
+| *API documentation* | *Manager viewed* |
 
 ---
 

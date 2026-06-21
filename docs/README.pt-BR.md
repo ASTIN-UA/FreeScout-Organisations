@@ -55,7 +55,7 @@ OrgPortal preenche essa lacuna:
 - **Excluir** — disponível apenas quando a organização tem 0 membros e 0 tickets (proteção de segurança)
 - Todas as ações de exclusão e desativação exigem confirmação
 
-![Lista de organizações — filtro de status, busca ao vivo, emblemas coloridos, tags, contagem de tickets](docs/screenshots/org-list.png)
+![Lista de organizações — filtro de status, busca ao vivo, emblemas coloridos, tags, contagem de tickets](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-list.png)
 
 ### Formulário de edição de organização
 
@@ -66,7 +66,7 @@ OrgPortal preenche essa lacuna:
 - **Painel de unidades estruturais** — crie e renomeie unidades diretamente no formulário de edição; membros são atribuídos às unidades na mesma tela
 - **Adicionar um membro** — preenche automaticamente conversas existentes não atribuídas para esse cliente
 
-![Edição de organização — seletor de cores, chips de tags, tabela de membros com funções e unidades](docs/screenshots/org-edit.png)
+![Edição de organização — seletor de cores, chips de tags, tabela de membros com funções e unidades](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png)
 
 ### Integração com perfil do cliente
 
@@ -75,7 +75,7 @@ OrgPortal preenche essa lacuna:
 - **Bloco de informações da org na barra lateral de tickets do administrador** — nome da organização (link clicável para a página de edição da org), unidade estrutural e função do membro; visibilidade configurável por caixa postal nas configurações
 - **Uma membership ativa por cliente** — um cliente não pode ser adicionado a uma segunda organização enquanto tiver uma membership ativa; memberships inativas/arquivadas são permitidas
 
-![Edição de cliente — campo de organização com autocomplete e seletor de função](docs/screenshots/customer-org-field.png)
+![Edição de cliente — campo de organização com autocomplete e seletor de função](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/customer-org-field.png)
 
 ---
 
@@ -100,7 +100,7 @@ As organizações podem ser divididas em **unidades estruturais** ilimitadas (de
 - Gestores de unidade têm todas as capacidades do portal — respostas, anexos, reatribuição de autor, fechar/reabrir, gerenciamento de notificações — limitadas estritamente à sua unidade
 - O acesso a tickets e a entrega de notificações são aplicados nos limites das unidades
 
-![Edição de organização — membros com funções e unidades, painel de gerenciamento de unidades](docs/screenshots/org-edit.png)
+![Edição de organização — membros com funções e unidades, painel de gerenciamento de unidades](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png)
 
 ---
 
@@ -135,7 +135,7 @@ Os modos `tag` e `tag_only` são desabilitados quando o módulo Tags está inati
 - **Redefinir atribuição** — limpa todos os snapshots da org (ação perigosa, requer confirmação)
 - Linha de comando: `php artisan orgportal:backfill-attribution`
 
-![Aba Sistema — fonte de atribuição, barra de progresso, estatísticas preliminares, controles de preenchimento](docs/screenshots/attribution-settings.png)
+![Aba Sistema — fonte de atribuição, barra de progresso, estatísticas preliminares, controles de preenchimento](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/attribution-settings.png)
 
 ---
 
@@ -148,7 +148,7 @@ Os modos `tag` e `tag_only` são desabilitados quando o módulo Tags está inati
 - **Rótulos multilíngues de filtro de status do Kanban** — dê a cada coluna do Kanban um nome personalizado por idioma do portal; mude de localidade com o seletor de idioma nas configurações por caixa postal; arraste para reordenar os filtros
 - Os rótulos traduzidos aparecem tanto na barra de filtros do portal quanto na coluna **Estado** da tabela de tickets da empresa; cadeia de fallback: localidade salva → inglês salvo → nome original da coluna
 
-![Kanban — emblemas de organização nos cartões e modal de filtro de org](docs/screenshots/kanban-org.png)
+![Kanban — emblemas de organização nos cartões e modal de filtro de org](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
 
 ---
 
@@ -163,7 +163,7 @@ Os modos `tag` e `tag_only` são desabilitados quando o módulo Tags está inati
 - A exclusão de organizações permanece exclusivamente para administradores
 - O acesso ao portal é estritamente limitado por caixa postal: um gestor da Organização A não pode acessar a Organização B
 
-![Permissões granulares — permitir gerenciar organizações e templates de notificação](docs/screenshots/user-permissions.png)
+![Permissões granulares — permitir gerenciar organizações e templates de notificação](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/user-permissions.png)
 
 ---
 
@@ -184,7 +184,7 @@ Consulte [Org Snapshot](#org-snapshot--atribuição-permanente-de-tickets) acima
 - Quando habilitado, os gestores podem trocar o idioma do portal; a escolha é salva e usada para e-mails de notificação
 - Este é o alternador de idioma integrado do OrgPortal — funciona independentemente de qualquer módulo de troca de idioma de terceiros; ambos podem coexistir
 
-![Aba Sistema — painel do alternador de idioma do portal com checkboxes de localidade](docs/screenshots/system-settings.png)
+![Aba Sistema — painel do alternador de idioma do portal com checkboxes de localidade](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/system-settings.png)
 
 ---
 
@@ -223,7 +223,7 @@ Tanto a tabela desktop quanto um **layout de cards responsivo para mobile** est�
 
 O template da barra de filtros suporta **substituição** via `enduserportal::partials.tickets_filters` — coloque uma view personalizada nesse caminho para substituir a barra de filtros padrão do OrgPortal mantendo todas as outras funcionalidades.
 
-![Tickets da Empresa — tabela completa com indicadores de leitura, banner de filtro de autor, filtros de status](docs/screenshots/portal-tickets.png)
+![Tickets da Empresa — tabela completa com indicadores de leitura, banner de filtro de autor, filtros de status](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-tickets.png)
 
 ### Ações de Ticket no Portal
 
@@ -235,7 +235,7 @@ Os gestores podem agir diretamente — sem precisar contatar o suporte:
 - **Filtrar por unidade** — gestores globais filtram a lista de tickets por unidade estrutural
 - **Filtrar por status do Kanban** — configurável por caixa postal, rótulos exibidos no idioma atual do portal
 
-![Visualização de ticket no portal — formulário de resposta com drag & drop de anexos e banner de ticket fechado](docs/screenshots/portal-reply.png)
+![Visualização de ticket no portal — formulário de resposta com drag & drop de anexos e banner de ticket fechado](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-reply.png)
 
 ### Rastreamento de Visualização pelo Gestor
 
@@ -243,7 +243,7 @@ Os gestores podem agir diretamente — sem precisar contatar o suporte:
 - Mostra nome do gestor, função (Gestor da organização / Gestor de unidade) e tempo decorrido
 - Visualizações do gestor global e do gestor de unidade rastreadas e exibidas independentemente — mesma UX do "Cliente visualizou" nativo do FreeScout
 
-![Rastreamento de visualização pelo gestor — nota 'visualizado' aparece abaixo da resposta do agente na visualização de ticket do administrador](docs/screenshots/manager-viewed.png)
+![Rastreamento de visualização pelo gestor — nota 'visualizado' aparece abaixo da resposta do agente na visualização de ticket do administrador](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/manager-viewed.png)
 
 ---
 
@@ -260,7 +260,7 @@ Requer o módulo [End-User Portal](https://freescout.net/module/end-user-portal/
 - Marcar notificações individuais como lidas via ×; **Marcar todas como lidas** no cabeçalho do painel
 - Consulta a cada 15 segundos; atualiza na navegação de voltar/avançar do browser (compatível com bfcache)
 
-![Sino de notificações em tempo real — dropdown com notificações não lidas agrupadas](docs/screenshots/portal-bell.png)
+![Sino de notificações em tempo real — dropdown com notificações não lidas agrupadas](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-bell.png)
 
 ---
 
@@ -280,7 +280,7 @@ Requer o módulo [End-User Portal](https://freescout.net/module/end-user-portal/
 - Gestores globais gerenciam todos os membros; gestores de unidade gerenciam apenas sua própria unidade
 - As notificações usam o driver de e-mail da caixa postal correspondente
 
-![Matriz de assinaturas de notificação — alternâncias por unidade e por membro](docs/screenshots/portal-subscriptions.png)
+![Matriz de assinaturas de notificação — alternâncias por unidade e por membro](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-subscriptions.png)
 
 ---
 
@@ -310,7 +310,7 @@ A matriz de assinaturas descrita acima.
 - **Gestores globais não podem promover um membro a gestor global** no portal — isso requer acesso de administrador
 - Botão **Ativar / desativar** por membro com confirmação para desativação
 
-![Configurações da Organização no Portal — abas Unidades e Membros](docs/screenshots/portal-settings.png)
+![Configurações da Organização no Portal — abas Unidades e Membros](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-settings.png)
 
 ---
 
@@ -351,7 +351,7 @@ Configurado em **Gerenciar → Organizações → aba Templates** (visível para
 
 O idioma da notificação é determinado pela seleção de idioma do portal de cada gestor, salva automaticamente quando ele usa o alternador de idioma.
 
-![Templates de e-mail — painéis recolhíveis por localidade, botão Carregar Padrão, editor Summernote](docs/screenshots/admin-templates.png)
+![Templates de e-mail — painéis recolhíveis por localidade, botão Carregar Padrão, editor Summernote](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/admin-templates.png)
 
 ---
 
@@ -370,7 +370,7 @@ Requer o módulo [API and Webhooks](https://freescout.net/module/api-webhooks/).
 
 📖 **Referência completa da API → [docs/api/README.md](docs/api/README.md)**
 
-![Documentação interativa da API — ReDoc com todos os endpoints do OrgPortal](docs/screenshots/api-docs.png)
+![Documentação interativa da API — ReDoc com todos os endpoints do OrgPortal](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/api-docs.png)
 
 ---
 
@@ -438,7 +438,7 @@ Substitui os valores globais para a caixa postal específica.
 | Exibir bloco de organização no perfil do cliente | Alternar bloco de informações da org na barra lateral do ticket |
 | Filtros de status dos tickets da empresa | Mapeie colunas do Kanban para filtros nomeados no portal; rótulos por idioma com alternador de localidade; arraste para reordenar |
 
-![Configurações por caixa postal — visibilidade do emblema e filtros de status do Kanban com rótulos multilíngues](docs/screenshots/mailbox-settings.png)
+![Configurações por caixa postal — visibilidade do emblema e filtros de status do Kanban com rótulos multilíngues](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/mailbox-settings.png)
 
 ---
 
@@ -477,19 +477,19 @@ O idioma que um gestor seleciona se aplica a todas as strings de interface do Or
 
 | | |
 |---|---|
-| ![Lista de organizações](docs/screenshots/org-list.png) | ![Edição de organização](docs/screenshots/org-edit.png) |
+| ![Lista de organizações](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-list.png) | ![Edição de organização](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png) |
 | *Lista de organizações — filtro de status, busca ao vivo, emblemas coloridos* | *Edição de organização — seletor de cores, chips de tags, tabela de membros* |
-| ![Aba Sistema](docs/screenshots/system-settings.png) | ![Edição de cliente](docs/screenshots/customer-org-field.png) |
+| ![Aba Sistema](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/system-settings.png) | ![Edição de cliente](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/customer-org-field.png) |
 | *Aba Sistema — modos de atribuição, preenchimento, alternador de idioma* | *Edição de cliente — campo de org com autocomplete* |
-| ![Portal de Tickets da Empresa](docs/screenshots/portal-tickets.png) | ![Resposta no portal](docs/screenshots/portal-reply.png) |
+| ![Portal de Tickets da Empresa](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-tickets.png) | ![Resposta no portal](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-reply.png) |
 | *Tickets da Empresa — tabela, filtro de autor, indicadores de leitura* | *Ticket no portal — resposta com anexos, banner de ticket fechado* |
-| ![Configurações da Organização no Portal](docs/screenshots/portal-settings.png) | ![Sino de notificações](docs/screenshots/portal-bell.png) |
+| ![Configurações da Organização no Portal](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-settings.png) | ![Sino de notificações](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-bell.png) |
 | *Config. da Org. no Portal — abas Unidades e Membros* | *Sino de notificações em tempo real com dropdown* |
-| ![Matriz de assinaturas](docs/screenshots/portal-subscriptions.png) | ![Templates de e-mail](docs/screenshots/admin-templates.png) |
+| ![Matriz de assinaturas](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-subscriptions.png) | ![Templates de e-mail](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/admin-templates.png) |
 | *Matriz de assinaturas de notificação — por unidade, por membro* | *Templates de e-mail — alternador de localidade, Carregar Padrão, Summernote* |
-| ![Integração com Kanban](docs/screenshots/kanban-org.png) | ![Configurações por caixa postal](docs/screenshots/mailbox-settings.png) |
+| ![Integração com Kanban](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png) | ![Configurações por caixa postal](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/mailbox-settings.png) |
 | *Kanban — emblemas de org e modal de filtro de org* | *Config. por caixa postal — filtros do Kanban com rótulos multilíngues* |
-| ![Documentação da API](docs/screenshots/api-docs.png) | |
+| ![Documentação da API](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/api-docs.png) | |
 | *Documentação interativa da API — ReDoc* | |
 
 ---

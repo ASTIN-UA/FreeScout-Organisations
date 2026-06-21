@@ -55,7 +55,7 @@ OrgPortal täyttää tämän aukon:
 - **Poista** — saatavilla vain kun organisaatiolla on 0 jäsentä ja 0 tikettejä (turvaesto)
 - Kaikki poisto- ja deaktivointitoiminnot vaativat vahvistuksen
 
-![Organisaatiolista — tilasuodatin, reaaliaikahaku, väritunnisteet, tunnisteet, tikettimäärät](docs/screenshots/org-list.png)
+![Organisaatiolista — tilasuodatin, reaaliaikahaku, väritunnisteet, tunnisteet, tikettimäärät](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-list.png)
 
 ### Organisaation muokkauslomake
 
@@ -66,7 +66,7 @@ OrgPortal täyttää tämän aukon:
 - **Rakenteelliset yksiköt -paneeli** — luo ja nimeä uudelleen yksiköitä suoraan muokkauslomakkeesta; jäsenet liitetään yksiköihin samassa näkymässä
 - **Jäsenen lisääminen** — täydentää automaattisesti asiakkaan olemassa olevat attribuoimattomat viestit
 
-![Organisaation muokkaus — värinvalitsin, tunnistesirut, jäsentaulukko rooleilla ja yksiköillä](docs/screenshots/org-edit.png)
+![Organisaation muokkaus — värinvalitsin, tunnistesirut, jäsentaulukko rooleilla ja yksiköillä](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png)
 
 ### Asiakasprofiilin integraatio
 
@@ -75,7 +75,7 @@ OrgPortal täyttää tämän aukon:
 - **Org-tietojen lohko hallinta-tiketin sivupalkissa** — organisaation nimi (klikattava linkki org-muokkaussivulle), rakenteellinen yksikkö ja jäsenen rooli; vaihda näkyvyyttä postilaatikkokohtaisesti asetuksissa
 - **Yksi aktiivinen jäsenyys asiakkaalle** — asiakasta ei voi lisätä toiseen organisaatioon aktiivisen jäsenyyden aikana; passiiviset/arkistoidut jäsenyydet ovat sallittuja
 
-![Asiakkaan muokkaus — organisaatiokenttä automaattisella haulla ja roolivalitsimella](docs/screenshots/customer-org-field.png)
+![Asiakkaan muokkaus — organisaatiokenttä automaattisella haulla ja roolivalitsimella](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/customer-org-field.png)
 
 ---
 
@@ -100,7 +100,7 @@ Organisaatiot voidaan jakaa rajattomaan määrään **rakenteellisia yksiköitä
 - Yksikköpäälliköillä on täydet portaalin ominaisuudet — vastaukset, liitteet, tekijän siirto, sulkeminen/avaaminen, ilmoitushallinta — rajattuna tiukasti omaan yksikköönsä
 - Tikettien pääsy ja ilmoitusten toimitus noudattavat yksikkörajoja
 
-![Organisaation muokkaus — jäsenet rooleilla ja yksiköillä, yksikönhallintapaneeli](docs/screenshots/org-edit.png)
+![Organisaation muokkaus — jäsenet rooleilla ja yksiköillä, yksikönhallintapaneeli](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png)
 
 ---
 
@@ -135,7 +135,7 @@ Määritetään kohdassa **Manage → Organizations → System tab**:
 - **Nollaa attribuointi** — tyhjentää kaikki org-tilannekuvat (vaarallinen toiminto, vaatii vahvistuksen)
 - Komentorivi: `php artisan orgportal:backfill-attribution`
 
-![Järjestelmävälilehti — attribuointilähde, edistymispalkki, ennakkotilastot, täydennystyökalut](docs/screenshots/attribution-settings.png)
+![Järjestelmävälilehti — attribuointilähde, edistymispalkki, ennakkotilastot, täydennystyökalut](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/attribution-settings.png)
 
 ---
 
@@ -148,7 +148,7 @@ Määritetään kohdassa **Manage → Organizations → System tab**:
 - **Monikieliset Kanban-tilasuodatintunnisteet** — anna jokaiselle Kanban-sarakkeelle mukautettu nimi portaalin kielellä; vaihda lokaalia postilaatikkokohtaisissa asetuksissa olevalla kielenvalitsimella; järjestä vetämällä
 - Käännetyt tunnisteet näkyvät sekä portaalin suodatinpalkissa että yritystikettitaulukon **Tila**-sarakkeessa; varajärjestys: tallennettu lokaalikieli → tallennettu englanti → alkuperäinen sarakkeen nimi
 
-![Kanban — organisaatiotunnisteet korteissa ja organisaatiosuodatinmodaali](docs/screenshots/kanban-org.png)
+![Kanban — organisaatiotunnisteet korteissa ja organisaatiosuodatinmodaali](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
 
 ---
 
@@ -163,7 +163,7 @@ Määritetään kohdassa **Manage → Organizations → System tab**:
 - Organisaatioiden poistaminen on yksinomaan ylläpitäjän oikeus
 - Portaalin pääsy on tiukasti rajattu postilaatikkokohtaisesti: organisaation A päällikkö ei pääse organisaation B tietoihin
 
-![Yksityiskohtaiset käyttöoikeudet — salli organisaatioiden ja ilmoitusmallien hallinta](docs/screenshots/user-permissions.png)
+![Yksityiskohtaiset käyttöoikeudet — salli organisaatioiden ja ilmoitusmallien hallinta](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/user-permissions.png)
 
 ---
 
@@ -184,7 +184,7 @@ Katso [Org Snapshot](#org-snapshot--pysyvä-tikettien-attribuointi) yllä saadak
 - Kun käytössä, päälliköt voivat vaihtaa portaalin kieltä; heidän valintansa tallennetaan ja käytetään ilmoitussähköposteissa
 - Tämä on OrgPortalin sisäänrakennettu kielenvalitsin — se toimii riippumattomasti kolmannen osapuolen kielenvaihtomoduuleista; molemmat voivat olla aktiivisina samanaikaisesti
 
-![Järjestelmävälilehti — portaalin kielenvalitsinpaneeli lokaaliruudukoilla](docs/screenshots/system-settings.png)
+![Järjestelmävälilehti — portaalin kielenvalitsinpaneeli lokaaliruudukoilla](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/system-settings.png)
 
 ---
 
@@ -223,7 +223,7 @@ Sekä pöytätietokoneelle tarkoitettu taulukko että reagoiva **mobiilikorttin�
 
 Suodatinpalkin malline tukee **ohitusta** kohteella `enduserportal::partials.tickets_filters` — sijoita mukautettu näkymä siihen polkuun korvataksesi OrgPortalin oletussuodatinpalkin säilyttäen kaikki muut toiminnot.
 
-![Yritystiketit — täysi taulukko lukuindikaattoreilla, tekijäsuodatinbannerilla, tilasuodattimilla](docs/screenshots/portal-tickets.png)
+![Yritystiketit — täysi taulukko lukuindikaattoreilla, tekijäsuodatinbannerilla, tilasuodattimilla](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-tickets.png)
 
 ### Tikettitoiminnot portaalissa
 
@@ -235,7 +235,7 @@ Päälliköt voivat toimia suoraan — tukeen ei tarvitse ottaa yhteyttä:
 - **Suodata yksiköllä** — globaalit päälliköt suodattavat tikettilistan rakenteellisen yksikön mukaan
 - **Suodata Kanban-tilalla** — postilaatikkokohtaisesti konfiguroitavissa, tunnisteet näytetään nykyisellä portaalin kielellä
 
-![Portaalin tikettinäkymä — vastauslomake vedä-ja-pudota-liitteillä ja suljettu-tiketti-banneri](docs/screenshots/portal-reply.png)
+![Portaalin tikettinäkymä — vastauslomake vedä-ja-pudota-liitteillä ja suljettu-tiketti-banneri](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-reply.png)
 
 ### Päällikön katselun seuranta
 
@@ -243,7 +243,7 @@ Päälliköt voivat toimia suoraan — tukeen ei tarvitse ottaa yhteyttä:
 - Näyttää päällikön nimen, roolin (Organisaation päällikkö / Yksikköpäällikkö) ja kuluneen ajan
 - Globaalin päällikön ja yksikköpäällikön katselut seurataan ja näytetään erikseen — sama UX kuin FreeScoutin natiivi "Asiakas katsoi"
 
-![Päällikön katselun seuranta — 'katsottu'-merkintä ilmestyy agentin vastauksen alle hallinta-tikettinäkymässä](docs/screenshots/manager-viewed.png)
+![Päällikön katselun seuranta — 'katsottu'-merkintä ilmestyy agentin vastauksen alle hallinta-tikettinäkymässä](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/manager-viewed.png)
 
 ---
 
@@ -260,7 +260,7 @@ Vaatii [End-User Portal](https://freescout.net/module/end-user-portal/) -moduuli
 - Merkitse yksittäiset ilmoitukset luetuksi × -painikkeella; **Merkitse kaikki luetuksi** paneelin otsikossa
 - Pollaa 15 sekunnin välein; päivittyy selaimen eteen/taakse-navigoinnissa (bfcache-tietoinen)
 
-![Reaaliaikaiset ilmoituskellot — pudotuspaneeli ryhmitellyillä lukemattomilla ilmoituksilla](docs/screenshots/portal-bell.png)
+![Reaaliaikaiset ilmoituskellot — pudotuspaneeli ryhmitellyillä lukemattomilla ilmoituksilla](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-bell.png)
 
 ---
 
@@ -280,7 +280,7 @@ Vaatii [End-User Portal](https://freescout.net/module/end-user-portal/) -moduuli
 - Globaalit päälliköt hallitsevat kaikkia jäseniä; yksikköpäälliköt hallitsevat vain omaa yksikköään
 - Ilmoitukset käyttävät vastaavan postilaatikon sähköpostiajuria
 
-![Ilmoitustilausmatriisi — yksikkö- ja jäsenkohtaiset kytkimet](docs/screenshots/portal-subscriptions.png)
+![Ilmoitustilausmatriisi — yksikkö- ja jäsenkohtaiset kytkimet](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-subscriptions.png)
 
 ---
 
@@ -310,7 +310,7 @@ Yllä kuvattu tilausmatriisi.
 - **Globaalit päälliköt eivät voi ylentää jäsentä globaaliksi päälliköksi** portaalista — tämä vaatii ylläpitäjän oikeudet
 - **Aktivoi / deaktivoi** -painike jäsentä kohti deaktivoinnin vahvistuksella
 
-![Portaalin organisaatioasetukset — Units- ja Members-välilehdet](docs/screenshots/portal-settings.png)
+![Portaalin organisaatioasetukset — Units- ja Members-välilehdet](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-settings.png)
 
 ---
 
@@ -351,7 +351,7 @@ Määritetään kohdassa **Manage → Organizations → Templates tab** (näkyy 
 
 Ilmoituskieli määräytyy jokaisen päällikön portaalin kielivalinnasta, tallennetaan automaattisesti kun he käyttävät kielenvalitsinta.
 
-![Sähköpostimallit — lokaalikohdisteinen kokoontaittuva paneeli, Lataa oletus -painike, Summernote-editori](docs/screenshots/admin-templates.png)
+![Sähköpostimallit — lokaalikohdisteinen kokoontaittuva paneeli, Lataa oletus -painike, Summernote-editori](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/admin-templates.png)
 
 ---
 
@@ -370,7 +370,7 @@ Vaatii [API and Webhooks](https://freescout.net/module/api-webhooks/) -moduulin.
 
 📖 **Täysi API-viite → [docs/api/README.md](docs/api/README.md)**
 
-![Interaktiivinen API-dokumentaatio — ReDoc kaikilla OrgPortal-päätepisteillä](docs/screenshots/api-docs.png)
+![Interaktiivinen API-dokumentaatio — ReDoc kaikilla OrgPortal-päätepisteillä](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/api-docs.png)
 
 ---
 
@@ -438,7 +438,7 @@ Ohittaa globaalit arvot tietyn postilaatikon osalta.
 | Näytä organisaatiolohko asiakasprofiilissa | Vaihda org-tietolohkon näkyvyyttä tiketin sivupalkissa |
 | Yritystikettien tilasuodattimet | Kartoita Kanban-sarakkeet nimettyihin suodattimiin portaalissa; kielikohtaiset tunnisteet lokaalikytkimellä; järjestä vetämällä |
 
-![Postilaatikkokohtaiset asetukset — tunnistevärin näkyvyys ja Kanban-tilasuodattimet monikielisillä tunnisteilla](docs/screenshots/mailbox-settings.png)
+![Postilaatikkokohtaiset asetukset — tunnistevärin näkyvyys ja Kanban-tilasuodattimet monikielisillä tunnisteilla](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/mailbox-settings.png)
 
 ---
 
@@ -477,19 +477,19 @@ Päällikön valitsema kieli koskee kaikkia OrgPortalin käyttöliittymämerkkij
 
 | | |
 |---|---|
-| ![Organisaatiolista](docs/screenshots/org-list.png) | ![Organisaation muokkaus](docs/screenshots/org-edit.png) |
+| ![Organisaatiolista](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-list.png) | ![Organisaation muokkaus](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png) |
 | *Organisaatiolista — tilasuodatin, reaaliaikahaku, väritunnisteet* | *Organisaation muokkaus — värinvalitsin, tunnistesirut, jäsentaulukko* |
-| ![Järjestelmävälilehti](docs/screenshots/system-settings.png) | ![Asiakkaan muokkaus](docs/screenshots/customer-org-field.png) |
+| ![Järjestelmävälilehti](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/system-settings.png) | ![Asiakkaan muokkaus](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/customer-org-field.png) |
 | *Järjestelmävälilehti — attribuointitilat, täydennys, kielenvalitsin* | *Asiakkaan muokkaus — org-kenttä automaattisella haulla* |
-| ![Yritystiketit portaali](docs/screenshots/portal-tickets.png) | ![Portaalin vastaus](docs/screenshots/portal-reply.png) |
+| ![Yritystiketit portaali](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-tickets.png) | ![Portaalin vastaus](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-reply.png) |
 | *Yritystiketit — taulukko, tekijäsuodatin, lukuindikaattorit* | *Portaalin tiketti — vastaus liitteillä, suljettu-banneri* |
-| ![Portaalin organisaatioasetukset](docs/screenshots/portal-settings.png) | ![Ilmoituskello](docs/screenshots/portal-bell.png) |
+| ![Portaalin organisaatioasetukset](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-settings.png) | ![Ilmoituskello](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-bell.png) |
 | *Portaalin org-asetukset — Units- ja Members-välilehdet* | *Reaaliaikaiset ilmoituskellot pudotuspaneelilla* |
-| ![Tilausmatriisi](docs/screenshots/portal-subscriptions.png) | ![Sähköpostimallit](docs/screenshots/admin-templates.png) |
+| ![Tilausmatriisi](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-subscriptions.png) | ![Sähköpostimallit](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/admin-templates.png) |
 | *Ilmoitustilausmatriisi — yksikkö- ja jäsenkohtainen* | *Sähköpostimallit — lokaalivalitsin, Lataa oletus, Summernote* |
-| ![Kanban-integraatio](docs/screenshots/kanban-org.png) | ![Postilaatikkoasetukset](docs/screenshots/mailbox-settings.png) |
+| ![Kanban-integraatio](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png) | ![Postilaatikkoasetukset](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/mailbox-settings.png) |
 | *Kanban — org-tunnisteet ja org-suodatinmodaali* | *Postilaatikkoasetukset — Kanban-suodattimet monikielisillä tunnisteilla* |
-| ![API-dokumentaatio](docs/screenshots/api-docs.png) | |
+| ![API-dokumentaatio](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/api-docs.png) | |
 | *Interaktiivinen API-dokumentaatio — ReDoc* | |
 
 ---

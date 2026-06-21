@@ -55,7 +55,7 @@ OrgPortal 填补了这一空缺：
 - **删除** — 仅当组织有 0 个成员和 0 张工单时可用（安全保护）
 - 所有删除和停用操作都需要确认
 
-![组织列表 — 状态筛选、实时搜索、颜色徽章、标签、工单数量](docs/screenshots/org-list.png)
+![组织列表 — 状态筛选、实时搜索、颜色徽章、标签、工单数量](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-list.png)
 
 ### 组织编辑表单
 
@@ -66,7 +66,7 @@ OrgPortal 填补了这一空缺：
 - **结构单元面板** — 直接在编辑表单中创建和重命名单元；成员在同一视图中分配到单元
 - **添加成员** — 自动为该客户现有的未归属对话进行回填
 
-![组织编辑 — 颜色选择器、标签片、带角色和单元的成员表格](docs/screenshots/org-edit.png)
+![组织编辑 — 颜色选择器、标签片、带角色和单元的成员表格](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png)
 
 ### 客户档案集成
 
@@ -75,7 +75,7 @@ OrgPortal 填补了这一空缺：
 - **管理员工单侧边栏中的组织信息块** — 组织名称（可点击链接到组织编辑页面）、结构单元和成员角色；可在设置中按邮箱切换可见性
 - **每位客户只能有一个活跃成员关系** — 客户有活跃成员关系时无法被添加到第二个组织；允许非活跃/已归档的成员关系
 
-![客户编辑 — 带自动完成和角色选择器的组织字段](docs/screenshots/customer-org-field.png)
+![客户编辑 — 带自动完成和角色选择器的组织字段](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/customer-org-field.png)
 
 ---
 
@@ -100,7 +100,7 @@ OrgPortal 填补了这一空缺：
 - 单元管理员拥有完整的门户功能——回复、附件、作者重新分配、关闭/重新打开、通知管理——严格限定在其单元范围内
 - 工单访问和通知发送在单元边界处强制执行
 
-![组织编辑 — 带角色和单元的成员、单元管理面板](docs/screenshots/org-edit.png)
+![组织编辑 — 带角色和单元的成员、单元管理面板](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png)
 
 ---
 
@@ -135,7 +135,7 @@ OrgPortal 填补了这一空缺：
 - **重置归属** — 清除所有组织快照（危险操作，需要确认）
 - 命令行：`php artisan orgportal:backfill-attribution`
 
-![系统标签页 — 归属来源、进度条、预检统计、回填控件](docs/screenshots/attribution-settings.png)
+![系统标签页 — 归属来源、进度条、预检统计、回填控件](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/attribution-settings.png)
 
 ---
 
@@ -148,7 +148,7 @@ OrgPortal 填补了这一空缺：
 - **多语言 Kanban 状态筛选标签** — 为每个 Kanban 列按门户语言设置自定义名称；在每邮箱设置中使用语言选择器切换语言区域；拖动重新排序筛选器
 - 翻译后的标签同时出现在门户筛选栏和公司工单表格的**状态**列中；回退链：已保存的语言区域 → 已保存的英语 → 原始列名
 
-![Kanban — 卡片上的组织徽章和组织筛选弹窗](docs/screenshots/kanban-org.png)
+![Kanban — 卡片上的组织徽章和组织筛选弹窗](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
 
 ---
 
@@ -163,7 +163,7 @@ OrgPortal 填补了这一空缺：
 - 删除组织仍然仅限管理员
 - 门户访问严格按邮箱限定范围：组织 A 的管理员无法访问组织 B
 
-![细粒度权限 — 允许管理组织和通知模板](docs/screenshots/user-permissions.png)
+![细粒度权限 — 允许管理组织和通知模板](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/user-permissions.png)
 
 ---
 
@@ -184,7 +184,7 @@ OrgPortal 填补了这一空缺：
 - 启用后，管理员可以切换门户语言；其选择会被保存并用于通知邮件
 - 这是 OrgPortal 内置的语言切换器——它独立于任何第三方语言切换模块运行；两者可以同时使用
 
-![系统标签页 — 带语言区域复选框的门户语言切换器面板](docs/screenshots/system-settings.png)
+![系统标签页 — 带语言区域复选框的门户语言切换器面板](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/system-settings.png)
 
 ---
 
@@ -223,7 +223,7 @@ OrgPortal 填补了这一空缺：
 
 筛选栏模板支持通过 `enduserportal::partials.tickets_filters` 进行**覆盖** — 在该路径放置自定义视图以替换 OrgPortal 的默认筛选栏，同时保留所有其他功能。
 
-![公司工单 — 带已读指示器、作者筛选横幅、状态筛选的完整表格](docs/screenshots/portal-tickets.png)
+![公司工单 — 带已读指示器、作者筛选横幅、状态筛选的完整表格](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-tickets.png)
 
 ### 门户中的工单操作
 
@@ -235,7 +235,7 @@ OrgPortal 填补了这一空缺：
 - **按单元筛选** — 全局管理员按结构单元筛选工单列表
 - **按 Kanban 状态筛选** — 可按邮箱配置，标签以当前门户语言显示
 
-![门户工单视图 — 带拖放附件和已关闭工单横幅的回复表单](docs/screenshots/portal-reply.png)
+![门户工单视图 — 带拖放附件和已关闭工单横幅的回复表单](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-reply.png)
 
 ### 管理员查看跟踪
 
@@ -243,7 +243,7 @@ OrgPortal 填补了这一空缺：
 - 显示管理员姓名、角色（组织管理员 / 单元管理员）和经过的时间
 - 全局管理员和单元管理员的查看记录独立跟踪和显示——与 FreeScout 原生"客户已查看"相同的用户体验
 
-![管理员查看跟踪 — 管理员工单视图中客服回复下方显示"已查看"注记](docs/screenshots/manager-viewed.png)
+![管理员查看跟踪 — 管理员工单视图中客服回复下方显示"已查看"注记](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/manager-viewed.png)
 
 ---
 
@@ -260,7 +260,7 @@ OrgPortal 填补了这一空缺：
 - 通过 × 标记单个通知已读；面板标题中的**全部标记为已读**
 - 每 15 秒轮询一次；在浏览器前进/后退导航时刷新（支持 bfcache）
 
-![实时通知铃铛 — 带分组未读通知的下拉面板](docs/screenshots/portal-bell.png)
+![实时通知铃铛 — 带分组未读通知的下拉面板](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-bell.png)
 
 ---
 
@@ -280,7 +280,7 @@ OrgPortal 填补了这一空缺：
 - 全局管理员管理所有成员；单元管理员只管理自己的单元
 - 通知使用相应邮箱的邮件驱动
 
-![通知订阅矩阵 — 按单元和按成员的切换](docs/screenshots/portal-subscriptions.png)
+![通知订阅矩阵 — 按单元和按成员的切换](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-subscriptions.png)
 
 ---
 
@@ -310,7 +310,7 @@ OrgPortal 填补了这一空缺：
 - **全局管理员无法从门户将成员提升为全局管理员** — 这需要管理员访问权限
 - 每位成员的**启用 / 停用**按钮，停用需要确认
 
-![门户组织设置 — 单元和成员标签页](docs/screenshots/portal-settings.png)
+![门户组织设置 — 单元和成员标签页](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-settings.png)
 
 ---
 
@@ -351,7 +351,7 @@ OrgPortal 填补了这一空缺：
 
 通知语言由每位管理员的门户语言选择决定，使用语言切换器时自动保存。
 
-![邮件模板 — 按语言区域的可折叠面板、加载默认值按钮、Summernote 编辑器](docs/screenshots/admin-templates.png)
+![邮件模板 — 按语言区域的可折叠面板、加载默认值按钮、Summernote 编辑器](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/admin-templates.png)
 
 ---
 
@@ -370,7 +370,7 @@ OrgPortal 填补了这一空缺：
 
 📖 **完整 API 参考 → [docs/api/README.md](docs/api/README.md)**
 
-![交互式 API 文档 — 包含所有 OrgPortal 端点的 ReDoc](docs/screenshots/api-docs.png)
+![交互式 API 文档 — 包含所有 OrgPortal 端点的 ReDoc](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/api-docs.png)
 
 ---
 
@@ -438,7 +438,7 @@ OrgPortal 通过 FreeScout 内置的模块更新机制支持**一键更新**。
 | 在客户档案中显示组织块 | 切换工单侧边栏中的组织信息块 |
 | 公司工单状态筛选 | 将 Kanban 列映射到门户中的命名筛选器；带语言区域切换器的每语言标签；拖动重新排序 |
 
-![每邮箱设置 — 徽章可见性和带多语言标签的 Kanban 状态筛选](docs/screenshots/mailbox-settings.png)
+![每邮箱设置 — 徽章可见性和带多语言标签的 Kanban 状态筛选](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/mailbox-settings.png)
 
 ---
 
@@ -477,19 +477,19 @@ OrgPortal 包含内置的门户语言切换器（在**系统标签页 → 门户
 
 | | |
 |---|---|
-| ![组织列表](docs/screenshots/org-list.png) | ![组织编辑](docs/screenshots/org-edit.png) |
+| ![组织列表](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-list.png) | ![组织编辑](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png) |
 | *组织列表 — 状态筛选、实时搜索、颜色徽章* | *组织编辑 — 颜色选择器、标签片、成员表格* |
-| ![系统标签页](docs/screenshots/system-settings.png) | ![客户编辑](docs/screenshots/customer-org-field.png) |
+| ![系统标签页](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/system-settings.png) | ![客户编辑](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/customer-org-field.png) |
 | *系统标签页 — 归属模式、回填、语言切换器* | *客户编辑 — 带自动完成的组织字段* |
-| ![公司工单门户](docs/screenshots/portal-tickets.png) | ![门户回复](docs/screenshots/portal-reply.png) |
+| ![公司工单门户](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-tickets.png) | ![门户回复](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-reply.png) |
 | *公司工单 — 表格、作者筛选、已读指示器* | *门户工单 — 带附件的回复、已关闭横幅* |
-| ![门户组织设置](docs/screenshots/portal-settings.png) | ![通知铃铛](docs/screenshots/portal-bell.png) |
+| ![门户组织设置](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-settings.png) | ![通知铃铛](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-bell.png) |
 | *门户组织设置 — 单元和成员标签页* | *带下拉面板的实时通知铃铛* |
-| ![订阅矩阵](docs/screenshots/portal-subscriptions.png) | ![邮件模板](docs/screenshots/admin-templates.png) |
+| ![订阅矩阵](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-subscriptions.png) | ![邮件模板](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/admin-templates.png) |
 | *通知订阅矩阵 — 按单元、按成员* | *邮件模板 — 语言区域切换器、加载默认值、Summernote* |
-| ![Kanban 集成](docs/screenshots/kanban-org.png) | ![邮箱设置](docs/screenshots/mailbox-settings.png) |
+| ![Kanban 集成](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png) | ![邮箱设置](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/mailbox-settings.png) |
 | *Kanban — 组织徽章和组织筛选弹窗* | *每邮箱设置 — 带多语言标签的 Kanban 筛选* |
-| ![API 文档](docs/screenshots/api-docs.png) | |
+| ![API 文档](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/api-docs.png) | |
 | *交互式 API 文档 — ReDoc* | |
 
 ---

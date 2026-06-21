@@ -55,7 +55,7 @@ OrgPortal fyller den luckan:
 - **Ta bort** — tillgängligt endast när organisationen har 0 medlemmar och 0 ärenden (säkerhetsskydd)
 - Alla borttagnings- och inaktiveringsåtgärder kräver bekräftelse
 
-![Organisationslista — statusfilter, livesökning, färgmärken, taggar, ärendeantal](docs/screenshots/org-list.png)
+![Organisationslista — statusfilter, livesökning, färgmärken, taggar, ärendeantal](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-list.png)
 
 ### Organisationsredigeringsformulär
 
@@ -66,7 +66,7 @@ OrgPortal fyller den luckan:
 - **Panel för strukturella enheter** — skapa och byt namn på enheter direkt i redigeringsformuläret; medlemmar tilldelas enheter i samma vy
 - **Att lägga till en medlem** — fyller automatiskt i befintliga otillskrivna konversationer för den kunden
 
-![Organisationsredigering — färgväljare, tagg-chips, medlemstabell med roller och enheter](docs/screenshots/org-edit.png)
+![Organisationsredigering — färgväljare, tagg-chips, medlemstabell med roller och enheter](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png)
 
 ### Integration med kundprofil
 
@@ -75,7 +75,7 @@ OrgPortal fyller den luckan:
 - **Org-infoblocket i administratörsärendets sidopanel** — organisationsnamn (klickbar länk till org-redigeringssidan), strukturell enhet och medlemsroll; växla synlighet per postlåda i inställningar
 - **Ett aktivt medlemskap per kund** — en kund kan inte läggas till i en andra organisation medan de har ett aktivt medlemskap; inaktiva/arkiverade medlemskap är tillåtna
 
-![Kundredigering — organisationsfält med autokomplettering och rollväljare](docs/screenshots/customer-org-field.png)
+![Kundredigering — organisationsfält med autokomplettering och rollväljare](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/customer-org-field.png)
 
 ---
 
@@ -100,7 +100,7 @@ Organisationer kan delas in i obegränsat antal **strukturella enheter** (avdeln
 - Enhetschefer har fullständiga portalfunktioner — svar, bilagor, omtilldelning av författare, stäng/öppna igen, avisieringshantering — strikt begränsade till deras enhet
 - Åtkomst till ärenden och leverans av aviseringar upprätthålls vid enhetsgränser
 
-![Organisationsredigering — medlemmar med roller och enheter, enhetshanterings-panel](docs/screenshots/org-edit.png)
+![Organisationsredigering — medlemmar med roller och enheter, enhetshanterings-panel](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png)
 
 ---
 
@@ -135,7 +135,7 @@ Konfigureras i **Manage → Organizations → System tab**:
 - **Återställ tillskrivning** — rensar alla org-ögonblicksbilder (farlig åtgärd, kräver bekräftelse)
 - Kommandorad: `php artisan orgportal:backfill-attribution`
 
-![Systemflik — tillskrivningskälla, förloppsindikator, preflight-statistik, backfill-kontroller](docs/screenshots/attribution-settings.png)
+![Systemflik — tillskrivningskälla, förloppsindikator, preflight-statistik, backfill-kontroller](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/attribution-settings.png)
 
 ---
 
@@ -148,7 +148,7 @@ Konfigureras i **Manage → Organizations → System tab**:
 - **Flerspråkiga Kanban-statusfilteretikett** — ge varje Kanban-kolumn ett anpassat namn per portalspråk; växla lokaler med språkväljaren i per-postlåde-inställningar; dra för att ordna om filter
 - Översatta etiketter visas både i portalens filterfält och i **State**-kolumnen i företagsärendetabellen; fallback-kedja: sparad lokal → sparad engelska → ursprungligt kolumnnamn
 
-![Kanban — organisationsmärken på kort och org-filtermodal](docs/screenshots/kanban-org.png)
+![Kanban — organisationsmärken på kort och org-filtermodal](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
 
 ---
 
@@ -163,7 +163,7 @@ Konfigureras i **Manage → Organizations → System tab**:
 - Borttagning av organisationer förblir uteslutande administratörsexklusivt
 - Portalåtkomst är strikt begränsad per postlåda: en chef från Organisation A kan inte komma åt Organisation B
 
-![Detaljerade behörigheter — tillåt hantering av organisationer och aviseringsmallar](docs/screenshots/user-permissions.png)
+![Detaljerade behörigheter — tillåt hantering av organisationer och aviseringsmallar](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/user-permissions.png)
 
 ---
 
@@ -184,7 +184,7 @@ Se [Org Snapshot](#org-snapshot--permanent-ärendetillskrivning) ovan för den f
 - När aktiverat kan chefer byta portalspråk; deras val sparas och används för aviseringsmeddelanden
 - Detta är OrgPortals inbyggda språkväxlare — den fungerar oberoende av alla tredjepartsspråkbytesmoduler; båda kan samexistera
 
-![Systemflik — portalspråksväxlarpanel med lokalkryssrutor](docs/screenshots/system-settings.png)
+![Systemflik — portalspråksväxlarpanel med lokalkryssrutor](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/system-settings.png)
 
 ---
 
@@ -223,7 +223,7 @@ Både skrivbordstabellen och en responsiv **kortlayout för mobil** ingår; de v
 
 Filterbarsmallen stödjer **åsidosättning** via `enduserportal::partials.tickets_filters` — placera en anpassad vy på den sökvägen för att ersätta OrgPortals standardfilterfält och behålla all annan funktionalitet.
 
-![Företagsärenden — fullständig tabell med läsindikatorer, författarfilterbanner, statusfilter](docs/screenshots/portal-tickets.png)
+![Företagsärenden — fullständig tabell med läsindikatorer, författarfilterbanner, statusfilter](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-tickets.png)
 
 ### Ärendeåtgärder i portalen
 
@@ -235,7 +235,7 @@ Chefer kan agera direkt — inget behov av att kontakta support:
 - **Filtrera efter enhet** — globala chefer filtrerar ärendelistan efter strukturell enhet
 - **Filtrera efter Kanban-status** — konfigurerbar per postlåda, etiketter visas på det aktuella portalspråket
 
-![Portalärendevy — svarsformulär med dra-och-släpp-bilagor och stängd-ärendebanner](docs/screenshots/portal-reply.png)
+![Portalärendevy — svarsformulär med dra-och-släpp-bilagor och stängd-ärendebanner](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-reply.png)
 
 ### Spårning av chefens visning
 
@@ -243,7 +243,7 @@ Chefer kan agera direkt — inget behov av att kontakta support:
 - Visar chefens namn, roll (Organisation manager / Unit manager) och förfluten tid
 - Globala chefs- och enhetschefsvyer spåras och visas oberoende — samma UX som FreeScouts inbyggda "Customer viewed"
 
-![Spårning av chefens visning — 'viewed'-anteckning visas under agentsvar i admin-ärendevy](docs/screenshots/manager-viewed.png)
+![Spårning av chefens visning — 'viewed'-anteckning visas under agentsvar i admin-ärendevy](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/manager-viewed.png)
 
 ---
 
@@ -260,7 +260,7 @@ Kräver modulen [End-User Portal](https://freescout.net/module/end-user-portal/)
 - Markera enskilda aviseringar som lästa via ×; **Markera alla som lästa** i panelhuvudet
 - Hämtar var 15:e sekund; uppdateras vid webbläsarens fram/tillbaka-navigering (bfcache-medveten)
 
-![Aviseringsklocka i realtid — rullgardin med grupperade olästa aviseringar](docs/screenshots/portal-bell.png)
+![Aviseringsklocka i realtid — rullgardin med grupperade olästa aviseringar](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-bell.png)
 
 ---
 
@@ -280,7 +280,7 @@ Kräver modulen [End-User Portal](https://freescout.net/module/end-user-portal/)
 - Globala chefer hanterar alla medlemmar; enhetschefer hanterar bara sin egen enhet
 - Aviseringar använder postdrivrutinen för den motsvarande postlådan
 
-![Aviseringsprenumerationsmatris — per-enhets- och per-medlemsväxlar](docs/screenshots/portal-subscriptions.png)
+![Aviseringsprenumerationsmatris — per-enhets- och per-medlemsväxlar](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-subscriptions.png)
 
 ---
 
@@ -310,7 +310,7 @@ Prenumerationsmatrisen beskriven ovan.
 - **Globala chefer kan inte befordra en medlem till global chef** från portalen — detta kräver administratörsåtkomst
 - **Aktivera / inaktivera**-knapp per medlem med bekräftelse för inaktivering
 
-![Portalorganisationsinställningar — flikarna Units och Members](docs/screenshots/portal-settings.png)
+![Portalorganisationsinställningar — flikarna Units och Members](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-settings.png)
 
 ---
 
@@ -351,7 +351,7 @@ Konfigureras i **Manage → Organizations → Templates tab** (synlig för anvä
 
 Aviseringsspråket bestäms av varje chefs portalspråksval, sparat automatiskt när de använder språkväxlaren.
 
-![E-postmallar — per-locale infällbara paneler, Ladda standard-knapp, Summernote-redigerare](docs/screenshots/admin-templates.png)
+![E-postmallar — per-locale infällbara paneler, Ladda standard-knapp, Summernote-redigerare](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/admin-templates.png)
 
 ---
 
@@ -370,7 +370,7 @@ Kräver modulen [API and Webhooks](https://freescout.net/module/api-webhooks/).
 
 📖 **Fullständig API-referens → [docs/api/README.md](docs/api/README.md)**
 
-![Interaktiv API-dokumentation — ReDoc med alla OrgPortal-slutpunkter](docs/screenshots/api-docs.png)
+![Interaktiv API-dokumentation — ReDoc med alla OrgPortal-slutpunkter](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/api-docs.png)
 
 ---
 
@@ -438,7 +438,7 @@ När en ny version är tillgänglig visas en banner på **Manage → Modules**. 
 | Visa organisationsblock i kundprofil | Växla org-infoblocket i ärendesidopanelen |
 | Företagsärendessstatusfilter | Mappa Kanban-kolumner till namngivna filter i portalen; per-språketiketter med lokalväxlare; dra för att ordna om |
 
-![Per-postlåde-inställningar — märkessynlighet och Kanban-statusfilter med flerspråkiga etiketter](docs/screenshots/mailbox-settings.png)
+![Per-postlåde-inställningar — märkessynlighet och Kanban-statusfilter med flerspråkiga etiketter](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/mailbox-settings.png)
 
 ---
 
@@ -477,19 +477,19 @@ Det språk en chef väljer gäller för alla OrgPortal UI-strängar och sparas s
 
 | | |
 |---|---|
-| ![Organisationslista](docs/screenshots/org-list.png) | ![Organisationsredigering](docs/screenshots/org-edit.png) |
+| ![Organisationslista](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-list.png) | ![Organisationsredigering](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png) |
 | *Organisationslista — statusfilter, livesökning, färgmärken* | *Organisationsredigering — färgväljare, tagg-chips, medlemstabell* |
-| ![Systemflik](docs/screenshots/system-settings.png) | ![Kundredigering](docs/screenshots/customer-org-field.png) |
+| ![Systemflik](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/system-settings.png) | ![Kundredigering](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/customer-org-field.png) |
 | *Systemflik — tillskrivningslägen, backfill, språkväxlare* | *Kundredigering — org-fält med autokomplettering* |
-| ![Portalen Företagsärenden](docs/screenshots/portal-tickets.png) | ![Portalsvar](docs/screenshots/portal-reply.png) |
+| ![Portalen Företagsärenden](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-tickets.png) | ![Portalsvar](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-reply.png) |
 | *Företagsärenden — tabell, författarfilter, läsindikatorer* | *Portalärende — svar med bilagor, stängd banner* |
-| ![Portalorganisationsinställningar](docs/screenshots/portal-settings.png) | ![Aviseringsklocka](docs/screenshots/portal-bell.png) |
+| ![Portalorganisationsinställningar](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-settings.png) | ![Aviseringsklocka](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-bell.png) |
 | *Portalorganisationsinst. — flikarna Units och Members* | *Aviseringsklocka i realtid med rullgardin* |
-| ![Prenumerationsmatris](docs/screenshots/portal-subscriptions.png) | ![E-postmallar](docs/screenshots/admin-templates.png) |
+| ![Prenumerationsmatris](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-subscriptions.png) | ![E-postmallar](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/admin-templates.png) |
 | *Aviseringsprenumerationsmatris — per-enhet, per-medlem* | *E-postmallar — lokalväxlare, Ladda standard, Summernote* |
-| ![Kanban-integration](docs/screenshots/kanban-org.png) | ![Postlådeinställningar](docs/screenshots/mailbox-settings.png) |
+| ![Kanban-integration](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png) | ![Postlådeinställningar](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/mailbox-settings.png) |
 | *Kanban — org-märken och org-filtermodal* | *Per-postlåde-inställningar — Kanban-filter med flerspråkiga etiketter* |
-| ![API-dokumentation](docs/screenshots/api-docs.png) | |
+| ![API-dokumentation](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/api-docs.png) | |
 | *Interaktiv API-dokumentation — ReDoc* | |
 
 ---

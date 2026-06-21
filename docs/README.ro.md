@@ -55,7 +55,7 @@ OrgPortal umple acest gol:
 - **Ștergere** — disponibilă doar când organizația are 0 membri și 0 tichete (gardă de siguranță)
 - Toate acțiunile de ștergere și dezactivare necesită confirmare
 
-![Lista organizațiilor — filtru de stare, căutare live, insigne colorate, etichete, număr de tichete](docs/screenshots/org-list.png)
+![Lista organizațiilor — filtru de stare, căutare live, insigne colorate, etichete, număr de tichete](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-list.png)
 
 ### Formularul de editare a organizației
 
@@ -66,7 +66,7 @@ OrgPortal umple acest gol:
 - **Panoul unităților structurale** — creează și redenumește unități direct în formularul de editare; membrii sunt atribuiți unităților în aceeași vizualizare
 - **Adăugarea unui membru** — completează automat conversațiile existente neatribuite ale acelui client
 
-![Editare organizație — selector de culori, chip-uri de etichete, tabel de membri cu roluri și unități](docs/screenshots/org-edit.png)
+![Editare organizație — selector de culori, chip-uri de etichete, tabel de membri cu roluri și unități](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png)
 
 ### Integrarea profilului clientului
 
@@ -75,7 +75,7 @@ OrgPortal umple acest gol:
 - **Bloc de informații despre organizație în bara laterală a tichetului din admin** — numele organizației (link clicabil spre pagina de editare a organizației), unitatea structurală și rolul membrului; comutare vizibilitate per căsuță poștală în setări
 - **O singură apartenența activă per client** — un client nu poate fi adăugat la o a doua organizație în timp ce are o apartenența activă; apartenența inactivă/arhivată este permisă
 
-![Editare client — câmp organizație cu autocompletare și selector de rol](docs/screenshots/customer-org-field.png)
+![Editare client — câmp organizație cu autocompletare și selector de rol](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/customer-org-field.png)
 
 ---
 
@@ -100,7 +100,7 @@ Organizațiile pot fi împărțite în **unități structurale** nelimitate (dep
 - Managerii de unitate au capabilități complete în portal — răspunsuri, atașamente, reatribuire autor, închidere/redeschidere, gestionarea notificărilor — limitate strict la unitatea lor
 - Accesul la tichete și livrarea notificărilor sunt aplicate la granițele unității
 
-![Editare organizație — membri cu roluri și unități, panel de gestionare a unităților](docs/screenshots/org-edit.png)
+![Editare organizație — membri cu roluri și unități, panel de gestionare a unităților](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png)
 
 ---
 
@@ -135,7 +135,7 @@ Modurile `tag` și `tag_only` sunt dezactivate când modulul Tags este inactiv.
 - **Resetare atribuire** — șterge toate snapshot-urile organizației (acțiune periculoasă, necesită confirmare)
 - Linie de comandă: `php artisan orgportal:backfill-attribution`
 
-![Fila System — sursa de atribuire, bară de progres, statistici preliminare, controale de completare](docs/screenshots/attribution-settings.png)
+![Fila System — sursa de atribuire, bară de progres, statistici preliminare, controale de completare](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/attribution-settings.png)
 
 ---
 
@@ -148,7 +148,7 @@ Modurile `tag` și `tag_only` sunt dezactivate când modulul Tags este inactiv.
 - **Etichete multilingve pentru filtrele de stare Kanban** — oferă fiecărei coloane Kanban un nume personalizat per limbă a portalului; comutare locale cu selectorul de limbă din setările per căsuță poștală; trage pentru a reordona filtrele
 - Etichetele traduse apar atât în bara de filtrare a portalului, cât și în coloana **State** a tabelului de tichete al companiei; lanț de rezervă: locale salvat → engleza salvată → numele original al coloanei
 
-![Kanban — insigne de organizație pe carduri și modal de filtru al organizației](docs/screenshots/kanban-org.png)
+![Kanban — insigne de organizație pe carduri și modal de filtru al organizației](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
 
 ---
 
@@ -163,7 +163,7 @@ Modurile `tag` și `tag_only` sunt dezactivate când modulul Tags este inactiv.
 - Ștergerea organizațiilor rămâne exclusiv pentru administratori
 - Accesul la portal este limitat strict per căsuță poștală: un manager din Organizația A nu poate accesa Organizația B
 
-![Permisiuni granulare — permite gestionarea organizațiilor și a șabloanelor de notificare](docs/screenshots/user-permissions.png)
+![Permisiuni granulare — permite gestionarea organizațiilor și a șabloanelor de notificare](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/user-permissions.png)
 
 ---
 
@@ -184,7 +184,7 @@ Vezi [Org Snapshot](#org-snapshot--atribuire-permanent-a-tichetelor) de mai sus 
 - Când este activat, managerii pot comuta limba portalului; alegerea lor este salvată și utilizată pentru e-mailurile de notificare
 - Acesta este comutatorul de limbă integrat al OrgPortal — funcționează independent de orice modul terță parte de comutare a limbii; ambele pot coexista
 
-![Fila System — panoul comutatorului de limbă al portalului cu checkbox-uri de locale](docs/screenshots/system-settings.png)
+![Fila System — panoul comutatorului de limbă al portalului cu checkbox-uri de locale](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/system-settings.png)
 
 ---
 
@@ -223,7 +223,7 @@ Atât tabelul pentru desktop, cât și un **layout de card mobil** responsiv sun
 
 Șablonul barei de filtrare suportă **suprascrierea** prin `enduserportal::partials.tickets_filters` — plasează o vizualizare personalizată la acea cale pentru a înlocui bara de filtrare implicită a OrgPortal, păstrând toate celelalte funcționalități.
 
-![Company Tickets — tabel complet cu indicatori de citire, banner filtru autor, filtre de stare](docs/screenshots/portal-tickets.png)
+![Company Tickets — tabel complet cu indicatori de citire, banner filtru autor, filtre de stare](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-tickets.png)
 
 ### Acțiuni asupra tichetelor în portal
 
@@ -235,7 +235,7 @@ Managerii pot acționa direct — fără a fi nevoie să contacteze asistența:
 - **Filtrare după unitate** — managerii globali filtrează lista de tichete după unitatea structurală
 - **Filtrare după starea Kanban** — configurabil per căsuță poștală, etichetele sunt afișate în limba curentă a portalului
 
-![Vizualizare tichet în portal — formular de răspuns cu atașamente drag & drop și banner tichet închis](docs/screenshots/portal-reply.png)
+![Vizualizare tichet în portal — formular de răspuns cu atașamente drag & drop și banner tichet închis](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-reply.png)
 
 ### Urmărirea vizualizării de către manager
 
@@ -243,7 +243,7 @@ Managerii pot acționa direct — fără a fi nevoie să contacteze asistența:
 - Afișează numele managerului, rolul (Organization manager / Unit manager) și timpul scurs
 - Vizualizările managerului global și ale managerului de unitate sunt urmărite și afișate independent — același UX ca „Customer viewed" nativ al FreeScout
 
-![Urmărire vizualizare manager — nota 'viewed' apare sub răspunsul agentului în vizualizarea tichetului din admin](docs/screenshots/manager-viewed.png)
+![Urmărire vizualizare manager — nota 'viewed' apare sub răspunsul agentului în vizualizarea tichetului din admin](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/manager-viewed.png)
 
 ---
 
@@ -260,7 +260,7 @@ Necesită modulul [End-User Portal](https://freescout.net/module/end-user-portal
 - Marchează notificările individuale ca citite prin ×; **Mark all as read** în antetul panoului
 - Interogare la fiecare 15 secunde; se reîmprospătează la navigarea înainte/înapoi în browser (conștient de bfcache)
 
-![Clopoțel de notificare în timp real — dropdown cu notificări necitite grupate](docs/screenshots/portal-bell.png)
+![Clopoțel de notificare în timp real — dropdown cu notificări necitite grupate](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-bell.png)
 
 ---
 
@@ -280,7 +280,7 @@ Necesită modulul [End-User Portal](https://freescout.net/module/end-user-portal
 - Managerii globali gestionează toți membrii; managerii de unitate gestionează doar propria unitate
 - Notificările folosesc driver-ul de mail al căsuței poștale corespunzătoare
 
-![Matricea de abonamente la notificări — comutatoare per-unitate și per-membru](docs/screenshots/portal-subscriptions.png)
+![Matricea de abonamente la notificări — comutatoare per-unitate și per-membru](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-subscriptions.png)
 
 ---
 
@@ -310,7 +310,7 @@ Matricea de abonamente descrisă mai sus.
 - **Managerii globali nu pot promova un membru la manager global** din portal — aceasta necesită acces de administrator
 - Buton **Activare / dezactivare** per membru cu confirmare pentru dezactivare
 
-![Setările organizației din portal — filele Units și Members](docs/screenshots/portal-settings.png)
+![Setările organizației din portal — filele Units și Members](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-settings.png)
 
 ---
 
@@ -351,7 +351,7 @@ Configurat în **Manage → Organizations → fila Templates** (vizibil utilizat
 
 Limba notificării este determinată de selecția limbii portalului a fiecărui manager, salvată automat când folosesc comutatorul de limbă.
 
-![Șabloane de e-mail — panouri pliabile per-locale, buton Load Default, editor Summernote](docs/screenshots/admin-templates.png)
+![Șabloane de e-mail — panouri pliabile per-locale, buton Load Default, editor Summernote](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/admin-templates.png)
 
 ---
 
@@ -370,7 +370,7 @@ Necesită modulul [API and Webhooks](https://freescout.net/module/api-webhooks/)
 
 📖 **Referință API completă → [docs/api/README.md](docs/api/README.md)**
 
-![Documentație API interactivă — ReDoc cu toate endpoint-urile OrgPortal](docs/screenshots/api-docs.png)
+![Documentație API interactivă — ReDoc cu toate endpoint-urile OrgPortal](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/api-docs.png)
 
 ---
 
@@ -438,7 +438,7 @@ Suprascrie valorile globale pentru căsuța poștală specifică.
 | Show organization block in customer profile | Comutare bloc informații organizație în bara laterală a tichetului |
 | Company ticket status filters | Mapează coloanele Kanban la filtre numite în portal; etichete per limbă cu comutator de locale; trage pentru a reordona |
 
-![Setări per căsuță poștală — vizibilitate insignă și filtre de stare Kanban cu etichete multilingve](docs/screenshots/mailbox-settings.png)
+![Setări per căsuță poștală — vizibilitate insignă și filtre de stare Kanban cu etichete multilingve](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/mailbox-settings.png)
 
 ---
 
@@ -477,19 +477,19 @@ Limba selectată de un manager se aplică tuturor șirurilor de interfață OrgP
 
 | | |
 |---|---|
-| ![Lista organizațiilor](docs/screenshots/org-list.png) | ![Editare organizație](docs/screenshots/org-edit.png) |
+| ![Lista organizațiilor](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-list.png) | ![Editare organizație](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/org-edit.png) |
 | *Lista organizațiilor — filtru de stare, căutare live, insigne colorate* | *Editare organizație — selector culori, chip-uri etichete, tabel membri* |
-| ![Fila System](docs/screenshots/system-settings.png) | ![Editare client](docs/screenshots/customer-org-field.png) |
+| ![Fila System](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/system-settings.png) | ![Editare client](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/customer-org-field.png) |
 | *Fila System — moduri de atribuire, completare, comutator de limbă* | *Editare client — câmp organizație cu autocompletare* |
-| ![Portalul Company Tickets](docs/screenshots/portal-tickets.png) | ![Răspuns în portal](docs/screenshots/portal-reply.png) |
+| ![Portalul Company Tickets](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-tickets.png) | ![Răspuns în portal](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-reply.png) |
 | *Company Tickets — tabel, filtru autor, indicatori de citire* | *Tichet în portal — răspuns cu atașamente, banner închis* |
-| ![Setările organizației în portal](docs/screenshots/portal-settings.png) | ![Clopoțel de notificare](docs/screenshots/portal-bell.png) |
+| ![Setările organizației în portal](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-settings.png) | ![Clopoțel de notificare](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-bell.png) |
 | *Setările organizației în portal — filele Units și Members* | *Clopoțel de notificare în timp real cu dropdown* |
-| ![Matricea de abonamente](docs/screenshots/portal-subscriptions.png) | ![Șabloane de e-mail](docs/screenshots/admin-templates.png) |
+| ![Matricea de abonamente](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/portal-subscriptions.png) | ![Șabloane de e-mail](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/admin-templates.png) |
 | *Matricea de abonamente la notificări — per-unitate, per-membru* | *Șabloane e-mail — comutator locale, Load Default, Summernote* |
-| ![Integrare Kanban](docs/screenshots/kanban-org.png) | ![Setări căsuță poștală](docs/screenshots/mailbox-settings.png) |
+| ![Integrare Kanban](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png) | ![Setări căsuță poștală](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/mailbox-settings.png) |
 | *Kanban — insigne organizație și modal filtru organizație* | *Setări per căsuță poștală — filtre Kanban cu etichete multilingve* |
-| ![Documentație API](docs/screenshots/api-docs.png) | |
+| ![Documentație API](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/api-docs.png) | |
 | *Documentație API interactivă — ReDoc* | |
 
 ---
