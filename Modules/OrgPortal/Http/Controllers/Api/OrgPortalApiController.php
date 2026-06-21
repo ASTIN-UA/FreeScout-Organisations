@@ -258,14 +258,30 @@ class OrgPortalApiController extends Controller
 
     /**
      * DELETE /api/organizations/{id}
-     * Delete an organization (cascades members).
+     * Delete an organization. Blocked when it has active members or tickets.
      */
     public function deleteOrganization(int $id): JsonResponse
     {
-        $org = Organization::find($id);
+        $org = Organization::withCount(['members', 'conversations'])->find($id);
 
         if (!$org) {
             return $this->errorResponse('Organization not found.', 404);
+        }
+
+        if ($org->members_count > 0) {
+            return $this->errorResponse(
+                'Cannot delete an organization that has members. Remove all members first.',
+                422,
+                ['members_count' => $org->members_count]
+            );
+        }
+
+        if ($org->conversations_count > 0) {
+            return $this->errorResponse(
+                'Cannot delete an organization that has tickets. Reassign or delete all tickets first.',
+                422,
+                ['conversations_count' => $org->conversations_count]
+            );
         }
 
         $org->delete();

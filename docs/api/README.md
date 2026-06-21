@@ -63,6 +63,7 @@ Authentication — `X-FreeScout-API-Key` header or `api_key` query parameter.
 | `401` | Invalid or missing API key |
 | `404` | Resource not found |
 | `409` | Conflict — customer already has an active membership in another organization |
+| `422` | Business rule violation — e.g. deleting an organization that still has members or tickets |
 | `503` | Required module (e.g. Tags) is not active |
 
 ---
@@ -218,9 +219,21 @@ curl -X PUT "https://your-freescout.com/api/organizations/1" \
 
 ### DELETE /api/organizations/{id}
 
-**200 OK** *(all members are cascaded deleted)*
+Blocked when the organization has active members or tickets. Remove all members and reassign/delete all tickets first.
+
+**200 OK**
 ```json
 {"success": true, "message": "Organization deleted."}
+```
+
+**422 Unprocessable Entity** *(organization has members)*
+```json
+{"message": "Cannot delete an organization that has members. Remove all members first.", "_embedded": {"errors": [{"members_count": 3}]}}
+```
+
+**422 Unprocessable Entity** *(organization has tickets)*
+```json
+{"message": "Cannot delete an organization that has tickets. Reassign or delete all tickets first.", "_embedded": {"errors": [{"conversations_count": 12}]}}
 ```
 
 ---
