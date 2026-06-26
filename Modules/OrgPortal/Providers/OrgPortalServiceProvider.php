@@ -379,19 +379,28 @@ class OrgPortalServiceProvider extends ServiceProvider
                 return;
             }
 
-            $member = OrganizationMember::where('customer_id', $conversation->customer_id)
-                ->with('organization')
-                ->first();
+            $organization = null;
 
-            if (!$member || !$member->organization) {
+            if (OrgAttribution::snapshotEnabled() && $conversation->org_id) {
+                $organization = Organization::find($conversation->org_id);
+            }
+
+            if (!$organization) {
+                $member = OrganizationMember::where('customer_id', $conversation->customer_id)
+                    ->with('organization')
+                    ->first();
+                $organization = $member?->organization;
+            }
+
+            if (!$organization) {
                 return;
             }
 
             $searchBase = rtrim(url(\Helper::getSubdirectory() . 'search'), '/');
-            $searchUrl  = $searchBase . '?' . http_build_query(['f' => ['organization' => $member->organization_id]]);
+            $searchUrl  = $searchBase . '?' . http_build_query(['f' => ['organization' => $organization->id]]);
 
             echo view('orgportal::partials.org_badge', [
-                'organization' => $member->organization,
+                'organization' => $organization,
                 'searchUrl'    => $searchUrl,
             ])->render();
         }, 5, 2);
@@ -417,14 +426,24 @@ class OrgPortalServiceProvider extends ServiceProvider
             }
 
             $customerId = $conversation->customer_id;
-            if (!array_key_exists($customerId, $cache)) {
-                $cache[$customerId] = OrganizationMember::where('customer_id', $customerId)
-                    ->with('organization')
-                    ->first();
+            $orgId      = $conversation->org_id ?? null;
+            $snapshotOn = OrgAttribution::snapshotEnabled();
+            $cacheKey   = $snapshotOn && $orgId ? 'org_' . $orgId : 'cust_' . $customerId;
+
+            if (!array_key_exists($cacheKey, $cache)) {
+                $snapshotOrg = ($snapshotOn && $orgId) ? Organization::find($orgId) : null;
+                $memberOrg   = null;
+                if (!$snapshotOrg) {
+                    $member    = OrganizationMember::where('customer_id', $customerId)
+                        ->with('organization')
+                        ->first();
+                    $memberOrg = $member?->organization;
+                }
+                $cache[$cacheKey] = $snapshotOrg ?? $memberOrg;
             }
 
-            $member = $cache[$customerId];
-            if (!$member || !$member->organization) {
+            $organization = $cache[$cacheKey];
+            if (!$organization) {
                 return;
             }
 
@@ -432,7 +451,7 @@ class OrgPortalServiceProvider extends ServiceProvider
             // so render it as a non-clickable <span> to avoid nested <a> (which
             // breaks the row link and the layout).
             echo view('orgportal::partials.org_badge', [
-                'organization' => $member->organization,
+                'organization' => $organization,
                 'searchUrl'    => '',
                 'asLink'       => false,
             ])->render();
