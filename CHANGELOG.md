@@ -4,6 +4,14 @@ All notable changes to OrgPortal are documented here.
 
 ---
 
+## [2.0.1] — 2026-06-26
+
+### Bug Fixes
+
+- **Org badge on ticket page and conversations list**: when Snapshot Visibility is enabled and a ticket has `org_id` set (attributed via tag or backfill), the organization badge now correctly resolves from `org_id` instead of the customer's membership record. This fixes missing badges for tag-attributed tickets where the customer is not a member of any organization. Falls back to membership lookup when snapshot mode is off or `org_id` is null.
+
+---
+
 ## [2.0.0] — 2026-06-21
 
 This release is a major expansion of OrgPortal. Nearly every subsystem was extended or rewritten. The highlights are structural units with role-scoped portal access, permanent ticket attribution (org snapshot), a full notification infrastructure, tag-based attribution, Georgian language, and dozens of improvements across the admin UI, portal, API, and localization.
