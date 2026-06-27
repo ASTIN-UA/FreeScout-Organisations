@@ -128,6 +128,10 @@ return [
     'filter_board'                => 'Tableau',
     'company_filters_no_boards'   => 'Aucun tableau Kanban trouvé. Créez d\'abord un tableau.',
 
+    // Custom Fields in portal
+    'cf_fields_heading'           => 'Champs personnalisés sur la page du ticket',
+    'cf_fields_hint'              => 'Sélectionnez les champs personnalisés à afficher sur la page du ticket dans le portail. Faites glisser pour réorganiser. Définissez un libellé par langue du portail — le libellé remplace le nom d\'origine du champ.',
+
     // User permission
     'perm_manage_organizations' => 'Autoriser la gestion des organisations',
 

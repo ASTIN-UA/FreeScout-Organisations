@@ -128,6 +128,10 @@ return [
     'filter_board'                => 'Bord',
     'company_filters_no_boards'   => 'Geen Kanban-borden gevonden. Maak eerst een bord aan.',
 
+    // Custom Fields in portal
+    'cf_fields_heading'           => 'Aangepaste velden op de ticketpagina',
+    'cf_fields_hint'              => 'Selecteer welke aangepaste velden worden weergegeven op de ticketpagina in het portaal. Sleep om te herordenen. Stel een label in per portaaltaal — het label wordt weergegeven in plaats van de oorspronkelijke veldnaam.',
+
     // User permission
     'perm_manage_organizations' => 'Organisaties beheren toestaan',
 

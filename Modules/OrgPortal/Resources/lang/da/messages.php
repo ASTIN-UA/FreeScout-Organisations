@@ -128,6 +128,10 @@ return [
     'filter_board'                => 'Tavle',
     'company_filters_no_boards'   => 'Ingen Kanban-tavler fundet. Opret en tavle først.',
 
+    // Custom Fields in portal
+    'cf_fields_heading'           => 'Brugerdefinerede felter på billetsiden',
+    'cf_fields_hint'              => 'Vælg hvilke brugerdefinerede felter der vises på billetsiden i portalen. Træk for at ændre rækkefølge. Angiv en etiket pr. portalsprog — etiketten vises i stedet for det originale feltnavn.',
+
     // User permission
     'perm_manage_organizations' => 'Tillad håndtering af organisationer',
 

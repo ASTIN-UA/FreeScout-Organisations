@@ -128,6 +128,10 @@ return [
     'filter_board'                => 'Lauta',
     'company_filters_no_boards'   => 'Kanban-lautoja ei löytynyt. Luo lauta ensin.',
 
+    // Custom Fields in portal
+    'cf_fields_heading'           => 'Mukautetut kentät tikettisivulla',
+    'cf_fields_hint'              => 'Valitse mitkä mukautetut kentät näkyvät tikettisivulla portaalissa. Vedä järjestääksesi uudelleen. Aseta tunniste portaalin kieltä kohden — tunniste näytetään alkuperäisen kenttänimen sijaan.',
+
     // User permission
     'perm_manage_organizations' => 'Salli organisaatioiden hallinta',
 

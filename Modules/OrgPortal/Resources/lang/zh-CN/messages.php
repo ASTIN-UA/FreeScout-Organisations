@@ -128,6 +128,10 @@ return [
     'filter_board'                => '看板',
     'company_filters_no_boards'   => '未找到看板。请先创建一个看板。',
 
+    // Custom Fields in portal
+    'cf_fields_heading'           => '工单页面上的自定义字段',
+    'cf_fields_hint'              => '选择在门户工单页面上显示哪些自定义字段。拖动以重新排序。为每种门户语言设置标签——标签将替代字段原始名称显示。',
+
     // User permission
     'perm_manage_organizations' => '允许管理组织',
 

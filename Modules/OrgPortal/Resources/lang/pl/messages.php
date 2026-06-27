@@ -128,6 +128,10 @@ return [
     'filter_board'                => 'Tablica',
     'company_filters_no_boards'   => 'Nie znaleziono tablic Kanban. Najpierw utwórz tablicę.',
 
+    // Custom Fields in portal
+    'cf_fields_heading'           => 'Pola niestandardowe na stronie zgłoszenia',
+    'cf_fields_hint'              => 'Wybierz, które pola niestandardowe mają być wyświetlane na stronie zgłoszenia w portalu. Przeciągnij, aby zmienić kolejność. Ustaw etykietę dla każdego języka portalu — etykieta jest wyświetlana zamiast oryginalnej nazwy pola.',
+
     // User permission
     'perm_manage_organizations' => 'Zezwól na zarządzanie organizacjami',
 

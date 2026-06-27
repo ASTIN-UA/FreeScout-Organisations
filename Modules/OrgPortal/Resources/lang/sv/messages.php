@@ -128,6 +128,10 @@ return [
     'filter_board'                => 'Bräde',
     'company_filters_no_boards'   => 'Inga Kanban-brädor hittades. Skapa ett bräde först.',
 
+    // Custom Fields in portal
+    'cf_fields_heading'           => 'Anpassade fält på ärendesidan',
+    'cf_fields_hint'              => 'Välj vilka anpassade fält som visas på ärendesidan i portalen. Dra för att ändra ordning. Ange en etikett per portalspråk — etiketten visas istället för det ursprungliga fältnamnet.',
+
     // User permission
     'perm_manage_organizations' => 'Tillåt hantering av organisationer',
 

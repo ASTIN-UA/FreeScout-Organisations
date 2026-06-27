@@ -128,6 +128,10 @@ return [
     'filter_board'                => 'Tablă',
     'company_filters_no_boards'   => 'Nu s-au găsit tablouri Kanban. Creați mai întâi un tablou.',
 
+    // Custom Fields in portal
+    'cf_fields_heading'           => 'Câmpuri personalizate pe pagina tichetului',
+    'cf_fields_hint'              => 'Selectați câmpurile personalizate care apar pe pagina tichetului în portal. Trageți pentru reordonare. Setați o etichetă pentru fiecare limbă a portalului — eticheta este afișată în locul numelui original al câmpului.',
+
     // User permission
     'perm_manage_organizations' => 'Permiteți gestionarea organizațiilor',
 

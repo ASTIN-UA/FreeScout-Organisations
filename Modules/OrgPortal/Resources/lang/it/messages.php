@@ -128,6 +128,10 @@ return [
     'filter_board'                => 'Bacheca',
     'company_filters_no_boards'   => 'Nessuna bacheca Kanban trovata. Crea prima una bacheca.',
 
+    // Custom Fields in portal
+    'cf_fields_heading'           => 'Campi personalizzati nella pagina del ticket',
+    'cf_fields_hint'              => 'Seleziona quali campi personalizzati vengono visualizzati nella pagina del ticket nel portale. Trascina per riordinare. Imposta un\'etichetta per lingua del portale — l\'etichetta viene mostrata al posto del nome originale del campo.',
+
     // User permission
     'perm_manage_organizations' => 'Consenti gestione organizzazioni',
 
