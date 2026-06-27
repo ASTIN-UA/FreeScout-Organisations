@@ -42,10 +42,3 @@
 - ServiceProvider: хук на EUP tickets route → redirect на `orgportal.portal.company-tickets`
 - Розширити Company Tickets: доступ для звичайних учасників (лише свої заявки, без фільтру підрозділу, без зміни автора)
 
-### Інтеграція Custom Fields у вигляді тікету на порталі
-
-Якщо встановлений модуль Custom Fields — виводити значення кастомних полів всередині тікету на порталі EUP.
-
-- Перевірка `\Module::isActive('customfields')` у `viewTicket()`
-- Завантаження custom fields для conversation
-- Відображення у `portal/ticket.blade.php` між заголовком і тредами
