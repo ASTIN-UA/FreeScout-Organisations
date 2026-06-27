@@ -11,6 +11,12 @@
 **Compatible con:** FreeScout 1.8.147+  
 **Integraciones opcionales:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
 
+> [!IMPORTANT]
+> **Instala siempre desde la [última versión](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest), no desde el código fuente del repositorio.**
+> Descarga `OrgPortal.zip` desde la página de Releases — contiene la estructura de directorios correcta que requiere FreeScout.
+> Descargar el código fuente (mediante "Code → Download ZIP" o `git clone`) **no funcionará** y romperá la estructura del módulo.
+> Las actualizaciones automáticas también requieren que el ZIP de la versión se haya utilizado para la instalación inicial.
+
 ---
 
 🌐 **También disponible en:**
@@ -31,6 +37,31 @@
 [Português (PT)](docs/README.pt-PT.md) ·
 [Română](docs/README.ro.md) ·
 [中文 (简体)](docs/README.zh-CN.md)
+
+---
+
+## Tabla de contenidos
+
+- [Qué añade OrgPortal a FreeScout](#qué-añade-orgportal-a-freescout)
+- [Organizaciones](#organizaciones)
+- [Unidades Estructurales — Control de Acceso a Nivel de Departamento](#unidades-estructurales--control-de-acceso-a-nivel-de-departamento)
+- [Org Snapshot — Atribución Permanente de Tickets](#org-snapshot--atribución-permanente-de-tickets)
+- [Integración Kanban](#integración-kanban)
+- [Control de Acceso y Permisos](#control-de-acceso-y-permisos)
+- [Configuración del Sistema](#configuración-del-sistema--manage--organizations--system-tab)
+- [End-User Portal — Autoservicio para Gerentes Corporativos](#end-user-portal--autoservicio-para-gerentes-corporativos-opcional)
+- [Campana de Notificación en Tiempo Real](#campana-de-notificación-en-tiempo-real-opcional)
+- [Suscripciones de Notificación](#suscripciones-de-notificación-opcional)
+- [Configuración de Organización del Portal](#configuración-de-organización-del-portal)
+- [Plantillas de Correo de Notificación Multilingües](#plantillas-de-correo-de-notificación-multilingües-opcional)
+- [API REST](#api-rest-opcional)
+- [Instalación](#instalación)
+- [Actualizaciones Automáticas](#actualizaciones-automáticas)
+- [Compatibilidad de Módulos](#compatibilidad-de-módulos)
+- [Configuración](#configuración)
+- [Traducciones](#traducciones)
+- [Capturas de pantalla](#capturas-de-pantalla)
+- [Licencia](#licencia)
 
 ---
 
@@ -390,7 +421,11 @@ Requiere el módulo [API and Webhooks](https://freescout.net/module/api-webhooks
 
 ## Instalación
 
-1. Copia la carpeta `OrgPortal` en `Modules/` de tu instalación de FreeScout
+> [!IMPORTANT]
+> Descarga `OrgPortal.zip` desde la **[página de Releases](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest)** — **no** uses "Code → Download ZIP" ni clones el repositorio. Solo el ZIP de la versión tiene la estructura correcta para FreeScout y es compatible con las actualizaciones automáticas.
+
+1. Descarga `OrgPortal.zip` desde la [última versión](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest)
+2. Extrae y copia la carpeta `OrgPortal` en `Modules/` de tu instalación de FreeScout
 2. Ve a **Manage → Modules → OrgPortal → Activate**
 3. Ejecuta migraciones:
    ```bash

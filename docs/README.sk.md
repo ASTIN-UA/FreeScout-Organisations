@@ -11,6 +11,12 @@
 **Funguje s:** FreeScout 1.8.147+  
 **Voliteľné integrácie:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
 
+> [!IMPORTANT]
+> **Vždy inštalujte z [najnovšej verzie](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest), nie zo zdrojového kódu repozitára.**
+> Stiahnite `OrgPortal.zip` zo stránky Releases — obsahuje správnu adresárovú štruktúru vyžadovanú FreeScoutom.
+> Stiahnutie zdrojového kódu (cez "Code → Download ZIP" alebo `git clone`) **nebude fungovať** a zničí štruktúru modulu.
+> Automatické aktualizácie tiež vyžadujú, aby bol ZIP verzie použitý pri počiatočnej inštalácii.
+
 ---
 
 🌐 **K dispozícii aj v:**
@@ -31,6 +37,31 @@
 [Português (PT)](docs/README.pt-PT.md) ·
 [Română](docs/README.ro.md) ·
 [中文 (简体)](docs/README.zh-CN.md)
+
+---
+
+## Obsah
+
+- [Čo OrgPortal pridáva do FreeScout](#čo-orgportal-pridáva-do-freescout)
+- [Organizácie](#organizácie)
+- [Štrukturálne jednotky — Kontrola prístupu na úrovni oddelení](#štrukturálne-jednotky--kontrola-prístupu-na-úrovni-oddelení)
+- [Org Snapshot — Trvalé priradenie tiketu](#org-snapshot--trvalé-priradenie-tiketu)
+- [Integrácia s Kanban](#integrácia-s-kanban)
+- [Kontrola prístupu a oprávnení](#kontrola-prístupu-a-oprávnení)
+- [Systémové nastavenia](#systémové-nastavenia--manage--organizations--záložka-system)
+- [End-User Portal — Samoobsluha pre firemných manažérov](#end-user-portal--samoobsluha-pre-firemných-manažérov-voliteľné)
+- [Notifikačný zvonček v reálnom čase](#notifikačný-zvonček-v-reálnom-čase-voliteľné)
+- [Predplatné notifikácií](#predplatné-notifikácií-voliteľné)
+- [Nastavenia organizácie v portáli](#nastavenia-organizácie-v-portáli)
+- [Viacjazyčné šablóny e-mailov notifikácií](#viacjazyčné-šablóny-e-mailov-notifikácií-voliteľné)
+- [REST API](#rest-api-voliteľné)
+- [Inštalácia](#inštalácia)
+- [Automatické aktualizácie](#automatické-aktualizácie)
+- [Kompatibilita modulov](#kompatibilita-modulov)
+- [Konfigurácia](#konfigurácia)
+- [Preklady](#preklady)
+- [Snímky obrazovky](#snímky-obrazovky)
+- [Licencia](#licencia)
 
 ---
 
@@ -392,7 +423,11 @@ Vyžaduje modul [API and Webhooks](https://freescout.net/module/api-webhooks/).
 
 ## Inštalácia
 
-1. Skopírujte priečinok `OrgPortal` do `Modules/` vašej inštalácie FreeScout
+> [!IMPORTANT]
+> Stiahnite `OrgPortal.zip` zo **[stránky Releases](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest)** — **nepoužívajte** "Code → Download ZIP" ani neklonujte repozitár. Iba ZIP verzie má správnu štruktúru pre FreeScout a podporuje automatické aktualizácie.
+
+1. Stiahnite `OrgPortal.zip` z [najnovšej verzie](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest)
+2. Rozbaľte a skopírujte priečinok `OrgPortal` do `Modules/` vašej inštalácie FreeScout
 2. Prejdite na **Manage → Modules → OrgPortal → Activate**
 3. Spustite migrácie:
    ```bash

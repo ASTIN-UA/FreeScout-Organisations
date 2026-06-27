@@ -11,6 +11,12 @@
 **Werkt met:** FreeScout 1.8.147+  
 **Optionele integraties:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
 
+> [!IMPORTANT]
+> **Installeer altijd vanuit de [nieuwste release](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest), niet vanuit de broncode van het repository.**
+> Download `OrgPortal.zip` van de Releases-pagina — deze bevat de juiste mapstructuur die FreeScout vereist.
+> Het downloaden van de broncode (via "Code → Download ZIP" of `git clone`) **werkt niet** en verbreekt de modulestructuur.
+> Automatische updates vereisen ook dat het release-ZIP voor de eerste installatie is gebruikt.
+
 ---
 
 🌐 **Ook beschikbaar in:**
@@ -31,6 +37,31 @@
 [Português (PT)](docs/README.pt-PT.md) ·
 [Română](docs/README.ro.md) ·
 [中文 (简体)](docs/README.zh-CN.md)
+
+---
+
+## Inhoudsopgave
+
+- [Wat OrgPortal toevoegt aan FreeScout](#wat-orgportal-toevoegt-aan-freescout)
+- [Organisaties](#organisaties)
+- [Structurele Eenheden — Toegangsbeheer op Afdelingsniveau](#structurele-eenheden--toegangsbeheer-op-afdelingsniveau)
+- [Org Snapshot — Permanente Ticketkoppeling](#org-snapshot--permanente-ticketkoppeling)
+- [Kanban-integratie](#kanban-integratie)
+- [Toegangsbeheer & Machtigingen](#toegangsbeheer--machtigingen)
+- [Systeeminstellingen](#systeeminstellingen--beheer--organisaties--systeemtabblad)
+- [End-User Portal — Selfservice voor Zakelijke Managers](#end-user-portal--selfservice-voor-zakelijke-managers-optioneel)
+- [Realtime Notificatiebel](#realtime-notificatiebel-optioneel)
+- [Notificatieabonnementen](#notificatieabonnementen-optioneel)
+- [Portaal Organisatie-instellingen](#portaal-organisatie-instellingen)
+- [Meertalige Notificatie E-mailsjablonen](#meertalige-notificatie-e-mailsjablonen-optioneel)
+- [REST API](#rest-api-optioneel)
+- [Installatie](#installatie)
+- [Automatische Updates](#automatische-updates)
+- [Modulecompatibiliteit](#modulecompatibiliteit)
+- [Configuratie](#configuratie)
+- [Vertalingen](#vertalingen)
+- [Schermafbeeldingen](#schermafbeeldingen)
+- [Licentie](#licentie)
 
 ---
 
@@ -392,7 +423,11 @@ Vereist de [API and Webhooks](https://freescout.net/module/api-webhooks/) module
 
 ## Installatie
 
-1. Kopieer de map `OrgPortal` naar `Modules/` van uw FreeScout-installatie
+> [!IMPORTANT]
+> Download `OrgPortal.zip` van de **[Releases-pagina](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest)** — gebruik **niet** "Code → Download ZIP" en kloon het repository niet. Alleen het release-ZIP heeft de juiste structuur voor FreeScout en ondersteunt automatische updates.
+
+1. Download `OrgPortal.zip` van de [nieuwste release](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest)
+2. Pak uit en kopieer de map `OrgPortal` naar `Modules/` van uw FreeScout-installatie
 2. Ga naar **Beheer → Modules → OrgPortal → Activeren**
 3. Voer migraties uit:
    ```bash

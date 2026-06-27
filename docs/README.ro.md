@@ -11,6 +11,12 @@
 **Compatibil cu:** FreeScout 1.8.147+  
 **Integrări opționale:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
 
+> [!IMPORTANT]
+> **Instalează întotdeauna din [cea mai recentă versiune](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest), nu din codul sursă al repozitoriului.**
+> Descarcă `OrgPortal.zip` de pe pagina Releases — conține structura de directoare corectă necesară pentru FreeScout.
+> Descărcarea codului sursă (prin "Code → Download ZIP" sau `git clone`) **nu va funcționa** și va strica structura modulului.
+> Actualizările automate necesită, de asemenea, ca ZIP-ul versiunii să fi fost utilizat pentru instalarea inițială.
+
 ---
 
 🌐 **Disponibil și în:**
@@ -31,6 +37,31 @@
 [Português (PT)](docs/README.pt-PT.md) ·
 [Română](docs/README.ro.md) ·
 [中文 (简体)](docs/README.zh-CN.md)
+
+---
+
+## Cuprins
+
+- [Ce adaugă OrgPortal în FreeScout](#ce-adaugă-orgportal-în-freescout)
+- [Organizații](#organizații)
+- [Unități Structurale — Control de acces la nivel de departament](#unități-structurale--control-de-acces-la-nivel-de-departament)
+- [Org Snapshot — Atribuire permanentă a tichetelor](#org-snapshot--atribuire-permanentă-a-tichetelor)
+- [Integrare Kanban](#integrare-kanban)
+- [Control acces și permisiuni](#control-acces-și-permisiuni)
+- [Setări de sistem](#setări-de-sistem--manage--organizations--fila-system)
+- [End-User Portal — Auto-servire pentru managerii corporativi](#end-user-portal--auto-servire-pentru-managerii-corporativi-opțional)
+- [Clopoțel de notificare în timp real](#clopoțel-de-notificare-în-timp-real-opțional)
+- [Abonamente la notificări](#abonamente-la-notificări-opțional)
+- [Setările organizației din portal](#setările-organizației-din-portal)
+- [Șabloane de e-mail pentru notificări multilingve](#șabloane-de-e-mail-pentru-notificări-multilingve-opțional)
+- [REST API](#rest-api-opțional)
+- [Instalare](#instalare)
+- [Actualizări automate](#actualizări-automate)
+- [Compatibilitate module](#compatibilitate-module)
+- [Configurare](#configurare)
+- [Traduceri](#traduceri)
+- [Capturi de ecran](#capturi-de-ecran)
+- [Licență](#licență)
 
 ---
 
@@ -392,7 +423,11 @@ Necesită modulul [API and Webhooks](https://freescout.net/module/api-webhooks/)
 
 ## Instalare
 
-1. Copiază dosarul `OrgPortal` în `Modules/` al instalației tale FreeScout
+> [!IMPORTANT]
+> Descarcă `OrgPortal.zip` de pe **[pagina Releases](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest)** — **nu** folosi "Code → Download ZIP" și nu clona repozitoriul. Numai ZIP-ul versiunii are structura corectă pentru FreeScout și suportă actualizări automate.
+
+1. Descarcă `OrgPortal.zip` din [cea mai recentă versiune](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest)
+2. Dezarhivează și copiază dosarul `OrgPortal` în `Modules/` al instalației tale FreeScout
 2. Mergi la **Manage → Modules → OrgPortal → Activate**
 3. Rulează migrările:
    ```bash

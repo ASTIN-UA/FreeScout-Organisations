@@ -11,6 +11,12 @@
 **Virker med:** FreeScout 1.8.147+  
 **Valgfrie integrationer:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
 
+> [!IMPORTANT]
+> **Installer altid fra den [seneste version](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest), ikke fra kildekoden i repositoriet.**
+> Download `OrgPortal.zip` fra Releases-siden — den indeholder den korrekte mappestruktur, som FreeScout kræver.
+> Download af kildekoden (via "Code → Download ZIP" eller `git clone`) **virker ikke** og vil ødelægge modulstrukturen.
+> Automatiske opdateringer kræver også, at release-ZIP-en blev brugt til den første installation.
+
 ---
 
 🌐 **Også tilgængelig på:**
@@ -31,6 +37,31 @@
 [Português (PT)](docs/README.pt-PT.md) ·
 [Română](docs/README.ro.md) ·
 [中文 (简体)](docs/README.zh-CN.md)
+
+---
+
+## Indholdsfortegnelse
+
+- [Hvad OrgPortal tilføjer til FreeScout](#hvad-orgportal-tilføjer-til-freescout)
+- [Organisationer](#organisationer)
+- [Strukturelle enheder — Adgangskontrol på afdelingsniveau](#strukturelle-enheder--adgangskontrol-på-afdelingsniveau)
+- [Org Snapshot — Permanent sagsattribuering](#org-snapshot--permanent-sagsattribuering)
+- [Kanban-integration](#kanban-integration)
+- [Adgangskontrol og tilladelser](#adgangskontrol-og-tilladelser)
+- [Systemindstillinger](#systemindstillinger--manage--organizations--system-tab)
+- [End-User Portal — Selvbetjening for virksomhedsledere](#end-user-portal--selvbetjening-for-virksomhedsledere-valgfrit)
+- [Realtids-notifikationsklokke](#realtids-notifikationsklokke-valgfrit)
+- [Notifikationsabonnementer](#notifikationsabonnementer-valgfrit)
+- [Portalorganisationsindstillinger](#portalorganisationsindstillinger)
+- [Flersprogede notifikations-e-mailskabeloner](#flersprogede-notifikations-e-mailskabeloner-valgfrit)
+- [REST API](#rest-api-valgfrit)
+- [Installation](#installation)
+- [Automatiske opdateringer](#automatiske-opdateringer)
+- [Modulkompatibilitet](#modulkompatibilitet)
+- [Konfiguration](#konfiguration)
+- [Oversættelser](#oversættelser)
+- [Skærmbilleder](#skærmbilleder)
+- [Licens](#licens)
 
 ---
 
@@ -392,7 +423,11 @@ Kræver [API and Webhooks](https://freescout.net/module/api-webhooks/)-modulet.
 
 ## Installation
 
-1. Kopiér `OrgPortal`-mappen til `Modules/` i din FreeScout-installation
+> [!IMPORTANT]
+> Download `OrgPortal.zip` fra **[Releases-siden](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest)** — brug **ikke** "Code → Download ZIP" og klon ikke repositoriet. Kun release-ZIP-en har den korrekte struktur til FreeScout og understøtter automatiske opdateringer.
+
+1. Download `OrgPortal.zip` fra [den seneste version](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest)
+2. Udpak og kopiér `OrgPortal`-mappen til `Modules/` i din FreeScout-installation
 2. Gå til **Manage → Modules → OrgPortal → Activate**
 3. Kør migreringer:
    ```bash

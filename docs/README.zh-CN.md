@@ -11,6 +11,12 @@
 **兼容：** FreeScout 1.8.147+  
 **可选集成：** [End-User Portal](https://freescout.net/module/end-user-portal/)、[API and Webhooks](https://freescout.net/module/api-webhooks/)、[Kanban](https://freescout.net/module/kanban/)
 
+> [!IMPORTANT]
+> **请始终从[最新版本](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest)安装，而不是从仓库源代码安装。**
+> 从 Releases 页面下载 `OrgPortal.zip` — 它包含 FreeScout 所需的正确目录结构。
+> 通过"Code → Download ZIP"或 `git clone` 下载源代码**无法正常工作**，并且会破坏模块结构。
+> 自动更新也需要在初始安装时使用 Release ZIP 包。
+
 ---
 
 🌐 **其他语言版本：**
@@ -31,6 +37,31 @@
 [Português (PT)](docs/README.pt-PT.md) ·
 [Română](docs/README.ro.md) ·
 [中文 (简体)](docs/README.zh-CN.md)
+
+---
+
+## 目录
+
+- [OrgPortal 为 FreeScout 带来了什么](#orgportal-为-freescout-带来了什么)
+- [组织](#组织)
+- [结构单元 — 部门级访问控制](#结构单元--部门级访问控制)
+- [Org Snapshot — 永久工单归属](#org-snapshot--永久工单归属)
+- [Kanban 集成](#kanban-集成)
+- [访问控制与权限](#访问控制与权限)
+- [系统设置](#系统设置--管理--组织--系统标签页)
+- [End-User Portal — 企业管理员自助服务](#end-user-portal--企业管理员自助服务-可选)
+- [实时通知铃铛](#实时通知铃铛-可选)
+- [通知订阅](#通知订阅-可选)
+- [门户组织设置](#门户组织设置)
+- [多语言通知邮件模板](#多语言通知邮件模板-可选)
+- [REST API](#rest-api-可选)
+- [安装](#安装)
+- [自动更新](#自动更新)
+- [模块兼容性](#模块兼容性)
+- [配置](#配置)
+- [翻译](#翻译)
+- [截图](#截图)
+- [许可证](#许可证)
 
 ---
 
@@ -392,7 +423,11 @@ OrgPortal 填补了这一空缺：
 
 ## 安装
 
-1. 将 `OrgPortal` 文件夹复制到您的 FreeScout 安装目录的 `Modules/` 中
+> [!IMPORTANT]
+> 从**[Releases 页面](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest)**下载 `OrgPortal.zip` — **不要**使用"Code → Download ZIP"，也不要克隆仓库。只有 Release ZIP 包才具有 FreeScout 所需的正确结构，并支持自动更新。
+
+1. 从[最新版本](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest)下载 `OrgPortal.zip`
+2. 解压并将 `OrgPortal` 文件夹复制到您的 FreeScout 安装目录的 `Modules/` 中
 2. 前往 **管理 → 模块 → OrgPortal → 激活**
 3. 运行迁移：
    ```bash
