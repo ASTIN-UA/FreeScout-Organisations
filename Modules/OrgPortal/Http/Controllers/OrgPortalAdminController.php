@@ -575,6 +575,14 @@ class OrgPortalAdminController extends Controller
         $show_badge_kanban       = $perKanban  !== null ? (bool) $perKanban  : true;
         $show_org_in_profile     = $perProfile !== null ? (bool) $perProfile : true;
 
+        $cfFields        = [];
+        $cfFieldSettings = [];
+        if (\Module::isActive('customfields')) {
+            $cfFields = \Modules\CustomFields\Entities\CustomField::getMailboxCustomFields($mailbox_id)->all();
+            $rawCf    = \Option::get('orgportal.cf_fields_' . $mailbox_id, '[]');
+            $cfFieldSettings = is_array($rawCf) ? $rawCf : (json_decode($rawCf, true) ?: []);
+        }
+
         return view('orgportal::admin.mailbox_settings', [
             'mailbox'                 => $mailbox,
             'companyFilters'          => $companyFilters,
@@ -584,6 +592,8 @@ class OrgPortalAdminController extends Controller
             'show_badge_conversation' => $show_badge_conversation,
             'show_badge_kanban'       => $show_badge_kanban,
             'show_org_in_profile'     => $show_org_in_profile,
+            'cfFields'                => $cfFields,
+            'cfFieldSettings'         => $cfFieldSettings,
         ]);
     }
 
@@ -621,6 +631,32 @@ class OrgPortalAdminController extends Controller
         \Option::set('orgportal.show_badge_conversation_' . $id, (bool) $request->input('show_badge_conversation'));
         \Option::set('orgportal.show_badge_kanban_' . $id, (bool) $request->input('show_badge_kanban'));
         \Option::set('orgportal.show_org_in_profile_' . $id, (bool) $request->input('show_org_in_profile'));
+
+        // Custom Fields — save selected fields with labels and sort order
+        if (\Module::isActive('customfields')) {
+            $cfFields     = [];
+            $cfSelectedIds = $request->input('cf_field_ids', []);
+            $cfLabels      = $request->input('cf_field_labels', []);
+            $cfSort        = $request->input('cf_field_sort', []);
+            foreach ($cfSelectedIds as $fid) {
+                $fid = (int) $fid;
+                if ($fid <= 0) continue;
+                $labels = [];
+                foreach ((array) ($cfLabels[$fid] ?? []) as $loc => $lbl) {
+                    $lbl = trim((string) $lbl);
+                    if ($lbl !== '') {
+                        $labels[preg_replace('/[^a-zA-Z0-9_\-]/', '', $loc)] = $lbl;
+                    }
+                }
+                $cfFields[] = [
+                    'id'     => $fid,
+                    'labels' => $labels,
+                    'sort'   => (int) ($cfSort[$fid] ?? 999),
+                ];
+            }
+            usort($cfFields, fn($a, $b) => $a['sort'] <=> $b['sort']);
+            \Option::set('orgportal.cf_fields_' . $id, json_encode($cfFields));
+        }
 
         return redirect()->route('orgportal.admin.mailbox-settings', $id)
             ->with('flash_success', __('orgportal::messages.settings_saved'));
