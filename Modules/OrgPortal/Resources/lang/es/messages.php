@@ -258,6 +258,7 @@ return [
     'system_lang_enable_hint' => 'Muestra un icono de globo en la barra de navegación del portal que permite a los clientes cambiar el idioma del portal.',
     'system_lang_locales' => 'Idiomas disponibles',
     'system_lang_locales_hint' => 'Solo los idiomas seleccionados aparecen en el selector. Deje todos marcados para mostrar cada idioma disponible.',
+    'system_lang_requires_eup'  => 'El selector de idioma del portal requiere el módulo <strong>EndUserPortal</strong>.',
 
     // Notification bell
     'notifications'        => 'Notificaciones',

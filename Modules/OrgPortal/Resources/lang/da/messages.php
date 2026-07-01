@@ -258,6 +258,7 @@ return [
     'system_lang_enable_hint' => 'Viser et globusikonet i portalens navigationslinje, der lader kunderne skifte portalens sprog.',
     'system_lang_locales' => 'Tilgængelige sprog',
     'system_lang_locales_hint' => 'Kun de markerede sprog vises i skifteren. Lad alle markeres for at vise alle tilgængelige sprog.',
+    'system_lang_requires_eup'  => 'Portal-sprogskifteren kræver modulet <strong>EndUserPortal</strong>.',
 
     // Notification bell
     'notifications'        => 'Notifikationer',

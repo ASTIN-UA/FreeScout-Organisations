@@ -258,6 +258,7 @@ return [
     'system_lang_enable_hint' => 'Pokazuje ikonę globusa na pasku nawigacyjnym portalu, którą klienci mogą używać do przełączania języka portalu.',
     'system_lang_locales' => 'Dostępne języki',
     'system_lang_locales_hint' => 'W przełączeniu pojawią się tylko zaznaczone języki. Pozostaw wszystkie zaznaczone, aby wyświetlić każdy dostępny język.',
+    'system_lang_requires_eup'  => 'Przełącznik języka portalu wymaga modułu <strong>EndUserPortal</strong>.',
 
     // Notification bell
     'notifications'        => 'Powiadomienia',

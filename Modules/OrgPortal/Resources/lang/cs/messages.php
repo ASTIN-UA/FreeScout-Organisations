@@ -258,6 +258,7 @@ return [
     'system_lang_enable_hint' => 'Zobrazí ikonu zemegule v navigačním panelu portálu, která zákazníkům umožňuje přepínat jazyk portálu.',
     'system_lang_locales' => 'Dostupné jazyky',
     'system_lang_locales_hint' => 'V přepínači se zobrazují pouze zaškrtnuté jazyky. Nechte všechny zaškrtnuté, aby se zobrazoval každý dostupný jazyk.',
+    'system_lang_requires_eup'  => 'Přepínač jazyka portálu vyžaduje modul <strong>EndUserPortal</strong>.',
 
     // Notification bell
     'notifications'        => 'Oznámení',

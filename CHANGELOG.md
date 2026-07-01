@@ -4,6 +4,20 @@ All notable changes to OrgPortal are documented here.
 
 ---
 
+## [2.0.2] — 2026-07-02
+
+### Bug Fixes
+
+- **OrgPortal now works without EndUserPortal installed**: the module no longer crashes FreeScout on boot when EndUserPortal is absent. Previously, `deployGeorgianAssets()` attempted to copy `ka.json` into the EndUserPortal language directory unconditionally, causing a fatal PHP error that prevented FreeScout from loading entirely. The Georgian asset is now only deployed when EndUserPortal is active.
+- **Removed dev-only impersonate endpoint**: the `/orgportal/admin/impersonate/{customer_id}/{mailbox_id}` route was a temporary testing helper that was never exposed in the UI. It has been removed to reduce attack surface.
+
+### UI Improvements
+
+- **Portal Language Switcher panel** in global settings now shows a clear notice ("EndUserPortal module is required") instead of the settings form when EndUserPortal is not installed — available in all 19 supported languages.
+- **Kanban company filters** in per-mailbox settings are now hidden when EndUserPortal is not installed, since these filters configure portal display which requires EUP to function.
+
+---
+
 ## [2.0.1] — 2026-06-26
 
 ### Bug Fixes

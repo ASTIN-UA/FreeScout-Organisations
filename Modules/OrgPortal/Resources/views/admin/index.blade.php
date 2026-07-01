@@ -556,6 +556,7 @@
                             </div>
                             <div id="sys-panel-lang" class="collapse">
                                 <div class="panel-body">
+                                    @if(\Module::isActive('enduserportal'))
                                     <p class="text-muted" style="font-size:12px;margin-top:0;">{{ __('orgportal::messages.system_lang_desc') }}</p>
 
                                     <div class="checkbox" style="margin-bottom:10px;">
@@ -583,6 +584,9 @@
                                         </div>
                                         <p class="text-muted" style="font-size:12px;">{{ __('orgportal::messages.system_lang_locales_hint') }}</p>
                                     </div>
+                                    @else
+                                    <p class="text-muted" style="font-size:13px;margin:0;">{!! __('orgportal::messages.system_lang_requires_eup') !!}</p>
+                                    @endif
                                 </div>
                             </div>
                         </div>

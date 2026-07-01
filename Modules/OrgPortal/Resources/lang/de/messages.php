@@ -214,6 +214,7 @@ return [
     'system_lang_enable_hint' => 'Zeigt ein Globussymbol in der Portal-Navigationsleiste an, mit dem Kunden die Portal-Sprache wechseln können.',
     'system_lang_locales' => 'Verfügbare Sprachen',
     'system_lang_locales_hint' => 'Im Umschalter werden nur die aktivierten Sprachen angezeigt. Lassen Sie alle aktiviert, um jede verfügbare Sprache anzuzeigen.',
+    'system_lang_requires_eup' => 'Der Portal-Sprachumschalter erfordert das Modul <strong>EndUserPortal</strong>.',
 
     // Notification bell
     'notifications'        => 'Benachrichtigungen',

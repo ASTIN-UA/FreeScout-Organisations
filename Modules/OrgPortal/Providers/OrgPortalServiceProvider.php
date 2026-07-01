@@ -1072,8 +1072,11 @@ class OrgPortalServiceProvider extends ServiceProvider
 
         $targets = [
             $assets . 'parsley.js' => public_path('js/parsley/i18n/ka.js'),
-            $assets . 'eup.json'   => base_path('Modules/EndUserPortal/Resources/lang/ka.json'),
         ];
+
+        if (\Module::isActive('enduserportal')) {
+            $targets[$assets . 'eup.json'] = base_path('Modules/EndUserPortal/Resources/lang/ka.json');
+        }
 
         foreach ($targets as $src => $dst) {
             if (!file_exists($dst) && !copy($src, $dst)) {

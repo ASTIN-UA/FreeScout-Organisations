@@ -719,27 +719,6 @@ class OrgPortalAdminController extends Controller
     }
 
     /**
-     * Generate and redirect to a portal login link for a given customer (admin only).
-     * Usage: /orgportal/admin/impersonate/{customer_id}/{mailbox_id}
-     */
-    public function impersonatePortalLink(int $customer_id, int $mailbox_id)
-    {
-        $this->authorizeAdmin();
-
-        $customer = Customer::findOrFail($customer_id);
-        $mailbox  = \App\Mailbox::findOrFail($mailbox_id);
-
-        $link = route('enduserportal.login_from_email', [
-            'id'          => \EndUserPortal::encodeMailboxId($mailbox->id),
-            'customer_id' => encrypt($customer->id),
-            'hash'        => \EndUserPortal::customerHash($customer->created_at),
-            'timestamp'   => encrypt(time()),
-        ]);
-
-        return redirect($link);
-    }
-
-    /**
      * AJAX: search customers by name or email for the member-add form.
      * Excludes customers already in any organization (one org per customer rule).
      */
