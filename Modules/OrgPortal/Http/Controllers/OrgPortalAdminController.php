@@ -690,6 +690,10 @@ class OrgPortalAdminController extends Controller
     {
         $this->authorizeAdmin();
 
+        if (!\Module::isActive('enduserportal')) {
+            abort(404);
+        }
+
         $customer = Customer::findOrFail($customer_id);
         $mailbox  = \App\Mailbox::findOrFail($mailbox_id);
 
