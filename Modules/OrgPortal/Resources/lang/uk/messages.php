@@ -303,6 +303,7 @@ return [
     'system_lang_enable_hint'   => 'Показує іконку глобуса в шапці порталу, де клієнти можуть обрати мову інтерфейсу.',
     'system_lang_locales'       => 'Доступні мови',
     'system_lang_locales_hint'  => 'У перемикачі відображатимуться лише обрані мови. Залиште всі вибраними, щоб показувати всі доступні мови.',
+    'system_lang_requires_eup'  => 'Перемикач мови порталу потребує модуля <strong>EndUserPortal</strong>.',
 
     // ApiWebhooks settings page
     'api_docs_link'          => 'Документація API OrgPortal',

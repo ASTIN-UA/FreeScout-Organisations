@@ -303,6 +303,7 @@ return [
     'system_lang_enable_hint'   => 'Shows a globe icon in the portal navbar that lets customers switch the portal language.',
     'system_lang_locales'       => 'Available languages',
     'system_lang_locales_hint'  => 'Only the checked languages appear in the switcher. Leave all checked to show every available language.',
+    'system_lang_requires_eup'  => 'The Portal Language Switcher requires the <strong>EndUserPortal</strong> module to be installed and active.',
 
     // ApiWebhooks settings page
     'api_docs_link'          => 'OrgPortal API Docs',

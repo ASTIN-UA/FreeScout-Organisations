@@ -254,6 +254,7 @@ return [
     'system_lang_enable_hint' => 'Viser et globusikonet i portals navigasjonslinje som lar kunder bytte portalens språk.',
     'system_lang_locales' => 'Tilgjengelige språk',
     'system_lang_locales_hint' => 'Bare de merkede språkene vises i velgeren. La alle være merket for å vise hvert tilgjengelige språk.',
+    'system_lang_requires_eup'  => 'Portalspråkbytteren krever modulen <strong>EndUserPortal</strong>.',
 
     // Notification bell
     'notifications'        => 'Varsler',

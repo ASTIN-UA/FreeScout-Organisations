@@ -254,6 +254,7 @@ return [
     'system_lang_enable_hint' => 'Zobrazí ikonu glóbusu v navigačnom paneli portálu, ktorá umožní zákazníkom zmeniť jazyk portálu.',
     'system_lang_locales' => 'Dostupné jazyky',
     'system_lang_locales_hint' => 'V prepínači sa zobrazujú iba zaškrtnuté jazyky. Nechajte všetky zaškrtnuté, aby sa zobrazil každý dostupný jazyk.',
+    'system_lang_requires_eup'  => 'Prepínač jazyka portálu vyžaduje modul <strong>EndUserPortal</strong>.',
 
     // Notification bell
     'notifications'        => 'Oznámenia',

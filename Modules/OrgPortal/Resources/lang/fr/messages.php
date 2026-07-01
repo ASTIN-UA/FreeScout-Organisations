@@ -254,6 +254,7 @@ return [
     'system_lang_enable_hint' => 'Affiche une icône de globe dans la barre de navigation du portail qui permet aux clients de changer la langue du portail.',
     'system_lang_locales' => 'Langues disponibles',
     'system_lang_locales_hint' => 'Seules les langues cochées apparaissent dans le sélecteur. Laissez tous cochés pour afficher chaque langue disponible.',
+    'system_lang_requires_eup'  => 'Le sélecteur de langue du portail nécessite le module <strong>EndUserPortal</strong>.',
 
     // Notification bell
     'notifications'        => 'Notifications',

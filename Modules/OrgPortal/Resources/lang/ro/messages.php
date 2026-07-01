@@ -254,6 +254,7 @@ return [
     'system_lang_enable_hint' => 'Afișează o pictogramă de glob în bara de navigare a portalului care permite clienților să schimbe limba portalului.',
     'system_lang_locales' => 'Limbi disponibile',
     'system_lang_locales_hint' => 'Doar limbile bifate apar în selector. Lăsați toate bifate pentru a afișa fiecare limbă disponibilă.',
+    'system_lang_requires_eup'  => 'Selectorul de limbă al portalului necesită modulul <strong>EndUserPortal</strong>.',
 
     // Notification bell
     'notifications'        => 'Notificări',

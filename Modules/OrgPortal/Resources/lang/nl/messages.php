@@ -254,6 +254,7 @@ return [
     'system_lang_enable_hint' => 'Geeft een globuspictogram in de portaalnavigatiebalk weer waarmee klanten de portaaltaal kunnen wijzigen.',
     'system_lang_locales' => 'Beschikbare talen',
     'system_lang_locales_hint' => 'Alleen de ingevinkte talen verschijnen in de schakelaar. Laat alle talen aangevinkt om alle beschikbare talen weer te geven.',
+    'system_lang_requires_eup'  => 'De portaaltaalwisselaar vereist de module <strong>EndUserPortal</strong>.',
 
     // Notification bell
     'notifications'        => 'Meldingen',

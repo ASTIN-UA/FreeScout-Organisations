@@ -254,6 +254,7 @@ return [
     'system_lang_enable_hint' => 'Näyttää globusikonin portaalin navigointipalkkissa, jonka avulla asiakkaat voivat vaihtaa portaalin kielen.',
     'system_lang_locales' => 'Käytettävissä olevat kielet',
     'system_lang_locales_hint' => 'Valitsimessa näkyvät vain valitut kielet. Jätä kaikki valitut näyttääksesi jokaisen käytettävissä olevan kielen.',
+    'system_lang_requires_eup'  => 'Portaalin kielenvaihtaja vaatii <strong>EndUserPortal</strong>-moduulin.',
 
     // Notification bell
     'notifications'        => 'Ilmoitukset',

@@ -254,6 +254,7 @@ return [
     'system_lang_enable_hint' => 'Visar en globikon i portalens navigeringsfält som låter kunder byta portalens språk.',
     'system_lang_locales' => 'Tillgängliga språk',
     'system_lang_locales_hint' => 'Endast de markerade språken visas i väljaren. Låt alla markeras för att visa alla tillgängliga språk.',
+    'system_lang_requires_eup'  => 'Portalspråkväljaren kräver modulen <strong>EndUserPortal</strong>.',
 
     // Notification bell
     'notifications'        => 'Aviseringar',
