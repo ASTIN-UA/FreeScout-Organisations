@@ -65,9 +65,6 @@ Route::group([
     Route::get('customers/search', 'OrgPortalAdminController@searchCustomers')
         ->name('orgportal.admin.customers.search');
 
-    Route::get('impersonate/{customer_id}/{mailbox_id}', 'OrgPortalAdminController@impersonatePortalLink')
-        ->name('orgportal.admin.impersonate');
-
     Route::get('api-docs', 'OrgPortalAdminController@apiDocs')
         ->name('orgportal.admin.api-docs');
 
