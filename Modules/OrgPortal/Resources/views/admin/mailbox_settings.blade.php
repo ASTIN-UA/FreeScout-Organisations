@@ -53,7 +53,7 @@
             </div>
         </div>
 
-        @if(\Module::isActive('kanban'))
+        @if(\Module::isActive('kanban') && \Module::isActive('enduserportal'))
         <div class="panel panel-default">
             <div class="panel-heading">{{ __('orgportal::messages.company_filters_heading') }}</div>
             <div class="panel-body">
