@@ -170,7 +170,7 @@
 
         @endif
 
-        @if(\Module::isActive('customfields') && !empty($cfFields))
+        @if(\Module::isActive('customfields') && \Module::isActive('enduserportal') && !empty($cfFields))
         <div class="panel panel-default">
             <div class="panel-heading">{{ __('orgportal::messages.cf_fields_heading') }}</div>
             <div class="panel-body">
