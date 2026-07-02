@@ -47,6 +47,7 @@
 - [Strukturelle Einheiten — Zugriffskontrolle auf Abteilungsebene](#strukturelle-einheiten--zugriffskontrolle-auf-abteilungsebene)
 - [Org Snapshot — Permanente Ticket-Zuordnung](#org-snapshot--permanente-ticket-zuordnung)
 - [Kanban-Integration](#kanban-integration)
+- [Integration von benutzerdefinierten Feldern](#integration-von-benutzerdefinierten-feldern)
 - [Zugriffskontrolle & Berechtigungen](#zugriffskontrolle--berechtigungen)
 - [Systemeinstellungen](#systemeinstellungen--verwalten--organisationen--system-tab)
 - [End-User Portal — Self-Service für Unternehmensmanager](#end-user-portal--self-service-für-unternehmensmanager-optional)
@@ -198,6 +199,19 @@ Konfiguriert in **Verwalten → Organisationen → System-Tab**:
 - Übersetzte Labels erscheinen sowohl in der Portal-Filterleiste als auch in der **Status**-Spalte der Unternehmensticket-Tabelle; Fallback-Kette: gespeichertes Locale → gespeichertes Englisch → ursprünglicher Spaltenname
 
 ![Kanban — Organisations-Badges auf Karten und Org-Filter-Modal](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
+
+---
+
+## Integration von benutzerdefinierten Feldern
+
+*Zeigen Sie Daten aus dem Modul „Benutzerdefinierte Felder" direkt auf der Ticket-Seite im Portal an.*
+
+Erfordert, dass das Modul [Custom Fields](https://freescout.net/module/custom-fields/) installiert und aktiv ist.
+
+- Ein Panel pro Mailbox in Mailbox-Einstellungen → OrgPortal lässt Sie auswählen, welche benutzerdefinierten Felder auf der Ticket-Seite im Portal angezeigt werden
+- Ziehen Sie Felder, um die Reihenfolge zu ändern; jedes Feld kann eine benutzerdefinierte Bezeichnung pro Portalsprache haben, mit Rückgriff auf die gespeicherte englische Bezeichnung und dann den ursprünglichen Feldnamen
+- Auf der Ticket-Seite im Portal werden aktivierte Felder in einem responsiven zweispaltigen Raster zwischen dem Ticket-Betreff und dem Thread angezeigt — nur Felder mit einem nicht leeren Wert werden angezeigt
+- Vollständig optional — das Panel und der Block auf der Ticket-Seite werden automatisch ausgeblendet, wenn das Modul Custom Fields nicht installiert oder nicht aktiv ist
 
 ---
 

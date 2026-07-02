@@ -128,6 +128,10 @@ return [
     'filter_board'                => 'Tablero',
     'company_filters_no_boards'   => 'No se encontraron tableros Kanban. Cree un tablero primero.',
 
+    // Custom Fields in portal
+    'cf_fields_heading'           => 'Campos personalizados en la página del ticket',
+    'cf_fields_hint'              => 'Seleccione qué campos personalizados aparecen en la página del ticket en el portal. Arrastre para reordenar. Establezca una etiqueta por idioma del portal — la etiqueta se muestra en lugar del nombre original del campo.',
+
     // User permission
     'perm_manage_organizations' => 'Permitir gestionar organizaciones',
 

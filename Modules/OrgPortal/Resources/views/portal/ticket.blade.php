@@ -50,6 +50,41 @@
             <h3 style="margin:0;">{{ $conversation->subject ?: __('orgportal::messages.no_subject') }}</h3>
         </div>
 
+        <hr style="margin:12px 0;">
+
+        @if($customFields->isNotEmpty())
+        @php
+            $cfLocale     = app()->getLocale();
+            $cfSettingsById = collect($cfFieldSettings)->keyBy('id');
+            $cfList       = $customFields->values();
+            $cfCount      = $cfList->count();
+            $cfHalf       = (int) ceil($cfCount / 2);
+            $cfCol1       = $cfList->slice(0, $cfHalf);
+            $cfCol2       = $cfList->slice($cfHalf);
+        @endphp
+        <div style="display:flex; gap:24px; margin-bottom:12px; flex-wrap:wrap;">
+            @foreach([$cfCol1, $cfCol2] as $cfColumn)
+            <div style="flex:1; min-width:200px;">
+                @foreach($cfColumn as $cf)
+                @php
+                    $cfSetting  = $cfSettingsById->get($cf->id);
+                    $cfLabels   = $cfSetting['labels'] ?? [];
+                    $cfLabel    = $cfLabels[$cfLocale] ?? $cfLabels['en'] ?? $cf->name;
+                    $cfValue    = $cf->getAsText();
+                @endphp
+                @if($cfValue !== '' && $cfValue !== null)
+                <div style="margin-bottom:6px; font-size:13px;">
+                    <strong>{{ $cfLabel }}:</strong> {{ $cfValue }}
+                </div>
+                @endif
+                @endforeach
+            </div>
+            @endforeach
+        </div>
+
+        <hr style="margin:12px 0;">
+        @endif
+
         <div style="display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:4px;">
             <p class="text-muted" style="margin:0;">
                 {{ __('orgportal::messages.from') }}:

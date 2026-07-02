@@ -45,6 +45,7 @@
 - [Structural Units — Department-Level Access Control](#structural-units--department-level-access-control)
 - [Org Snapshot — Permanent Ticket Attribution](#org-snapshot--permanent-ticket-attribution)
 - [Kanban Integration](#kanban-integration)
+- [Custom Fields Integration](#custom-fields-integration)
 - [Access Control & Permissions](#access-control--permissions)
 - [System Settings](#system-settings--manage--organizations--system-tab)
 - [End-User Portal — Self-Service for Corporate Managers](#end-user-portal--self-service-for-corporate-managers-optional)
@@ -198,6 +199,19 @@ Configured in **Manage → Organizations → System tab**:
 - Translated labels appear in both the portal filter bar and the **State** column of the company tickets table; fallback chain: saved locale → saved English → original column name
 
 ![Kanban integration](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
+
+---
+
+## Custom Fields Integration
+
+*Surface your Custom Fields module data right on the portal ticket page.*
+
+Requires the [Custom Fields](https://freescout.net/module/custom-fields/) module to be installed and active.
+
+- Per-mailbox panel in **Mailbox Settings → OrgPortal** lets you pick which custom fields appear on the portal ticket page
+- Drag to reorder fields; each field can have a custom label per portal language, with fallback to the saved English label, then the original field name
+- On the portal ticket page, enabled fields render in a responsive two-column grid between the ticket subject and the thread — only fields with a non-empty value are shown
+- Fully optional — the panel and the ticket-page block are hidden automatically when the Custom Fields module is not installed or not active
 
 ---
 

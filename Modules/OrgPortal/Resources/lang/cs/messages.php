@@ -128,6 +128,10 @@ return [
     'filter_board'                => 'Deska',
     'company_filters_no_boards'   => 'Nebyly nalezeny žádné desky Kanban. Nejdříve vytvořte desku.',
 
+    // Custom Fields in portal
+    'cf_fields_heading'           => 'Vlastní pole na stránce tiketu',
+    'cf_fields_hint'              => 'Vyberte, která vlastní pole se zobrazí na stránce tiketu v portálu. Přetáhněte pro přeřazení. Nastavte popisek pro každý jazyk portálu — popisek se zobrazuje místo původního názvu pole.',
+
     // User permission
     'perm_manage_organizations' => 'Povolit správu organizací',
 

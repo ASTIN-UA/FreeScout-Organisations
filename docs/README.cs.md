@@ -47,6 +47,7 @@
 - [Strukturální jednotky — Řízení přístupu na úrovni oddělení](#strukturální-jednotky--řízení-přístupu-na-úrovni-oddělení)
 - [Org Snapshot — Trvalé přiřazení ticketů](#org-snapshot--trvalé-přiřazení-ticketů)
 - [Integrace s Kanbanem](#integrace-s-kanbanem)
+- [Integrace s vlastními poli](#integrace-s-vlastními-poli)
 - [Řízení přístupu a oprávnění](#řízení-přístupu-a-oprávnění)
 - [Systémová nastavení](#systémová-nastavení--manage--organizations--záložka-system)
 - [End-User Portal — Samoobsluha pro firemní manažery](#end-user-portal--samoobsluha-pro-firemní-manažery-volitelné)
@@ -196,6 +197,19 @@ Režimy `tag` a `tag_only` jsou deaktivovány, pokud není aktivní modul Tags.
 - Přeložené štítky se zobrazují jak v panelu filtrů portálu, tak ve sloupci **Stav** tabulky firemních ticketů; záložní řetězec: uložené nastavení jazyka → uložená angličtina → původní název sloupce
 
 ![Kanban — odznaky organizací na kartách a modální okno filtru organizace](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
+
+---
+
+## Integrace s vlastními poli
+
+*Zobrazte data z modulu Vlastní pole přímo na stránce tiketu v portálu.*
+
+Vyžaduje nainstalovaný a aktivní modul [Custom Fields](https://freescout.net/module/custom-fields/).
+
+- Panel pro každou schránku v Nastavení schránky → OrgPortal vám umožní vybrat, která vlastní pole se zobrazí na stránce tiketu v portálu
+- Přetáhněte pole pro změnu pořadí; každé pole může mít vlastní popisek pro každý jazyk portálu, s návratem na uloženou anglickou verzi a poté na původní název pole
+- Na stránce tiketu v portálu se povolená pole zobrazují ve dvousloupcové mřížce mezi předmětem tiketu a vlákny — zobrazují se pouze pole s neprázdnou hodnotou
+- Zcela volitelné — panel i blok na stránce tiketu se automaticky skryjí, pokud modul Vlastní pole není nainstalován nebo aktivní
 
 ---
 

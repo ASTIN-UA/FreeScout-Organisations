@@ -47,6 +47,7 @@
 - [Jednostki strukturalne — Kontrola dostępu na poziomie działu](#jednostki-strukturalne--kontrola-dostępu-na-poziomie-działu)
 - [Org Snapshot — Trwałe przypisanie zgłoszeń](#org-snapshot--trwałe-przypisanie-zgłoszeń)
 - [Integracja z Kanban](#integracja-z-kanban)
+- [Integracja z polami niestandardowymi](#integracja-z-polami-niestandardowymi)
 - [Kontrola dostępu i uprawnienia](#kontrola-dostępu-i-uprawnienia)
 - [Ustawienia systemowe](#ustawienia-systemowe--manage--organizations--system-tab)
 - [End-User Portal — Samoobsługa dla menedżerów korporacyjnych](#end-user-portal--samoobsługa-dla-menedżerów-korporacyjnych-opcjonalne)
@@ -196,6 +197,19 @@ Tryby `tag` i `tag_only` są wyłączone gdy moduł Tags jest nieaktywny.
 - Przetłumaczone etykiety pojawiają się zarówno na pasku filtrów portalu, jak i w kolumnie **State** tabeli zgłoszeń firmy; łańcuch rezerwy: zapisany język → zapisany angielski → oryginalna nazwa kolumny
 
 ![Kanban — odznaki organizacji na kartach i modal filtra organizacji](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
+
+---
+
+## Integracja z polami niestandardowymi
+
+*Wyświetl dane z modułu Pola niestandardowe bezpośrednio na stronie zgłoszenia w portalu.*
+
+Wymaga zainstalowanego i aktywnego modułu [Custom Fields](https://freescout.net/module/custom-fields/).
+
+- Panel dla każdej skrzynki w Ustawieniach skrzynki → OrgPortal pozwala wybrać, które pola niestandardowe pojawiają się na stronie zgłoszenia w portalu
+- Przeciągnij pola, aby zmienić ich kolejność; każde pole może mieć niestandardową etykietę dla każdego języka portalu, z powrotem do zapisanej etykiety angielskiej, a następnie oryginalnej nazwy pola
+- Na stronie zgłoszenia w portalu włączone pola są wyświetlane w responsywnej siatce dwukolumnowej między tematem zgłoszenia a wątkiem — wyświetlane są tylko pola z niepustą wartością
+- Całkowicie opcjonalne — panel i blok na stronie zgłoszenia są automatycznie ukrywane, gdy moduł Pola niestandardowe nie jest zainstalowany lub nieaktywny
 
 ---
 

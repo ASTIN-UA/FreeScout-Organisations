@@ -92,6 +92,11 @@ return [
     'filter_add'                  => 'Filter hinzufügen',
     'filter_board'                => 'Board',
     'company_filters_no_boards'   => 'Keine Kanban-Boards gefunden. Erstellen Sie zunächst ein Board.',
+
+    // Custom Fields in portal
+    'cf_fields_heading'           => 'Benutzerdefinierte Felder auf der Ticket-Seite',
+    'cf_fields_hint'              => 'Wählen Sie aus, welche benutzerdefinierten Felder auf der Ticket-Seite im Portal angezeigt werden. Ziehen zum Neuordnen. Legen Sie eine Bezeichnung pro Portalsprache fest — die Bezeichnung wird anstelle des ursprünglichen Feldnamens angezeigt.',
+
     'perm_manage_organizations' => 'Organisations-Management zulassen',
     'api_docs_link'          => 'OrgPortal API Dokumentation',
     'close_ticket'                  => 'Ticket schließen',

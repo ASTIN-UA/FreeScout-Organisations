@@ -47,6 +47,7 @@
 - [Strukturelle enheder — Adgangskontrol på afdelingsniveau](#strukturelle-enheder--adgangskontrol-på-afdelingsniveau)
 - [Org Snapshot — Permanent sagsattribuering](#org-snapshot--permanent-sagsattribuering)
 - [Kanban-integration](#kanban-integration)
+- [Integration med brugerdefinerede felter](#integration-med-brugerdefinerede-felter)
 - [Adgangskontrol og tilladelser](#adgangskontrol-og-tilladelser)
 - [Systemindstillinger](#systemindstillinger--manage--organizations--system-tab)
 - [End-User Portal — Selvbetjening for virksomhedsledere](#end-user-portal--selvbetjening-for-virksomhedsledere-valgfrit)
@@ -196,6 +197,19 @@ Konfigureres i **Manage → Organizations → System tab**:
 - Oversatte labels vises både i portalfilterlinjen og i **Tilstand**-kolonnen i virksomhedssagstabellen; fallback-kæde: gemt locale → gemt engelsk → originalt kolonnenavn
 
 ![Kanban — organisationsbadges på kort og org-filtermodal](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
+
+---
+
+## Integration med brugerdefinerede felter
+
+*Vis data fra modulet Brugerdefinerede felter direkte på billetsiden i portalen.*
+
+Kræver at modulet [Custom Fields](https://freescout.net/module/custom-fields/) er installeret og aktivt.
+
+- Panel pr. postkasse i Postkasseindstillinger → OrgPortal lader dig vælge, hvilke brugerdefinerede felter der vises på billetsiden i portalen
+- Træk for at ændre rækkefølgen på felterne; hvert felt kan have en brugerdefineret etiket pr. portalsprog, med fallback til den gemte engelske etiket og derefter det oprindelige feltnavn
+- På billetsiden i portalen vises aktiverede felter i et responsivt to-kolonne-gitter mellem billettens emne og tråden — kun felter med en ikke-tom værdi vises
+- Helt valgfrit — panelet og blokken på billetsiden skjules automatisk, når modulet Brugerdefinerede felter ikke er installeret eller aktivt
 
 ---
 

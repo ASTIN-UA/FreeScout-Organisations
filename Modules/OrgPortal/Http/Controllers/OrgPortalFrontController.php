@@ -284,13 +284,35 @@ class OrgPortalFrontController extends Controller
         // Author dropdown — only members who can still be assigned (active).
         $orgMembers = Customer::whereIn('id', $this->assignableCustomerIds($member))->get();
 
+        // Custom Fields — load enabled fields with their values for this conversation
+        $customFields    = collect();
+        $cfFieldSettings = [];
+        if (\Module::isActive('customfields')) {
+            $rawCf           = \Option::get('orgportal.cf_fields_' . $mailbox->id, '[]');
+            $cfFieldSettings = is_array($rawCf) ? $rawCf : (json_decode($rawCf, true) ?: []);
+
+            if (!empty($cfFieldSettings)) {
+                $enabledIds   = collect($cfFieldSettings)->pluck('id')->all();
+                $allWithValues = \Modules\CustomFields\Entities\CustomField::getCustomFieldsWithValues(
+                    $mailbox->id,
+                    $conversation->id
+                );
+                $customFields = $allWithValues
+                    ->whereIn('id', $enabledIds)
+                    ->filter(fn($f) => $f->value !== null && $f->value !== '')
+                    ->sortBy(fn($f) => array_search($f->id, $enabledIds));
+            }
+        }
+
         return view('orgportal::portal.ticket', [
-            'mailbox'       => $mailbox,
-            'mailbox_id'    => $mailbox_id,
-            'customer'      => $customer,
-            'conversation'  => $conversation,
-            'threads'       => $threads,
-            'orgMembers'    => $orgMembers,
+            'mailbox'         => $mailbox,
+            'mailbox_id'      => $mailbox_id,
+            'customer'        => $customer,
+            'conversation'    => $conversation,
+            'threads'         => $threads,
+            'orgMembers'      => $orgMembers,
+            'customFields'    => $customFields,
+            'cfFieldSettings' => $cfFieldSettings,
         ]);
     }
 

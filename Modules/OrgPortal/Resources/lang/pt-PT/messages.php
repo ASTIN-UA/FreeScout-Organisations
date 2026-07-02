@@ -128,6 +128,10 @@ return [
     'filter_board'                => 'Quadro',
     'company_filters_no_boards'   => 'Nenhum quadro Kanban encontrado. Crie um quadro primeiro.',
 
+    // Custom Fields in portal
+    'cf_fields_heading'           => 'Campos personalizados na página do bilhete',
+    'cf_fields_hint'              => 'Selecione quais campos personalizados aparecem na página do bilhete no portal. Arraste para reordenar. Defina um rótulo por idioma do portal — o rótulo é apresentado em vez do nome original do campo.',
+
     // User permission
     'perm_manage_organizations' => 'Permitir gestão de organizações',
 

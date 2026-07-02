@@ -240,6 +240,10 @@ return [
     'filter_board'                => 'Board',
     'company_filters_no_boards'   => 'No Kanban boards found. Create a board first.',
 
+    // Custom Fields in portal
+    'cf_fields_heading'           => 'Custom Fields on Ticket Page',
+    'cf_fields_hint'              => 'Select which custom fields appear on the ticket page in the portal. Drag to reorder. Set a label per portal language — the label is shown instead of the original field name.',
+
     // User permission
     'perm_manage_organizations' => 'Allow managing organizations',
     'perm_manage_templates'     => 'Allow managing notification templates',

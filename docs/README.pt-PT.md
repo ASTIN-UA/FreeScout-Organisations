@@ -47,6 +47,7 @@
 - [Unidades Estruturais — Controlo de Acesso ao Nível Departamental](#unidades-estruturais--controlo-de-acesso-ao-nível-departamental)
 - [Org Snapshot — Atribuição Permanente de Pedidos](#org-snapshot--atribuição-permanente-de-pedidos)
 - [Integração com o Kanban](#integração-com-o-kanban)
+- [Integração com Campos Personalizados](#integração-com-campos-personalizados)
 - [Controlo de Acesso e Permissões](#controlo-de-acesso-e-permissões)
 - [Definições do Sistema](#definições-do-sistema--gerir--organizações--separador-sistema)
 - [End-User Portal — Autoatendimento para Gestores Corporativos](#end-user-portal--autoatendimento-para-gestores-corporativos-opcional)
@@ -196,6 +197,19 @@ Os modos `tag` e `tag_only` são desativados quando o módulo Tags está inativo
 - As etiquetas traduzidas aparecem tanto na barra de filtros do portal como na coluna **Estado** da tabela de pedidos da empresa; cadeia de alternância: idioma guardado → inglês guardado → nome original da coluna
 
 ![Kanban — emblemas de organização nos cartões e modal de filtro de organização](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
+
+---
+
+## Integração com Campos Personalizados
+
+*Apresente os dados do módulo Campos Personalizados diretamente na página do bilhete do portal.*
+
+Requer que o módulo [Custom Fields](https://freescout.net/module/custom-fields/) esteja instalado e ativo.
+
+- Um painel por caixa de correio em Definições da Caixa de Correio → OrgPortal permite escolher quais campos personalizados aparecem na página do bilhete do portal
+- Arraste os campos para os reordenar; cada campo pode ter um rótulo personalizado por idioma do portal, com fallback para o rótulo em inglês guardado e depois para o nome original do campo
+- Na página do bilhete do portal, os campos ativados são apresentados numa grelha responsiva de duas colunas entre o assunto do bilhete e a conversa — apenas são apresentados campos com um valor não vazio
+- Totalmente opcional — o painel e o bloco da página do bilhete são ocultados automaticamente quando o módulo Campos Personalizados não está instalado ou ativo
 
 ---
 

@@ -47,6 +47,7 @@
 - [Unità Strutturali — Controllo degli Accessi a Livello di Reparto](#unità-strutturali--controllo-degli-accessi-a-livello-di-reparto)
 - [Org Snapshot — Attribuzione Permanente dei Ticket](#org-snapshot--attribuzione-permanente-dei-ticket)
 - [Integrazione Kanban](#integrazione-kanban)
+- [Integrazione dei Campi Personalizzati](#integrazione-dei-campi-personalizzati)
 - [Controllo Accessi e Permessi](#controllo-accessi-e-permessi)
 - [Impostazioni di Sistema](#impostazioni-di-sistema--gestione--organizzazioni--scheda-sistema)
 - [End-User Portal — Self-Service per Manager Aziendali](#end-user-portal--self-service-per-manager-aziendali-opzionale)
@@ -196,6 +197,19 @@ Le modalità `tag` e `tag_only` sono disabilitate quando il modulo Tags è inatt
 - Le etichette tradotte appaiono sia nella barra dei filtri del portale che nella colonna **Stato** della tabella ticket aziendali; catena di fallback: lingua salvata → inglese salvato → nome colonna originale
 
 ![Kanban — badge organizzazione sulle carte e modal filtro org](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
+
+---
+
+## Integrazione dei Campi Personalizzati
+
+*Mostra i dati del modulo Campi Personalizzati direttamente nella pagina del ticket del portale.*
+
+Richiede che il modulo [Custom Fields](https://freescout.net/module/custom-fields/) sia installato e attivo.
+
+- Un pannello per casella di posta in Impostazioni Casella di Posta → OrgPortal ti permette di scegliere quali campi personalizzati appaiono nella pagina del ticket del portale
+- Trascina i campi per riordinarli; ogni campo può avere un'etichetta personalizzata per ogni lingua del portale, con fallback all'etichetta inglese salvata e poi al nome originale del campo
+- Nella pagina del ticket del portale, i campi abilitati vengono visualizzati in una griglia responsive a due colonne tra l'oggetto del ticket e il thread — vengono mostrati solo i campi con un valore non vuoto
+- Completamente opzionale — il pannello e il blocco della pagina del ticket vengono nascosti automaticamente quando il modulo Campi Personalizzati non è installato o non è attivo
 
 ---
 

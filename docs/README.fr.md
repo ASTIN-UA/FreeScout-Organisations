@@ -47,6 +47,7 @@
 - [Unités Structurelles — Contrôle d'Accès au Niveau du Département](#unités-structurelles--contrôle-daccès-au-niveau-du-département)
 - [Instantané d'Organisation — Attribution Permanente des Tickets](#instantané-dorganisation--attribution-permanente-des-tickets)
 - [Intégration Kanban](#intégration-kanban)
+- [Intégration des Champs Personnalisés](#intégration-des-champs-personnalisés)
 - [Contrôle d'Accès et Permissions](#contrôle-daccès-et-permissions)
 - [Paramètres Système](#paramètres-système--gérer--organisations--onglet-système)
 - [Portail Utilisateur Final — Auto-Service pour Gestionnaires d'Entreprise](#portail-utilisateur-final--auto-service-pour-gestionnaires-dentreprise-optionnel)
@@ -198,6 +199,19 @@ Les modes `tag` et `tag_only` sont désactivés quand le module Tags est inactif
 - Les étiquettes traduites apparaissent dans le panneau de filtres du portail et la colonne **État** du tableau des tickets d'entreprise ; chaîne de secours : locale enregistrée → anglais enregistré → nom de colonne original
 
 ![Kanban — badges d'organisation sur les cartes et modal de filtre d'organisation](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
+
+---
+
+## Intégration des Champs Personnalisés
+
+*Affichez les données du module Champs Personnalisés directement sur la page du ticket dans le portail.*
+
+Nécessite que le module [Custom Fields](https://freescout.net/module/custom-fields/) soit installé et actif.
+
+- Un panneau par boîte mail dans Paramètres de la Boîte Mail → OrgPortal vous permet de choisir quels champs personnalisés apparaissent sur la page du ticket dans le portail
+- Faites glisser les champs pour les réorganiser ; chaque champ peut avoir un libellé personnalisé par langue du portail, avec repli sur le libellé anglais enregistré puis sur le nom d'origine du champ
+- Sur la page du ticket dans le portail, les champs activés s'affichent dans une grille responsive à deux colonnes entre l'objet du ticket et le fil de discussion — seuls les champs avec une valeur non vide sont affichés
+- Entièrement optionnel — le panneau et le bloc de la page du ticket sont automatiquement masqués lorsque le module Champs Personnalisés n'est pas installé ou actif
 
 ---
 

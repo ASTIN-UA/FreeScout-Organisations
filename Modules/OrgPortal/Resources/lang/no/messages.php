@@ -128,6 +128,10 @@ return [
     'filter_board'                => 'Brett',
     'company_filters_no_boards'   => 'Ingen Kanban-brett funnet. Opprett et brett først.',
 
+    // Custom Fields in portal
+    'cf_fields_heading'           => 'Egendefinerte felt på sakssiden',
+    'cf_fields_hint'              => 'Velg hvilke egendefinerte felt som vises på sakssiden i portalen. Dra for å endre rekkefølge. Angi en etikett per portalspråk — etiketten vises i stedet for det opprinnelige feltnavnet.',
+
     // User permission
     'perm_manage_organizations' => 'Tillat håndtering av organisasjoner',
 

@@ -128,6 +128,10 @@ return [
     'filter_board'                => 'Tabuľa',
     'company_filters_no_boards'   => 'Nepodarilo sa nájsť žiadne tabuľy Kanban. Najskôr vytvorte tabuľu.',
 
+    // Custom Fields in portal
+    'cf_fields_heading'           => 'Vlastné polia na stránke tiketu',
+    'cf_fields_hint'              => 'Vyberte, ktoré vlastné polia sa zobrazia na stránke tiketu v portáli. Presuňte pre zmenu poradia. Nastavte popis pre každý jazyk portálu — popis sa zobrazuje namiesto pôvodného názvu poľa.',
+
     // User permission
     'perm_manage_organizations' => 'Povoliť správu organizácií',
 
