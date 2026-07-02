@@ -47,6 +47,7 @@
 - [Unidades Estruturais — Controle de Acesso por Departamento](#unidades-estruturais--controle-de-acesso-por-departamento)
 - [Org Snapshot — Atribuição Permanente de Tickets](#org-snapshot--atribuição-permanente-de-tickets)
 - [Integração com Kanban](#integração-com-kanban)
+- [Integração com Campos Personalizados](#integração-com-campos-personalizados)
 - [Controle de Acesso e Permissões](#controle-de-acesso-e-permissões)
 - [Configurações do Sistema](#configurações-do-sistema--gerenciar--organizações--aba-sistema)
 - [End-User Portal — Autoatendimento para Gestores Corporativos](#end-user-portal--autoatendimento-para-gestores-corporativos-opcional)
@@ -196,6 +197,19 @@ Os modos `tag` e `tag_only` são desabilitados quando o módulo Tags está inati
 - Os rótulos traduzidos aparecem tanto na barra de filtros do portal quanto na coluna **Estado** da tabela de tickets da empresa; cadeia de fallback: localidade salva → inglês salvo → nome original da coluna
 
 ![Kanban — emblemas de organização nos cartões e modal de filtro de org](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
+
+---
+
+## Integração com Campos Personalizados
+
+*Exiba os dados do módulo Campos Personalizados diretamente na página do ticket do portal.*
+
+Requer que o módulo [Custom Fields](https://freescout.net/module/custom-fields/) esteja instalado e ativo.
+
+- Um painel por caixa postal em Configurações da Caixa Postal → OrgPortal permite escolher quais campos personalizados aparecem na página do ticket do portal
+- Arraste os campos para reordená-los; cada campo pode ter um rótulo personalizado por idioma do portal, com fallback para o rótulo em inglês salvo e depois para o nome original do campo
+- Na página do ticket do portal, os campos habilitados são exibidos em uma grade responsiva de duas colunas entre o assunto do ticket e a thread — apenas campos com valor não vazio são exibidos
+- Totalmente opcional — o painel e o bloco da página do ticket são ocultados automaticamente quando o módulo Campos Personalizados não está instalado ou ativo
 
 ---
 

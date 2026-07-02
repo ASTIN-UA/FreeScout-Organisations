@@ -32,4 +32,8 @@ auth.json
 # Third-party paid modules (local reference copies, not part of this repo)
 /EndUserPortal/
 /Kanban/
+/CustomFields/
 /.vs/
+
+# Local dev screenshots (not part of the repo)
+/screenshots/

@@ -47,6 +47,7 @@
 - [Unități Structurale — Control de acces la nivel de departament](#unități-structurale--control-de-acces-la-nivel-de-departament)
 - [Org Snapshot — Atribuire permanentă a tichetelor](#org-snapshot--atribuire-permanentă-a-tichetelor)
 - [Integrare Kanban](#integrare-kanban)
+- [Integrare cu câmpuri personalizate](#integrare-cu-câmpuri-personalizate)
 - [Control acces și permisiuni](#control-acces-și-permisiuni)
 - [Setări de sistem](#setări-de-sistem--manage--organizations--fila-system)
 - [End-User Portal — Auto-servire pentru managerii corporativi](#end-user-portal--auto-servire-pentru-managerii-corporativi-opțional)
@@ -196,6 +197,19 @@ Modurile `tag` și `tag_only` sunt dezactivate când modulul Tags este inactiv.
 - Etichetele traduse apar atât în bara de filtrare a portalului, cât și în coloana **State** a tabelului de tichete al companiei; lanț de rezervă: locale salvat → engleza salvată → numele original al coloanei
 
 ![Kanban — insigne de organizație pe carduri și modal de filtru al organizației](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
+
+---
+
+## Integrare cu câmpuri personalizate
+
+*Afișați datele din modulul Câmpuri personalizate direct pe pagina tichetului din portal.*
+
+Necesită ca modulul [Custom Fields](https://freescout.net/module/custom-fields/) să fie instalat și activ.
+
+- Un panou per căsuță poștală în Setări căsuță poștală → OrgPortal vă permite să alegeți ce câmpuri personalizate apar pe pagina tichetului din portal
+- Trageți câmpurile pentru a le reordona; fiecare câmp poate avea o etichetă personalizată pentru fiecare limbă a portalului, cu revenire la eticheta în engleză salvată și apoi la numele original al câmpului
+- Pe pagina tichetului din portal, câmpurile activate sunt afișate într-o grilă responsive cu două coloane între subiectul tichetului și fir — sunt afișate doar câmpurile cu o valoare nevidă
+- Complet opțional — panoul și blocul de pe pagina tichetului sunt ascunse automat atunci când modulul Câmpuri personalizate nu este instalat sau activ
 
 ---
 

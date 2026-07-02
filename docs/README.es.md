@@ -47,6 +47,7 @@
 - [Unidades Estructurales — Control de Acceso a Nivel de Departamento](#unidades-estructurales--control-de-acceso-a-nivel-de-departamento)
 - [Org Snapshot — Atribución Permanente de Tickets](#org-snapshot--atribución-permanente-de-tickets)
 - [Integración Kanban](#integración-kanban)
+- [Integración de Campos Personalizados](#integración-de-campos-personalizados)
 - [Control de Acceso y Permisos](#control-de-acceso-y-permisos)
 - [Configuración del Sistema](#configuración-del-sistema--manage--organizations--system-tab)
 - [End-User Portal — Autoservicio para Gerentes Corporativos](#end-user-portal--autoservicio-para-gerentes-corporativos-opcional)
@@ -198,6 +199,19 @@ Los modos `tag` y `tag_only` están deshabilitados cuando el módulo Tags está 
 - Las etiquetas traducidas aparecen tanto en la barra de filtros del portal como en la columna **State** de la tabla de tickets de la empresa; cadena de retroceso: idioma guardado → idioma inglés guardado → nombre de columna original
 
 ![Kanban — insignias de organización en tarjetas y modal de filtro de org](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
+
+---
+
+## Integración de Campos Personalizados
+
+*Muestre los datos del módulo Campos Personalizados directamente en la página del ticket del portal.*
+
+Requiere que el módulo [Custom Fields](https://freescout.net/module/custom-fields/) esté instalado y activo.
+
+- Un panel por buzón en Configuración de Buzón → OrgPortal le permite elegir qué campos personalizados aparecen en la página del ticket del portal
+- Arrastre los campos para reordenarlos; cada campo puede tener una etiqueta personalizada por idioma del portal, con reserva a la etiqueta en inglés guardada y luego al nombre original del campo
+- En la página del ticket del portal, los campos habilitados se muestran en una cuadrícula responsiva de dos columnas entre el asunto del ticket y el hilo — solo se muestran los campos con un valor no vacío
+- Totalmente opcional — el panel y el bloque de la página del ticket se ocultan automáticamente cuando el módulo Campos Personalizados no está instalado o no está activo
 
 ---
 

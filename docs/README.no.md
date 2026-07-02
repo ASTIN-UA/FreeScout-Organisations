@@ -47,6 +47,7 @@
 - [Strukturelle enheter — Tilgangskontroll på avdelingsnivå](#strukturelle-enheter--tilgangskontroll-på-avdelingsnivå)
 - [Org Snapshot — Permanent sakstilskriving](#org-snapshot--permanent-sakstilskriving)
 - [Kanban-integrasjon](#kanban-integrasjon)
+- [Integrasjon med egendefinerte felt](#integrasjon-med-egendefinerte-felt)
 - [Tilgangskontroll og tillatelser](#tilgangskontroll-og-tillatelser)
 - [Systeminnstillinger](#systeminnstillinger--manage--organizations--system-tab)
 - [End-User Portal — Selvbetjening for bedriftsledere](#end-user-portal--selvbetjening-for-bedriftsledere-valgfritt)
@@ -196,6 +197,19 @@ Konfigurert i **Manage → Organizations → System tab**:
 - Oversatte etiketter vises i både portalfilterlisten og **State**-kolonnen i bedriftssaktabellen; reservekjede: lagret lokalitet → lagret engelsk → opprinnelig kolonnenavn
 
 ![Kanban — organisasjonsmerker på kort og org-filtermodal](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
+
+---
+
+## Integrasjon med egendefinerte felt
+
+*Vis data fra modulen Egendefinerte felt direkte på sakssiden i portalen.*
+
+Krever at modulen [Custom Fields](https://freescout.net/module/custom-fields/) er installert og aktiv.
+
+- Et panel per postboks i Postboksinnstillinger → OrgPortal lar deg velge hvilke egendefinerte felt som vises på sakssiden i portalen
+- Dra felt for å endre rekkefølgen; hvert felt kan ha en egendefinert etikett per portalspråk, med tilbakefall til den lagrede engelske etiketten og deretter det opprinnelige feltnavnet
+- På sakssiden i portalen vises aktiverte felt i et responsivt topunkts rutenett mellom sakens emne og tråden — kun felt med en ikke-tom verdi vises
+- Helt valgfritt — panelet og blokken på sakssiden skjules automatisk når modulen Egendefinerte felt ikke er installert eller aktiv
 
 ---
 

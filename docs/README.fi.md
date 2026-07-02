@@ -47,6 +47,7 @@
 - [Rakenteelliset yksiköt — Osastotason pääsynhallinta](#rakenteelliset-yksiköt--osastotason-pääsynhallinta)
 - [Org Snapshot — Pysyvä tikettien attribuointi](#org-snapshot--pysyvä-tikettien-attribuointi)
 - [Kanban-integraatio](#kanban-integraatio)
+- [Mukautettujen kenttien integraatio](#mukautettujen-kenttien-integraatio)
 - [Pääsynhallinta ja käyttöoikeudet](#pääsynhallinta-ja-käyttöoikeudet)
 - [Järjestelmäasetukset](#järjestelmäasetukset--manage--organizations--system-tab)
 - [End-User Portal — Itsepalvelu yrityspäälliköille](#end-user-portal--itsepalvelu-yrityspäälliköille-valinnainen)
@@ -196,6 +197,19 @@ Määritetään kohdassa **Manage → Organizations → System tab**:
 - Käännetyt tunnisteet näkyvät sekä portaalin suodatinpalkissa että yritystikettitaulukon **Tila**-sarakkeessa; varajärjestys: tallennettu lokaalikieli → tallennettu englanti → alkuperäinen sarakkeen nimi
 
 ![Kanban — organisaatiotunnisteet korteissa ja organisaatiosuodatinmodaali](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
+
+---
+
+## Mukautettujen kenttien integraatio
+
+*Näytä Mukautetut kentät -moduulin tiedot suoraan portaalin tikettisivulla.*
+
+Edellyttää, että moduuli [Custom Fields](https://freescout.net/module/custom-fields/) on asennettu ja käytössä.
+
+- Postilaatikkokohtainen paneeli kohdassa Postilaatikon asetukset → OrgPortal antaa sinun valita, mitkä mukautetut kentät näkyvät portaalin tikettisivulla
+- Vedä kenttiä järjestääksesi ne uudelleen; jokaisella kentällä voi olla mukautettu tunniste jokaista portaalin kieltä kohden, palautuen tallennettuun englanninkieliseen tunnisteeseen ja sitten alkuperäiseen kentän nimeen
+- Portaalin tikettisivulla käytössä olevat kentät näytetään responsiivisessa kaksisarakkeisessa ruudukossa tiketin aiheen ja viestiketjun välissä — vain kentät, joilla on ei-tyhjä arvo, näytetään
+- Täysin valinnainen — paneeli ja tikettisivun lohko piilotetaan automaattisesti, kun Mukautetut kentät -moduuli ei ole asennettu tai käytössä
 
 ---
 

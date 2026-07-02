@@ -47,6 +47,7 @@
 - [Structurele Eenheden — Toegangsbeheer op Afdelingsniveau](#structurele-eenheden--toegangsbeheer-op-afdelingsniveau)
 - [Org Snapshot — Permanente Ticketkoppeling](#org-snapshot--permanente-ticketkoppeling)
 - [Kanban-integratie](#kanban-integratie)
+- [Integratie met aangepaste velden](#integratie-met-aangepaste-velden)
 - [Toegangsbeheer & Machtigingen](#toegangsbeheer--machtigingen)
 - [Systeeminstellingen](#systeeminstellingen--beheer--organisaties--systeemtabblad)
 - [End-User Portal — Selfservice voor Zakelijke Managers](#end-user-portal--selfservice-voor-zakelijke-managers-optioneel)
@@ -196,6 +197,19 @@ Geconfigureerd in **Beheer → Organisaties → Systeemtabblad**:
 - Vertaalde labels verschijnen zowel in de portaalfilterbar als in de **Status**-kolom van de bedrijfstickets tabel; terugvalvolgorde: opgeslagen taal → opgeslagen Engels → originele kolomnaam
 
 ![Kanban — organisatiebadges op kaarten en organisatiefiltermodaal](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
+
+---
+
+## Integratie met aangepaste velden
+
+*Toon gegevens uit de module Aangepaste velden direct op de ticketpagina van het portaal.*
+
+Vereist dat de module [Custom Fields](https://freescout.net/module/custom-fields/) is geïnstalleerd en actief.
+
+- Een paneel per mailbox in Mailbox-instellingen → OrgPortal laat u kiezen welke aangepaste velden worden weergegeven op de ticketpagina van het portaal
+- Sleep velden om ze opnieuw te ordenen; elk veld kan een aangepast label hebben per portaaltaal, met terugval naar het opgeslagen Engelse label en vervolgens de oorspronkelijke veldnaam
+- Op de ticketpagina van het portaal worden ingeschakelde velden weergegeven in een responsief raster met twee kolommen tussen het ticketonderwerp en de thread — alleen velden met een niet-lege waarde worden weergegeven
+- Volledig optioneel — het paneel en het blok op de ticketpagina worden automatisch verborgen wanneer de module Aangepaste velden niet is geïnstalleerd of niet actief is
 
 ---
 

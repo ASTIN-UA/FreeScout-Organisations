@@ -47,6 +47,7 @@
 - [Strukturella enheter — Åtkomstkontroll på avdelningsnivå](#strukturella-enheter--åtkomstkontroll-på-avdelningsnivå)
 - [Org Snapshot — Permanent ärendetillskrivning](#org-snapshot--permanent-ärendetillskrivning)
 - [Kanban-integration](#kanban-integration)
+- [Integration med anpassade fält](#integration-med-anpassade-fält)
 - [Åtkomstkontroll och behörigheter](#åtkomstkontroll-och-behörigheter)
 - [Systeminställningar](#systeminställningar--manage--organizations--system-tab)
 - [End-User Portal — Självbetjäning för företagschefer](#end-user-portal--självbetjäning-för-företagschefer-valfritt)
@@ -196,6 +197,19 @@ Konfigureras i **Manage → Organizations → System tab**:
 - Översatta etiketter visas både i portalens filterfält och i **State**-kolumnen i företagsärendetabellen; fallback-kedja: sparad lokal → sparad engelska → ursprungligt kolumnnamn
 
 ![Kanban — organisationsmärken på kort och org-filtermodal](https://raw.githubusercontent.com/ASTIN-UA/FreeScout-Organisations/main/docs/screenshots/kanban-org.png)
+
+---
+
+## Integration med anpassade fält
+
+*Visa data från modulen Anpassade fält direkt på ärendesidan i portalen.*
+
+Kräver att modulen [Custom Fields](https://freescout.net/module/custom-fields/) är installerad och aktiv.
+
+- En panel per brevlåda i Postlådeinställningar → OrgPortal låter dig välja vilka anpassade fält som visas på ärendesidan i portalen
+- Dra fält för att ändra ordning; varje fält kan ha en anpassad etikett per portalspråk, med reservfall till den sparade engelska etiketten och sedan det ursprungliga fältnamnet
+- På ärendesidan i portalen visas aktiverade fält i ett responsivt rutnät med två kolumner mellan ärendets ämne och tråden — endast fält med ett icke-tomt värde visas
+- Helt valfritt — panelen och blocket på ärendesidan döljs automatiskt när modulen Anpassade fält inte är installerad eller aktiv
 
 ---
 
