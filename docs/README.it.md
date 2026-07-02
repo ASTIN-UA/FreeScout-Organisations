@@ -9,7 +9,7 @@
 > Stai cercando un modo per gestire gli account aziendali in FreeScout? Per offrire ai clienti corporate il loro portale di supporto? Per controllare quali ticket può vedere ogni contatto B2B in base al suo ruolo e reparto? OrgPortal risolve tutto questo.
 
 **Compatibile con:** FreeScout 1.8.147+  
-**Integrazioni opzionali:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
+**Integrazioni opzionali:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/), [Custom Fields](https://freescout.net/module/custom-fields/)
 
 > [!IMPORTANT]
 > **Installa sempre dalla [versione più recente](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest), non dal codice sorgente del repository.**

@@ -9,7 +9,7 @@
 > 正在寻找在 FreeScout 中管理企业账户的方法？想为企业客户提供专属支持门户？想根据角色和部门控制每个 B2B 联系人可以看到哪些工单？OrgPortal 解决了所有这些问题。
 
 **兼容：** FreeScout 1.8.147+  
-**可选集成：** [End-User Portal](https://freescout.net/module/end-user-portal/)、[API and Webhooks](https://freescout.net/module/api-webhooks/)、[Kanban](https://freescout.net/module/kanban/)
+**可选集成：** [End-User Portal](https://freescout.net/module/end-user-portal/)、[API and Webhooks](https://freescout.net/module/api-webhooks/)、[Kanban](https://freescout.net/module/kanban/)、[Custom Fields](https://freescout.net/module/custom-fields/)
 
 > [!IMPORTANT]
 > **请始终从[最新版本](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest)安装，而不是从仓库源代码安装。**

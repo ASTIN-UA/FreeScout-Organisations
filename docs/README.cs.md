@@ -9,7 +9,7 @@
 > Hledáte způsob, jak spravovat firemní účty ve FreeScoutu? Jak dát firemním klientům vlastní portál podpory? Jak řídit, které tickety může každý B2B kontakt vidět na základě své role a oddělení? OrgPortal to vše řeší.
 
 **Funguje s:** FreeScout 1.8.147+  
-**Volitelné integrace:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
+**Volitelné integrace:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/), [Custom Fields](https://freescout.net/module/custom-fields/)
 
 > [!IMPORTANT]
 > **Vždy instalujte z [nejnovější verze](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest), nikoli ze zdrojového kódu repozitáře.**

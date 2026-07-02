@@ -7,7 +7,7 @@
 > Looking for a way to manage company accounts in FreeScout? To give corporate clients their own support portal? To control which tickets each B2B contact can see based on their role and department? OrgPortal solves all of that.
 
 **Works with:** FreeScout 1.8.147+  
-**Optional integrations:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
+**Optional integrations:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/), [Custom Fields](https://freescout.net/module/custom-fields/)
 
 > [!IMPORTANT]
 > **Always install from the [latest release](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest), not from the repository source.**

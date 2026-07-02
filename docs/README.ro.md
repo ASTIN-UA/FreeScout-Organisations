@@ -9,7 +9,7 @@
 > Cauți o modalitate de a gestiona conturile de companie în FreeScout? Să oferi clienților corporativi propriul portal de asistență? Să controlezi ce tichete poate vedea fiecare contact B2B în funcție de rol și departament? OrgPortal rezolvă toate acestea.
 
 **Compatibil cu:** FreeScout 1.8.147+  
-**Integrări opționale:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
+**Integrări opționale:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/), [Custom Fields](https://freescout.net/module/custom-fields/)
 
 > [!IMPORTANT]
 > **Instalează întotdeauna din [cea mai recentă versiune](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest), nu din codul sursă al repozitoriului.**

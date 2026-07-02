@@ -9,7 +9,7 @@
 > Etsitkö tapaa hallita yritystilejä FreeScoutissa? Antaa yrityksille oma tukiportaali? Hallita, mitä tikettejä kukin B2B-yhteyshenkilö näkee roolinsa ja osastonsa perusteella? OrgPortal ratkaisee kaiken tämän.
 
 **Toimii:** FreeScout 1.8.147+  
-**Valinnaiset integraatiot:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
+**Valinnaiset integraatiot:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/), [Custom Fields](https://freescout.net/module/custom-fields/)
 
 > [!IMPORTANT]
 > **Asenna aina [uusimmasta julkaisusta](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest), ei repositorion lähdekoodista.**

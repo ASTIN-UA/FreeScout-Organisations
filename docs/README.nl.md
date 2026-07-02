@@ -9,7 +9,7 @@
 > Op zoek naar een manier om bedrijfsaccounts te beheren in FreeScout? Om zakelijke klanten hun eigen supportportaal te geven? Om te bepalen welke tickets elke B2B-contactpersoon kan zien op basis van hun rol en afdeling? OrgPortal lost dat allemaal op.
 
 **Werkt met:** FreeScout 1.8.147+  
-**Optionele integraties:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
+**Optionele integraties:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/), [Custom Fields](https://freescout.net/module/custom-fields/)
 
 > [!IMPORTANT]
 > **Installeer altijd vanuit de [nieuwste release](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest), niet vanuit de broncode van het repository.**

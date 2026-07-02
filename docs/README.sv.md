@@ -9,7 +9,7 @@
 > Letar du efter ett sätt att hantera företagskonton i FreeScout? Att ge företagskunder en egen supportportal? Att kontrollera vilka ärenden varje B2B-kontakt kan se baserat på sin roll och avdelning? OrgPortal löser allt detta.
 
 **Fungerar med:** FreeScout 1.8.147+  
-**Valfria integrationer:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/)
+**Valfria integrationer:** [End-User Portal](https://freescout.net/module/end-user-portal/), [API and Webhooks](https://freescout.net/module/api-webhooks/), [Kanban](https://freescout.net/module/kanban/), [Custom Fields](https://freescout.net/module/custom-fields/)
 
 > [!IMPORTANT]
 > **Installera alltid från den [senaste versionen](https://github.com/ASTIN-UA/FreeScout-Organisations/releases/latest), inte från källkoden i repositoriet.**
