@@ -4,6 +4,23 @@ All notable changes to OrgPortal are documented here.
 
 ---
 
+## [2.0.3] — 2026-07-02
+
+### New Features
+
+- **Custom Fields integration on the portal ticket page**: when the [Custom Fields](https://freescout.net/module/custom-fields/) module is installed and active, admins can now pick which custom fields appear on the portal ticket page from a new panel in **Mailbox Settings → OrgPortal**. Fields support drag-to-reorder and a custom label per portal language (falling back to the saved English label, then the original field name). Enabled fields with a non-empty value render in a responsive two-column grid between the ticket subject and the thread. Fully optional — hidden automatically when the module is not installed. Documented in all 18 README languages.
+
+### Bug Fixes
+
+- **Drag-to-reorder was non-functional** in both the Kanban company filters panel and the new Custom Fields panel: the code checked for jQuery UI's `$.fn.sortable`, which is not part of this project. Switched to the `sortable()`/`sortupdate` API of the html5sortable library that FreeScout already loads globally via the Kanban module.
+- **Portal ticket view layout**: the custom fields block now renders above the "From / Change author" row, separated by horizontal rules, for clearer visual grouping.
+
+### Internal
+
+- Deduplicated the company-filters and custom-fields label-editor JavaScript in `mailbox_settings.blade.php` into a single shared `initLabelEditor()` helper.
+
+---
+
 ## [2.0.2] — 2026-07-02
 
 ### Bug Fixes
