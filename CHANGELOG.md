@@ -4,6 +4,30 @@ All notable changes to OrgPortal are documented here.
 
 ---
 
+## [2.0.4] — 2026-07-03
+
+### Bug Fixes
+
+- **Org badge and API showed a customer's old, deactivated organization instead of their current one**: when a customer moved from one organization to another (deactivated in the old one, added active in the new one), four places resolved their organization by taking the first `OrganizationMember` row for that customer without filtering `is_active` — silently returning whichever row had the lowest ID, i.e. the old one. Fixed in all four spots: the single-ticket badge, the conversations list badge, the Kanban card badge, and `GET /api/customers/{id}/organization`. No data migration needed — this was a query-time resolution bug, so badges self-correct immediately.
+- **Admin UI could hard-delete an organization that still had members or tickets**: the API already blocked this with a `422`, but the admin "Delete organization" button had no server-side check at all — only a JS confirmation dialog. Applied the same guard to the admin controller.
+- **`DELETE /api/customers/{id}/organization` wiped a customer's entire membership history**: it deleted every `OrganizationMember` row for the customer regardless of organization or active status, silently destroying historical (deactivated) memberships in other organizations — exactly what `is_active`/`deactivated_at` exist to preserve. Now scoped to the active membership only.
+- **Removing a member or deleting an organization with existing tickets is now consistently blocked** across the admin UI and the API (`removeMember`, `deleteMember`, `removeCustomerOrganization`): hard delete is for correcting a mistake, not for offboarding someone with real ticket history — deactivating (`isActive: false` / the admin "fire" toggle) is the correct path and preserves ticket history. The ticket check uses the customer's actual tickets directly, so it works correctly even when Org Snapshot / attribution mode is not enabled.
+- **Portal ticket view layout**: fixed drag-to-reorder in the Custom Fields and Kanban company-filter label editors, which never worked — the code checked for jQuery UI's `$.fn.sortable` (not part of this project) instead of the `sortable()`/`sortupdate` API of the html5sortable library FreeScout already loads globally.
+
+### Internal / Hardening
+
+- `Organization::forCustomer()` no longer falls back to a historical (deactivated) membership when no active one exists — a customer with no active org now correctly shows no badge. The three badge call sites now use this single helper instead of duplicating the lookup query, so this class of bug can't reappear in a fourth place.
+- Deduplicated the company-filters and custom-fields label-editor JavaScript in `mailbox_settings.blade.php` into one shared `initLabelEditor()` helper.
+- Removed a stray `structure.md` (leftover raw AI-analysis dump) and an unused Google site-verification file from the repo root.
+
+### Documentation
+
+- Documented the Custom Fields portal integration in the README, in all 18 languages, including listing it in the "Optional integrations" line.
+- Documented the entire `/organizations/{id}/members/...` sub-resource (list, get, update, delete) in the interactive ReDoc API docs — implemented in code but previously missing from the docs entirely.
+- Documented the new `422` (has-tickets) responses on member/customer removal in both ReDoc and `docs/api/README.md`, in all 18 languages.
+
+---
+
 ## [2.0.3] — 2026-07-02
 
 ### New Features
