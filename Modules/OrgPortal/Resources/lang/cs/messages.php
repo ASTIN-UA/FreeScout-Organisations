@@ -272,6 +272,8 @@ return [
 
     'org_deactivated'                   => 'Organizace deaktivována.',
     'org_activated'                     => 'Organizace aktivována.',
+    'org_delete_has_members'            => 'Tuto organizaci nelze smazat: stále obsahuje :count člena/členů. Nejprve odeberte všechny členy.',
+    'org_delete_has_tickets'            => 'Tuto organizaci nelze smazat: stále obsahuje :count tiket(ů). Nejprve přeřaďte nebo smažte tikety.',
     'col_tickets'                       => 'Vstupenky',
     'col_tags'                          => 'Značky',
     'col_status'                        => 'Stav',

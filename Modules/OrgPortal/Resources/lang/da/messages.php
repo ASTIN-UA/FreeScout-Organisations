@@ -273,6 +273,8 @@ return [
     // Organizations list — status & filters
     'org_deactivated'                   => 'Organisation deaktiveret.',
     'org_activated'                     => 'Organisation aktiveret.',
+    'org_delete_has_members'            => 'Kan ikke slette denne organisation: den har stadig :count medlem(mer). Fjern alle medlemmer først.',
+    'org_delete_has_tickets'            => 'Kan ikke slette denne organisation: den har stadig :count billet(ter). Omfordel eller slet billetterne først.',
     'col_tickets'                       => 'Billetter',
     'col_tags'                          => 'Tags',
     'col_status'                        => 'Status',

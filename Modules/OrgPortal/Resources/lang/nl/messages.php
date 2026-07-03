@@ -273,6 +273,8 @@ return [
     // New keys — org deactivation & status management
     'org_deactivated'                   => 'Organisatie gedeactiveerd.',
     'org_activated'                     => 'Organisatie geactiveerd.',
+    'org_delete_has_members'            => 'Deze organisatie kan niet worden verwijderd: er zijn nog :count lid/leden. Verwijder eerst alle leden.',
+    'org_delete_has_tickets'            => 'Deze organisatie kan niet worden verwijderd: er zijn nog :count ticket(s). Wijs de tickets eerst opnieuw toe of verwijder ze.',
     'col_tickets'                       => 'Tickets',
     'col_tags'                          => 'Tags',
     'col_status'                        => 'Status',

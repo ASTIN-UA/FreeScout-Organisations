@@ -272,6 +272,8 @@ return [
 
     'org_deactivated'                   => 'Organizzazione disattivata.',
     'org_activated'                     => 'Organizzazione attivata.',
+    'org_delete_has_members'            => 'Impossibile eliminare questa organizzazione: ha ancora :count membro/i. Rimuovi prima tutti i membri.',
+    'org_delete_has_tickets'            => 'Impossibile eliminare questa organizzazione: ha ancora :count ticket. Riassegna o elimina prima i ticket.',
     'col_tickets'                       => 'Ticket',
     'col_tags'                          => 'Tag',
     'col_status'                        => 'Stato',

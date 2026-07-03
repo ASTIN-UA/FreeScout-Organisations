@@ -273,6 +273,8 @@ return [
     // Organizations list enhancements
     'org_deactivated'                   => 'Organisaatio poistettiin käytöstä.',
     'org_activated'                     => 'Organisaatio aktivoitu.',
+    'org_delete_has_members'            => 'Tätä organisaatiota ei voi poistaa: siinä on vielä :count jäsen(tä). Poista ensin kaikki jäsenet.',
+    'org_delete_has_tickets'            => 'Tätä organisaatiota ei voi poistaa: siinä on vielä :count tiketti(ä). Määritä uudelleen tai poista tiketit ensin.',
     'col_tickets'                       => 'Liput',
     'col_tags'                          => 'Tunnisteet',
     'col_status'                        => 'Tila',

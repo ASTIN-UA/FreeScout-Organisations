@@ -273,6 +273,8 @@ return [
     // Organizations list — new keys (49 keys added 2026-06-19)
     'org_deactivated'                   => '组织已停用。',
     'org_activated'                     => '组织已激活。',
+    'org_delete_has_members'            => '无法删除该组织：仍有 :count 名成员。请先移除所有成员。',
+    'org_delete_has_tickets'            => '无法删除该组织：仍有 :count 个工单。请先重新分配或删除工单。',
     'col_tickets'                       => '工单',
     'col_tags'                          => '标签',
     'col_status'                        => '状态',

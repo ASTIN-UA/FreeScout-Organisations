@@ -30,6 +30,8 @@ return [
     'org_deleted'            => 'Organization deleted.',
     'org_deactivated'        => 'Organization deactivated.',
     'org_activated'          => 'Organization activated.',
+    'org_delete_has_members' => 'Cannot delete this organization: it still has :count member(s). Remove all members first.',
+    'org_delete_has_tickets' => 'Cannot delete this organization: it still has :count ticket(s). Reassign or delete tickets first.',
 
     // Admin — organizations list columns & actions
     'col_tickets'            => 'Tickets',

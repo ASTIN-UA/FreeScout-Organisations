@@ -30,6 +30,8 @@ return [
     'org_deleted'            => 'Організацію видалено.',
     'org_deactivated'        => 'Організацію деактивовано.',
     'org_activated'          => 'Організацію активовано.',
+    'org_delete_has_members' => 'Неможливо видалити організацію: у ній ще є :count учасник(ів). Спочатку видаліть усіх учасників.',
+    'org_delete_has_tickets' => 'Неможливо видалити організацію: у ній ще є :count заявка(ок). Спочатку перепризначте або видаліть заявки.',
 
     // Admin — organizations list columns & actions
     'col_tickets'            => 'Заявки',

@@ -308,7 +308,19 @@ class OrgPortalAdminController extends Controller
         // Deleting organizations is admin-only, even for permitted managers.
         $this->authorizeAdmin();
 
-        Organization::findOrFail($id)->delete();
+        $org = Organization::withCount(['members', 'conversations'])->findOrFail($id);
+
+        if ($org->members_count > 0) {
+            return redirect()->route('orgportal.admin.index')
+                ->with('flash_error', __('orgportal::messages.org_delete_has_members', ['count' => $org->members_count]));
+        }
+
+        if ($org->conversations_count > 0) {
+            return redirect()->route('orgportal.admin.index')
+                ->with('flash_error', __('orgportal::messages.org_delete_has_tickets', ['count' => $org->conversations_count]));
+        }
+
+        $org->delete();
 
         return redirect()->route('orgportal.admin.index')
             ->with('flash_success', __('orgportal::messages.org_deleted'));

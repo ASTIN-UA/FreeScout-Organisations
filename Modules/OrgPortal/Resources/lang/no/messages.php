@@ -273,6 +273,8 @@ return [
     // Organizations — status and activity
     'org_deactivated'                   => 'Organisasjon deaktivert.',
     'org_activated'                     => 'Organisasjon aktivert.',
+    'org_delete_has_members'            => 'Kan ikke slette denne organisasjonen: den har fortsatt :count medlem(mer). Fjern alle medlemmer først.',
+    'org_delete_has_tickets'            => 'Kan ikke slette denne organisasjonen: den har fortsatt :count sak(er). Tildel eller slett sakene først.',
     'col_tickets'                       => 'Billetter',
     'col_tags'                          => 'Merkelapper',
     'col_status'                        => 'Status',

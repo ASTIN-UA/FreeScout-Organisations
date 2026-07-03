@@ -272,6 +272,8 @@ return [
 
     'org_deactivated'                   => 'Organizacja dezaktywowana.',
     'org_activated'                     => 'Organizacja aktywowana.',
+    'org_delete_has_members'            => 'Nie można usunąć tej organizacji: nadal ma :count członka/członków. Najpierw usuń wszystkich członków.',
+    'org_delete_has_tickets'            => 'Nie można usunąć tej organizacji: nadal ma :count zgłoszenie/zgłoszeń. Najpierw ponownie przypisz lub usuń zgłoszenia.',
     'col_tickets'                       => 'Zgłoszenia',
     'col_tags'                          => 'Znaczniki',
     'col_status'                        => 'Stan',

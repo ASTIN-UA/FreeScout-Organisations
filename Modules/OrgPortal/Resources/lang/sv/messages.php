@@ -273,6 +273,8 @@ return [
     // Organizations list — status and columns
     'org_deactivated'                   => 'Organisation inaktiverad.',
     'org_activated'                     => 'Organisation aktiverad.',
+    'org_delete_has_members'            => 'Det går inte att ta bort den här organisationen: den har fortfarande :count medlem(mar). Ta bort alla medlemmar först.',
+    'org_delete_has_tickets'            => 'Det går inte att ta bort den här organisationen: den har fortfarande :count ärende(n). Omtilldela eller ta bort ärendena först.',
     'col_tickets'                       => 'Biljetter',
     'col_tags'                          => 'Taggar',
     'col_status'                        => 'Status',

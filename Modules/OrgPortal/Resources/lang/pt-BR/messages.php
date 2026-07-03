@@ -273,6 +273,8 @@ return [
     // Org deactivation & listing enhancements
     'org_deactivated'                   => 'Organização desativada.',
     'org_activated'                     => 'Organização ativada.',
+    'org_delete_has_members'            => 'Não é possível excluir esta organização: ela ainda tem :count membro(s). Remova todos os membros primeiro.',
+    'org_delete_has_tickets'            => 'Não é possível excluir esta organização: ela ainda tem :count ticket(s). Reatribua ou exclua os tickets primeiro.',
     'col_tickets'                       => 'Tíquetes',
     'col_tags'                          => 'Tags',
     'col_status'                        => 'Status',

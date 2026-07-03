@@ -273,6 +273,8 @@ return [
     // 49 new keys (June 2026)
     'org_deactivated'                   => 'Organizácia deaktivovaná.',
     'org_activated'                     => 'Organizácia aktivovaná.',
+    'org_delete_has_members'            => 'Túto organizáciu nemožno odstrániť: stále má :count člena/členov. Najprv odstráňte všetkých členov.',
+    'org_delete_has_tickets'            => 'Túto organizáciu nemožno odstrániť: stále má :count tiket(ov). Najprv preraďte alebo odstráňte tikety.',
     'col_tickets'                       => 'Lístky',
     'col_tags'                          => 'Značky',
     'col_status'                        => 'Stav',

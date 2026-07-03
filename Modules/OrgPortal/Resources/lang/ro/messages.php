@@ -273,6 +273,8 @@ return [
     // Organizations — activation / deactivation
     'org_deactivated'                   => 'Organizație dezactivată.',
     'org_activated'                     => 'Organizație activată.',
+    'org_delete_has_members'            => 'Nu se poate șterge această organizație: mai are :count membru/membri. Eliminați mai întâi toți membrii.',
+    'org_delete_has_tickets'            => 'Nu se poate șterge această organizație: mai are :count tichet(e). Reatribuiți sau ștergeți mai întâi tichetele.',
     'col_tickets'                       => 'Tichete',
     'col_tags'                          => 'Etichete',
     'col_status'                        => 'Status',

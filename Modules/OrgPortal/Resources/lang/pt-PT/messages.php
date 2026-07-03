@@ -273,6 +273,8 @@ return [
     // Organizations list — activity status
     'org_deactivated'                   => 'Organização desactivada.',
     'org_activated'                     => 'Organização activada.',
+    'org_delete_has_members'            => 'Não é possível eliminar esta organização: ainda tem :count membro(s). Remova primeiro todos os membros.',
+    'org_delete_has_tickets'            => 'Não é possível eliminar esta organização: ainda tem :count bilhete(s). Reatribua ou elimine os bilhetes primeiro.',
     'col_tickets'                       => 'Bilhetes',
     'col_tags'                          => 'Etiquetas',
     'col_status'                        => 'Estado',
