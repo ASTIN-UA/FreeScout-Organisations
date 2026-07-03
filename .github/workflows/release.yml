@@ -25,3 +25,10 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: OrgPortal.zip
+          # Without an explicit body, action-gh-release falls back to the raw
+          # message of the commit the tag points to — including internal
+          # trailers (Co-Authored-By, session links) — and publishes it as
+          # the public release description. Point release notes at the
+          # changelog instead.
+          body: |
+            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.
