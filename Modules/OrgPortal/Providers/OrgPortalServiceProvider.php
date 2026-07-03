@@ -387,6 +387,7 @@ class OrgPortalServiceProvider extends ServiceProvider
 
             if (!$organization) {
                 $member = OrganizationMember::where('customer_id', $conversation->customer_id)
+                    ->where('is_active', true)
                     ->with('organization')
                     ->first();
                 $organization = $member?->organization;
@@ -435,6 +436,7 @@ class OrgPortalServiceProvider extends ServiceProvider
                 $memberOrg   = null;
                 if (!$snapshotOrg) {
                     $member    = OrganizationMember::where('customer_id', $customerId)
+                        ->where('is_active', true)
                         ->with('organization')
                         ->first();
                     $memberOrg = $member?->organization;
@@ -515,6 +517,7 @@ class OrgPortalServiceProvider extends ServiceProvider
             $customerId = $conversation->customer_id;
             if (!array_key_exists($customerId, $cache)) {
                 $cache[$customerId] = OrganizationMember::where('customer_id', $customerId)
+                    ->where('is_active', true)
                     ->with('organization')
                     ->first();
             }

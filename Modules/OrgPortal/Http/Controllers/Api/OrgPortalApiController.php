@@ -519,6 +519,7 @@ class OrgPortalApiController extends Controller
         }
 
         $member = OrganizationMember::where('customer_id', $customerId)
+            ->where('is_active', true)
             ->with('organization')
             ->first();
 
