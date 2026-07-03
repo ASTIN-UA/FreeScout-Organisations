@@ -319,11 +319,16 @@ curl -X PUT "https://your-freescout.com/api/organizations/1/members/5" \
 
 ### DELETE /api/organizations/{id}/members/{memberId}
 
-Eliminar un miembro de la organización.
+Eliminar un miembro de la organización. Bloqueado si el miembro tiene tickets en esta organización — use `PUT` con `isActive: false` en su lugar para desactivarlo y conservar su historial de tickets.
 
 **200 OK**
 ```json
 {"success": true, "message": "Member removed."}
+```
+
+**422 Unprocessable Entity** *(member has tickets)*
+```json
+{"message": "Cannot remove this member: they have tickets in this organization. Deactivate them instead (isActive: false) to preserve their ticket history.", "_embedded": {"errors": [{"tickets_count": 5}]}}
 ```
 
 ---
@@ -532,7 +537,14 @@ curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
 
 ### DELETE /api/customers/{id}/organization
 
+Elimina únicamente la membresía **activa** del cliente. Las membresías históricas (desactivadas) en otras organizaciones se conservan sin cambios. Bloqueado si el cliente tiene tickets en esta organización — use `PUT` con `isActive: false` en su lugar para desactivar y conservar el historial de tickets.
+
 **200 OK**
 ```json
 {"success": true, "message": "Membership removed."}
+```
+
+**422 Unprocessable Entity** *(customer has tickets)*
+```json
+{"message": "Cannot remove this membership: the customer has tickets in this organization. Deactivate instead (isActive: false) to preserve their ticket history.", "_embedded": {"errors": [{"tickets_count": 5}]}}
 ```

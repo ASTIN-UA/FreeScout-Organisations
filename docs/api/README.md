@@ -63,7 +63,7 @@ Authentication — `X-FreeScout-API-Key` header or `api_key` query parameter.
 | `401` | Invalid or missing API key |
 | `404` | Resource not found |
 | `409` | Conflict — customer already has an active membership in another organization |
-| `422` | Business rule violation — e.g. deleting an organization that still has members or tickets |
+| `422` | Business rule violation — e.g. deleting an organization or removing a member that still has tickets |
 | `503` | Required module (e.g. Tags) is not active |
 
 ---
@@ -319,11 +319,16 @@ curl -X PUT "https://your-freescout.com/api/organizations/1/members/5" \
 
 ### DELETE /api/organizations/{id}/members/{memberId}
 
-Remove a member from the organization.
+Hard-deletes the membership record. Blocked when the member has tickets in this organization — use `PUT` with `isActive: false` instead to deactivate ("fire") them and keep their ticket history intact.
 
 **200 OK**
 ```json
 {"success": true, "message": "Member removed."}
+```
+
+**422 Unprocessable Entity** *(member has tickets)*
+```json
+{"message": "Cannot remove this member: they have tickets in this organization. Deactivate them instead (isActive: false) to preserve their ticket history.", "_embedded": {"errors": [{"tickets_count": 5}]}}
 ```
 
 ---
@@ -532,7 +537,14 @@ curl -X PUT "https://your-freescout.com/api/customers/42/organization" \
 
 ### DELETE /api/customers/{id}/organization
 
+Removes the customer's **active** membership only. Historical (deactivated) memberships in other organizations are preserved and untouched. Blocked when the customer has tickets in this organization — use `PUT` with `isActive: false` instead to deactivate and keep their ticket history intact.
+
 **200 OK**
 ```json
 {"success": true, "message": "Membership removed."}
+```
+
+**422 Unprocessable Entity** *(customer has tickets)*
+```json
+{"message": "Cannot remove this membership: the customer has tickets in this organization. Deactivate instead (isActive: false) to preserve their ticket history.", "_embedded": {"errors": [{"tickets_count": 5}]}}
 ```
