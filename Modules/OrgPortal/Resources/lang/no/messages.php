@@ -55,6 +55,7 @@ return [
     'role_updated'           => 'Rolle oppdatert.',
     'member_added'           => 'Medlem lagt til.',
     'member_removed'         => 'Medlem fjernet.',
+    'member_remove_has_tickets' => 'Kan ikke fjerne dette medlemmet: de har :count sak(er) i denne organisasjonen. Deaktiver dem i stedet for å bevare sakshistorikken.',
     'already_member'         => 'Denne kunden er allerede medlem av organisasjonen.',
     'already_in_org'         => 'Denne kunden tilhører allerede en annen organisasjon.',
 

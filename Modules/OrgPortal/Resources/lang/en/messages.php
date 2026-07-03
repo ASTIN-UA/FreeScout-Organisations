@@ -77,6 +77,7 @@ return [
     'role_updated'           => 'Role updated.',
     'member_added'           => 'Member added.',
     'member_removed'         => 'Member removed.',
+    'member_remove_has_tickets' => 'Cannot remove this member: they have :count ticket(s) in this organization. Deactivate them instead to preserve their ticket history.',
     'already_member'         => 'This customer is already a member of the organization.',
     'already_in_org'         => 'This customer already belongs to another organization.',
 

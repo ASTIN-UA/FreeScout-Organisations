@@ -55,6 +55,7 @@ return [
     'role_updated'           => '角色已更新。',
     'member_added'           => '成员已添加。',
     'member_removed'         => '成员已移除。',
+    'member_remove_has_tickets' => '无法移除该成员：该成员在此组织中有 :count 个工单。请改为将其停用以保留工单历史记录。',
     'already_member'         => '此客户已是组织成员。',
     'already_in_org'         => '此客户已属于另一个组织。',
 

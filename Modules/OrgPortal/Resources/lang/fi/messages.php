@@ -55,6 +55,7 @@ return [
     'role_updated'           => 'Rooli päivitetty.',
     'member_added'           => 'Jäsen lisätty.',
     'member_removed'         => 'Jäsen poistettu.',
+    'member_remove_has_tickets' => 'Tätä jäsentä ei voi poistaa: hänellä on :count tiketti(ä) tässä organisaatiossa. Poista hänet käytöstä sen sijaan säilyttääksesi tikettihistorian.',
     'already_member'         => 'Tämä asiakas on jo organisaation jäsen.',
     'already_in_org'         => 'Tämä asiakas kuuluu jo toiseen organisaatioon.',
 

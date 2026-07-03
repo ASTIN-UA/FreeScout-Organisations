@@ -55,6 +55,7 @@ return [
     'role_updated'           => 'Rolul a fost actualizat.',
     'member_added'           => 'Membrul a fost adăugat.',
     'member_removed'         => 'Membrul a fost eliminat.',
+    'member_remove_has_tickets' => 'Nu se poate elimina acest membru: are :count tichet(e) în această organizație. Dezactivați-l în schimb pentru a păstra istoricul tichetelor.',
     'already_member'         => 'Acest client este deja membru al organizației.',
     'already_in_org'         => 'Acest client aparține deja unei alte organizații.',
 

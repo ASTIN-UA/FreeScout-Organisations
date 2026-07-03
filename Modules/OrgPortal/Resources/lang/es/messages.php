@@ -55,6 +55,7 @@ return [
     'role_updated'           => 'Rol actualizado.',
     'member_added'           => 'Miembro agregado.',
     'member_removed'         => 'Miembro eliminado.',
+    'member_remove_has_tickets' => 'No se puede eliminar a este miembro: tiene :count ticket(s) en esta organización. Desactívelo en su lugar para conservar el historial de tickets.',
     'already_member'         => 'Este cliente ya es miembro de la organización.',
     'already_in_org'         => 'Este cliente ya pertenece a otra organización.',
 

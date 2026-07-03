@@ -55,6 +55,7 @@ return [
     'role_updated'           => 'Rola zaktualizowana.',
     'member_added'           => 'Członek dodany.',
     'member_removed'         => 'Członek usunięty.',
+    'member_remove_has_tickets' => 'Nie można usunąć tego członka: ma :count zgłoszenie/zgłoszeń w tej organizacji. Zamiast tego dezaktywuj go, aby zachować historię zgłoszeń.',
     'already_member'         => 'Ten klient jest już członkiem organizacji.',
     'already_in_org'         => 'Ten klient już należy do innej organizacji.',
 

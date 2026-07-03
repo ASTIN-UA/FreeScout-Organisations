@@ -55,6 +55,7 @@ return [
     'role_updated'           => 'Roll uppdaterad.',
     'member_added'           => 'Medlem tillagd.',
     'member_removed'         => 'Medlem borttagen.',
+    'member_remove_has_tickets' => 'Det går inte att ta bort den här medlemmen: de har :count ärende(n) i den här organisationen. Inaktivera dem istället för att bevara ärendehistoriken.',
     'already_member'         => 'Denna kund är redan medlem i organisationen.',
     'already_in_org'         => 'Denna kund tillhör redan en annan organisation.',
 

@@ -55,6 +55,7 @@ return [
     'role_updated'           => 'Role aktualizována.',
     'member_added'           => 'Člen přidán.',
     'member_removed'         => 'Člen odstraněn.',
+    'member_remove_has_tickets' => 'Tohoto člena nelze odstranit: má :count tiket(ů) v této organizaci. Místo toho jej deaktivujte, aby se zachovala historie tiketů.',
     'already_member'         => 'Tento zákazník je již členem organizace.',
     'already_in_org'         => 'Tento zákazník již patří do jiné organizace.',
 

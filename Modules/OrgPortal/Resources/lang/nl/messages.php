@@ -55,6 +55,7 @@ return [
     'role_updated'           => 'Rol bijgewerkt.',
     'member_added'           => 'Lid toegevoegd.',
     'member_removed'         => 'Lid verwijderd.',
+    'member_remove_has_tickets' => 'Dit lid kan niet worden verwijderd: heeft :count ticket(s) in deze organisatie. Deactiveer het in plaats daarvan om de tickethistorie te behouden.',
     'already_member'         => 'Deze klant is al lid van de organisatie.',
     'already_in_org'         => 'Deze klant behoort al tot een andere organisatie.',
 

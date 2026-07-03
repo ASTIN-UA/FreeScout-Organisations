@@ -409,6 +409,15 @@ class OrgPortalApiController extends Controller
             return $this->errorResponse('Member not found.', 404);
         }
 
+        $ticketsCount = \App\Conversation::where('customer_id', $member->customer_id)->count();
+        if ($ticketsCount > 0) {
+            return $this->errorResponse(
+                'Cannot remove this member: they have tickets in this organization. Deactivate them instead (isActive: false) to preserve their ticket history.',
+                422,
+                ['tickets_count' => $ticketsCount]
+            );
+        }
+
         $member->delete();
 
         return response()->json(['success' => true, 'message' => 'Member removed.']);
@@ -743,13 +752,24 @@ class OrgPortalApiController extends Controller
             return $this->errorResponse('Customer not found.', 404);
         }
 
-        $deleted = OrganizationMember::where('customer_id', $customerId)
+        $member = OrganizationMember::where('customer_id', $customerId)
             ->where('is_active', true)
-            ->delete();
+            ->first();
 
-        if (!$deleted) {
+        if (!$member) {
             return $this->errorResponse('Customer is not an active member of any organization.', 404);
         }
+
+        $ticketsCount = \App\Conversation::where('customer_id', $customerId)->count();
+        if ($ticketsCount > 0) {
+            return $this->errorResponse(
+                'Cannot remove this membership: the customer has tickets in this organization. Deactivate instead (isActive: false) to preserve their ticket history.',
+                422,
+                ['tickets_count' => $ticketsCount]
+            );
+        }
+
+        $member->delete();
 
         return response()->json(['success' => true, 'message' => 'Membership removed.']);
     }

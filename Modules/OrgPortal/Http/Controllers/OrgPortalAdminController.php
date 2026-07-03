@@ -454,10 +454,17 @@ class OrgPortalAdminController extends Controller
     public function removeMember(int $id, int $memberId)
     {
         Organization::findOrFail($id);
-        OrganizationMember::where('id', $memberId)
+        $member = OrganizationMember::where('id', $memberId)
             ->where('organization_id', $id)
-            ->firstOrFail()
-            ->delete();
+            ->firstOrFail();
+
+        $ticketsCount = \App\Conversation::where('customer_id', $member->customer_id)->count();
+        if ($ticketsCount > 0) {
+            return redirect()->route('orgportal.admin.edit', $id)
+                ->with('flash_error', __('orgportal::messages.member_remove_has_tickets', ['count' => $ticketsCount]));
+        }
+
+        $member->delete();
 
         return redirect()->route('orgportal.admin.edit', $id)
             ->with('flash_success', __('orgportal::messages.member_removed'));

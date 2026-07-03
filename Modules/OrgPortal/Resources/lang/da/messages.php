@@ -55,6 +55,7 @@ return [
     'role_updated'           => 'Rolle opdateret.',
     'member_added'           => 'Medlem tilføjet.',
     'member_removed'         => 'Medlem fjernet.',
+    'member_remove_has_tickets' => 'Kan ikke fjerne dette medlem: de har :count billet(ter) i denne organisation. Deaktiver dem i stedet for at bevare billethistorikken.',
     'already_member'         => 'Denne kunde er allerede medlem af organisationen.',
     'already_in_org'         => 'Denne kunde tilhører allerede en anden organisation.',
 

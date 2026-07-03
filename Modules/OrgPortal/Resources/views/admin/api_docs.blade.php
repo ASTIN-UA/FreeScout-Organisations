@@ -557,7 +557,7 @@
             "tags": ["Customer Membership"],
             "summary": "Remove customer from organization",
             "operationId": "removeCustomerOrganization",
-            "description": "Removes the customer's **active** membership only. Historical (deactivated) memberships in other organizations are preserved and untouched.",
+            "description": "Removes the customer's **active** membership only. Historical (deactivated) memberships in other organizations are preserved and untouched. Blocked with `422` if the customer has tickets in this organization — deactivate them instead via `PUT /api/customers/{customerId}/organization` with `isActive: false` to preserve their ticket history.",
             "parameters": [
               { "name": "customerId", "in": "path", "required": true, "schema": { "type": "integer" }, "description": "FreeScout customer ID" },
               { "name": "api_key",    "in": "query", "schema": { "type": "string" }, "description": "API key (alternative to header)" }
@@ -570,6 +570,10 @@
               "404": {
                 "description": "Customer not found or not an active member of any organization",
                 "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NotFound" } } }
+              },
+              "422": {
+                "description": "Customer has tickets in this organization and cannot be removed",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ValidationError" }, "example": { "message": "Cannot remove this membership: the customer has tickets in this organization. Deactivate instead (isActive: false) to preserve their ticket history.", "_embedded": { "errors": [{ "tickets_count": 5 }] } } } }
               }
             }
           }

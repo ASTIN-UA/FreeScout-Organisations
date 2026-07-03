@@ -38,6 +38,7 @@ return [
     'role_updated'           => 'Rolle aktualisiert.',
     'member_added'           => 'Mitglied hinzugefügt.',
     'member_removed'         => 'Mitglied entfernt.',
+    'member_remove_has_tickets' => 'Dieses Mitglied kann nicht entfernt werden: Es hat :count Ticket(s) in dieser Organisation. Deaktivieren Sie es stattdessen, um den Ticketverlauf zu erhalten.',
     'already_member'         => 'Dieser Kunde ist bereits Mitglied der Organisation.',
     'already_in_org'         => 'Dieser Kunde gehört bereits zu einer anderen Organisation.',
     'company_tickets'        => 'Unternehmenstickets',
