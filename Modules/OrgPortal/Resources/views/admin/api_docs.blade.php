@@ -557,6 +557,7 @@
             "tags": ["Customer Membership"],
             "summary": "Remove customer from organization",
             "operationId": "removeCustomerOrganization",
+            "description": "Removes the customer's **active** membership only. Historical (deactivated) memberships in other organizations are preserved and untouched.",
             "parameters": [
               { "name": "customerId", "in": "path", "required": true, "schema": { "type": "integer" }, "description": "FreeScout customer ID" },
               { "name": "api_key",    "in": "query", "schema": { "type": "string" }, "description": "API key (alternative to header)" }
@@ -567,7 +568,7 @@
                 "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SuccessResponse" }, "example": { "success": true, "message": "Membership removed." } } }
               },
               "404": {
-                "description": "Customer not found or not a member of any organization",
+                "description": "Customer not found or not an active member of any organization",
                 "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NotFound" } } }
               }
             }

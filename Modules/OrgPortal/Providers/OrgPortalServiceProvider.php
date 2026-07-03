@@ -386,11 +386,7 @@ class OrgPortalServiceProvider extends ServiceProvider
             }
 
             if (!$organization) {
-                $member = OrganizationMember::where('customer_id', $conversation->customer_id)
-                    ->where('is_active', true)
-                    ->with('organization')
-                    ->first();
-                $organization = $member?->organization;
+                $organization = Organization::forCustomer($conversation->customer_id);
             }
 
             if (!$organization) {
@@ -433,14 +429,7 @@ class OrgPortalServiceProvider extends ServiceProvider
 
             if (!array_key_exists($cacheKey, $cache)) {
                 $snapshotOrg = ($snapshotOn && $orgId) ? Organization::find($orgId) : null;
-                $memberOrg   = null;
-                if (!$snapshotOrg) {
-                    $member    = OrganizationMember::where('customer_id', $customerId)
-                        ->where('is_active', true)
-                        ->with('organization')
-                        ->first();
-                    $memberOrg = $member?->organization;
-                }
+                $memberOrg   = $snapshotOrg ? null : Organization::forCustomer($customerId);
                 $cache[$cacheKey] = $snapshotOrg ?? $memberOrg;
             }
 
@@ -516,14 +505,11 @@ class OrgPortalServiceProvider extends ServiceProvider
 
             $customerId = $conversation->customer_id;
             if (!array_key_exists($customerId, $cache)) {
-                $cache[$customerId] = OrganizationMember::where('customer_id', $customerId)
-                    ->where('is_active', true)
-                    ->with('organization')
-                    ->first();
+                $cache[$customerId] = Organization::forCustomer($customerId);
             }
 
-            $member = $cache[$customerId];
-            if (!$member || !$member->organization) {
+            $organization = $cache[$customerId];
+            if (!$organization) {
                 return;
             }
 
@@ -533,16 +519,16 @@ class OrgPortalServiceProvider extends ServiceProvider
 
             if ($enabled[$mailboxId]) {
                 $searchBase = rtrim(url(\Helper::getSubdirectory() . 'search'), '/');
-                $searchUrl  = $searchBase . '?' . http_build_query(['f' => ['organization' => $member->organization_id]]);
+                $searchUrl  = $searchBase . '?' . http_build_query(['f' => ['organization' => $organization->id]]);
 
                 echo view('orgportal::partials.org_badge', [
-                    'organization' => $member->organization,
+                    'organization' => $organization,
                     'searchUrl'    => $searchUrl,
                 ])->render();
             } else {
                 // Render hidden marker so the JS org filter can still work
                 // even when the visible badge is disabled for this mailbox.
-                echo '<span class="orgportal-org-badge" data-org-id="' . (int) $member->organization_id . '" style="display:none"></span>';
+                echo '<span class="orgportal-org-badge" data-org-id="' . (int) $organization->id . '" style="display:none"></span>';
             }
         }, 20, 1);
 

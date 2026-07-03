@@ -102,14 +102,15 @@ class Organization extends Model
     }
 
     /**
-     * Find the organization a customer belongs to via their active membership.
-     * Falls back to any membership when no active one exists (historical).
+     * Find the organization a customer currently, actively belongs to.
+     * Returns null if the customer has no active membership — a customer
+     * with only historical (deactivated) memberships is not "in" any
+     * organization for display/badge purposes.
      */
     public static function forCustomer(int $customerId): ?self
     {
         $member = OrganizationMember::where('customer_id', $customerId)
-            ->orderByDesc('is_active')
-            ->orderByDesc('id')
+            ->where('is_active', true)
             ->first();
 
         return $member ? $member->organization : null;

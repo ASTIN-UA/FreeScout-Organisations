@@ -733,7 +733,9 @@ class OrgPortalApiController extends Controller
 
     /**
      * DELETE /api/customers/{customerId}/organization
-     * Remove a customer from their organization.
+     * Remove a customer from their current (active) organization. Historical
+     * (deactivated) memberships in other organizations are left untouched —
+     * they are preserved the same way the admin UI preserves them.
      */
     public function removeCustomerOrganization(int $customerId): JsonResponse
     {
@@ -741,10 +743,12 @@ class OrgPortalApiController extends Controller
             return $this->errorResponse('Customer not found.', 404);
         }
 
-        $deleted = OrganizationMember::where('customer_id', $customerId)->delete();
+        $deleted = OrganizationMember::where('customer_id', $customerId)
+            ->where('is_active', true)
+            ->delete();
 
         if (!$deleted) {
-            return $this->errorResponse('Customer is not a member of any organization.', 404);
+            return $this->errorResponse('Customer is not an active member of any organization.', 404);
         }
 
         return response()->json(['success' => true, 'message' => 'Membership removed.']);
