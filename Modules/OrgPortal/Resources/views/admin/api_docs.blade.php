@@ -213,6 +213,7 @@
       "tags": [
         { "name": "Organizations",         "description": "Create and manage organizations" },
         { "name": "Units",                 "description": "Create and manage structural subdivisions (units) within an organization" },
+        { "name": "Members",               "description": "List and manage an organization's membership records directly by member ID (see also Customer Membership, which operates by customerId)" },
         { "name": "Customer Membership",   "description": "Assign customers to organizations and manage their roles" },
         { "name": "Customers (FreeScout)", "description": "Standard FreeScout endpoints for looking up customers. Use these to obtain a `customerId` before membership operations." },
         { "name": "Mailboxes (FreeScout)", "description": "Standard FreeScout endpoints for listing mailboxes. Use these to obtain a `mailboxId` for scoping organizations or filtering results." }
@@ -474,6 +475,114 @@
               "404": {
                 "description": "Unit not found",
                 "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NotFound" } } }
+              }
+            }
+          }
+        },
+
+        "/api/organizations/{id}/members": {
+          "get": {
+            "tags": ["Members"],
+            "summary": "List members",
+            "description": "Lists **all** membership records for the organization, active and deactivated alike. Use `isActive` on each record to tell them apart.",
+            "operationId": "listMembers",
+            "parameters": [
+              { "name": "id",      "in": "path",  "required": true, "schema": { "type": "integer" }, "description": "Organization ID" },
+              { "name": "api_key", "in": "query", "schema": { "type": "string" }, "description": "API key (alternative to header)" }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success",
+                "content": { "application/json": { "schema": { "type": "object", "properties": { "_embedded": { "type": "object", "properties": { "members": { "type": "array", "items": { "$ref": "#/components/schemas/Member" } } } } } } } }
+              },
+              "404": {
+                "description": "Organization not found",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NotFound" } } }
+              }
+            }
+          }
+        },
+
+        "/api/organizations/{id}/members/{memberId}": {
+          "get": {
+            "tags": ["Members"],
+            "summary": "Get a member",
+            "operationId": "getMember",
+            "parameters": [
+              { "name": "id",       "in": "path",  "required": true, "schema": { "type": "integer" }, "description": "Organization ID" },
+              { "name": "memberId", "in": "path",  "required": true, "schema": { "type": "integer" }, "description": "Membership record ID" },
+              { "name": "api_key",  "in": "query", "schema": { "type": "string" }, "description": "API key (alternative to header)" }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Member" } } }
+              },
+              "404": {
+                "description": "Organization or member not found",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NotFound" } } }
+              }
+            }
+          },
+          "put": {
+            "tags": ["Members"],
+            "summary": "Update a member",
+            "description": "Updates `role`, `unitId`, `canManageOrg`, and/or `isActive`. All fields are optional — only the ones present in the body are changed.\n\nSet `role = manager` with a `unitId` to make this a **unit manager** (sees only that unit's tickets), or with `unitId = null` to make it a **global manager** (sees the whole organization).\n\nSetting `isActive: false` is the correct way to \"fire\" a member without losing their ticket history — deactivated members keep their history but can no longer be assigned as a ticket author. Compare with `DELETE`, below, which is a hard delete blocked once the member has tickets.",
+            "operationId": "updateMember",
+            "parameters": [
+              { "name": "id",       "in": "path",  "required": true, "schema": { "type": "integer" }, "description": "Organization ID" },
+              { "name": "memberId", "in": "path",  "required": true, "schema": { "type": "integer" }, "description": "Membership record ID" },
+              { "name": "api_key",  "in": "query", "schema": { "type": "string" }, "description": "API key (alternative to header)" }
+            ],
+            "requestBody": {
+              "required": false,
+              "content": { "application/json": { "schema": { "type": "object", "properties": {
+                "role":         { "type": "string",  "enum": ["member", "manager"], "example": "manager" },
+                "unitId":       { "type": "integer", "nullable": true, "example": 7, "description": "Must belong to this organization. `null` = no unit (global manager when role = manager)." },
+                "canManageOrg": { "type": "boolean", "example": true },
+                "isActive":     { "type": "boolean", "example": false, "description": "Set to `false` to deactivate (\"fire\") this member while preserving their ticket history." }
+              } } } }
+            },
+            "responses": {
+              "200": {
+                "description": "Member updated (or no changes if the body was empty)",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SuccessResponse" }, "example": { "success": true, "message": "Member updated." } } }
+              },
+              "400": {
+                "description": "Validation error",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ValidationError" }, "examples": {
+                  "bad_role": { "summary": "Invalid role", "value": { "message": "Validation failed", "_embedded": { "errors": [{ "path": "role", "message": "role must be \"member\" or \"manager\".", "source": "JSON" }] } } },
+                  "bad_unit": { "summary": "Unit belongs to a different organization", "value": { "message": "Validation failed", "_embedded": { "errors": [{ "path": "unitId", "message": "Unit does not belong to organization #1.", "source": "JSON" }] } } }
+                } } }
+              },
+              "404": {
+                "description": "Organization or member not found",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NotFound" } } }
+              }
+            }
+          },
+          "delete": {
+            "tags": ["Members"],
+            "summary": "Remove a member",
+            "description": "Hard-deletes the membership record. Blocked with `422` if the member has tickets in this organization — use `PUT` with `isActive: false` instead to deactivate (\"fire\") them and keep their ticket history intact.",
+            "operationId": "deleteMember",
+            "parameters": [
+              { "name": "id",       "in": "path",  "required": true, "schema": { "type": "integer" }, "description": "Organization ID" },
+              { "name": "memberId", "in": "path",  "required": true, "schema": { "type": "integer" }, "description": "Membership record ID" },
+              { "name": "api_key",  "in": "query", "schema": { "type": "string" }, "description": "API key (alternative to header)" }
+            ],
+            "responses": {
+              "200": {
+                "description": "Member removed",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SuccessResponse" }, "example": { "success": true, "message": "Member removed." } } }
+              },
+              "404": {
+                "description": "Organization or member not found",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NotFound" } } }
+              },
+              "422": {
+                "description": "Member has tickets in this organization and cannot be removed",
+                "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ValidationError" }, "example": { "message": "Cannot remove this member: they have tickets in this organization. Deactivate them instead (isActive: false) to preserve their ticket history.", "_embedded": { "errors": [{ "tickets_count": 5 }] } } } }
               }
             }
           }
