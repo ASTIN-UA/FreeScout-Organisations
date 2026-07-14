@@ -119,6 +119,9 @@ return [
 
     // Kanban filter
     'kanban_filter_org'           => 'Organisasjon',
+    'kanban_filter_org_search_placeholder' => 'Skriv organisasjonsnavn...',
+    'kanban_filter_org_no_results'         => 'Ingen organisasjoner funnet.',
+    'kanban_filter_org_reset'              => 'Fjern filter',
 
     // Company tickets filters (settings)
     'company_filters_heading'     => 'Bedriftsbilletter statusfilter',

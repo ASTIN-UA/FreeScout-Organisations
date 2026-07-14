@@ -489,6 +489,54 @@ class OrgPortalServiceProvider extends ServiceProvider
 
     protected function registerKanbanHooks()
     {
+        // Real server-side org filtering for the Kanban board, without
+        // touching a single Kanban file. Kanban builds every board/pagination
+        // query through the `App\Conversation` Eloquent model
+        // (`Conversation::query()`/`Conversation::where(...)` in
+        // KanbanController@ajax) — an Eloquent global scope registered here
+        // therefore transparently applies to those queries too.
+        //
+        // The other half of this trick lives in
+        // partials/kanban_org_filter.blade.php: it injects a `<li
+        // data-param-name="org" data-param-value="...">` into Kanban's own
+        // `.kn-param[data-param="filters"]` dropdown — the exact same DOM
+        // contract Kanban's native Status/Tag/Assignee filters use — so
+        // Kanban's own `knGetParams()` picks it up automatically and sends
+        // it as `kn[filters][org][]=...` on every single AJAX call
+        // (board show, "load more", "Show Closed" pagination — all of them
+        // call knGetParams() too). That's why this scope only has to read
+        // `kn.filters.org` from the request: Kanban is unknowingly carrying
+        // our filter for us on every request, the same way it carries its
+        // own tag/status filters.
+        //
+        // Guarded twice for safety: only applies on Kanban's own routes, and
+        // only does anything when the org filter param is actually present —
+        // every other Conversation query anywhere else in the app (mailbox
+        // views, search, API, other modules) is completely unaffected.
+        \App\Conversation::addGlobalScope('orgportal_kanban_org_filter', function ($builder) {
+            if (!\Route::is('kanban.*')) {
+                return;
+            }
+
+            $orgIds = array_filter(array_map('intval', (array) request()->input('kn.filters.org', [])));
+            if (empty($orgIds)) {
+                return;
+            }
+
+            $memberIds = OrganizationMember::whereIn('organization_id', $orgIds)->pluck('customer_id');
+
+            $builder->where(function ($q) use ($orgIds, $memberIds) {
+                if (OrgAttribution::snapshotEnabled()) {
+                    $q->whereIn('org_id', $orgIds)
+                      ->orWhere(function ($sq) use ($memberIds) {
+                          $sq->whereNull('org_attributed_at')->whereIn('customer_id', $memberIds);
+                      });
+                } else {
+                    $q->whereIn('customer_id', $memberIds);
+                }
+            });
+        });
+
         // Show org badge on Kanban cards — only fires on Kanban route.
         // (conversations list now uses conversations_table.before_subject instead)
         \Eventy::addAction('conversations_table.after_subject', function ($conversation) {

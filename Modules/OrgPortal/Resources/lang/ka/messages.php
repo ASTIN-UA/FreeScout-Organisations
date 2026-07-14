@@ -119,6 +119,9 @@ return [
 
     // Kanban filter
     'kanban_filter_org'           => 'ორგანიზაცია',
+    'kanban_filter_org_search_placeholder' => 'შეიყვანეთ ორგანიზაციის სახელი...',
+    'kanban_filter_org_no_results'         => 'ორგანიზაციები ვერ მოიძებნა.',
+    'kanban_filter_org_reset'              => 'ფილტრის გასუფთავება',
 
     // Company tickets filters (settings)
     'company_filters_heading'     => 'კომპანიის ტიკეტების სტატუსის ფილტრები',

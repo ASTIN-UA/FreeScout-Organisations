@@ -231,6 +231,9 @@ return [
 
     // Kanban filter
     'kanban_filter_org'           => 'Організація',
+    'kanban_filter_org_search_placeholder' => 'Введіть назву організації...',
+    'kanban_filter_org_no_results'         => 'Нічого не знайдено.',
+    'kanban_filter_org_reset'              => 'Зняти фільтр',
 
     // Company tickets filters (settings)
     'company_filters_heading'     => 'Фільтри статусів тікетів компанії',

@@ -119,6 +119,9 @@ return [
 
     // Kanban filter
     'kanban_filter_org'           => 'Organisation',
+    'kanban_filter_org_search_placeholder' => 'Skriv organisationens namn...',
+    'kanban_filter_org_no_results'         => 'Inga organisationer hittades.',
+    'kanban_filter_org_reset'              => 'Rensa filter',
 
     // Company tickets filters (settings)
     'company_filters_heading'     => 'Företagsbiljetter statusfilter',

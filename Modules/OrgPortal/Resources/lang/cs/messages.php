@@ -119,6 +119,9 @@ return [
 
     // Kanban filter
     'kanban_filter_org'           => 'Organizace',
+    'kanban_filter_org_search_placeholder' => 'Zadejte název organizace...',
+    'kanban_filter_org_no_results'         => 'Nebyly nalezeny žádné organizace.',
+    'kanban_filter_org_reset'              => 'Zrušit filtr',
 
     // Company tickets filters (settings)
     'company_filters_heading'     => 'Filtry stavu firemních lístků',

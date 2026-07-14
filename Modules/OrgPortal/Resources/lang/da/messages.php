@@ -119,6 +119,9 @@ return [
 
     // Kanban filter
     'kanban_filter_org'           => 'Organisation',
+    'kanban_filter_org_search_placeholder' => 'Skriv organisationsnavn...',
+    'kanban_filter_org_no_results'         => 'Ingen organisationer fundet.',
+    'kanban_filter_org_reset'              => 'Ryd filter',
 
     // Company tickets filters (settings)
     'company_filters_heading'     => 'Virksomhedsbilletter statusfiltre',

@@ -119,6 +119,9 @@ return [
 
     // Kanban filter
     'kanban_filter_org'           => 'Organizație',
+    'kanban_filter_org_search_placeholder' => 'Introduceți numele organizației...',
+    'kanban_filter_org_no_results'         => 'Nu s-au găsit organizații.',
+    'kanban_filter_org_reset'              => 'Șterge filtrul',
 
     // Company tickets filters (settings)
     'company_filters_heading'     => 'Filtre status tichete companie',

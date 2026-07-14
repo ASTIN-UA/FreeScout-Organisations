@@ -119,6 +119,9 @@ return [
 
     // Kanban filter
     'kanban_filter_org'           => '组织',
+    'kanban_filter_org_search_placeholder' => '输入组织名称...',
+    'kanban_filter_org_no_results'         => '未找到组织。',
+    'kanban_filter_org_reset'              => '清除筛选',
 
     // Company tickets filters (settings)
     'company_filters_heading'     => '公司工单状态过滤器',

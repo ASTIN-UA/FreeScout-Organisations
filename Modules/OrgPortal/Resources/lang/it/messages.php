@@ -119,6 +119,9 @@ return [
 
     // Kanban filter
     'kanban_filter_org'           => 'Organizzazione',
+    'kanban_filter_org_search_placeholder' => 'Digita il nome dell\'organizzazione...',
+    'kanban_filter_org_no_results'         => 'Nessuna organizzazione trovata.',
+    'kanban_filter_org_reset'              => 'Cancella filtro',
 
     // Company tickets filters (settings)
     'company_filters_heading'     => 'Filtri Stato Ticket Aziendali',

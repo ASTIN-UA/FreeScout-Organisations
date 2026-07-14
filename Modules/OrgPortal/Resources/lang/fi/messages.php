@@ -119,6 +119,9 @@ return [
 
     // Kanban filter
     'kanban_filter_org'           => 'Organisaatio',
+    'kanban_filter_org_search_placeholder' => 'Kirjoita organisaation nimi...',
+    'kanban_filter_org_no_results'         => 'Organisaatioita ei löytynyt.',
+    'kanban_filter_org_reset'              => 'Tyhjennä suodatin',
 
     // Company tickets filters (settings)
     'company_filters_heading'     => 'Yrityksen lippujen tilasuodattimet',
