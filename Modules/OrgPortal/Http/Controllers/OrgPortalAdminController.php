@@ -458,7 +458,15 @@ class OrgPortalAdminController extends Controller
             ->where('organization_id', $id)
             ->firstOrFail();
 
-        $ticketsCount = \App\Conversation::where('customer_id', $member->customer_id)->count();
+        // Count only tickets attributed to this organisation — a customer may have
+        // personal tickets predating membership (or from another org) that must not
+        // block removal. Snapshot mode has org_id to scope by; legacy mode has no
+        // per-ticket attribution, so fall back to the raw customer_id count.
+        $ticketsQuery = \App\Conversation::where('customer_id', $member->customer_id);
+        if (OrgAttribution::snapshotEnabled()) {
+            $ticketsQuery->where('org_id', $id);
+        }
+        $ticketsCount = $ticketsQuery->count();
         if ($ticketsCount > 0) {
             return redirect()->route('orgportal.admin.edit', $id)
                 ->with('flash_error', __('orgportal::messages.member_remove_has_tickets', ['count' => $ticketsCount]));

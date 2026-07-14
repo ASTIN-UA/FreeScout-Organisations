@@ -104,15 +104,20 @@ class OrgAttribution
     }
 
     /**
-     * Re-attribute all previously un-attributed conversations for a customer.
+     * Re-attribute all currently org-less conversations for a customer.
      * Called when a customer is added to an organisation (addMember).
-     * Only touches conversations where org_attributed_at IS NULL — conversations
-     * that already have a snapshot keep their original attribution.
+     *
+     * Matches on org_id IS NULL rather than org_attributed_at IS NULL: a
+     * conversation created (and attributed by the cron) before the customer
+     * joined any organisation gets org_id = NULL but org_attributed_at
+     * stamped — so it must still be picked up here, or it stays orphaned
+     * forever. Conversations already attributed to a (different) org keep
+     * their original attribution.
      */
     public static function reattributeForCustomer(int $customerId, int $organizationId, ?int $unitId): void
     {
         Conversation::where('customer_id', $customerId)
-            ->whereNull('org_attributed_at')
+            ->whereNull('org_id')
             ->update([
                 'org_id'            => $organizationId,
                 'org_unit_id'       => $unitId,
