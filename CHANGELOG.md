@@ -4,6 +4,20 @@ All notable changes to OrgPortal are documented here.
 
 ---
 
+## [2.0.5] — 2026-07-14
+
+### Bug Fixes
+
+- **A customer's tickets could become permanently "orphaned" from their organization**: when Org Snapshot attribution is enabled, a ticket created before its author joined any organization gets attributed with `org_id = NULL` at the time it's processed. Adding that customer to an organization afterwards only re-attributed tickets that had never been processed at all (`org_attributed_at IS NULL`) — tickets already stamped with a null organization were skipped and stayed invisible to the org's manager forever, even after membership was added. Re-attribution now matches on `org_id IS NULL` instead, so it correctly picks up these tickets whenever the customer is (re-)added to an organization.
+- **Removing an organization member was blocked by tickets that didn't belong to that organization**: the "member has tickets" guard counted *every* ticket the customer had ever written, regardless of which organization (if any) it was attributed to — so a manager could not remove a member whose only tickets were personal ones predating membership, or attributed to a different organization. The count is now scoped to the organization being removed from (when Org Snapshot is enabled).
+- **Organization search in the customer info panel didn't work when opened from a Kanban card modal**: the ticket view rendered inside that modal is an embedded page, not the main `customers.update` route the search's JS was hard-guarded to; separately, the request URL was built by blindly appending `?q=...`, which produced two `?` characters (and a silently-dropped `q` parameter) whenever the page's own URL already carried a query string, as it does inside the embedded view. Both are fixed — the picker now works from any page it's rendered on, including inside the Kanban modal.
+
+### Improvements
+
+- **Kanban organization filter is now server-side**: filtering the Kanban board by organization used to hide/show already-rendered cards client-side, which missed cards loaded via pagination or "Show Closed". It now plugs into Kanban's own native filter-param contract, so every board request (pagination, sort/group-by, "Show Closed") is filtered correctly at the query level, without modifying a single Kanban file. The filter modal also gained an inline search box and a "Clear filter" button.
+
+---
+
 ## [2.0.4] — 2026-07-03
 
 ### Bug Fixes
