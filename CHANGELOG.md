@@ -4,6 +4,15 @@ All notable changes to OrgPortal are documented here.
 
 ---
 
+## [2.0.6] — 2026-07-14
+
+### Bug Fixes
+
+- **Editing an organization crashed with "Call to a member function map() on array" when the Tags module was inactive**: the controller defaulted `$allTags` to a plain PHP array, but the edit view calls Collection methods (`count()`, `whereIn()`, `map()`) on it — now defaults to an empty Collection instead, and the tag-search JS widget is skipped entirely when the Tags module is off. (#4)
+- **Organization attribution could silently be set to (or left on) "by tag" even with the Tags module inactive**: the system settings form only visually dimmed the tag-based options with CSS, with no server-side check — a direct form submission (or the module being disabled after the setting was already saved) could leave conversations unattributed with no error. The setting is now forced back to "by membership" both on save and on read whenever the Tags module isn't active.
+
+---
+
 ## [2.0.5] — 2026-07-14
 
 ### Bug Fixes
