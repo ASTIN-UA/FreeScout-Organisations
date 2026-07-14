@@ -223,9 +223,12 @@ class OrgPortalServiceProvider extends ServiceProvider
             ])->render();
         }, 20, 2);
 
-        // Inject org search JS after jQuery (javascript action fires inside main <script> block at page bottom)
+        // Inject org search JS after jQuery (javascript action fires inside main <script> block at page bottom).
+        // No route guard here: the customer_org_field partial (and its #orgportal_org_search
+        // input) is rendered anywhere customer.edit.after_fields fires — including the customer
+        // info panel inside a conversation/Kanban modal, not just the customers.update page.
+        // The IIFE below already no-ops via `if (!elSearch) return;` when the input isn't present.
         \Eventy::addAction('javascript', function () {
-            if (!\Route::is('customers.update')) return;
             $searchUrl = route('orgportal.admin.organizations.search');
             echo "
 (function () {
@@ -271,7 +274,8 @@ class OrgPortalServiceProvider extends ServiceProvider
         timer = setTimeout(function () {
             var xhr = new XMLHttpRequest();
             activeXhr = xhr;
-            xhr.open('GET', searchUrl + '?q=' + encodeURIComponent(q), true);
+            var sep = searchUrl.indexOf('?') === -1 ? '?' : '&';
+            xhr.open('GET', searchUrl + sep + 'q=' + encodeURIComponent(q), true);
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
             xhr.onload = function () {
                 if (xhr !== activeXhr) return;
