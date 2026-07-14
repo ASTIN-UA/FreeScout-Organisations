@@ -11,7 +11,11 @@ class OrgAttribution
 {
     public static function attributionSource(): string
     {
-        return (string) \Option::get('orgportal.attribution_source', 'member');
+        $source = (string) \Option::get('orgportal.attribution_source', 'member');
+        if (in_array($source, ['tag', 'tag_only']) && !static::tagsModuleActive()) {
+            return 'member';
+        }
+        return $source;
     }
 
     public static function tagsModuleActive(): bool

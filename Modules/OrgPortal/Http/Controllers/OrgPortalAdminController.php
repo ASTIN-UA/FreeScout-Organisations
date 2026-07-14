@@ -205,6 +205,7 @@ class OrgPortalAdminController extends Controller
 
         $source = $request->input('attribution_source', 'member');
         if (!in_array($source, ['member', 'tag', 'tag_only'])) $source = 'member';
+        if (in_array($source, ['tag', 'tag_only']) && !\Module::isActive('tags')) $source = 'member';
         \Option::set('orgportal.attribution_source', $source);
 
         \Option::set('orgportal.attribution_cron_enabled', $request->input('attribution_cron_enabled') == '1' ? '1' : '0');
@@ -251,7 +252,7 @@ class OrgPortalAdminController extends Controller
         $mailboxes    = \App\Mailbox::orderBy('name')->get(['id', 'name']);
 
         $tagsModuleActive = \Module::isActive('tags');
-        $allTags          = [];
+        $allTags          = collect();
         $boundTagIds      = [];
         $boundTagUnits    = [];
         if ($tagsModuleActive && \Schema::hasTable('tags') && \Schema::hasTable('organization_tags')) {
