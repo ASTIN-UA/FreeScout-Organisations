@@ -341,6 +341,15 @@ class OrgPortalServiceProvider extends ServiceProvider
                     'role'            => $role,
                 ]);
             }
+
+            // Back-fill snapshot on existing un-attributed conversations for this
+            // customer — same as OrgPortalAdminController::addMember(). This hook
+            // is a separate membership-assignment path (customer edit page) and
+            // must re-attribute too, or pre-membership tickets stay org_id=NULL.
+            // unit_id is always null here — this picker has no unit field, unlike
+            // the org edit page's addMember(); a later unit assignment goes through
+            // updateMemberRole(), which syncs org_unit_id on existing tickets itself.
+            OrgAttribution::reattributeForCustomer($customer->id, $orgId, null);
         }, 20, 1);
 
         // Show org / unit / role info in the customer sidebar (conversation view)

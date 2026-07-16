@@ -432,6 +432,13 @@ class OrgPortalAdminController extends Controller
             'can_manage_org' => (bool) $request->input('can_manage_org', false),
         ]);
 
+        // Sync org_unit_id on this member's existing tickets — a unit change
+        // must move the ticket into the new unit scope, or unit-filtered
+        // manager views won't find tickets attributed before the unit change.
+        \App\Conversation::where('customer_id', $member->customer_id)
+            ->where('org_id', $id)
+            ->update(['org_unit_id' => $unitId]);
+
         return redirect()->route('orgportal.admin.edit', $id)
             ->with('flash_success', __('orgportal::messages.role_updated'));
     }
