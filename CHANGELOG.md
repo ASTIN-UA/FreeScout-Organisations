@@ -4,6 +4,15 @@ All notable changes to OrgPortal are documented here.
 
 ---
 
+## [2.0.7] — 2026-07-16
+
+### Bug Fixes
+
+- **A customer added to an organization from the customer-edit membership picker kept pre-existing tickets un-attributed**: this membership-assignment path only stamped `org_id` on newly created attributions going forward, unlike the organization-edit page's "add member" flow, which already back-fills existing un-attributed tickets. Both paths now re-attribute existing tickets consistently.
+- **Changing a member's unit didn't move their existing tickets into the new unit**: unit-scoped manager views only match tickets by `org_unit_id`, so a member's already-attributed tickets stayed under their old unit (or no unit) after being reassigned, making them invisible to the new unit's managers. Updating a member's role/unit now syncs `org_unit_id` on all of that member's tickets in the organization.
+
+---
+
 ## [2.0.6] — 2026-07-14
 
 ### Bug Fixes
