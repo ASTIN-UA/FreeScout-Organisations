@@ -4,6 +4,30 @@ All notable changes to OrgPortal are documented here.
 
 ---
 
+## [2.0.8] — 2026-07-21
+
+### Bug Fixes
+
+- **`POST /api/organizations` reported a brand-new organization as inactive**: the organization was in fact created active (the `is_active` column defaults to `true`), but the freshly created model in memory never learned the database default, so the `201` response body always came back with `"isActive": false`. Integrations trusted the response and fired a pointless follow-up `PUT` to "fix" an organization that was never broken. The response now reflects the stored row.
+- **`PUT /api/customers/{customerId}/organization` silently reset every field it wasn't given**: the endpoint was documented as a role/unit update but behaved as a full replace — omitting `role`, `unitId`, `canManageOrg` or `isActive` reset each one to its default, so a call carrying only `organizationId` demoted a manager to a regular member, cleared their unit, revoked their organization-management right, and reactivated a member who had been deliberately deactivated. It now changes only the fields present in the request body, matching `PUT /api/organizations/{id}/members/{memberId}`. Defaults still apply when the membership is being created.
+- **Reactivating a membership could give a customer two active memberships at once**: the "one active membership per customer" rule was only enforced when creating a membership, not when flipping an existing dormant one back to `isActive: true`. Reactivation is now subject to the same rule and returns `409` when the customer is active elsewhere.
+- **A single unrelated ticket made an organization membership impossible to delete over the API**: `DELETE /api/organizations/{id}/members/{memberId}` and `DELETE /api/customers/{customerId}/organization` counted *every* ticket the customer had ever written, regardless of which organization it belonged to — the same bug fixed in the admin UI in 2.0.5, which had never been carried over to the API. Since a deactivated membership can only be cleared through these endpoints, and an organization refuses to delete while any membership record remains, this also made test organizations with a deactivated member undeletable through the API entirely. The count is now scoped to the organization in question when Org Snapshot is enabled, exactly as in the admin UI.
+- **Organization and unit names were validated against the wrong maximum length**: both the API and the admin UI accepted up to 255 characters for a column that stores 191, turning a long name into a database error instead of a clean validation message.
+
+### New Features
+
+- **Organization lookup by name**: `GET /api/organizations` accepts `exactName` (full match) and `name` (partial, case-insensitive contains) filters, plus `isActive`. Without these, an integration hitting `400 "An organization with this name already exists"` had no way to fetch the existing organization short of paging through the entire list. Literal `%` and `_` in a search term are matched as characters, not wildcards.
+- **`POST /api/organizations` accepts `isActive` and `color`**, so an organization can be created in its final state instead of requiring a follow-up update.
+
+### Documentation
+
+- **Tag endpoints were entirely missing from the API reference**: `GET`/`PUT /api/organizations/{id}/tags` have always existed but appeared nowhere in the spec. They are now documented, including the full-replace semantics of `PUT` and the `503` returned when the Tags module is inactive.
+- **Fields that worked but weren't documented are now listed**: `isActive` and `color` on organizations, `isActive` on customer membership.
+- Documented the partial-update convention that applies to every `PUT`, the real 191-character name limit, and the `422`/`503` status codes.
+- Corrected the `422` error body shape (`_embedded.errors` is an object of counters, not an array of field errors), the `409` conflict message, and the claim that `DELETE /api/organizations/{id}` is blocked by *active* members — it is blocked by any membership record, deactivated ones included.
+
+---
+
 ## [2.0.7] — 2026-07-16
 
 ### Bug Fixes
