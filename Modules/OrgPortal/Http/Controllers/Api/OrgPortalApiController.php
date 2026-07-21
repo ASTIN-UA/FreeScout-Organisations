@@ -43,6 +43,56 @@ class OrgPortalApiController extends Controller
         return $id;
     }
 
+    /**
+     * Longest name the `organizations`/`organization_units` name columns accept.
+     * They are varchar(191) — the utf8mb4 index limit — not varchar(255).
+     */
+    const NAME_MAX_LENGTH = 191;
+
+    /**
+     * Parse an optional color field. Returns the hex string, or null when the
+     * field is absent/empty; sets $error on malformed input. Mirrors the
+     * validation the admin UI applies (OrgPortalAdminController::store()).
+     */
+    private function parseColor(Request $request, string $field, ?string &$error): ?string
+    {
+        $error = null;
+        $raw   = $request->input($field);
+
+        if ($raw === null || $raw === '') {
+            return null;
+        }
+
+        $color = trim((string) $raw);
+
+        if (!preg_match('/^#[0-9a-fA-F]{3,6}$/', $color)) {
+            $error = 'color must be a hex color such as "#ff0000", or null.';
+            return null;
+        }
+
+        return $color;
+    }
+
+    /**
+     * Count a member's tickets that block hard-deleting their membership.
+     *
+     * Only tickets attributed to THIS organisation count — a customer may have
+     * personal tickets predating membership (or belonging to another org) that
+     * must not block removal. Snapshot mode stamps org_id on each ticket to
+     * scope by; legacy mode has no per-ticket attribution, so it falls back to
+     * the raw customer_id count. Mirrors OrgPortalAdminController::removeMember().
+     */
+    private function blockingTicketsCount(int $customerId, int $organizationId): int
+    {
+        $query = \App\Conversation::where('customer_id', $customerId);
+
+        if (\Modules\OrgPortal\Services\OrgAttribution::snapshotEnabled()) {
+            $query->where('org_id', $organizationId);
+        }
+
+        return $query->count();
+    }
+
     private function errorResponse(string $message, int $status, array $errors = []): JsonResponse
     {
         $body = [
@@ -122,7 +172,7 @@ class OrgPortalApiController extends Controller
      */
     public function listOrganizations(Request $request): JsonResponse
     {
-        $perPage = min((int) $request->input('pageSize', 25), 100);
+        $perPage = min(max((int) $request->input('pageSize', 25), 1), 100);
         $page    = max((int) $request->input('page', 1), 1);
 
         $query = Organization::orderBy('name');
@@ -130,6 +180,23 @@ class OrgPortalApiController extends Controller
         if ($request->filled('mailboxId')) {
             $mailboxId = (int) $request->input('mailboxId');
             $query->visibleInMailbox($mailboxId);
+        }
+
+        // exactName wins over name — it answers "does this exact organization
+        // already exist?", which is what a client asks before falling back to
+        // POST /api/organizations.
+        if ($request->filled('exactName')) {
+            $query->where('name', trim((string) $request->input('exactName')));
+        } elseif ($request->filled('name')) {
+            $needle = trim((string) $request->input('name'));
+            // Escape LIKE wildcards so a literal % or _ in the search term
+            // matches itself instead of acting as a pattern.
+            $escaped = str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], $needle);
+            $query->where('name', 'like', '%' . $escaped . '%');
+        }
+
+        if ($request->filled('isActive')) {
+            $query->where('is_active', filter_var($request->input('isActive'), FILTER_VALIDATE_BOOLEAN));
         }
 
         $paginator = $query->paginate($perPage, ['*'], 'page', $page);
@@ -164,9 +231,9 @@ class OrgPortalApiController extends Controller
             ]);
         }
 
-        if (mb_strlen($name) > 255) {
+        if (mb_strlen($name) > self::NAME_MAX_LENGTH) {
             return $this->errorResponse('Validation failed', 400, [
-                ['path' => 'name', 'message' => 'Name may not exceed 255 characters.', 'source' => 'JSON'],
+                ['path' => 'name', 'message' => 'Name may not exceed ' . self::NAME_MAX_LENGTH . ' characters.', 'source' => 'JSON'],
             ]);
         }
 
@@ -183,7 +250,25 @@ class OrgPortalApiController extends Controller
             ]);
         }
 
-        $org = Organization::create(['name' => $name, 'mailbox_id' => $mailboxId]);
+        $color = $this->parseColor($request, 'color', $colorError);
+        if ($colorError) {
+            return $this->errorResponse('Validation failed', 400, [
+                ['path' => 'color', 'message' => $colorError, 'source' => 'JSON'],
+            ]);
+        }
+
+        $org = Organization::create([
+            'name'       => $name,
+            'mailbox_id' => $mailboxId,
+            'color'      => $color,
+            'is_active'  => $request->has('isActive') ? (bool) $request->input('isActive') : true,
+        ]);
+
+        // The INSERT relies on column defaults for anything not passed above, and
+        // the in-memory model does not know them — without this the response
+        // would report isActive: false for an organization that is active in the
+        // database.
+        $org->refresh();
 
         return response()->json($this->orgToArray($org), 201)
             ->header('Resource-ID', $org->id);
@@ -226,6 +311,12 @@ class OrgPortalApiController extends Controller
             ]);
         }
 
+        if (mb_strlen($name) > self::NAME_MAX_LENGTH) {
+            return $this->errorResponse('Validation failed', 400, [
+                ['path' => 'name', 'message' => 'Name may not exceed ' . self::NAME_MAX_LENGTH . ' characters.', 'source' => 'JSON'],
+            ]);
+        }
+
         if (Organization::where('name', $name)->where('id', '!=', $id)->exists()) {
             return $this->errorResponse('Validation failed', 400, [
                 ['path' => 'name', 'message' => 'An organization with this name already exists.', 'source' => 'JSON'],
@@ -243,7 +334,17 @@ class OrgPortalApiController extends Controller
             $mailboxId = $org->mailbox_id;
         }
 
-        $color    = $request->has('color') ? ($request->input('color') ?: null) : $org->color;
+        if ($request->has('color')) {
+            $color = $this->parseColor($request, 'color', $colorError);
+            if ($colorError) {
+                return $this->errorResponse('Validation failed', 400, [
+                    ['path' => 'color', 'message' => $colorError, 'source' => 'JSON'],
+                ]);
+            }
+        } else {
+            $color = $org->color;
+        }
+
         $isActive = $request->has('isActive') ? (bool) $request->input('isActive') : (bool) $org->is_active;
 
         $org->update([
@@ -409,7 +510,7 @@ class OrgPortalApiController extends Controller
             return $this->errorResponse('Member not found.', 404);
         }
 
-        $ticketsCount = \App\Conversation::where('customer_id', $member->customer_id)->count();
+        $ticketsCount = $this->blockingTicketsCount($member->customer_id, $id);
         if ($ticketsCount > 0) {
             return $this->errorResponse(
                 'Cannot remove this member: they have tickets in this organization. Deactivate them instead (isActive: false) to preserve their ticket history.',
@@ -562,11 +663,7 @@ class OrgPortalApiController extends Controller
             return $this->errorResponse('Customer not found.', 404);
         }
 
-        $orgId        = $request->input('organizationId');
-        $role         = $request->input('role', 'member');
-        $unitId       = $request->input('unitId') ?: null;
-        $canManageOrg = (bool) $request->input('canManageOrg', false);
-        $isActive     = $request->has('isActive') ? (bool) $request->input('isActive') : true;
+        $orgId = $request->input('organizationId');
 
         if (!$orgId) {
             return $this->errorResponse('Validation failed', 400, [
@@ -574,7 +671,7 @@ class OrgPortalApiController extends Controller
             ]);
         }
 
-        if (!in_array($role, ['member', 'manager'])) {
+        if ($request->has('role') && !in_array($request->input('role'), ['member', 'manager'], true)) {
             return $this->errorResponse('Validation failed', 400, [
                 ['path' => 'role', 'message' => 'role must be "member" or "manager".', 'source' => 'JSON'],
             ]);
@@ -585,6 +682,7 @@ class OrgPortalApiController extends Controller
         }
 
         // Unit (if provided) must belong to the target organization.
+        $unitId = $request->has('unitId') ? ($request->input('unitId') ?: null) : null;
         if ($unitId && !OrganizationUnit::where('organization_id', $orgId)->where('id', $unitId)->exists()) {
             return $this->errorResponse('Validation failed', 400, [
                 ['path' => 'unitId', 'message' => 'Unit does not belong to organization #' . $orgId . '.', 'source' => 'JSON'],
@@ -595,10 +693,19 @@ class OrgPortalApiController extends Controller
             ->where('organization_id', $orgId)
             ->first();
 
-        if (!$member) {
-            // One ACTIVE membership per customer — block if active elsewhere.
+        // One ACTIVE membership per customer. This applies both to a brand-new
+        // membership and to re-activating a dormant one — without the second
+        // check, isActive: true here would silently give the customer two
+        // active memberships at once.
+        $wouldBeActive = $member
+            ? ($request->has('isActive') ? (bool) $request->input('isActive') : (bool) $member->is_active)
+            : ($request->has('isActive') ? (bool) $request->input('isActive') : true);
+
+        if ($wouldBeActive) {
             $activeElsewhere = OrganizationMember::where('customer_id', $customerId)
-                ->where('is_active', true)->first();
+                ->where('organization_id', '!=', $orgId)
+                ->where('is_active', true)
+                ->first();
 
             if ($activeElsewhere) {
                 return $this->errorResponse('Customer already has an active membership in another organization.', 409, [
@@ -610,24 +717,47 @@ class OrgPortalApiController extends Controller
                     ],
                 ]);
             }
+        }
 
+        if (!$member) {
             OrganizationMember::create([
                 'organization_id' => $orgId,
                 'customer_id'     => $customerId,
                 'unit_id'         => $unitId,
-                'role'            => $role,
-                'can_manage_org'  => $canManageOrg,
-                'is_active'       => $isActive,
+                'role'            => $request->input('role', 'member'),
+                'can_manage_org'  => (bool) $request->input('canManageOrg', false),
+                'is_active'       => $request->has('isActive') ? (bool) $request->input('isActive') : true,
             ]);
             return response()->json(['success' => true, 'message' => 'Membership created.'], 201);
         }
 
-        $member->update([
-            'unit_id'        => $unitId,
-            'role'           => $role,
-            'can_manage_org' => $canManageOrg,
-            'is_active'      => $isActive,
-        ]);
+        // Partial update: only fields actually present in the body are touched,
+        // matching PUT /organizations/{id}/members/{memberId}. Previously any
+        // omitted field was reset to its default, which silently demoted
+        // managers, cleared units and re-activated deactivated members.
+        $updates = [];
+
+        if ($request->has('unitId')) {
+            $updates['unit_id'] = $unitId;
+        }
+
+        if ($request->has('role')) {
+            $updates['role'] = $request->input('role');
+        }
+
+        if ($request->has('canManageOrg')) {
+            $updates['can_manage_org'] = (bool) $request->input('canManageOrg');
+        }
+
+        if ($request->has('isActive')) {
+            $updates['is_active'] = (bool) $request->input('isActive');
+        }
+
+        if (empty($updates)) {
+            return response()->json(['success' => true, 'message' => 'No changes.']);
+        }
+
+        $member->update($updates);
 
         return response()->json(['success' => true, 'message' => 'Membership updated.']);
     }
@@ -673,6 +803,12 @@ class OrgPortalApiController extends Controller
             ]);
         }
 
+        if (mb_strlen($name) > self::NAME_MAX_LENGTH) {
+            return $this->errorResponse('Validation failed', 400, [
+                ['path' => 'name', 'message' => 'Name may not exceed ' . self::NAME_MAX_LENGTH . ' characters.', 'source' => 'JSON'],
+            ]);
+        }
+
         if (OrganizationUnit::where('organization_id', $id)->where('name', $name)->exists()) {
             return $this->errorResponse('Validation failed', 400, [
                 ['path' => 'name', 'message' => 'A unit with this name already exists in this organization.', 'source' => 'JSON'],
@@ -702,6 +838,12 @@ class OrgPortalApiController extends Controller
         if ($name === '') {
             return $this->errorResponse('Validation failed', 400, [
                 ['path' => 'name', 'message' => 'Name is required.', 'source' => 'JSON'],
+            ]);
+        }
+
+        if (mb_strlen($name) > self::NAME_MAX_LENGTH) {
+            return $this->errorResponse('Validation failed', 400, [
+                ['path' => 'name', 'message' => 'Name may not exceed ' . self::NAME_MAX_LENGTH . ' characters.', 'source' => 'JSON'],
             ]);
         }
 
@@ -760,7 +902,7 @@ class OrgPortalApiController extends Controller
             return $this->errorResponse('Customer is not an active member of any organization.', 404);
         }
 
-        $ticketsCount = \App\Conversation::where('customer_id', $customerId)->count();
+        $ticketsCount = $this->blockingTicketsCount($customerId, $member->organization_id);
         if ($ticketsCount > 0) {
             return $this->errorResponse(
                 'Cannot remove this membership: the customer has tickets in this organization. Deactivate instead (isActive: false) to preserve their ticket history.',

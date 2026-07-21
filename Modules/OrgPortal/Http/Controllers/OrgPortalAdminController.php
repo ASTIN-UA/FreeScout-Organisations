@@ -229,7 +229,7 @@ class OrgPortalAdminController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'       => 'required|string|max:255|unique:organizations,name',
+            'name'       => 'required|string|max:191|unique:organizations,name',
             'color'      => 'nullable|string|max:20|regex:/^#[0-9a-fA-F]{3,6}$/',
             'mailbox_id' => 'nullable|integer|exists:mailboxes,id',
         ]);
@@ -273,7 +273,7 @@ class OrgPortalAdminController extends Controller
         $organization = Organization::findOrFail($id);
 
         $request->validate([
-            'name'       => 'required|string|max:255|unique:organizations,name,' . $id,
+            'name'       => 'required|string|max:191|unique:organizations,name,' . $id,
             'color'      => 'nullable|string|max:20|regex:/^#[0-9a-fA-F]{3,6}$/',
             'mailbox_id' => 'nullable|integer|exists:mailboxes,id',
         ]);
@@ -492,7 +492,7 @@ class OrgPortalAdminController extends Controller
     {
         $organization = Organization::findOrFail($id);
 
-        $request->validate(['name' => 'required|string|max:255']);
+        $request->validate(['name' => 'required|string|max:191']);
         $name = trim($request->input('name'));
 
         if (OrganizationUnit::where('organization_id', $id)->where('name', $name)->exists()) {
@@ -508,7 +508,7 @@ class OrgPortalAdminController extends Controller
 
     public function renameUnit(Request $request, int $id, int $unitId)
     {
-        $request->validate(['name' => 'required|string|max:255']);
+        $request->validate(['name' => 'required|string|max:191']);
         $name = trim($request->input('name'));
 
         $unit = OrganizationUnit::where('organization_id', $id)->findOrFail($unitId);
