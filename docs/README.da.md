@@ -45,6 +45,7 @@
 - [Hvad OrgPortal tilføjer til FreeScout](#hvad-orgportal-tilføjer-til-freescout)
 - [Organisationer](#organisationer)
 - [Strukturelle enheder — Adgangskontrol på afdelingsniveau](#strukturelle-enheder--adgangskontrol-på-afdelingsniveau)
+- [Email-domæner — Automatisk medlemskab](#email-domæner--automatisk-medlemskab)
 - [Org Snapshot — Permanent sagsattribuering](#org-snapshot--permanent-sagsattribuering)
 - [Kanban-integration](#kanban-integration)
 - [Integration med brugerdefinerede felter](#integration-med-brugerdefinerede-felter)
@@ -73,6 +74,7 @@ FreeScout er bygget omkring individuelle kunder — hver e-mail er fra en person
 OrgPortal udfylder dette hul:
 
 - **Virksomhedskonti** — gruppér kunder i organisationer med navn, farve-badge, postkassescope og aktiv/inaktiv-status
+- **Automatisk medlemskab via e-maildomæner** — bind `company.com` til en organisation og hver kunde, der skriver fra det, registreres og tilskrives automatisk
 - **Afdelingshierarkier** — opdel organisationer i strukturelle enheder (afdelinger, filialer, teams); hvert medlem er begrænset til sin enhed
 - **Rollebaseret adgang** — `member` ser kun egne sager; `unit_manager` ser hele enheden; `manager` ser hele organisationen
 - **Virksomheders selvbetjeningsportal** — ledere ser alle virksomhedens sager, svarer, lukker, omtildeler forfattere og administrerer notifikationspræferencer uden at kontakte dit team
@@ -152,6 +154,45 @@ Organisationer kan opdeles i ubegrænsede **strukturelle enheder** (afdelinger, 
 
 ---
 
+## Email-domæner — Automatisk medlemskab
+
+*Stop med at tilføje de samme virksomhedsmedarbejdere én efter én.*
+
+Bind en e-maildomæne til en organisation, og hver kunde, der skriver fra det domæne, tilskrives det og registreres automatisk som medlem — uden manuel trin, intet at glemme når en ny person e-mailer første gang.
+
+Konfigureres per organisation i **Manage → Organizations → edit → Email domains**.
+
+### Sådan fungerer matching
+
+| Regel | Adfærd |
+|-------|--------|
+| **Kun nøjagtig match** | `company.com` matcher `jane@company.com`. Det matcher ikke `jane@mail.company.com` eller `jane@www.company.com` — tilføj dem som separate poster hvis du ønsker det |
+| **Normalisering** | `@Company.COM`, `https://www.company.com/` og `company.com.` gemmes alle som `company.com` |
+| **Manuel attributering vinder altid** | En kunde, der allerede tilhører en anden organisation, flyttes aldrig. Leverandører og bevidste adminkodecisioner er sikre |
+| **Tilbagekaldelse er permanent** | Deaktivering af et medlem er permanent, indtil en person omgør det. Kunden kan fortsætte med at sende e-mails; automatiseringen gendanner ikke deres adgang |
+| **Postkassescope** | En domæne på en postkassespecifik organisation gælder kun inden for den postkasse. En postkassespecifik binding går forud for en global binding for samme domæne |
+| **Flere domæner** | En organisation kan have så mange domæner som det har brug for (`company.com`, `company.co.uk`, et erhvervet brand…) |
+
+### Offentlige udbydere er blokeret
+
+`gmail.com`, `outlook.com`, `ukr.net`, `icloud.com`, engangsmail-tjenester og lignende er **afvist ved lagring**. Binding af en ville trække hundredvis af urelaterede kunder ind i en enkelt organisation og — gennem End-User Portal — give dem adgang til hinandens sager.
+
+Listen leveres med modulet og kan **udvides** (aldrig reduceres) via optionen `orgportal.public_domains_extra` for regionale udbydere. En hardkoderet fallback garanterer, at de vigtigste udbydere forbliver blokeret selv hvis konfigurationsfilen mangler eller er beskadiget.
+
+Deaktiverede organisationer holder op med at registrere kunder helt.
+
+### Eksisterende kunder
+
+En binding påvirker kun fremtidigt mail: kunder, der allerede eksisterer, tilmeldes ikke retroaktivt. De opsamles, når de skriver igen.
+
+### Fjernelse af en binding
+
+Fjernelse af en domæne stopper fremtidig auto-attributering. Medlemmer, som den allerede har oprettet, **bevares som standard** — de bruger måske allerede portalen. Du bliver særskilt spurgt, om du vil deaktivere dem; denne rollback påvirker kun medlemmer registreret af denne specifikt domæne, aldrig dem tilføjet manuelt.
+
+Medlemmer oprettet automatisk er markeret med et **@**-badge i medlemslisten.
+
+---
+
 ## Org Snapshot — Permanent sagsattribuering
 
 *Pålidelig historisk rapportering selv når din kundeliste ændrer sig.*
@@ -173,6 +214,8 @@ Konfigureres i **Manage → Organizations → System tab**:
 | `tag_only` | Tilskriver udelukkende efter tag; medlemskab bruges ikke |
 
 `tag` og `tag_only`-tilstande er deaktiveret når Tags-modulet er inaktivt.
+
+**Email-domæner fungerer som sidste fallback** i `member`- og `tag`-tilstande: når hverken en tag-binding eller et eksisterende medlemskab løser sagen, kontrolleres forfatters e-maildomæne. Det overrider aldrig nogen af dem, så en tag-regel eller en admins manuelle attributering har altid forrang. I `tag_only`-tilstand bruges domænematching ikke.
 
 ### Backfill-værktøjer
 

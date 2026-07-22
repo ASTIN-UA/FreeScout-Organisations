@@ -45,6 +45,7 @@
 - [Vad OrgPortal lägger till i FreeScout](#vad-orgportal-lägger-till-i-freescout)
 - [Organisationer](#organisationer)
 - [Strukturella enheter — Åtkomstkontroll på avdelningsnivå](#strukturella-enheter--åtkomstkontroll-på-avdelningsnivå)
+- [Emaildomäner — Automatisk medlemskap](#emaildomäner--automatisk-medlemskap)
 - [Org Snapshot — Permanent ärendetillskrivning](#org-snapshot--permanent-ärendetillskrivning)
 - [Kanban-integration](#kanban-integration)
 - [Integration med anpassade fält](#integration-med-anpassade-fält)
@@ -73,6 +74,7 @@ FreeScout är byggt kring enskilda kunder — varje e-post är från en person o
 OrgPortal fyller den luckan:
 
 - **Företagskonton** — gruppera kunder i organisationer med namn, färgmärkning, postlådeomfattning och aktiv/inaktiv status
+- **Automatisk medlemskap genom e-postdomän** — binda `company.com` till en organisation och varje kund som skriver från den domänen registreras och tilldelas automatiskt
 - **Avdelningshierarkier** — dela upp organisationer i strukturella enheter (avdelningar, filialer, team); varje medlem är begränsad till sin enhet
 - **Rollbaserad åtkomst** — `member` ser bara egna ärenden; `unit_manager` ser hela enheten; `manager` ser hela organisationen
 - **Företagsselfservice-portal** — chefer visar alla företagsärenden, svarar, stänger, omtilldelar författare och hanterar aviseringsinställningar utan att kontakta ditt team
@@ -152,6 +154,45 @@ Organisationer kan delas in i obegränsat antal **strukturella enheter** (avdeln
 
 ---
 
+## Emaildomäner — Automatisk medlemskap
+
+*Sluta lägga till samma företags personal en efter en.*
+
+Binda en e-postdomän till en organisation och varje kund som skriver från den domänen tilldelas den och registreras som medlem automatiskt — ingen manuell åtgärd, inget att glömma när en ny person skickar ett e-postmeddelande för första gången.
+
+Konfigureras per organisation i **Manage → Organizations → edit → Email domains**.
+
+### Hur matchning fungerar
+
+| Regel | Beteende |
+|-------|----------|
+| **Endast exakt matchning** | `company.com` matchar `jane@company.com`. Det matchar **inte** `jane@mail.company.com` eller `jane@www.company.com` — lägg till dem som separata poster om du vill |
+| **Normalisering** | `@Company.COM`, `https://www.company.com/` och `company.com.` lagras alla som `company.com` |
+| **Manuell tilldelning vinner alltid** | En kund som redan tillhör en annan organisation flyttas aldrig. Konsulter och medvetna adminåtgärder är säkra |
+| **Återkallelse kvarstår** | Inaktivering av en medlem är permanent tills en människa reverserar det. Kunden kan fortsätta skicka e-post; automatisering återställer inte sin åtkomst |
+| **Postlådeomfattning** | En domän på en postlåda-specifik organisation gäller endast i den postlådan. En postlåda-specifik bindning tar företräde framför en global för samma domän |
+| **Flera domäner** | En organisation kan innehålla så många domäner den behöver (`company.com`, `company.co.uk`, ett förvärvat varumärke…) |
+
+### Offentliga leverantörer är blockerade
+
+`gmail.com`, `outlook.com`, `ukr.net`, `icloud.com`, engångsmajltjänster och liknande är **avvisade vid sparning**. Att binda en skulle dra hundratals orelaterade kunder in i en enda organisation och — genom End-User Portal — ge dem åtkomst till varandras ärenden.
+
+Listan levereras med modulen och kan **utökas** (aldrig reduceras) via alternativet `orgportal.public_domains_extra` för regionala leverantörer. En hårdkodad reserv garanterar att huvudleverantörerna förblir blockerade även om config-filen saknas eller är skadad.
+
+Inaktiverade organisationer slutar registrera kunder helt och hållet.
+
+### Lägga till befintliga kunder
+
+En ny bindning påverkar endast framtida e-post. För att registrera kunder som redan finns påverkar bindningen endast framtida e-post: befintliga kunder registreras inte retroaktivt. De plockas upp när de skriver in igen.
+
+### Ta bort en bindning
+
+Att ta bort en domän stoppar framtida automatisk tilldelning. Medlemmar som den redan skapade **behålls som standard** — de kanske redan använder portalen. Du uppmanas separat avgöra om du vill inaktivera dem; denna rollback påverkar endast medlemmar som registrerats av den specifika domänen, aldrig de tillagda för hand.
+
+Medlemmar som skapades automatiskt är markerade med ett **@** märke i medlemslistan.
+
+---
+
 ## Org Snapshot — Permanent ärendetillskrivning
 
 *Tillförlitlig historisk rapportering även när din kundlista förändras.*
@@ -173,6 +214,8 @@ Konfigureras i **Manage → Organizations → System tab**:
 | `tag_only` | Tillskriva uteslutande via tagg; medlemskap används inte |
 
 `tag`- och `tag_only`-lägen är inaktiverade när Tags-modulen är inaktiv.
+
+**Emaildomäner fungerar som sista utväg** i lägen `member` och `tag`: när varken en tagbindning eller ett befintligt medlemskap löser ärendet, kontrolleras författarens e-postdomän. Det åsidosätter aldrig någondera, så en taggregel eller en admins manuella tilldelning har alltid företräde. I läge `tag_only` används inte domänmatchning.
 
 ### Backfill-verktyg
 

@@ -45,6 +45,7 @@
 - [Ce adaugă OrgPortal în FreeScout](#ce-adaugă-orgportal-în-freescout)
 - [Organizații](#organizații)
 - [Unități Structurale — Control de acces la nivel de departament](#unități-structurale--control-de-acces-la-nivel-de-departament)
+- [Domenii de E-mail — Apartenența Automată](#domenii-de-e-mail--apartenența-automată)
 - [Org Snapshot — Atribuire permanentă a tichetelor](#org-snapshot--atribuire-permanentă-a-tichetelor)
 - [Integrare Kanban](#integrare-kanban)
 - [Integrare cu câmpuri personalizate](#integrare-cu-câmpuri-personalizate)
@@ -73,6 +74,7 @@ FreeScout este construit în jurul clienților individuali — fiecare e-mail pr
 OrgPortal umple acest gol:
 
 - **Conturi de companie** — grupează clienții în organizații cu un nume, insignă colorată, domeniu de căsuță poștală și stare activă/inactivă
+- **Apartenență automată prin domeniu de e-mail** — asociază `company.com` la o organizație și fiecare client care scrie de la aceasta este înscris și atribuit automat
 - **Ierarhii de departamente** — împarte organizațiile în unități structurale (departamente, sucursale, echipe); fiecare membru este limitat la unitatea sa
 - **Acces bazat pe rol** — `member` vede doar propriile tichete; `unit_manager` vede întreaga unitate; `manager` vede întreaga organizație
 - **Portal corporativ de auto-servire** — managerii vizualizează toate tichetele companiei, răspund, închid, reatribuie autori și gestionează preferințele de notificare fără a contacta echipa ta
@@ -152,6 +154,45 @@ Organizațiile pot fi împărțite în **unități structurale** nelimitate (dep
 
 ---
 
+## Domenii de E-mail — Apartenența Automată
+
+*Încetează să adaugi de fiecare dată aceiași angajații ai companiei.*
+
+Asociază un domeniu de e-mail la o organizație și fiecare client care scrie de la acel domeniu este atribuit automat și înscris ca membru — fără pași manuali, nimic de uitat când o persoană nouă trimite pentru prima dată un e-mail.
+
+Configurat per organizație în **Manage → Organizations → Edit → Email domains**.
+
+### Cum funcționează potrivirea
+
+| Regulă | Comportament |
+|--------|----------|
+| **Doar potrivire exactă** | `company.com` se potrivește cu `jane@company.com`. **Nu** se potrivește cu `jane@mail.company.com` sau `jane@www.company.com` — adaugă-le ca intrări separate dacă dorești |
+| **Normalizare** | `@Company.COM`, `https://www.company.com/` și `company.com.` sunt toate salvate ca `company.com` |
+| **Atribuirea manuală nu poate fi suprascrisă** | Un client care aparține deja altei organizații nu este niciodată mutat. Contractorii și deciziile deliberate ale administratorului sunt sigure |
+| **Revocarea este permanentă** | Dezactivarea unui membru este permanentă până când cineva o inversează. Clientul poate continua să trimită e-mailuri; automatizarea nu va restaura accesul |
+| **Domeniu de căsuță poștală** | Un domeniu pe o organizație specifică a unei căsuțe poștale se aplică doar în acea căsuță poștală. O asociere specifică a unei căsuțe poștale are prioritate asupra unei globale pentru același domeniu |
+| **Domenii multiple** | O organizație poate avea cât de multe domenii necesită (`company.com`, `company.co.uk`, o marcă achiziționată…) |
+
+### Furnizorii publici sunt blocați
+
+`gmail.com`, `outlook.com`, `ukr.net`, `icloud.com`, serviciile de e-mail disponibil și similare sunt **respinse la salvare**. Asocierea unuia ar pune sute de clienți neînrudiți într-o singură organizație și — prin End-User Portal — le-ar da acces la tichetele reciproce.
+
+Lista vine cu modulul și poate fi **extinsă** (niciodată micșorată) prin opțiunea `orgportal.public_domains_extra` pentru furnizori regionali. Un fallback codificat garantează că furnizorii majori rămân blocați chiar dacă fișierul de configurare lipsește sau este deteriorat.
+
+Organizațiile dezactivate încetează complet să înscrie clienți.
+
+### Adăugarea clienților existenți
+
+O asociere afectează doar mesajele viitoare: clienții care deja există nu sunt înscriși retroactiv. Sunt preluați imediat ce scriu din nou.
+
+### Ștergerea unei asocieri
+
+Ștergerea unui domeniu oprește atribuirea automată viitoare. Membrii pe care i-a creat deja sunt **păstrați în mod implicit** — pot deja folosi portalul. Ți se cere separat dacă vrei să-i dezactivezi; acest rollback atinge doar membrii înscriși de acel domeniu specific, niciodată pe cei adăugați manual.
+
+Membrii creați automat sunt marcați cu un crochet **@** în lista membrilor.
+
+---
+
 ## Org Snapshot — Atribuire permanentă a tichetelor
 
 *Raportări istorice fiabile chiar și atunci când lista de clienți se schimbă.*
@@ -173,6 +214,8 @@ Configurat în **Manage → Organizations → fila System**:
 | `tag_only` | Atribuie exclusiv după etichetă; apartenența nu este utilizată |
 
 Modurile `tag` și `tag_only` sunt dezactivate când modulul Tags este inactiv.
+
+**Domeniile de e-mail acționează ca ultimul resort** în modurile `member` și `tag`: când nici o asociere de tag nici o apartenență existentă nu rezolvă tichetul, se verifică domeniul de e-mail al autorului. Niciodată nu suprascrie niciodată din ele, deci o regulă de tag sau o atribuire manuală a administratorului are întotdeauna prioritate. În modul `tag_only`, potrivirea domeniului nu este utilizată.
 
 ### Instrumente de completare retrospectivă
 

@@ -45,6 +45,7 @@
 - [Co OrgPortal přidává do FreeScoutu](#co-orgportal-přidává-do-freescoutu)
 - [Organizace](#organizace)
 - [Strukturální jednotky — Řízení přístupu na úrovni oddělení](#strukturální-jednotky--řízení-přístupu-na-úrovni-oddělení)
+- [E-mailové domény — Automatické členství](#e-mailové-domény--automatické-členství)
 - [Org Snapshot — Trvalé přiřazení ticketů](#org-snapshot--trvalé-přiřazení-ticketů)
 - [Integrace s Kanbanem](#integrace-s-kanbanem)
 - [Integrace s vlastními poli](#integrace-s-vlastními-poli)
@@ -73,6 +74,7 @@ FreeScout je postaven okolo jednotlivých zákazníků — každý e-mail je od 
 OrgPortal tuto mezeru vyplňuje:
 
 - **Firemní účty** — seskupte zákazníky do organizací s názvem, barevným odznakem, vazbou na schránku a stavem aktivní/neaktivní
+- **Automatické členství podle e-mailové domény** — vázat `company.com` na organizaci a každý zákazník, který z ní píše, je automaticky zaregistrován a přiřazen
 - **Firemní hierarchie** — rozdělte organizace na strukturální jednotky (oddělení, pobočky, týmy); každý člen je přiřazen ke své jednotce
 - **Přístup podle rolí** — `member` vidí pouze vlastní tickety; `unit_manager` vidí celou jednotku; `manager` vidí celou organizaci
 - **Firemní samoobslužný portál** — manažeři vidí všechny firemní tickety, odpovídají, uzavírají, přeřazují autory a spravují notifikace bez nutnosti kontaktovat váš tým
@@ -152,6 +154,45 @@ Organizace lze rozdělit na neomezený počet **strukturálních jednotek** (odd
 
 ---
 
+## E-mailové domény — Automatické členství
+
+*Přestanete přidávat stejné zaměstnance společnosti jednoho po druhém.*
+
+Vázat e-mailovou doménu na organizaci a každý zákazník, který z ní píše, je jí přiřazen a automaticky zaregistrován jako člen — bez ručního kroku, nic na co by se dalo zapomenout, když nový člověk poprvé napíše e-mail.
+
+Konfigurováno na organizaci v **Manage → Organizations → edit → Email domains**.
+
+### Jak funguje párování
+
+| Pravidlo | Chování |
+|---------|---------|
+| **Pouze přesné shody** | `company.com` odpovídá `jane@company.com`. Neodpovídá `jane@mail.company.com` nebo `jane@www.company.com` — přidejte je jako samostatné položky, pokud je chcete |
+| **Normalizace** | `@Company.COM`, `https://www.company.com/` a `company.com.` se všechny ukládají jako `company.com` |
+| **Ruční přiřazení vždy vítězí** | Zákazník, který již patří do jiné organizace, se nikdy nepřesune. Dodavatelé a vědomá rozhodnutí správce jsou bezpečná |
+| **Odvolání trvá** | Deaktivace člena je trvalá, dokud ji lidský prvek neodvolá. Zákazník může nadále posílat e-maily; automatizace neobnoví jeho přístup |
+| **Rozsah schránky** | Doména v organizaci specifické pro schránku se vztahuje pouze v rámci této schránky. Vazba specifická pro schránku má přednost před globální vazbou pro stejnou doménu |
+| **Více domén** | Organizace může mít tolik domén, kolik potřebuje (`company.com`, `company.co.uk`, získaná značka…) |
+
+### Veřejní poskytovatelé jsou blokováni
+
+`gmail.com`, `outlook.com`, `ukr.net`, `icloud.com`, služby dočasného mailu a podobně jsou **odmítnuty při ukládání**. Vázání jedné by přitáhlo stovky nesouvisejících zákazníků do jedné organizace a — přes End-User Portal — by jim dalo přístup k lístkovým navzájem.
+
+Seznam se dodává s modulem a lze jej **rozšířit** (nikdy ne zúžit) pomocí možnosti `orgportal.public_domains_extra` pro regionální poskytovatele. Pevně zakódovaný fallback garantuje, že hlavní poskytovatelé zůstanou zablokováni, i když je konfigurační soubor chybí nebo poškozen.
+
+Deaktivované organizace přestanou registrovat zákazníky zcela.
+
+### Stávající zákazníci
+
+Vazba ovlivňuje pouze budoucí poštu: zákazníci, kteří již existují, nejsou retroaktivně zaregistrováni. Budou převzati, jakmile si znovu napíší.
+
+### Odebrání vazby
+
+Odebrání domény zastaví budoucí automatické přiřazení. Členové, které již vytvořila, jsou **ve výchozím nastavení zachováni** — již mohou portál používat. Budete zvlášť dotázáni, zda je chcete deaktivovat; tento rollback se dotýká pouze členů zaregistrovaných touto specifickou doménou, nikdy těch přidaných ručně.
+
+Členy vytvořené automaticky jsou označeny odznákem **@** v seznamu členů.
+
+---
+
 ## Org Snapshot — Trvalé přiřazení ticketů
 
 *Spolehlivé historické reporty i při změnách v seznamu klientů.*
@@ -173,6 +214,8 @@ Konfigurováno v **Manage → Organizations → záložka System**:
 | `tag_only` | Přiřazovat výhradně podle tagu; členství se nepoužívá |
 
 Režimy `tag` a `tag_only` jsou deaktivovány, pokud není aktivní modul Tags.
+
+**E-mailové domény fungují jako poslední záložka** v režimech `member` a `tag`: když ani vazba tagu ani stávající členství nevyřeší ticket, je zkontrolována e-mailová doména autora. Nikdy nepřepisuje ani jednu z nich, takže pravidlo tagu nebo ruční přiřazení správcem má vždy přednost. V režimu `tag_only` se párování domén nepoužívá.
 
 ### Nástroje pro doplnění
 

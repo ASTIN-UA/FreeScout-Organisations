@@ -45,6 +45,7 @@
 - [Wat OrgPortal toevoegt aan FreeScout](#wat-orgportal-toevoegt-aan-freescout)
 - [Organisaties](#organisaties)
 - [Structurele Eenheden — Toegangsbeheer op Afdelingsniveau](#structurele-eenheden--toegangsbeheer-op-afdelingsniveau)
+- [E-maildomein — Automatisch Lidmaatschap](#e-maildomein--automatisch-lidmaatschap)
 - [Org Snapshot — Permanente Ticketkoppeling](#org-snapshot--permanente-ticketkoppeling)
 - [Kanban-integratie](#kanban-integratie)
 - [Integratie met aangepaste velden](#integratie-met-aangepaste-velden)
@@ -73,6 +74,7 @@ FreeScout is gebouwd rondom individuele klanten — elke e-mail is van een perso
 OrgPortal vult die leemte:
 
 - **Bedrijfsaccounts** — groepeer klanten in organisaties met een naam, kleurenbadge, postvakmatch en actieve/inactieve status
+- **Automatisch lidmaatschap via e-maildomein** — koppel `company.com` aan een organisatie en elke klant die er van af schreef, wordt automatisch geregistreerd en gekoppeld
 - **Afdelingshiërarchieën** — verdeel organisaties in structurele eenheden (afdelingen, vestigingen, teams); elk lid heeft toegang tot zijn eigen eenheid
 - **Rolgebaseerde toegang** — `member` ziet alleen eigen tickets; `unit_manager` ziet de volledige eenheid; `manager` ziet de volledige organisatie
 - **Zakelijk selfserviceportaal** — managers bekijken alle bedrijfstickets, beantwoorden, sluiten, herbestemmen auteurs en beheren notificatievoorkeuren zonder uw team te contacteren
@@ -152,6 +154,45 @@ Organisaties kunnen worden verdeeld in onbeperkte **structurele eenheden** (afde
 
 ---
 
+## E-maildomein — Automatisch Lidmaatschap
+
+*Stop met het handmatig toevoegen van dezelfde bedrijfsmedewerkers één voor één.*
+
+Koppel een e-maildomein aan een organisatie en elke klant die er van af schreef, wordt gekoppeld en automatisch als lid geregistreerd — geen handmatige stap, niets wat je kunt vergeten wanneer iemand voor het eerst een e-mail verstuurt.
+
+Geconfigureerd per organisatie in **Beheer → Organisaties → Bewerken → E-maildomeinen**.
+
+### Hoe matching werkt
+
+| Regel | Gedrag |
+|-------|--------|
+| **Alleen exacte overeenkomst** | `company.com` komt overeen met `jane@company.com`. Het **komt niet** overeen met `jane@mail.company.com` of `jane@www.company.com` — voeg deze indien nodig als afzonderlijke vermeldingen toe |
+| **Normalisatie** | `@Company.COM`, `https://www.company.com/` en `company.com.` worden allemaal opgeslagen als `company.com` |
+| **Handmatige toewijzing wint altijd** | Een klant die al in een ander organisatie hoort, wordt nooit verplaatst. Contractanten en bewuste admin-beslissingen zijn veilig |
+| **Deactivering blijft bestaan** | Het deactiveren van een lid is permanent totdat een mens het ongedaan maakt. De klant kan e-mail blijven sturen; automatisering zal de toegang niet herstellen |
+| **Postvak-bereik** | Een domein in een postvak-specifieke organisatie geldt alleen in dat postvak. Een postvak-specifieke binding gaat voor een globale binding voor hetzelfde domein |
+| **Meerdere domeinen** | Een organisatie kan zoveel domeinen hebben als nodig (`company.com`, `company.co.uk`, een overgenomen merk…) |
+
+### Openbare providers zijn geblokkeerd
+
+`gmail.com`, `outlook.com`, `ukr.net`, `icloud.com`, wegwerpmail en dergelijke worden **op opslagmoment afgewezen**. Een binding zou honderden niet-gerelateerde klanten in één organisatie trekken en — via het End-User Portal — hen toegang geven tot elkaars tickets.
+
+De lijst wordt met de module geleverd en kan **uitgebreid** worden (nooit verkleind) via de optie `orgportal.public_domains_extra` voor regionale providers. Een hardgecodeerde fallback garandeert dat grote providers zelfs dan geblokkeerd blijven als het configuratiebestand ontbreekt of beschadigd is.
+
+Gedeactiveerde organisaties registreren geen klanten meer.
+
+### Bestaande klanten
+
+Een binding heeft alleen invloed op toekomstige e-mail: bestaande klanten worden niet retroactief geregistreerd. Ze worden opgenomen zodra ze opnieuw schrijven.
+
+### Een binding verwijderen
+
+Het verwijderen van een domein stopt de toekomstige auto-toewijzing. Leden die het al heeft gemaakt, worden **standaard behouden** — ze gebruiken het portaal misschien al. Je wordt afzonderlijk gevraagd of je ze wilt deactiveren; deze rollback raakt alleen leden die door dit specifieke domein zijn geregistreerd, nooit die handmatig zijn toegevoegd.
+
+Automatisch gemaakte leden zijn gemarkeerd met een **@**-badge in de ledenlijst.
+
+---
+
 ## Org Snapshot — Permanente Ticketkoppeling
 
 *Betrouwbare historische rapportage zelfs als uw klantenbestand verandert.*
@@ -173,6 +214,8 @@ Geconfigureerd in **Beheer → Organisaties → Systeemtabblad**:
 | `tag_only` | Ken uitsluitend toe op basis van tag; lidmaatschap wordt niet gebruikt |
 
 `tag` en `tag_only` modi zijn uitgeschakeld als de Tags-module inactief is.
+
+**E-maildomeinen dienen als laatste uitvaloptie** in de modi `member` en `tag`: wanneer noch een tag-binding noch een bestaand lidmaatschap het ticket oplevert, wordt het e-maildomein van de auteur gecontroleerd. Het overschrijft nooit een van beide, dus een tag-regel of handmatige toewijzing door een beheerder heeft altijd voorrang. In de modus `tag_only` wordt domeinovereenkomst niet gebruikt.
 
 ### Backfill-tools
 

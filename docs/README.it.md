@@ -45,6 +45,7 @@
 - [Cosa aggiunge OrgPortal a FreeScout](#cosa-aggiunge-orgportal-a-freescout)
 - [Organizzazioni](#organizzazioni)
 - [Unità Strutturali — Controllo degli Accessi a Livello di Reparto](#unità-strutturali--controllo-degli-accessi-a-livello-di-reparto)
+- [Domini E-mail — Iscrizione Automatica](#domini-e-mail--iscrizione-automatica)
 - [Org Snapshot — Attribuzione Permanente dei Ticket](#org-snapshot--attribuzione-permanente-dei-ticket)
 - [Integrazione Kanban](#integrazione-kanban)
 - [Integrazione dei Campi Personalizzati](#integrazione-dei-campi-personalizzati)
@@ -73,6 +74,7 @@ FreeScout è costruito attorno ai clienti individuali — ogni email proviene da
 OrgPortal colma questa lacuna:
 
 - **Account aziendali** — raggruppa i clienti in organizzazioni con nome, badge colorato, ambito mailbox e stato attivo/inattivo
+- **Iscrizione automatica per dominio e-mail** — associa `company.com` a un'organizzazione e chiunque scriva da quel dominio viene iscritto e attribuito automaticamente
 - **Gerarchie di reparti** — suddividi le organizzazioni in unità strutturali (reparti, filiali, team); ogni membro è vincolato alla propria unità
 - **Accesso basato sui ruoli** — `member` vede solo i propri ticket; `unit_manager` vede l'intera unità; `manager` vede l'intera organizzazione
 - **Portale self-service aziendale** — i manager visualizzano tutti i ticket aziendali, rispondono, chiudono, riassegnano autori e gestiscono le preferenze di notifica senza contattare il tuo team
@@ -152,6 +154,45 @@ Le organizzazioni possono essere suddivise in **unità strutturali** illimitate 
 
 ---
 
+## Domini E-mail — Iscrizione Automatica
+
+*Smetti di aggiungere il personale della stessa azienda uno per uno.*
+
+Associa un dominio di posta a un'organizzazione e tutti i clienti che scrivono da quel dominio vengono attribuiti e iscritti automaticamente — nessun passaggio manuale, niente da dimenticare quando una nuova persona scrive per la prima volta.
+
+Configurabile per organizzazione in **Gestione → Organizzazioni → modifica → Domini e-mail**.
+
+### Come funziona la corrispondenza
+
+| Regola | Comportamento |
+|--------|---------------|
+| **Solo corrispondenza esatta** | `company.com` corrisponde a `jane@company.com`. **Non** corrisponde a `jane@mail.company.com` o `jane@www.company.com` — aggiungili separatamente se vuoi |
+| **Normalizzazione** | `@Company.COM`, `https://www.company.com/` e `company.com.` vengono tutti archiviati come `company.com` |
+| **L'attribuzione manuale vince sempre** | Un cliente che appartiene già a un'altra organizzazione non viene mai spostato. I contraenti e le decisioni deliberate dell'amministratore sono al sicuro |
+| **La revoca persiste** | La disattivazione di un membro è permanente finché un umano non la annulla. Il cliente può continuare a scrivere; l'automazione non ripristinerà il suo accesso |
+| **Limitazione casella postale** | Un dominio in un'organizzazione specifica della casella postale si applica solo all'interno di quella casella postale. Un'associazione specifica della casella postale ha precedenza su una globale per lo stesso dominio |
+| **Domini multipli** | Un'organizzazione può contenere tanti domini quanti ne ha bisogno (`company.com`, `company.co.uk`, marchio acquisito…) |
+
+### I provider pubblici sono bloccati
+
+`gmail.com`, `outlook.com`, `ukr.net`, `icloud.com`, servizi di posta monouso e simili vengono **rifiutati al salvataggio**. L'associazione di uno attirerebbe centinaia di clienti non correlati in un'unica organizzazione e — attraverso il portale per utenti finali — darebbe loro accesso ai biglietti l'uno dell'altro.
+
+L'elenco viene fornito con il modulo e può essere **esteso** (mai ridotto) tramite l'opzione `orgportal.public_domains_extra` per i provider regionali. Un fallback hardcoded garantisce che i principali provider rimangano bloccati anche se il file di configurazione manca o è danneggiato.
+
+Le organizzazioni disattivate smettono completamente di iscrivere clienti.
+
+### Clienti esistenti
+
+Un'associazione influisce solo sulla posta futura: i clienti che già esistono non vengono iscritti retroattivamente. Vengono aggiunti non appena scrivono di nuovo.
+
+### Rimozione di un'associazione
+
+La rimozione di un dominio interrompe l'attribuzione automatica futura. I membri che ha già creato **vengono conservati per impostazione predefinita** — potrebbero già utilizzare il portale. Ti viene richiesto separatamente se desideri disattivarli; questo rollback riguarda solo i membri iscritti da quel dominio specifico, mai quelli aggiunti manualmente.
+
+I membri creati automaticamente sono contrassegnati con un badge **@** nell'elenco dei membri.
+
+---
+
 ## Org Snapshot — Attribuzione Permanente dei Ticket
 
 *Report storici affidabili anche quando cambia il tuo elenco clienti.*
@@ -173,6 +214,8 @@ Configurabile in **Gestione → Organizzazioni → scheda Sistema**:
 | `tag_only` | Attribuisce esclusivamente tramite tag; l'iscrizione non viene utilizzata |
 
 Le modalità `tag` e `tag_only` sono disabilitate quando il modulo Tags è inattivo.
+
+**I domini e-mail fungono da ultimo ricorso** nelle modalità `member` e `tag`: quando né un'associazione di tag né un'iscrizione esistente risolve il ticket, viene verificato il dominio di posta dell'autore. Non anulla mai nessuno di essi, quindi una regola di tag o un'attribuzione manuale di un amministratore ha sempre la precedenza. In modalità `tag_only` non viene utilizzata la corrispondenza di dominio.
 
 ### Strumenti di backfill
 

@@ -45,6 +45,7 @@
 - [Was OrgPortal zu FreeScout hinzufügt](#was-orgportal-zu-freescout-hinzufügt)
 - [Organisationen](#organisationen)
 - [Strukturelle Einheiten — Zugriffskontrolle auf Abteilungsebene](#strukturelle-einheiten--zugriffskontrolle-auf-abteilungsebene)
+- [E-Mail-Domänen — Automatische Mitgliedschaft](#e-mail-domänen--automatische-mitgliedschaft)
 - [Org Snapshot — Permanente Ticket-Zuordnung](#org-snapshot--permanente-ticket-zuordnung)
 - [Kanban-Integration](#kanban-integration)
 - [Integration von benutzerdefinierten Feldern](#integration-von-benutzerdefinierten-feldern)
@@ -73,6 +74,7 @@ FreeScout ist auf einzelne Kunden ausgerichtet — jede E-Mail stammt von einer 
 OrgPortal schließt diese Lücke:
 
 - **Unternehmenskonten** — Kunden in Organisationen gruppieren mit Name, Farb-Badge, Postfach-Bindung und Aktiv/Inaktiv-Status
+- **Automatische Mitgliedschaft über E-Mail-Domäne** — Binden Sie `company.com` an eine Organisation und jeder Kunde, der darüber schreibt, wird automatisch registriert und zugeordnet
 - **Abteilungshierarchien** — Organisationen in strukturelle Einheiten aufteilen (Abteilungen, Niederlassungen, Teams); jedes Mitglied ist auf seine Einheit beschränkt
 - **Rollenbasierter Zugriff** — `member` sieht nur eigene Tickets; `unit_manager` sieht die gesamte Einheit; `manager` sieht die gesamte Organisation
 - **Unternehmens-Self-Service-Portal** — Manager sehen alle Unternehmenstickets, antworten, schließen, ordnen Autoren neu zu und verwalten Benachrichtigungseinstellungen, ohne Ihr Team zu kontaktieren
@@ -154,6 +156,45 @@ Organisationen können in unbegrenzt viele **strukturelle Einheiten** unterteilt
 
 ---
 
+## E-Mail-Domänen — Automatische Mitgliedschaft
+
+*Hören Sie auf, die gleichen Mitarbeiter eines Unternehmens einzeln hinzuzufügen.*
+
+Binden Sie eine E-Mail-Domäne an eine Organisation und jeder Kunde, der von dieser Domäne aus schreibt, wird ihr zugeordnet und als Mitglied registriert — kein manueller Schritt, nichts, das man vergessen kann, wenn eine neue Person zum ersten Mal eine E-Mail schreibt.
+
+Konfiguriert pro Organisation in **Verwalten → Organisationen → Bearbeiten → E-Mail-Domänen**.
+
+### Wie Matching funktioniert
+
+| Regel | Verhalten |
+|-------|-----------|
+| **Nur exakte Übereinstimmung** | `company.com` stimmt überein mit `jane@company.com`. Es stimmt nicht überein mit `jane@mail.company.com` oder `jane@www.company.com` — fügen Sie diese als separate Einträge hinzu, falls gewünscht |
+| **Normalisierung** | `@Company.COM`, `https://www.company.com/` und `company.com.` werden alle als `company.com` gespeichert |
+| **Manuelle Zuordnung gewinnt immer** | Ein Kunde, der bereits zu einer anderen Organisation gehört, wird nie verschoben. Auftragnehmer und bewusste Admin-Entscheidungen sind sicher |
+| **Entzug bleibt bestehen** | Das Deaktivieren eines Mitglieds ist dauerhaft, bis ein Mensch es rückgängig macht. Der Kunde kann weiter E-Mails schreiben; die Automatisierung wird den Zugriff nicht wiederherstellen |
+| **Postfach-Bereich** | Eine Domäne in einer postfach-spezifischen Organisation gilt nur in diesem Postfach. Eine postfach-spezifische Bindung hat Vorrang vor einer globalen für die gleiche Domäne |
+| **Mehrere Domänen** | Eine Organisation kann so viele Domänen halten, wie sie benötigt (`company.com`, `company.co.uk`, eine erworbene Marke…) |
+
+### Öffentliche Anbieter sind blockiert
+
+`gmail.com`, `outlook.com`, `ukr.net`, `icloud.com`, Disposable-Mail-Dienste und ähnliche werden **beim Speichern abgelehnt**. Eine Bindung würde Hunderte unverwandter Kunden in eine einzige Organisation ziehen und — über das End-User Portal — ihnen Zugriff auf die Tickets der anderen geben.
+
+Die Liste wird mit dem Modul ausgeliefert und kann **erweitert** werden (nie verringert) über die Option `orgportal.public_domains_extra` für regionale Anbieter. Ein fest codierter Fallback garantiert, dass die Hauptanbieter auch dann blockiert bleiben, wenn die Konfigurationsdatei fehlt oder beschädigt ist.
+
+Deaktivierte Organisationen registrieren keine Kunden mehr.
+
+### Vorhandene Kunden
+
+Eine Bindung betrifft nur zukünftige E-Mails: Kunden, die bereits vorhanden sind, werden nicht rückwirkend registriert. Sie werden aufgenommen, sobald sie wieder schreiben.
+
+### Entfernen einer Bindung
+
+Das Entfernen einer Domäne stoppt die zukünftige Auto-Zuordnung. Mitglieder, die sie bereits erstellt hat, werden **standardmäßig beibehalten** — sie nutzen möglicherweise bereits das Portal. Sie werden separat gefragt, ob Sie sie deaktivieren möchten; dieser Rollback berührt nur Mitglieder, die von dieser spezifischen Domäne registriert wurden, nie die von Hand hinzugefügt wurden.
+
+Mitglieder, die automatisch erstellt wurden, sind mit einem **@**-Badge in der Mitgliederliste markiert.
+
+---
+
 ## Org Snapshot — Permanente Ticket-Zuordnung
 
 *Zuverlässige historische Berichterstattung auch wenn sich Ihre Kundenliste ändert.*
@@ -175,6 +216,8 @@ Konfiguriert in **Verwalten → Organisationen → System-Tab**:
 | `tag_only` | Ausschließlich nach Tag zuordnen; Mitgliedschaft wird nicht verwendet |
 
 `tag`- und `tag_only`-Modi sind deaktiviert, wenn das Tags-Modul inaktiv ist.
+
+**E-Mail-Domänen fungieren als letzter Fallback** in `member`- und `tag`-Modi: Wenn weder eine Tag-Bindung noch eine vorhandene Mitgliedschaft das Ticket löst, wird die E-Mail-Domäne des Autors überprüft. Sie überschreibt niemals eine davon, daher hat eine Tag-Regel oder eine manuelle Zuordnung durch einen Admin immer Vorrang. Im `tag_only`-Modus wird Domain-Matching nicht verwendet.
 
 ### Nachfüll-Tools
 

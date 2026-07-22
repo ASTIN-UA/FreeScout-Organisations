@@ -45,6 +45,7 @@
 - [Qué añade OrgPortal a FreeScout](#qué-añade-orgportal-a-freescout)
 - [Organizaciones](#organizaciones)
 - [Unidades Estructurales — Control de Acceso a Nivel de Departamento](#unidades-estructurales--control-de-acceso-a-nivel-de-departamento)
+- [Dominios de Correo Electrónico — Membresía Automática](#dominios-de-correo-electrónico--membresía-automática)
 - [Org Snapshot — Atribución Permanente de Tickets](#org-snapshot--atribución-permanente-de-tickets)
 - [Integración Kanban](#integración-kanban)
 - [Integración de Campos Personalizados](#integración-de-campos-personalizados)
@@ -73,6 +74,7 @@ FreeScout está construido alrededor de clientes individuales — cada correo el
 OrgPortal cierra esa brecha:
 
 - **Cuentas de empresas** — agrupa clientes en organizaciones con nombre, insignia de color, alcance de buzón y estado activo/inactivo
+- **Membresía automática por dominio de correo electrónico** — vincula `company.com` a una organización y cada cliente que escribe desde él se inscribe y atribuye automáticamente
 - **Jerarquías de departamentos** — divide organizaciones en unidades estructurales (departamentos, sucursales, equipos); cada miembro está limitado a su unidad
 - **Acceso basado en roles** — `member` ve solo sus propios tickets; `unit_manager` ve toda la unidad; `manager` ve toda la organización
 - **Portal de autoservicio corporativo** — los gerentes ven todos los tickets de la empresa, responden, cierran, reasignan autores y gestionar preferencias de notificación sin contactar a tu equipo
@@ -154,6 +156,45 @@ Las organizaciones pueden dividirse en **unidades estructurales** ilimitadas (de
 
 ---
 
+## Dominios de Correo Electrónico — Membresía Automática
+
+*Deja de añadir a los mismos empleados de la empresa uno a uno.*
+
+Vincula un dominio de correo electrónico a una organización y cada cliente que escribe desde ese dominio se atribuye a él y se inscribe automáticamente como miembro — sin pasos manuales, nada que olvidar cuando una nueva persona envía un correo electrónico por primera vez.
+
+Configurado por organización en **Manage → Organizations → edit → Email domains**.
+
+### Cómo funciona la coincidencia
+
+| Regla | Comportamiento |
+|-------|----------|
+| **Solo coincidencia exacta** | `company.com` coincide con `jane@company.com`. No coincide con `jane@mail.company.com` o `jane@www.company.com` — añádelos como entradas separadas si lo deseas |
+| **Normalización** | `@Company.COM`, `https://www.company.com/` y `company.com.` se guardan todos como `company.com` |
+| **La asignación manual siempre gana** | Un cliente que ya pertenece a otra organización nunca se mueve. Los contratistas y decisiones deliberadas del administrador están a salvo |
+| **La revocación persiste** | Desactivar un miembro es permanente hasta que una persona lo revierte. El cliente puede seguir enviando correos; la automatización no restaurará su acceso |
+| **Alcance de buzón** | Un dominio en una organización específica del buzón solo se aplica dentro de ese buzón. Un vínculo específico del buzón tiene prioridad sobre uno global para el mismo dominio |
+| **Múltiples dominios** | Una organización puede tener tantos dominios como necesite (`company.com`, `company.co.uk`, una marca adquirida…) |
+
+### Los proveedores públicos están bloqueados
+
+`gmail.com`, `outlook.com`, `ukr.net`, `icloud.com`, servicios de correo desechable y similares se **rechazan al guardar**. Vincular uno pondría a cientos de clientes no relacionados en una sola organización y — a través del Portal de Usuarios Finales — les daría acceso a los tickets mutuos.
+
+La lista se incluye con el módulo y se puede **extender** (nunca reducir) a través de la opción `orgportal.public_domains_extra` para proveedores regionales. Un fallback codificado garantiza que los principales proveedores sigan bloqueados incluso si falta o está dañado el archivo de configuración.
+
+Las organizaciones desactivadas dejan de inscribir clientes completamente.
+
+### Clientes existentes
+
+Una vinculación solo afecta al correo futuro: los clientes que ya existen no se inscriben retroactivamente. Se recogen tan pronto como escriben de nuevo.
+
+### Eliminar una vinculación
+
+Eliminar un dominio detiene la auto-atribución futura. Los miembros que ya ha creado se **conservan de forma predeterminada** — puede que ya estén usando el portal. Se te pregunta por separado si deseas desactivarlos; este rollback solo toca miembros inscritos por ese dominio específico, nunca los añadidos manualmente.
+
+Los miembros creados automáticamente se marcan con una insignia **@** en la lista de miembros.
+
+---
+
 ## Org Snapshot — Atribución Permanente de Tickets
 
 *Informes históricos confiables incluso mientras cambia tu cartera de clientes.*
@@ -175,6 +216,8 @@ Configurado en **Manage → Organizations → System tab**:
 | `tag_only` | Atribuye exclusivamente por etiqueta; la membresía no se usa |
 
 Los modos `tag` y `tag_only` están deshabilitados cuando el módulo Tags está inactivo.
+
+**Los dominios de correo electrónico actúan como último recurso** en los modos `member` y `tag`: cuando ni una vinculación de etiqueta ni una membresía existente resuelven el ticket, se verifica el dominio de correo electrónico del autor. Nunca reemplaza ninguno de los dos, por lo que una regla de etiqueta o una asignación manual de administrador siempre tiene prioridad. En modo `tag_only`, no se utiliza la coincidencia de dominio.
 
 ### Herramientas de relleno
 

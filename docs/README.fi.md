@@ -45,6 +45,7 @@
 - [Mitä OrgPortal lisää FreeScoutiin](#mitä-orgportal-lisää-freescoutiin)
 - [Organisaatiot](#organisaatiot)
 - [Rakenteelliset yksiköt — Osastotason pääsynhallinta](#rakenteelliset-yksiköt--osastotason-pääsynhallinta)
+- [Sähköpostialueet — Automaattinen jäsenyys](#sähköpostialueet--automaattinen-jäsenyys)
 - [Org Snapshot — Pysyvä tikettien attribuointi](#org-snapshot--pysyvä-tikettien-attribuointi)
 - [Kanban-integraatio](#kanban-integraatio)
 - [Mukautettujen kenttien integraatio](#mukautettujen-kenttien-integraatio)
@@ -73,6 +74,7 @@ FreeScout on rakennettu yksittäisten asiakkaiden ympärille — jokainen sähk�
 OrgPortal täyttää tämän aukon:
 
 - **Yritystilit** — ryhmittele asiakkaat organisaatioihin nimen, väritunnisteen, postilaatikon laajuuden ja aktiivisen/passiivisen tilan avulla
+- **Automaattinen jäsenyys sähköpostialueen kautta** — Sido `company.com` organisaatioon ja jokainen asiakas, joka siitä kirjoittaa, rekisteröidään ja attribuoidaan automaattisesti
 - **Osastohierarkiat** — jaa organisaatiot rakenteellisiin yksiköihin (osastot, toimipisteet, tiimit); jokainen jäsen kuuluu omaan yksikköönsä
 - **Roolipohjainen pääsynhallinta** — `member` näkee vain omat tikettinsä; `unit_manager` näkee koko yksikön; `manager` näkee koko organisaation
 - **Yrityksen itsepalveluportaali** — päälliköt näkevät kaikki yrityksen tiketit, voivat vastata, sulkea, siirtää tekijöitä ja hallita ilmoitusasetuksia ilman tukitiimin kontaktointia
@@ -152,6 +154,45 @@ Organisaatiot voidaan jakaa rajattomaan määrään **rakenteellisia yksiköitä
 
 ---
 
+## Sähköpostialueet — Automaattinen jäsenyys
+
+*Lopeta saman yrityksen työntekijöiden lisääminen yksitellen.*
+
+Sido sähköpostialue organisaatioon ja jokainen asiakas, joka siitä kirjoittaa, attribuoidaan sille ja rekisteröidään automaattisesti jäseneksi — ilman manuaalisia vaiheita, mitään mitä voisi unohtaa kun uusi henkilö lähettää sähköpostia ensimmäistä kertaa.
+
+Määritetään organisaatioittain kohdassa **Manage → Organizations → edit → Email domains**.
+
+### Kuinka vastaavuus toimii
+
+| Sääntö | Toiminta |
+|-------|----------|
+| **Vain tarkka vastaavuus** | `company.com` vastaa `jane@company.com`-osoitetta. Se ei vastaa `jane@mail.company.com`- tai `jane@www.company.com`-osoitteita — lisää ne erillisinä merkintöinä jos haluat |
+| **Normalisointi** | `@Company.COM`, `https://www.company.com/` ja `company.com.` tallennetaan kaikki muodossa `company.com` |
+| **Manuaalinen liittäminen voittaa aina** | Asiakas, joka jo kuuluu toiseen organisaatioon, ei koskaan siirry. Urakoitsijat ja tarkoituksenmukaiset ylläpitäjäpäätökset ovat turvassa |
+| **Peruutus jää voimaan** | Jäsenen poistaminen käytöstä on pysyvää kunnes ihminen peruu sen. Asiakas voi jatkaa sähköpostien lähettämistä; automaatio ei palauta hänen pääsyään |
+| **Postilaatikon laajuus** | Postilaatikokohtaiseen organisaatioon sidottu alue koskee vain kyseisen postilaatikon sisällä. Postilaatikokohtainen sidonta on etusijalla samaa aluetta koskevalle globaalille sidos |
+| **Useita alueita** | Organisaatiolla voi olla niin monta aluetta kuin se tarvitsee (`company.com`, `company.co.uk`, hankittu brändi…) |
+
+### Julkiset palveluntarjoajat ovat estettyjä
+
+`gmail.com`, `outlook.com`, `ukr.net`, `icloud.com`, kertakäyttöisen postin palvelut ja vastaavat **hylätään tallennuksessa**. Yhden sidonta veisi satoja toisiinsa liittymättömiä asiakkaita yhteen organisaatioon ja — End-User Portalin kautta — antaisi heille pääsyn toistensa tiketteihin.
+
+Luettelo toimitetaan moduulin kanssa ja voidaan **laajentaa** (ei koskaan pienentää) `orgportal.public_domains_extra`-vaihtoehdon kautta alueellisille palveluntarjoajille. Kovakoodattu takaisinkasvua takaa, että tärkeimmät palveluntarjoajat pysyvät estettyinä vaikka konfigurointitiedosto puuttuu tai on vioittunut.
+
+Poistetut käytöstä organisaatiot lopettavat asiakkaiden rekisteröinnin kokonaan.
+
+### Olemassa olevat asiakkaat
+
+Sidonta vaikuttaa vain tuleviin sähköposteihin: asiakkaat, jotka jo ovat olemassa, eivät rekisteröidy takautuvasti. He kerätään heti kun he kirjoittavat uudelleen.
+
+### Sidoksen poistaminen
+
+Alueen poistaminen pysäyttää tulevan automaattisen liittämisen. Jäsenet, jotka se on jo luonut, **säilytetään oletuksena** — he saattavat jo käyttää porttaalia. Sinulta kysytään erikseen, haluatko poistaa heidät käytöstä; tämä peruutus koskee vain kyseisen alueen rekisteröimiä jäseniä, ei koskaan manuaalisesti lisättyjä.
+
+Automaattisesti luodut jäsenet on merkitty **@**-tunnuksella jäsenluettelossa.
+
+---
+
 ## Org Snapshot — Pysyvä tikettien attribuointi
 
 *Luotettava historiaraportointi vaikka asiakasluettelosi muuttuu.*
@@ -173,6 +214,8 @@ Määritetään kohdassa **Manage → Organizations → System tab**:
 | `tag_only` | Attribuoi yksinomaan tunnisteen perusteella; jäsenyyttä ei käytetä |
 
 `tag`- ja `tag_only`-tilat ovat poistettu käytöstä kun Tags-moduuli ei ole aktiivinen.
+
+**Sähköpostialueet toimivat viimeisenä takaisinkasvuna** `member`- ja `tag`-tiloissa: kun sekä tunnisteen sidonta että olemassa oleva jäsenyys eivät ratkaise tikettia, tarkistetaan tekijän sähköpostialue. Se ei koskaan korvaa kumpaa tahansa, joten tunniste-sääntö tai ylläpitäjän manuaalinen liittäminen on aina etusijalla. `tag_only`-tilassa alueiden vastaavuutta ei käytetä.
 
 ### Täydennystyökalut
 

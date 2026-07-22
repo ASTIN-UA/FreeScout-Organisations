@@ -45,6 +45,7 @@
 - [Co OrgPortal dodaje do FreeScout](#co-orgportal-dodaje-do-freescout)
 - [Organizacje](#organizacje)
 - [Jednostki strukturalne — Kontrola dostępu na poziomie działu](#jednostki-strukturalne--kontrola-dostępu-na-poziomie-działu)
+- [Domeny e-mail — Automatyczne członkostwo](#domeny-e-mail--automatyczne-członkostwo)
 - [Org Snapshot — Trwałe przypisanie zgłoszeń](#org-snapshot--trwałe-przypisanie-zgłoszeń)
 - [Integracja z Kanban](#integracja-z-kanban)
 - [Integracja z polami niestandardowymi](#integracja-z-polami-niestandardowymi)
@@ -73,6 +74,7 @@ FreeScout jest zbudowany wokół indywidualnych klientów — każda wiadomość
 OrgPortal wypełnia tę lukę:
 
 - **Konta firmowe** — grupuj klientów w organizacje z nazwą, kolorową odznaką, powiązaniem ze skrzynką i statusem aktywny/nieaktywny
+- **Automatyczne członkostwo przez domenę e-mail** — powiąż `company.com` z organizacją i każdy klient piszący z tej domeny zostanie automatycznie zarejestrowany i przypisany
 - **Hierarchie działów** — dziel organizacje na jednostki strukturalne (działy, oddziały, zespoły); każdy członek jest przypisany do swojej jednostki
 - **Dostęp oparty na rolach** — `member` widzi tylko własne zgłoszenia; `unit_manager` widzi całą jednostkę; `manager` widzi całą organizację
 - **Korporacyjny portal samoobsługowy** — menedżerowie przeglądają wszystkie zgłoszenia firmy, odpowiadają, zamykają, zmieniają autorów i zarządzają preferencjami powiadomień bez kontaktowania się z Twoim zespołem
@@ -152,6 +154,45 @@ Organizacje mogą być podzielone na nieograniczoną liczbę **jednostek struktu
 
 ---
 
+## Domeny e-mail — Automatyczne członkostwo
+
+*Zaprzestań ręcznego dodawania pracowników jednej firmy po jednym.*
+
+Powiąż domenę e-mail z organizacją i każdy klient piszący z tej domeny zostanie przypisany i automatycznie zarejestrowany jako członek — żaden krok ręczny, nic do zapomnienia gdy nowa osoba po raz pierwszy wyśle e-mail.
+
+Konfiguruje się dla każdej organizacji w **Manage → Organizations → Edit → Email Domains**.
+
+### Jak działa dopasowanie
+
+| Reguła | Zachowanie |
+|--------|-----------|
+| **Tylko dokładne dopasowanie** | `company.com` pasuje do `jane@company.com`. **Nie pasuje** do `jane@mail.company.com` czy `jane@www.company.com` — dodaj te osobno jeśli chcesz |
+| **Normalizacja** | `@Company.COM`, `https://www.company.com/` i `company.com.` są wszystkie zapisywane jako `company.com` |
+| **Ręczne przypisanie zawsze wygrywa** | Klient już należący do innej organizacji nigdy nie zostanie przeniesiony. Podwykonawcy i świadome decyzje admina są bezpieczne |
+| **Dezaktywacja jest trwała** | Dezaktywowanie członka jest trwałe aż do wyraźnego cofnięcia. Klient może wysyłać dalej e-maile; automatyzacja nie przywróci dostępu |
+| **Zakres skrzynki** | Domena w organizacji specyficznej dla skrzynki dotyczy tylko tej skrzynki. Powiązanie specyficzne dla skrzynki zastępuje powiązanie globalne dla tej samej domeny |
+| **Wiele domen** | Organizacja może posiadać tyle domen ile potrzeba (`company.com`, `company.co.uk`, przejętą markę…) |
+
+### Dostawcy publiczni są zablokowani
+
+`gmail.com`, `outlook.com`, `ukr.net`, `icloud.com`, e-mail jednorazowy i podobne są **odrzucane przy zapisaniu**. Powiązanie wciągnęłoby setki niepowiązanych klientów do jednej organizacji i — poprzez End-User Portal — dałoby im dostęp do zgłoszeń innych osób.
+
+Lista jest dostarczana z modułem i może być **rozszerzona** (nigdy zmniejszona) za pośrednictwem ustawienia `orgportal.public_domains_extra` dla dostawców regionalnych. Hardkodowany fallback gwarantuje, że duzi dostawcy pozostają zablokowani nawet jeśli plik konfiguracyjny brakuje lub jest uszkodzony.
+
+Dezaktywowane organizacje nie rejestrują już klientów.
+
+### Istniejący klienci
+
+Powiązanie dotyczy tylko przyszłych e-maili: istniejący już klienci nie są rejestrowany wstecz. Zostaną dodani gdy tylko napiszą ponownie.
+
+### Usuwanie powiązania
+
+Usunięcie domeny zatrzymuje przyszłe automatyczne przypisywanie. Członkowie już przez nią utworzeni są **domyślnie zatrzymywani** — mogą już korzystać z portalu. Zostaniesz poproszony osobno czy chcesz ich dezaktywować; ten rollback dotyczy tylko członków zarejestrowanych przez tę konkretną domenę, nigdy tych dodanych ręcznie.
+
+Automatycznie utworzeni członkowie są oznaczeni odznaką **@** na liście członków.
+
+---
+
 ## Org Snapshot — Trwałe przypisanie zgłoszeń
 
 *Niezawodne historyczne raportowanie nawet gdy skład klientów się zmienia.*
@@ -173,6 +214,8 @@ Konfigurowane w **Manage → Organizations → System tab**:
 | `tag_only` | Przypisuj wyłącznie według tagów; członkostwo nie jest używane |
 
 Tryby `tag` i `tag_only` są wyłączone gdy moduł Tags jest nieaktywny.
+
+**Domeny e-mail służą jako ostatnia rezerwa** w trybach `member` i `tag`: gdy ani powiązanie tagiem ani istniejące członkostwo nie rozwiąże zgłoszenia, sprawdzana jest domena e-mail autora. Nigdy nie zastępuje one siebie nawzajem, więc reguła tagu lub ręczne przypisanie admina zawsze ma pierwszeństwo. W trybie `tag_only` nie jest używane dopasowanie domeny.
 
 ### Narzędzia uzupełniania
 

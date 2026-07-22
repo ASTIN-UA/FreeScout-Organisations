@@ -43,6 +43,7 @@
 - [What OrgPortal adds to FreeScout](#what-orgportal-adds-to-freescout)
 - [Organizations](#organizations)
 - [Structural Units — Department-Level Access Control](#structural-units--department-level-access-control)
+- [Email Domains — Automatic Membership](#email-domains--automatic-membership)
 - [Org Snapshot — Permanent Ticket Attribution](#org-snapshot--permanent-ticket-attribution)
 - [Kanban Integration](#kanban-integration)
 - [Custom Fields Integration](#custom-fields-integration)
@@ -71,6 +72,7 @@ FreeScout is built around individual customers — every email is from a person,
 OrgPortal fills that gap:
 
 - **Company accounts** — group customers into organizations with a name, color badge, mailbox scope, and active/inactive status
+- **Automatic membership by email domain** — bind `company.com` to an organization and everyone writing from it is enrolled and attributed automatically
 - **Department hierarchies** — divide organizations into structural units (departments, branches, teams); each member is scoped to their unit
 - **Role-based access** — `member` sees own tickets only; `unit_manager` sees the entire unit; `manager` sees the entire organization
 - **Corporate self-service portal** — managers view all company tickets, reply, close, reassign authors, and manage notification preferences without contacting your team
@@ -154,6 +156,45 @@ Organizations can be divided into unlimited **structural units** (departments, b
 
 ---
 
+## Email Domains — Automatic Membership
+
+*Stop adding the same company's staff one by one.*
+
+Bind an email domain to an organization and every customer writing from that domain is attributed to it and enrolled as a member automatically — no manual step, nothing to forget when a new person emails in for the first time.
+
+Configured per organization in **Manage → Organizations → edit → Email domains**.
+
+### How matching works
+
+| Rule | Behavior |
+|------|----------|
+| **Exact match only** | `company.com` matches `jane@company.com`. It does **not** match `jane@mail.company.com` or `jane@www.company.com` — add those as separate entries if you want them |
+| **Normalization** | `@Company.COM`, `https://www.company.com/`, and `company.com.` all store as `company.com` |
+| **Manual assignment always wins** | A customer who already belongs to another organization is never moved. Contractors and deliberate admin decisions are safe |
+| **Revocation sticks** | Deactivating a member is permanent until a human reverses it. The customer can keep emailing; automation will not restore their access |
+| **Mailbox scoping** | A domain on a mailbox-specific organization only applies inside that mailbox. A mailbox-specific binding takes precedence over a global one for the same domain |
+| **Multiple domains** | An organization can hold as many domains as it needs (`company.com`, `company.co.uk`, an acquired brand…) |
+
+### Public providers are blocked
+
+`gmail.com`, `outlook.com`, `ukr.net`, `icloud.com`, disposable-mail services and similar are **rejected at save time**. Binding one would pull hundreds of unrelated customers into a single organization and — through the End-User Portal — give them access to each other's tickets.
+
+The list ships with the module and can be **extended** (never shrunk) via the `orgportal.public_domains_extra` option for regional providers. A hard-coded fallback guarantees the major providers stay blocked even if the config file is missing or damaged.
+
+Deactivated organizations stop enrolling customers entirely.
+
+### Existing customers
+
+A binding only affects future mail: customers who already exist are not enrolled retroactively. They are picked up as soon as they write in again.
+
+### Removing a binding
+
+Removing a domain stops future auto-assignment. Members it already created are **kept by default** — they may already be using the portal. You are separately asked whether to deactivate them; that rollback touches only members enrolled by that specific domain, never those added by hand.
+
+Members created automatically are marked with an **@** badge in the members list.
+
+---
+
 ## Org Snapshot — Permanent Ticket Attribution
 
 *Reliable historical reporting even as your client roster changes.*
@@ -175,6 +216,8 @@ Configured in **Manage → Organizations → System tab**:
 | `tag_only` | Attribute exclusively by tag; membership is not used |
 
 `tag` and `tag_only` modes are disabled when the Tags module is inactive.
+
+**Email domains act as the last fallback** in `member` and `tag` modes: when neither a tag binding nor an existing membership resolves the ticket, the author's email domain is checked. It never overrides either of them, so a tag rule or an admin's manual assignment always takes precedence. In `tag_only` mode domain matching is not used.
 
 ### Backfill tools
 

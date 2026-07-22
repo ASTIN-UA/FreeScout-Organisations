@@ -45,6 +45,7 @@
 - [Ce qu'OrgPortal ajoute à FreeScout](#ce-quorgportal-ajoute-à-freescout)
 - [Organisations](#organisations)
 - [Unités Structurelles — Contrôle d'Accès au Niveau du Département](#unités-structurelles--contrôle-daccès-au-niveau-du-département)
+- [Domaines Email — Adhésion Automatique](#domaines-email--adhésion-automatique)
 - [Instantané d'Organisation — Attribution Permanente des Tickets](#instantané-dorganisation--attribution-permanente-des-tickets)
 - [Intégration Kanban](#intégration-kanban)
 - [Intégration des Champs Personnalisés](#intégration-des-champs-personnalisés)
@@ -73,6 +74,7 @@ FreeScout est construit autour de clients individuels — chaque email provient 
 OrgPortal comble cette lacune :
 
 - **Comptes d'entreprise** — regroupez les clients en organisations avec un nom, un badge de couleur, une portée de boîte aux lettres et un statut actif/inactif
+- **Adhésion automatique par domaine email** — liez `company.com` à une organisation et chaque client qui en écrit est automatiquement inscrit et attribué
 - **Hiérarchies de départements** — divisez les organisations en unités structurelles (départements, succursales, équipes) ; chaque membre est limité à son unité
 - **Accès basé sur les rôles** — `member` ne voit que ses propres tickets ; `unit_manager` voit toute l'unité ; `manager` voit toute l'organisation
 - **Portail d'auto-service d'entreprise** — les gestionnaires visualisent tous les tickets de l'entreprise, répondent, ferment, réaffectent les auteurs et gèrent les préférences de notification sans contacter votre équipe
@@ -154,6 +156,45 @@ Les organisations peuvent être divisées en **unités structurelles** illimité
 
 ---
 
+## Domaines Email — Adhésion Automatique
+
+*Cessez d'ajouter les mêmes employés de l'entreprise un par un.*
+
+Liez un domaine email à une organisation et chaque client qui en écrit est attribué et inscrit automatiquement en tant que membre — aucune étape manuelle, rien à oublier quand une nouvelle personne envoie un email pour la première fois.
+
+Configuré par organisation dans **Gérer → Organisations → modifier → Domaines Email**.
+
+### Comment fonctionne la correspondance
+
+| Règle | Comportement |
+|-------|-------------|
+| **Correspondance exacte uniquement** | `company.com` correspond à `jane@company.com`. Il ne correspond **pas** à `jane@mail.company.com` ou `jane@www.company.com` — ajoutez-les comme entrées séparées si vous le souhaitez |
+| **Normalisation** | `@Company.COM`, `https://www.company.com/` et `company.com.` se stockent tous sous `company.com` |
+| **L'attribution manuelle gagne toujours** | Un client qui appartient déjà à une autre organisation ne se déplace jamais. Les entrepreneurs et les décisions administratives délibérées sont sûrs |
+| **La révocation persiste** | Désactiver un membre est permanent jusqu'à ce qu'une personne l'annule. Le client peut continuer à envoyer des emails ; l'automatisation ne restaurera pas son accès |
+| **Portée de boîte aux lettres** | Un domaine sur une organisation spécifique à la boîte aux lettres s'applique uniquement dans cette boîte aux lettres. Une liaison spécifique à la boîte aux lettres a priorité sur une liaison globale pour le même domaine |
+| **Domaines multiples** | Une organisation peut avoir autant de domaines qu'elle le souhaite (`company.com`, `company.co.uk`, une marque acquise…) |
+
+### Les fournisseurs publics sont bloqués
+
+`gmail.com`, `outlook.com`, `ukr.net`, `icloud.com`, les services de courrier jetable et similaires sont **rejetés lors de l'enregistrement**. Lier un aurait pour effet d'attirer des centaines de clients non liés dans une seule organisation et — via le Portail Utilisateur Final — leur donnerait accès aux tickets les uns des autres.
+
+La liste est fournie avec le module et peut être **étendue** (jamais réduite) via l'option `orgportal.public_domains_extra` pour les fournisseurs régionaux. Un fallback codé en dur garantit que les principaux fournisseurs restent bloqués même si le fichier de configuration est manquant ou endommagé.
+
+Les organisations désactivées cessent complètement d'inscrire des clients.
+
+### Clients existants
+
+Une liaison n'affecte que les emails futurs : les clients qui existent déjà ne sont pas inscrits rétroactivement. Ils sont récupérés dès qu'ils écrivent à nouveau.
+
+### Retrait d'une liaison
+
+Retirer un domaine arrête l'attribution automatique future. Les membres qu'il a déjà créés sont **conservés par défaut** — ils utilisent peut-être déjà le portail. On vous demande séparément si vous souhaitez les désactiver ; ce rollback ne touche que les membres inscrits par ce domaine spécifique, jamais ceux ajoutés manuellement.
+
+Les membres créés automatiquement sont marqués d'un badge **@** dans la liste des membres.
+
+---
+
 ## Instantané d'Organisation — Attribution Permanente des Tickets
 
 *Rapports historiques fiables même si votre composition de clients change.*
@@ -175,6 +216,8 @@ Configuré dans **Gérer → Organisations → Onglet Système** :
 | `tag_only` | Attribuer exclusivement par tag ; l'adhésion n'est pas utilisée |
 
 Les modes `tag` et `tag_only` sont désactivés quand le module Tags est inactif.
+
+**Les domaines email agissent comme dernier recours** dans les modes `member` et `tag` : quand ni une liaison de tag ni une adhésion existante ne résolvent le ticket, le domaine email de l'auteur est vérifié. Il ne remplace jamais aucun des deux, donc une règle de tag ou une attribution manuelle d'administrateur a toujours priorité. En mode `tag_only`, la correspondance de domaine n'est pas utilisée.
 
 ### Outils de remplissage
 
