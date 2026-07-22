@@ -19,6 +19,7 @@ class OrganizationMember extends Model
         'is_active',
         'deactivated_at',
         'locale',
+        'source',
     ];
 
     protected $casts = [
@@ -76,5 +77,15 @@ class OrganizationMember extends Model
     public function isUnitManager(): bool
     {
         return $this->role === 'manager' && $this->unit_id !== null;
+    }
+
+    /**
+     * Whether this membership was created automatically by domain matching
+     * rather than by a human. Drives the "@" badge in the members list and
+     * lets a mistyped domain be rolled back.
+     */
+    public function isAutomatic(): bool
+    {
+        return $this->source === \Modules\OrgPortal\Services\MembershipService::SOURCE_DOMAIN;
     }
 }

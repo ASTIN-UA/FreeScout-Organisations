@@ -199,6 +199,27 @@ return [
     'member_activated'       => 'Membro reactivado.',
     'member_deactivated'     => 'Membro desactivado.',
     'member_status'          => 'Estado',
+
+    // Admin — email domains
+    'domains'                     => 'Domínios de e-mail',
+    'domains_help'                => 'Os clientes que escrevem a partir destes domínios são adicionados automaticamente a esta organização. Não é possível utilizar fornecedores públicos como o gmail.com.',
+    'no_domains'                  => 'Ainda não existem domínios.',
+    'add_domain'                  => 'Adicionar domínio',
+    'domain_placeholder'          => 'ex.: company.com',
+    'domain_added'                => 'Domínio :domain adicionado.',
+    'domain_removed'              => 'Domínio :domain removido. Os seus membros foram mantidos.',
+    'domain_removed_with_members' => 'Domínio :domain removido. :count membro(s) desactivado(s).',
+    'domain_invalid'              => 'Introduza um domínio válido, por exemplo company.com.',
+    'domain_public'               => ':domain é um fornecedor de e-mail público. Associá-lo adicionaria clientes sem relação a esta organização e dar-lhes-ia acesso aos bilhetes uns dos outros.',
+    'domain_already_bound'        => 'Este domínio já está associado a esta organização.',
+    'domain_taken'                => 'Este domínio já está associado à organização ":org".',
+    'domain_mailbox_conflict'     => 'Estes domínios foram mantidos na caixa de correio anterior porque a nova já os utiliza: :domains',
+    'domain_delete_confirm'       => 'Remover o domínio :domain? Os novos clientes deste domínio deixarão de ser adicionados automaticamente.',
+    'domain_delete_deactivate'    => 'Desactivar também os membros que foram adicionados automaticamente pelo domínio :domain?' . "\n\n"
+                                     . 'OK — desactivá-los (perdem o acesso ao portal).' . "\n"
+                                     . 'Cancelar — mantê-los como membros.',
+    'member_source_auto'          => 'adicionado automaticamente pelo domínio',
+
     'member_unit'            => 'Unidade estrutural',
     'member_updated'         => 'Membro actualizado.',
     'no_unit'                => 'Organização inteira',

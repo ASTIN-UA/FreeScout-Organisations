@@ -199,6 +199,27 @@ return [
     'member_activated'       => 'Jäsen aktivoitu uudelleen.',
     'member_deactivated'     => 'Jäsen poistettu käytöstä.',
     'member_status'          => 'Tila',
+
+    // Admin — email domains
+    'domains'                     => 'Sähköpostiverkkotunnukset',
+    'domains_help'                => 'Näistä verkkotunnuksista kirjoittavat asiakkaat lisätään automaattisesti tähän organisaatioon. Julkisia palveluntarjoajia, kuten gmail.com, ei voi käyttää.',
+    'no_domains'                  => 'Ei vielä verkkotunnuksia.',
+    'add_domain'                  => 'Lisää verkkotunnus',
+    'domain_placeholder'          => 'esim. company.com',
+    'domain_added'                => 'Verkkotunnus :domain lisätty.',
+    'domain_removed'              => 'Verkkotunnus :domain poistettu. Sen jäsenet säilytettiin.',
+    'domain_removed_with_members' => 'Verkkotunnus :domain poistettu. :count jäsen(tä) poistettu käytöstä.',
+    'domain_invalid'              => 'Anna kelvollinen verkkotunnus, esimerkiksi company.com.',
+    'domain_public'               => ':domain on julkinen sähköpostipalvelu. Sen liittäminen lisäisi tähän organisaatioon asiaankuulumattomia asiakkaita ja antaisi heille pääsyn toistensa lippuihin.',
+    'domain_already_bound'        => 'Tämä verkkotunnus on jo liitetty tähän organisaatioon.',
+    'domain_taken'                => 'Tämä verkkotunnus on jo liitetty organisaatioon ":org".',
+    'domain_mailbox_conflict'     => 'Nämä verkkotunnukset säilytettiin aiemmassa postilaatikossa, koska uusi käyttää niitä jo: :domains',
+    'domain_delete_confirm'       => 'Poistetaanko verkkotunnus :domain? Uusia asiakkaita siitä ei enää lisätä automaattisesti.',
+    'domain_delete_deactivate'    => 'Poistetaanko käytöstä myös jäsenet, jotka lisättiin automaattisesti verkkotunnuksen :domain perusteella?' . "\n\n"
+                                     . 'OK — poista heidät käytöstä (he menettävät pääsyn portaaliin).' . "\n"
+                                     . 'Peruuta — säilytä heidät jäseninä.',
+    'member_source_auto'          => 'lisätty automaattisesti verkkotunnuksen perusteella',
+
     'member_unit'            => 'Organisaatioyksiköt',
     'member_updated'         => 'Jäsen päivitetty.',
     'no_unit'                => 'Koko organisaatio',

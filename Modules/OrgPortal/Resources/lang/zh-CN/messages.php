@@ -199,6 +199,27 @@ return [
     'member_activated'       => '成员已重新激活。',
     'member_deactivated'     => '成员已停用。',
     'member_status'          => '状态',
+
+    // Admin — email domains
+    'domains'                     => '邮件域名',
+    'domains_help'                => '从这些域名发信的客户会自动加入本组织。不能使用 gmail.com 等公共邮箱服务商。',
+    'no_domains'                  => '尚无域名。',
+    'add_domain'                  => '添加域名',
+    'domain_placeholder'          => '例如 company.com',
+    'domain_added'                => '域名 :domain 已添加。',
+    'domain_removed'              => '域名 :domain 已移除。其成员已保留。',
+    'domain_removed_with_members' => '域名 :domain 已移除。已停用 :count 名成员。',
+    'domain_invalid'              => '请输入有效的域名，例如 company.com。',
+    'domain_public'               => ':domain 是公共邮箱服务商。绑定它会将无关客户加入本组织，并让他们可以访问彼此的工单。',
+    'domain_already_bound'        => '该域名已绑定到本组织。',
+    'domain_taken'                => '该域名已绑定到组织“:org”。',
+    'domain_mailbox_conflict'     => '这些域名仍保留在原邮箱中，因为新邮箱已在使用它们：:domains',
+    'domain_delete_confirm'       => '移除域名 :domain？来自该域名的新客户将不再被自动添加。',
+    'domain_delete_deactivate'    => '是否同时停用由域名 :domain 自动添加的成员？' . "\n\n"
+                                     . '确定 — 停用他们（他们将失去门户访问权限）。' . "\n"
+                                     . '取消 — 保留他们为成员。',
+    'member_source_auto'          => '按域名自动添加',
+
     'member_unit'            => '结构单位',
     'member_updated'         => '成员已更新。',
     'no_unit'                => '整个组织',

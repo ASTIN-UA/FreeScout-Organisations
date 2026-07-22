@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Customer;
 use Modules\OrgPortal\Models\Organization;
+use Modules\OrgPortal\Models\OrganizationDomain;
 use Modules\OrgPortal\Models\OrganizationMember;
 use Modules\OrgPortal\Models\OrganizationUnit;
 use Modules\OrgPortal\Providers\OrgPortalServiceProvider;
+use Modules\OrgPortal\Services\MembershipService;
 use Modules\OrgPortal\Services\OrgAttribution;
 
 class OrgPortalAdminController extends Controller
@@ -262,9 +264,13 @@ class OrgPortalAdminController extends Controller
             $boundTagUnits = $bindings->pluck('unit_id', 'tag_id')->toArray();
         }
 
+        $domains = \Schema::hasTable('organization_domains')
+            ? \Modules\OrgPortal\Models\OrganizationDomain::forOrg($id)
+            : collect();
+
         return view('orgportal::admin.edit', compact(
             'organization', 'members', 'units', 'mailboxes',
-            'tagsModuleActive', 'allTags', 'boundTagIds', 'boundTagUnits'
+            'tagsModuleActive', 'allTags', 'boundTagIds', 'boundTagUnits', 'domains'
         ));
     }
 
@@ -277,6 +283,18 @@ class OrgPortalAdminController extends Controller
             'color'      => 'nullable|string|max:20|regex:/^#[0-9a-fA-F]{3,6}$/',
             'mailbox_id' => 'nullable|integer|exists:mailboxes,id',
         ]);
+
+        // Domain management is admin-only. Changing the mailbox re-scopes every
+        // domain binding of this organisation, so a permitted manager must not
+        // reach it through this route either — clearing the mailbox would turn
+        // a deliberately mailbox-confined binding into a global one.
+        $newMailboxId = (int) ($request->input('mailbox_id') ?: 0);
+        if ((int) $organization->mailbox_id !== $newMailboxId
+            && \Schema::hasTable('organization_domains')
+            && OrganizationDomain::where('organization_id', $id)->exists()
+        ) {
+            $this->authorizeAdmin();
+        }
 
         $organization->update([
             'name'       => $request->input('name'),
@@ -300,8 +318,27 @@ class OrgPortalAdminController extends Controller
             }
         }
 
-        return redirect()->route('orgportal.admin.edit', $id)
+        // Keep the denormalised mailbox_id on domain bindings in step with the
+        // organisation. Domains that would collide with a binding already
+        // present in the target mailbox stay behind and are reported.
+        $domainConflicts = [];
+        if (\Schema::hasTable('organization_domains')) {
+            $domainConflicts = OrganizationDomain::syncMailbox(
+                $id,
+                $request->input('mailbox_id') ?: null
+            );
+        }
+
+        $redirect = redirect()->route('orgportal.admin.edit', $id)
             ->with('flash_success', __('orgportal::messages.org_updated'));
+
+        if ($domainConflicts) {
+            $redirect->with('flash_error', __('orgportal::messages.domain_mailbox_conflict', [
+                'domains' => implode(', ', $domainConflicts),
+            ]));
+        }
+
+        return $redirect;
     }
 
     public function destroy(int $id)
@@ -341,6 +378,105 @@ class OrgPortalAdminController extends Controller
 
         return redirect()->route('orgportal.admin.index')
             ->with('flash_success', $msg);
+    }
+
+    /**
+     * Bind an email domain to an organisation.
+     *
+     * Admin-only, unlike member management: one domain binding can enrol
+     * hundreds of customers and hand them portal access to each other's
+     * tickets, which is a wider blast radius than adding a single member.
+     */
+    public function addDomain(Request $request, int $id)
+    {
+        $this->authorizeAdmin();
+
+        $organization = Organization::findOrFail($id);
+
+        $request->validate(['domain' => 'required|string|max:191']);
+
+        $domain = OrganizationDomain::normalize($request->input('domain'));
+
+        if (!OrganizationDomain::isValidFormat($domain)) {
+            return redirect()->route('orgportal.admin.edit', $id)
+                ->with('flash_error', __('orgportal::messages.domain_invalid'));
+        }
+
+        if (OrganizationDomain::isPublicDomain($domain)) {
+            return redirect()->route('orgportal.admin.edit', $id)
+                ->with('flash_error', __('orgportal::messages.domain_public', ['domain' => $domain]));
+        }
+
+        $slot = $organization->mailbox_id ?: OrganizationDomain::GLOBAL_MAILBOX;
+
+        $taken = OrganizationDomain::where('domain', $domain)->where('mailbox_id', $slot)->first();
+        if ($taken) {
+            $msg = (int) $taken->organization_id === $id
+                ? __('orgportal::messages.domain_already_bound')
+                : __('orgportal::messages.domain_taken', [
+                    'org' => optional($taken->organization)->name ?: '#' . $taken->organization_id,
+                ]);
+
+            return redirect()->route('orgportal.admin.edit', $id)->with('flash_error', $msg);
+        }
+
+        OrganizationDomain::create([
+            'organization_id' => $id,
+            'mailbox_id'      => $slot,
+            'domain'          => $domain,
+        ]);
+
+        return redirect()->route('orgportal.admin.edit', $id)
+            ->with('flash_success', __('orgportal::messages.domain_added', ['domain' => $domain]));
+    }
+
+    /**
+     * Remove a domain binding.
+     *
+     * Memberships the binding produced are kept by default: those customers may
+     * already be using the portal, and silently cutting off dozens of people is
+     * worse than an over-broad membership. Passing deactivate_members=1 opts
+     * into the rollback — the reason organization_members.source exists.
+     */
+    public function removeDomain(Request $request, int $id, int $domainId)
+    {
+        $this->authorizeAdmin();
+
+        $domain = OrganizationDomain::where('organization_id', $id)->findOrFail($domainId);
+        $name   = $domain->domain;
+        $domain->delete();
+
+        $deactivated = 0;
+        if ($request->input('deactivate_members')) {
+            // Only members whose address actually belongs to the removed domain.
+            // Deactivating every domain-sourced member would cut off people
+            // enrolled by the organisation's OTHER, still-active domains.
+            $affected = OrganizationMember::where('organization_id', $id)
+                ->where('source', MembershipService::SOURCE_DOMAIN)
+                ->where('is_active', true)
+                ->pluck('customer_id');
+
+            $matching = \DB::table('emails')
+                ->whereIn('customer_id', $affected)
+                ->get(['customer_id', 'email'])
+                ->filter(fn ($row) => OrganizationDomain::fromEmail($row->email) === $name)
+                ->pluck('customer_id')
+                ->unique()
+                ->values();
+
+            if ($matching->isNotEmpty()) {
+                $deactivated = OrganizationMember::where('organization_id', $id)
+                    ->where('source', MembershipService::SOURCE_DOMAIN)
+                    ->where('is_active', true)
+                    ->whereIn('customer_id', $matching)
+                    ->update(['is_active' => false, 'deactivated_at' => now()]);
+            }
+        }
+
+        return redirect()->route('orgportal.admin.edit', $id)
+            ->with('flash_success', $deactivated
+                ? __('orgportal::messages.domain_removed_with_members', ['domain' => $name, 'count' => $deactivated])
+                : __('orgportal::messages.domain_removed', ['domain' => $name]));
     }
 
     public function addMember(Request $request, int $id)

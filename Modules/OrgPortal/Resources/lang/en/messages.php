@@ -136,6 +136,26 @@ return [
     'unit_not_found'         => 'Unit not found in this organization.',
     'confirm_delete_unit'    => 'Delete this unit? Its members will be unassigned and unit managers demoted to members.',
 
+    // Admin — email domains
+    'domains'                     => 'Email domains',
+    'domains_help'                => 'Customers writing from these domains are added to this organization automatically. Public providers such as gmail.com cannot be used.',
+    'no_domains'                  => 'No domains yet.',
+    'add_domain'                  => 'Add domain',
+    'domain_placeholder'          => 'e.g. company.com',
+    'domain_added'                => 'Domain :domain added.',
+    'domain_removed'              => 'Domain :domain removed. Its members were kept.',
+    'domain_removed_with_members' => 'Domain :domain removed. :count member(s) deactivated.',
+    'domain_invalid'              => 'Enter a valid domain, for example company.com.',
+    'domain_public'               => ':domain is a public email provider. Binding it would add unrelated customers to this organization and give them access to each other\'s tickets.',
+    'domain_already_bound'        => 'This domain is already bound to this organization.',
+    'domain_taken'                => 'This domain is already bound to organization ":org".',
+    'domain_mailbox_conflict'     => 'These domains were kept in their previous mailbox because the new one already uses them: :domains',
+    'domain_delete_confirm'       => 'Remove domain :domain? New customers from it will no longer be added automatically.',
+    'domain_delete_deactivate'    => 'Also deactivate members that were added automatically by :domain?' . "\n\n"
+                                     . 'OK — deactivate them (they lose portal access).' . "\n"
+                                     . 'Cancel — keep them as members.',
+    'member_source_auto'          => 'added automatically by domain',
+
     // Portal — member management
     'member_unit'            => 'Structural unit',
     'no_unit'                => 'Entire organization',

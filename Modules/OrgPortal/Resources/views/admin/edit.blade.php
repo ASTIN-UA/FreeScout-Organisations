@@ -201,6 +201,55 @@
                     </form>
                 </div>
             </div>
+
+            {{-- Email domains --}}
+            <div class="panel panel-default">
+                <div class="panel-heading"><strong>{{ __('orgportal::messages.domains') }}</strong></div>
+                <div class="panel-body">
+                    <p class="text-muted small">{{ __('orgportal::messages.domains_help') }}</p>
+
+                    @if($domains->count())
+                        <div class="orgportal-table-wrap">
+                        <table class="table table-condensed table-striped">
+                            <tbody>
+                                @foreach($domains as $domain)
+                                <tr>
+                                    <td>
+                                        <strong>{{ $domain->domain }}</strong>
+                                    </td>
+                                    <td class="text-right" style="white-space:nowrap">
+                                        <form method="POST" class="orgportal-domain-remove" style="display:inline"
+                                              action="{{ route('orgportal.admin.domains.remove', [$organization->id, $domain->id]) }}"
+                                              data-domain="{{ $domain->domain }}">
+                                            {{ csrf_field() }}
+                                            {{ method_field('DELETE') }}
+                                            <input type="hidden" name="deactivate_members" value="0">
+                                            <button type="submit" class="btn btn-xs btn-danger">
+                                                {{ __('orgportal::messages.delete') }}
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                        </div>{{-- orgportal-table-wrap --}}
+                    @else
+                        <p class="text-muted">{{ __('orgportal::messages.no_domains') }}</p>
+                    @endif
+
+                    <form method="POST" action="{{ route('orgportal.admin.domains.add', $organization->id) }}"
+                          style="display:flex;gap:4px;align-items:center;margin-top:8px;">
+                        {{ csrf_field() }}
+                        <input type="text" name="domain" class="form-control input-sm"
+                               placeholder="{{ __('orgportal::messages.domain_placeholder') }}"
+                               maxlength="191" required>
+                        <button type="submit" class="btn btn-success btn-sm">
+                            {{ __('orgportal::messages.add_domain') }}
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
 
         {{-- Members --}}
@@ -236,6 +285,12 @@
                                         @if($member->customer)
                                             {{ $member->customer->getFullName() }}
                                             <small class="text-muted">#{{ $member->customer_id }}</small>
+                                            @if($member->isAutomatic())
+                                                {{-- Domain-matched membership. The @ is the anchor; the
+                                                     tooltip carries the meaning for anyone seeing it first time. --}}
+                                                <span class="label label-default orgportal-src-domain"
+                                                      title="{{ __('orgportal::messages.member_source_auto') }}">@</span>
+                                            @endif
                                             @if($member->customer->getMainEmail())
                                                 <br><small class="text-muted">{{ $member->customer->getMainEmail() }}</small>
                                             @endif
@@ -544,5 +599,38 @@
     });
 })();
 @endif
+
+// Email domain widgets: delete confirmation
+(function () {
+    var i18n = {
+        confirmDelete:     @json(__('orgportal::messages.domain_delete_confirm')),
+        confirmDeactivate: @json(__('orgportal::messages.domain_delete_deactivate'))
+    };
+
+    function fill(template, values) {
+        return template.replace(/:(\w+)/g, function (match, key) {
+            return values.hasOwnProperty(key) ? values[key] : match;
+        });
+    }
+
+    // Deleting a binding keeps its memberships unless the admin opts in:
+    // people may already be using the portal, and cutting them off silently
+    // is worse than an over-broad membership.
+    Array.prototype.forEach.call(document.querySelectorAll('.orgportal-domain-remove'), function (form) {
+        form.addEventListener('submit', function (e) {
+            if (form.dataset.confirmed === '1') return;
+            e.preventDefault();
+
+            var domain = form.getAttribute('data-domain');
+            if (!confirm(fill(i18n.confirmDelete, { domain: domain }))) return;
+
+            form.querySelector('input[name="deactivate_members"]').value =
+                confirm(fill(i18n.confirmDeactivate, { domain: domain })) ? '1' : '0';
+
+            form.dataset.confirmed = '1';
+            form.submit();
+        });
+    });
+})();
 </script>
 @endsection

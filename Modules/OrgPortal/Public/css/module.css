@@ -63,6 +63,15 @@ a.orgportal-org-badge:focus {
     top: 1px;
 }
 
+/* ── Admin org edit: marker for domain-matched memberships ──────────────── */
+/* A tight "@" chip next to the member name. Deliberately quiet: it is a
+   provenance hint, not a status the admin has to act on. */
+.orgportal-src-domain {
+    padding: 1px 4px;
+    font-weight: 600;
+    cursor: help;
+}
+
 /* ── Admin org edit: tables scroll on small screens ─────────────────────── */
 .orgportal-table-wrap {
     overflow-x: auto;

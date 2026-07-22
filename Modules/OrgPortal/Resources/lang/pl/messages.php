@@ -199,6 +199,27 @@ return [
     'member_activated'       => 'Członek ponownie aktywowany.',
     'member_deactivated'     => 'Członek dezaktywowany.',
     'member_status'          => 'Stan',
+
+    // Admin — email domains
+    'domains'                     => 'Domeny e-mail',
+    'domains_help'                => 'Klienci piszący z tych domen są automatycznie dodawani do tej organizacji. Nie można używać publicznych dostawców, takich jak gmail.com.',
+    'no_domains'                  => 'Brak domen.',
+    'add_domain'                  => 'Dodaj domenę',
+    'domain_placeholder'          => 'np. company.com',
+    'domain_added'                => 'Domena :domain została dodana.',
+    'domain_removed'              => 'Domena :domain została usunięta. Jej członkowie zostali zachowani.',
+    'domain_removed_with_members' => 'Domena :domain została usunięta. Dezaktywowano :count członków.',
+    'domain_invalid'              => 'Wprowadź prawidłową domenę, na przykład company.com.',
+    'domain_public'               => ':domain jest publicznym dostawcą poczty. Powiązanie jej dodałoby do tej organizacji niepowiązanych klientów i dało im dostęp do zgłoszeń innych.',
+    'domain_already_bound'        => 'Ta domena jest już powiązana z tą organizacją.',
+    'domain_taken'                => 'Ta domena jest już powiązana z organizacją „:org”.',
+    'domain_mailbox_conflict'     => 'Te domeny pozostały w poprzedniej skrzynce pocztowej, ponieważ nowa już ich używa: :domains',
+    'domain_delete_confirm'       => 'Usunąć domenę :domain? Nowi klienci z tej domeny nie będą już dodawani automatycznie.',
+    'domain_delete_deactivate'    => 'Czy dezaktywować także członków dodanych automatycznie przez domenę :domain?' . "\n\n"
+                                     . 'OK — dezaktywuj ich (utracą dostęp do portalu).' . "\n"
+                                     . 'Anuluj — pozostaw ich jako członków.',
+    'member_source_auto'          => 'dodano automatycznie według domeny',
+
     'member_unit'            => 'Jednostka strukturalna',
     'member_updated'         => 'Członek zaktualizowany.',
     'no_unit'                => 'Cała organizacja',

@@ -199,6 +199,27 @@ return [
     'member_activated'       => 'Lid opnieuw ingeschakeld.',
     'member_deactivated'     => 'Lid gedeactiveerd.',
     'member_status'          => 'Status',
+
+    // Admin — email domains
+    'domains'                     => 'E-maildomeinen',
+    'domains_help'                => 'Klanten die vanaf deze domeinen schrijven, worden automatisch aan deze organisatie toegevoegd. Openbare providers zoals gmail.com kunnen niet worden gebruikt.',
+    'no_domains'                  => 'Nog geen domeinen.',
+    'add_domain'                  => 'Domein toevoegen',
+    'domain_placeholder'          => 'bijv. company.com',
+    'domain_added'                => 'Domein :domain toegevoegd.',
+    'domain_removed'              => 'Domein :domain verwijderd. De leden zijn behouden.',
+    'domain_removed_with_members' => 'Domein :domain verwijderd. :count lid/leden gedeactiveerd.',
+    'domain_invalid'              => 'Voer een geldig domein in, bijvoorbeeld company.com.',
+    'domain_public'               => ':domain is een openbare e-mailprovider. Koppelen zou niet-gerelateerde klanten aan deze organisatie toevoegen en hun toegang geven tot elkaars tickets.',
+    'domain_already_bound'        => 'Dit domein is al aan deze organisatie gekoppeld.',
+    'domain_taken'                => 'Dit domein is al gekoppeld aan de organisatie ":org".',
+    'domain_mailbox_conflict'     => 'Deze domeinen zijn in hun vorige postvak behouden omdat het nieuwe ze al gebruikt: :domains',
+    'domain_delete_confirm'       => 'Domein :domain verwijderen? Nieuwe klanten van dit domein worden niet meer automatisch toegevoegd.',
+    'domain_delete_deactivate'    => 'Ook leden deactiveren die automatisch zijn toegevoegd door :domain?' . "\n\n"
+                                     . 'OK — deactiveren (zij verliezen toegang tot het portaal).' . "\n"
+                                     . 'Annuleren — behouden als leden.',
+    'member_source_auto'          => 'automatisch toegevoegd op basis van domein',
+
     'member_unit'            => 'Structurele eenheid',
     'member_updated'         => 'Lid bijgewerkt.',
     'no_unit'                => 'Gehele organisatie',

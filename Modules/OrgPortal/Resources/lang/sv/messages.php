@@ -199,6 +199,27 @@ return [
     'member_activated'       => 'Medlem återaktiverad.',
     'member_deactivated'     => 'Medlem inaktiverad.',
     'member_status'          => 'Status',
+
+    // Admin — email domains
+    'domains'                     => 'E-postdomäner',
+    'domains_help'                => 'Kunder som skriver från dessa domäner läggs automatiskt till i denna organisation. Publika leverantörer som gmail.com kan inte användas.',
+    'no_domains'                  => 'Inga domäner ännu.',
+    'add_domain'                  => 'Lägg till domän',
+    'domain_placeholder'          => 't.ex. company.com',
+    'domain_added'                => 'Domänen :domain har lagts till.',
+    'domain_removed'              => 'Domänen :domain har tagits bort. Medlemmarna behölls.',
+    'domain_removed_with_members' => 'Domänen :domain har tagits bort. :count medlem(mar) inaktiverade.',
+    'domain_invalid'              => 'Ange en giltig domän, till exempel company.com.',
+    'domain_public'               => ':domain är en publik e-postleverantör. Att koppla den skulle lägga till orelaterade kunder i denna organisation och ge dem åtkomst till varandras biljetter.',
+    'domain_already_bound'        => 'Denna domän är redan kopplad till denna organisation.',
+    'domain_taken'                => 'Denna domän är redan kopplad till organisationen ":org".',
+    'domain_mailbox_conflict'     => 'Dessa domäner behölls i sin tidigare brevlåda eftersom den nya redan använder dem: :domains',
+    'domain_delete_confirm'       => 'Ta bort domänen :domain? Nya kunder därifrån kommer inte längre att läggas till automatiskt.',
+    'domain_delete_deactivate'    => 'Vill du även inaktivera medlemmar som lades till automatiskt av :domain?' . "\n\n"
+                                     . 'OK — inaktivera dem (de förlorar åtkomst till portalen).' . "\n"
+                                     . 'Avbryt — behåll dem som medlemmar.',
+    'member_source_auto'          => 'tillagd automatiskt via domän',
+
     'member_unit'            => 'Strukturell enhet',
     'member_updated'         => 'Medlem uppdaterad.',
     'no_unit'                => 'Hela organisationen',

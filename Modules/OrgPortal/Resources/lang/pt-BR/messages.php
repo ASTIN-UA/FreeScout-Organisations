@@ -199,6 +199,27 @@ return [
     'member_activated'       => 'Membro reativado.',
     'member_deactivated'     => 'Membro desativado.',
     'member_status'          => 'Status',
+
+    // Admin — email domains
+    'domains'                     => 'Domínios de e-mail',
+    'domains_help'                => 'Os clientes que escrevem a partir desses domínios são adicionados automaticamente a esta organização. Provedores públicos como gmail.com não podem ser usados.',
+    'no_domains'                  => 'Nenhum domínio ainda.',
+    'add_domain'                  => 'Adicionar domínio',
+    'domain_placeholder'          => 'ex.: company.com',
+    'domain_added'                => 'Domínio :domain adicionado.',
+    'domain_removed'              => 'Domínio :domain removido. Seus membros foram mantidos.',
+    'domain_removed_with_members' => 'Domínio :domain removido. :count membro(s) desativado(s).',
+    'domain_invalid'              => 'Informe um domínio válido, por exemplo company.com.',
+    'domain_public'               => ':domain é um provedor de e-mail público. Vinculá-lo adicionaria clientes sem relação a esta organização e daria a eles acesso aos tíquetes uns dos outros.',
+    'domain_already_bound'        => 'Este domínio já está vinculado a esta organização.',
+    'domain_taken'                => 'Este domínio já está vinculado à organização ":org".',
+    'domain_mailbox_conflict'     => 'Estes domínios foram mantidos na caixa de correio anterior porque a nova já os utiliza: :domains',
+    'domain_delete_confirm'       => 'Remover o domínio :domain? Novos clientes desse domínio não serão mais adicionados automaticamente.',
+    'domain_delete_deactivate'    => 'Desativar também os membros que foram adicionados automaticamente pelo domínio :domain?' . "\n\n"
+                                     . 'OK — desativá-los (eles perderão o acesso ao portal).' . "\n"
+                                     . 'Cancelar — mantê-los como membros.',
+    'member_source_auto'          => 'adicionado automaticamente pelo domínio',
+
     'member_unit'            => 'Unidade estrutural',
     'member_updated'         => 'Membro atualizado.',
     'no_unit'                => 'Toda a organização',

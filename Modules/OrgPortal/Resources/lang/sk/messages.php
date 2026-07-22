@@ -199,6 +199,27 @@ return [
     'member_activated'       => 'Člen bol opätovne aktivovaný.',
     'member_deactivated'     => 'Člen bol deaktivovaný.',
     'member_status'          => 'Stav',
+
+    // Admin — email domains
+    'domains'                     => 'E-mailové domény',
+    'domains_help'                => 'Zákazníci píšuci z týchto domén sú automaticky pridaní do tejto organizácie. Verejných poskytovateľov, ako je gmail.com, nie je možné použiť.',
+    'no_domains'                  => 'Zatiaľ žiadne domény.',
+    'add_domain'                  => 'Pridať doménu',
+    'domain_placeholder'          => 'napr. company.com',
+    'domain_added'                => 'Doména :domain bola pridaná.',
+    'domain_removed'              => 'Doména :domain bola odstránená. Jej členovia boli zachovaní.',
+    'domain_removed_with_members' => 'Doména :domain bola odstránená. Deaktivovaných členov: :count.',
+    'domain_invalid'              => 'Zadajte platnú doménu, napríklad company.com.',
+    'domain_public'               => ':domain je verejný poskytovateľ e-mailu. Jeho naviazaním by ste do tejto organizácie pridali nesúvisiacich zákazníkov a umožnili im prístup k lístkom ostatných.',
+    'domain_already_bound'        => 'Táto doména je už naviazaná na túto organizáciu.',
+    'domain_taken'                => 'Táto doména je už naviazaná na organizáciu „:org“.',
+    'domain_mailbox_conflict'     => 'Tieto domény zostali v predchádzajúcej poštovej schránke, pretože ich nová už používa: :domains',
+    'domain_delete_confirm'       => 'Odstrániť doménu :domain? Noví zákazníci z nej už nebudú pridávaní automaticky.',
+    'domain_delete_deactivate'    => 'Deaktivovať aj členov, ktorí boli automaticky pridaní doménou :domain?' . "\n\n"
+                                     . 'OK — deaktivovať ich (stratia prístup k portálu).' . "\n"
+                                     . 'Zrušiť — ponechať ich ako členov.',
+    'member_source_auto'          => 'pridané automaticky podľa domény',
+
     'member_unit'            => 'Organizačná jednotka',
     'member_updated'         => 'Člen bol aktualizovaný.',
     'no_unit'                => 'Celá organizácia',

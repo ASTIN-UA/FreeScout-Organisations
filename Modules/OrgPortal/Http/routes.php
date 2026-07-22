@@ -41,6 +41,12 @@ Route::group([
     Route::post('organizations/{id}/deactivate', 'OrgPortalAdminController@deactivateOrg')
         ->name('orgportal.admin.deactivate');
 
+    Route::post('organizations/{id}/domains', 'OrgPortalAdminController@addDomain')
+        ->name('orgportal.admin.domains.add');
+
+    Route::delete('organizations/{id}/domains/{domainId}', 'OrgPortalAdminController@removeDomain')
+        ->name('orgportal.admin.domains.remove');
+
     Route::post('organizations/{id}/members', 'OrgPortalAdminController@addMember')
         ->name('orgportal.admin.members.add');
 

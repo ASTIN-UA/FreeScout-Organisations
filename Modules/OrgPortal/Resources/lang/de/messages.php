@@ -155,6 +155,27 @@ return [
     'member_activated'       => 'Mitglied reaktiviert.',
     'member_deactivated'     => 'Mitglied deaktiviert.',
     'member_status'          => 'Status',
+
+    // Admin — email domains
+    'domains'                     => 'E-Mail-Domains',
+    'domains_help'                => 'Kunden, die von diesen Domains schreiben, werden dieser Organisation automatisch hinzugefügt. Öffentliche Anbieter wie gmail.com können nicht verwendet werden.',
+    'no_domains'                  => 'Noch keine Domains.',
+    'add_domain'                  => 'Domain hinzufügen',
+    'domain_placeholder'          => 'z. B. company.com',
+    'domain_added'                => 'Domain :domain hinzugefügt.',
+    'domain_removed'              => 'Domain :domain entfernt. Ihre Mitglieder wurden beibehalten.',
+    'domain_removed_with_members' => 'Domain :domain entfernt. :count Mitglied(er) deaktiviert.',
+    'domain_invalid'              => 'Geben Sie eine gültige Domain ein, zum Beispiel company.com.',
+    'domain_public'               => ':domain ist ein öffentlicher E-Mail-Anbieter. Eine Verknüpfung würde nicht zugehörige Kunden zu dieser Organisation hinzufügen und ihnen Zugriff auf die Tickets der anderen geben.',
+    'domain_already_bound'        => 'Diese Domain ist bereits mit dieser Organisation verknüpft.',
+    'domain_taken'                => 'Diese Domain ist bereits mit der Organisation „:org“ verknüpft.',
+    'domain_mailbox_conflict'     => 'Diese Domains wurden in ihrem bisherigen Postfach belassen, da das neue sie bereits verwendet: :domains',
+    'domain_delete_confirm'       => 'Domain :domain entfernen? Neue Kunden von dieser Domain werden nicht mehr automatisch hinzugefügt.',
+    'domain_delete_deactivate'    => 'Sollen auch Mitglieder deaktiviert werden, die automatisch über :domain hinzugefügt wurden?' . "\n\n"
+                                     . 'OK — deaktivieren (sie verlieren den Portalzugang).' . "\n"
+                                     . 'Abbrechen — als Mitglieder beibehalten.',
+    'member_source_auto'          => 'automatisch über Domain hinzugefügt',
+
     'member_unit'            => 'Strukturelle Einheit',
     'member_updated'         => 'Mitglied aktualisiert.',
     'no_unit'                => 'Gesamte Organisation',

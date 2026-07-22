@@ -3,6 +3,8 @@
 namespace Modules\OrgPortal\Services;
 
 use App\Conversation;
+use App\Customer;
+use Modules\OrgPortal\Models\OrganizationDomain;
 use Modules\OrgPortal\Models\OrganizationMember;
 use Modules\OrgPortal\Models\OrganizationTag;
 use Illuminate\Support\Facades\Schema;
@@ -47,11 +49,187 @@ class OrgAttribution
     }
 
     /**
+     * Resolve org_id + unit_id for a customer by their email domain, scoped to
+     * the mailbox the conversation belongs to.
+     *
+     * When a binding matches, the customer is also enrolled as a member — the
+     * point of the feature is that the organisation badge, portal access and
+     * filtering all start working without anyone clicking anything. Enrolment
+     * never overrides an existing active membership (see MembershipService).
+     *
+     * Returns ['org_id' => int, 'unit_id' => int|null] or null.
+     */
+    public static function resolveByDomain(int $customerId, ?int $mailboxId = null): ?array
+    {
+        if (!Schema::hasTable('organization_domains')) return null;
+
+        $customer = Customer::find($customerId);
+        if (!$customer) return null;
+
+        // A customer can hold several addresses; the first one that maps to a
+        // binding wins. Ordering by id keeps that deterministic run to run.
+        foreach ($customer->emails()->orderBy('id')->pluck('email') as $email) {
+            $match = OrganizationDomain::resolveByEmail($email, $mailboxId);
+            if (!$match) continue;
+
+            MembershipService::addByDomain($match['org_id'], $customerId, $match['unit_id']);
+
+            // Attribute only if the customer really ended up a member. When
+            // enrolment was refused — most importantly because an admin
+            // deactivated them — stamping the conversation anyway would put a
+            // revoked customer's ticket back on the organisation's portal.
+            if (!MembershipService::isActiveMember($match['org_id'], $customerId)) {
+                continue;
+            }
+
+            return $match;
+        }
+
+        return null;
+    }
+
+    /**
+     * Active memberships for a batch of customers, carrying the organisation's
+     * mailbox so each conversation can pick one visible in its own mailbox.
+     * Returns [customer_id => [ {organization_id, unit_id, org_mailbox_id}, ... ]].
+     */
+    protected static function membershipsForBatch(array $customerIds): array
+    {
+        if (!$customerIds) return [];
+
+        $rows = \DB::table('organization_members')
+            ->join('organizations', 'organizations.id', '=', 'organization_members.organization_id')
+            ->whereIn('organization_members.customer_id', $customerIds)
+            ->where('organization_members.is_active', true)
+            ->orderBy('organization_members.id')
+            ->get([
+                'organization_members.customer_id',
+                'organization_members.organization_id',
+                'organization_members.unit_id',
+                'organizations.mailbox_id as org_mailbox_id',
+            ]);
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[$row->customer_id][] = $row;
+        }
+
+        return $map;
+    }
+
+    /**
+     * First membership visible in the given mailbox: a global organisation, or
+     * one scoped to that same mailbox.
+     */
+    protected static function matchMembership(array $memberships, ?int $mailboxId)
+    {
+        foreach ($memberships as $m) {
+            if ($m->org_mailbox_id === null || (int) $m->org_mailbox_id === (int) $mailboxId) {
+                return $m;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Constrain a membership query to organisations visible in a mailbox:
+     * global ones (mailbox_id IS NULL) plus those scoped to that mailbox.
+     *
+     * Without this, a membership created by a mailbox-scoped domain binding
+     * leaks everywhere — organization_members has no mailbox column, so the
+     * membership lookup would happily attribute a conversation from a
+     * completely different mailbox to that organisation. Mirrors
+     * Organization::scopeVisibleInMailbox().
+     */
+    protected static function scopeMembershipToMailbox($query, ?int $mailboxId)
+    {
+        return $query->whereExists(function ($q) use ($mailboxId) {
+            $q->selectRaw('1')
+              ->from('organizations')
+              ->whereColumn('organizations.id', 'organization_members.organization_id')
+              ->where(function ($w) use ($mailboxId) {
+                  $w->whereNull('organizations.mailbox_id');
+                  if ($mailboxId) {
+                      $w->orWhere('organizations.mailbox_id', $mailboxId);
+                  }
+              });
+        });
+    }
+
+    /**
+     * Ordered, normalised email domains per customer, for a whole batch.
+     * Returns [customer_id => ['company.com', ...]].
+     */
+    protected static function domainsForCustomers(array $customerIds): array
+    {
+        if (!$customerIds) return [];
+
+        $rows = \DB::table('emails')
+            ->whereIn('customer_id', $customerIds)
+            ->orderBy('id')
+            ->get(['customer_id', 'email']);
+
+        $map = [];
+        foreach ($rows as $row) {
+            $domain = OrganizationDomain::fromEmail($row->email);
+            if ($domain === '' || OrganizationDomain::isPublicDomain($domain)) continue;
+            $map[$row->customer_id][] = $domain;
+        }
+
+        return $map;
+    }
+
+    /**
+     * Domain bindings keyed "mailbox_slot|domain", for a whole batch.
+     */
+    protected static function domainBindings(array $domains): array
+    {
+        if (!$domains || !Schema::hasTable('organization_domains')) return [];
+
+        $rows = OrganizationDomain::whereIn('domain', array_unique($domains))
+            ->get(['domain', 'mailbox_id', 'organization_id', 'unit_id']);
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[$row->mailbox_id . '|' . $row->domain] = $row;
+        }
+
+        return $map;
+    }
+
+    /**
+     * Pick the binding for a customer in a given mailbox, preferring the
+     * mailbox-specific rule over the global one.
+     */
+    protected static function matchDomain(array $customerDomains, array $bindings, ?int $mailboxId): ?array
+    {
+        $slots = $mailboxId
+            ? [$mailboxId, OrganizationDomain::GLOBAL_MAILBOX]
+            : [OrganizationDomain::GLOBAL_MAILBOX];
+
+        foreach ($customerDomains as $domain) {
+            foreach ($slots as $slot) {
+                $row = $bindings[$slot . '|' . $domain] ?? null;
+                if ($row) {
+                    return ['org_id' => (int) $row->organization_id, 'unit_id' => $row->unit_id];
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Stamp org_id / org_unit_id onto a single conversation.
      * Source priority depends on attribution_source setting:
      *   member     — membership only
      *   tag        — tag first, fall back to membership
      *   tag_only   — tag only
+     *
+     * Email-domain matching runs last in every mode except tag_only: it is the
+     * fallback for customers no explicit rule covers, and must never displace
+     * a tag binding or a membership an admin set by hand.
      */
     public static function attribute(Conversation $conversation): void
     {
@@ -70,13 +248,25 @@ class OrgAttribution
             }
         }
 
-        // Membership fallback (unless tag_only)
+        // Membership fallback (unless tag_only), limited to organisations that
+        // are actually visible in this conversation's mailbox.
         if ($orgId === null && $source !== 'tag_only') {
-            $member = OrganizationMember::where('customer_id', $conversation->customer_id)
-                ->where('is_active', true)
-                ->first();
+            $member = static::scopeMembershipToMailbox(
+                OrganizationMember::where('customer_id', $conversation->customer_id)
+                    ->where('is_active', true),
+                $conversation->mailbox_id
+            )->first();
             $orgId  = $member?->organization_id;
             $unitId = $member?->unit_id;
+        }
+
+        // Email-domain fallback
+        if ($orgId === null && $source !== 'tag_only') {
+            $resolved = static::resolveByDomain($conversation->customer_id, $conversation->mailbox_id);
+            if ($resolved) {
+                $orgId  = $resolved['org_id'];
+                $unitId = $resolved['unit_id'];
+            }
         }
 
         Conversation::where('id', $conversation->id)->update([
@@ -139,7 +329,7 @@ class OrgAttribution
             ->whereNotNull('customer_id')
             ->orderBy('id')
             ->limit($limit)
-            ->get(['id', 'customer_id']);
+            ->get(['id', 'customer_id', 'mailbox_id']);
 
         if ($batch->isEmpty()) return 0;
 
@@ -164,13 +354,22 @@ class OrgAttribution
             }
         }
 
-        // Build membership lookup: customer_id → member
-        $members = collect();
+        // Build membership lookup: customer_id → [memberships with org mailbox]
+        $members = [];
         if ($source !== 'tag_only') {
-            $members = OrganizationMember::whereIn('customer_id', $batch->pluck('customer_id'))
-                ->where('is_active', true)
-                ->get(['customer_id', 'organization_id', 'unit_id'])
-                ->keyBy('customer_id');
+            $members = static::membershipsForBatch($batch->pluck('customer_id')->unique()->values()->all());
+        }
+
+        // Domain lookup — needed for anyone without a usable membership. Which
+        // membership is usable depends on the conversation's mailbox, so this
+        // cannot be narrowed to "customers with no membership at all".
+        $custDomains = [];
+        $bindings    = [];
+        if ($source !== 'tag_only') {
+            $custDomains = static::domainsForCustomers(
+                $batch->pluck('customer_id')->unique()->values()->all()
+            );
+            $bindings    = static::domainBindings(array_merge(...array_values($custDomains) ?: [[]]));
         }
 
         foreach ($batch as $conv) {
@@ -181,9 +380,21 @@ class OrgAttribution
                 $orgId  = $tagBindings[$conv->id]->organization_id;
                 $unitId = $tagBindings[$conv->id]->unit_id;
             } elseif ($source !== 'tag_only') {
-                $m      = $members->get($conv->customer_id);
+                $m = static::matchMembership($members[$conv->customer_id] ?? [], $conv->mailbox_id);
                 $orgId  = $m?->organization_id;
                 $unitId = $m?->unit_id;
+
+                if ($orgId === null && isset($custDomains[$conv->customer_id])) {
+                    $match = static::matchDomain($custDomains[$conv->customer_id], $bindings, $conv->mailbox_id);
+                    if ($match) {
+                        MembershipService::addByDomain($match['org_id'], $conv->customer_id, $match['unit_id']);
+                        // Only attribute if enrolment actually took (see resolveByDomain).
+                        if (MembershipService::isActiveMember($match['org_id'], $conv->customer_id)) {
+                            $orgId  = $match['org_id'];
+                            $unitId = $match['unit_id'];
+                        }
+                    }
+                }
             }
 
             Conversation::where('id', $conv->id)->update([
@@ -245,13 +456,13 @@ class OrgAttribution
      */
     public static function backfillBatchDetailed(int $limit = 2000): array
     {
-        $result = ['processed' => 0, 'by_tag' => 0, 'by_member' => 0, 'unmatched' => 0];
+        $result = ['processed' => 0, 'by_tag' => 0, 'by_member' => 0, 'by_domain' => 0, 'unmatched' => 0];
 
         $batch = Conversation::whereNull('org_attributed_at')
             ->whereNotNull('customer_id')
             ->orderBy('id')
             ->limit($limit)
-            ->get(['id', 'customer_id']);
+            ->get(['id', 'customer_id', 'mailbox_id']);
 
         if ($batch->isEmpty()) return $result;
 
@@ -274,12 +485,18 @@ class OrgAttribution
             }
         }
 
-        $members = collect();
+        $members = [];
         if ($source !== 'tag_only') {
-            $members = OrganizationMember::whereIn('customer_id', $batch->pluck('customer_id'))
-                ->where('is_active', true)
-                ->get(['customer_id', 'organization_id', 'unit_id'])
-                ->keyBy('customer_id');
+            $members = static::membershipsForBatch($batch->pluck('customer_id')->unique()->values()->all());
+        }
+
+        $custDomains = [];
+        $bindings    = [];
+        if ($source !== 'tag_only') {
+            $custDomains = static::domainsForCustomers(
+                $batch->pluck('customer_id')->unique()->values()->all()
+            );
+            $bindings    = static::domainBindings(array_merge(...array_values($custDomains) ?: [[]]));
         }
 
         foreach ($batch as $conv) {
@@ -292,11 +509,23 @@ class OrgAttribution
                 $unitId = $tagBindings[$conv->id]->unit_id;
                 $via    = 'by_tag';
             } elseif ($source !== 'tag_only') {
-                $m = $members->get($conv->customer_id);
+                $m = static::matchMembership($members[$conv->customer_id] ?? [], $conv->mailbox_id);
                 if ($m) {
                     $orgId  = $m->organization_id;
                     $unitId = $m->unit_id;
                     $via    = 'by_member';
+                } elseif (isset($custDomains[$conv->customer_id])) {
+                    $match = static::matchDomain($custDomains[$conv->customer_id], $bindings, $conv->mailbox_id);
+                    if ($match) {
+                        MembershipService::addByDomain($match['org_id'], $conv->customer_id, $match['unit_id']);
+
+                        // Only attribute if enrolment actually took (see resolveByDomain).
+                        if (MembershipService::isActiveMember($match['org_id'], $conv->customer_id)) {
+                            $orgId  = $match['org_id'];
+                            $unitId = $match['unit_id'];
+                            $via    = 'by_domain';
+                        }
+                    }
                 }
             }
 

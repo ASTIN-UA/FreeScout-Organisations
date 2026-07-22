@@ -199,6 +199,27 @@ return [
     'member_activated'       => 'Medlem genaktiveret.',
     'member_deactivated'     => 'Medlem deaktiveret.',
     'member_status'          => 'Status',
+
+    // Admin — email domains
+    'domains'                     => 'E-maildomæner',
+    'domains_help'                => 'Kunder, der skriver fra disse domæner, tilføjes automatisk til denne organisation. Offentlige udbydere som gmail.com kan ikke bruges.',
+    'no_domains'                  => 'Ingen domæner endnu.',
+    'add_domain'                  => 'Tilføj domæne',
+    'domain_placeholder'          => 'f.eks. company.com',
+    'domain_added'                => 'Domænet :domain er tilføjet.',
+    'domain_removed'              => 'Domænet :domain er fjernet. Medlemmerne blev bevaret.',
+    'domain_removed_with_members' => 'Domænet :domain er fjernet. :count medlem(mer) deaktiveret.',
+    'domain_invalid'              => 'Indtast et gyldigt domæne, for eksempel company.com.',
+    'domain_public'               => ':domain er en offentlig e-mailudbyder. Hvis det bindes, vil urelaterede kunder blive tilføjet til denne organisation og få adgang til hinandens billetter.',
+    'domain_already_bound'        => 'Dette domæne er allerede bundet til denne organisation.',
+    'domain_taken'                => 'Dette domæne er allerede bundet til organisationen ":org".',
+    'domain_mailbox_conflict'     => 'Disse domæner blev bevaret i deres tidligere postkasse, fordi den nye allerede bruger dem: :domains',
+    'domain_delete_confirm'       => 'Fjern domænet :domain? Nye kunder derfra vil ikke længere blive tilføjet automatisk.',
+    'domain_delete_deactivate'    => 'Skal medlemmer, der blev tilføjet automatisk af :domain, også deaktiveres?' . "\n\n"
+                                     . 'OK — deaktiver dem (de mister adgang til portalen).' . "\n"
+                                     . 'Annuller — behold dem som medlemmer.',
+    'member_source_auto'          => 'tilføjet automatisk af domæne',
+
     'member_unit'            => 'Strukturel enhed',
     'member_updated'         => 'Medlem opdateret.',
     'no_unit'                => 'Hele organisationen',

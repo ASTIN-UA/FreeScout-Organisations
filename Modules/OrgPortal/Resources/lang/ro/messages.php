@@ -199,6 +199,27 @@ return [
     'member_activated'       => 'Membru reactivat.',
     'member_deactivated'     => 'Membru dezactivat.',
     'member_status'          => 'Status',
+
+    // Admin — email domains
+    'domains'                     => 'Domenii de e-mail',
+    'domains_help'                => 'Clienții care scriu de pe aceste domenii sunt adăugați automat în această organizație. Furnizorii publici precum gmail.com nu pot fi utilizați.',
+    'no_domains'                  => 'Încă nu există domenii.',
+    'add_domain'                  => 'Adăugați domeniu',
+    'domain_placeholder'          => 'de ex. company.com',
+    'domain_added'                => 'Domeniul :domain a fost adăugat.',
+    'domain_removed'              => 'Domeniul :domain a fost eliminat. Membrii săi au fost păstrați.',
+    'domain_removed_with_members' => 'Domeniul :domain a fost eliminat. :count membru(i) dezactivat(i).',
+    'domain_invalid'              => 'Introduceți un domeniu valid, de exemplu company.com.',
+    'domain_public'               => ':domain este un furnizor public de e-mail. Asocierea lui ar adăuga clienți fără legătură în această organizație și le-ar da acces la tichetele celorlalți.',
+    'domain_already_bound'        => 'Acest domeniu este deja asociat acestei organizații.',
+    'domain_taken'                => 'Acest domeniu este deja asociat organizației „:org”.',
+    'domain_mailbox_conflict'     => 'Aceste domenii au fost păstrate în căsuța poștală anterioară, deoarece cea nouă le utilizează deja: :domains',
+    'domain_delete_confirm'       => 'Eliminați domeniul :domain? Clienții noi de pe acest domeniu nu vor mai fi adăugați automat.',
+    'domain_delete_deactivate'    => 'Dezactivați și membrii care au fost adăugați automat prin domeniul :domain?' . "\n\n"
+                                     . 'OK — dezactivați-i (pierd accesul la portal).' . "\n"
+                                     . 'Anulați — păstrați-i ca membri.',
+    'member_source_auto'          => 'adăugat automat după domeniu',
+
     'member_unit'            => 'Unitate structurală',
     'member_updated'         => 'Membru actualizat.',
     'no_unit'                => 'Întreaga organizație',
