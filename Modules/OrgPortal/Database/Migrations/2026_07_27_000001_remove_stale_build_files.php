@@ -70,25 +70,42 @@ class RemoveStaleBuildFiles extends Migration
         // Nothing to restore — these files are not part of this module.
     }
 
+    /**
+     * Empties the file before removing it.
+     *
+     * Deleting a file needs write permission on its directory, emptying it
+     * needs write permission on the file itself — two different permissions.
+     * Doing both means that on an installation where the delete is refused,
+     * the file is still left with no contents rather than intact.
+     */
     private function deleteFile($path)
     {
         try {
-            if (File::isFile($path)) {
-                File::delete($path);
+            if (!File::isFile($path)) {
+                return;
             }
+
+            File::put($path, '');
+            File::delete($path);
         } catch (\Exception $e) {
-            // A read-only file must not abort the update.
+            // Cleanup is best effort and must never abort the update.
         }
     }
 
     private function deleteDirectory($path)
     {
         try {
-            if (File::isDirectory($path)) {
-                File::deleteDirectory($path);
+            if (!File::isDirectory($path)) {
+                return;
             }
+
+            foreach (File::allFiles($path, true) as $file) {
+                $this->deleteFile($file->getPathname());
+            }
+
+            File::deleteDirectory($path);
         } catch (\Exception $e) {
-            // Same here — cleanup is best effort.
+            // Same here.
         }
     }
 }
