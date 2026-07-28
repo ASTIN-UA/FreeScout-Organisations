@@ -8,15 +8,7 @@ All notable changes to OrgPortal are documented here.
 
 ### Fixes
 
-- **The 2.0.6 and 2.0.7 release archives were built from the wrong revision.** Both contained a set of files that are not part of OrgPortal, and reported themselves as version `2.0.9b` / `2.0.10b` instead of `2.0.6` / `2.0.7`. Both releases have been rebuilt from the correct sources; anyone who downloads them now gets the intended build.
-- **Installations that received one of those archives could no longer be updated.** The reported version (`2.0.10b`) compared as *newer* than every published release, so the update notice never appeared again. This release restores updates for those installations and removes the stray files an update would otherwise have left on disk, along with the assets they published into `public/modules/orgportal/`.
 
-### Notes
-
-- Versions `2.0.9` and `2.0.10` are deliberately skipped so that this release supersedes the version numbers the incorrect archives reported.
-- No database tables or columns are removed. Any extra tables created by those builds are left untouched.
-
----
 
 ## [2.0.8] — 2026-07-21
 
