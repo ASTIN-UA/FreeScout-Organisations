@@ -4,6 +4,16 @@ All notable changes to OrgPortal are documented here.
 
 ---
 
+## [2.0.12] — 2026-10-16
+
+### Bug Fixes
+
+- **Confirmation dialogs were skipped and forms submitted at once**: FreeScout's Content-Security-Policy (on by default, and it can no longer be turned off in recent FreeScout versions) blocks inline `onsubmit` / `onclick` / `onchange` handlers. So deleting or deactivating an organization, deleting a unit, removing or deactivating a member, resetting attribution and closing a ticket from the portal all went through without the "Are you sure?" question, and the unit filter in the portal ticket list never submitted. The views now carry `data-orgportal-confirm` / `data-orgportal-autosubmit` attributes, handled by `js/csp-handlers.js` (loaded on the agent and the portal layouts).
+
+### Security
+
+- **API rights for personal API keys**: newer versions of the API & Webhooks module accept personal API keys and log the key's owner in. With such a key the OrgPortal API now requires what the admin pages require — the "manage organizations" permission (or admin), and admin for deleting an organization; otherwise `403`. The install-wide API key and older API & Webhooks versions are not affected.
+
 ## [2.0.11] — 2026-07-27
 
 ### Fixes

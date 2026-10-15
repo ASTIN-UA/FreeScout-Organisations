@@ -31,7 +31,7 @@
 
             @if($units->isNotEmpty())
             <select name="unit_id" class="form-control input-sm" style="width:auto;"
-                    onchange="document.getElementById('ct-filter-form').submit()">
+                    data-orgportal-autosubmit>
                 <option value="">{{ __('orgportal::messages.notif_scope_org') }}</option>
                 @foreach($units as $u)
                     <option value="{{ $u->id }}" {{ $unitId == $u->id ? 'selected' : '' }}>

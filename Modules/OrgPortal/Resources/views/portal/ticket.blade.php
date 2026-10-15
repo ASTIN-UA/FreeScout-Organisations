@@ -23,7 +23,7 @@
             @if($conversation->status !== \App\Conversation::STATUS_CLOSED)
             <form method="POST"
                   action="{{ route('orgportal.portal.ticket.close', ['mailbox_id' => $mailbox_id, 'conversation_id' => $conversation->id]) }}"
-                  onsubmit="return confirm('{{ __('orgportal::messages.close_ticket_confirm') }}')"
+                  data-orgportal-confirm="{{ __('orgportal::messages.close_ticket_confirm') }}"
                   style="margin:0;">
                 {{ csrf_field() }}
                 <button type="submit" class="btn btn-default btn-sm">

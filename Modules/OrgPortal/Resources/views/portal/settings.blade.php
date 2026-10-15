@@ -100,7 +100,7 @@
                                 <td class="text-right">
                                     <form method="POST"
                                           action="{{ route('orgportal.portal.units.delete', ['mailbox_id' => $mailbox_id, 'unit_id' => $unit->id]) }}"
-                                          onsubmit="return confirm('{{ __('orgportal::messages.confirm_delete_unit') }}');"
+                                          data-orgportal-confirm="{{ __('orgportal::messages.confirm_delete_unit') }}"
                                           style="display:inline;">
                                         {{ csrf_field() }}
                                         {{ method_field('DELETE') }}
@@ -203,7 +203,7 @@
                                     <td class="text-right">
                                         <form method="POST"
                                               action="{{ route('orgportal.portal.members.toggle', ['mailbox_id' => $mailbox_id, 'member_id' => $m->id]) }}"
-                                              @if($m->is_active) onsubmit="return confirm('{{ __('orgportal::messages.confirm_deactivate') }}');" @endif
+                                              @if($m->is_active) data-orgportal-confirm="{{ __('orgportal::messages.confirm_deactivate') }}" @endif
                                               style="display:inline;">
                                             {{ csrf_field() }}
                                             <button type="submit" class="btn btn-link btn-sm {{ $m->is_active ? 'text-danger' : '' }}">

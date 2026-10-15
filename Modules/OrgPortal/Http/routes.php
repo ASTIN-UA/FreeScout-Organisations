@@ -100,7 +100,11 @@ Route::group([
 if (\Module::isActive('apiwebhooks')) {
     Route::group([
         'prefix'     => \Helper::getSubdirectory(true) . 'api',
-        'middleware' => ['bindings', \Modules\ApiWebhooks\Http\Middleware\ApiAuth::class],
+        'middleware' => [
+            'bindings',
+            \Modules\ApiWebhooks\Http\Middleware\ApiAuth::class,
+            \Modules\OrgPortal\Http\Middleware\OrgPortalApiUserAccess::class,
+        ],
         'namespace'  => 'Modules\OrgPortal\Http\Controllers\Api',
     ], function () {
 

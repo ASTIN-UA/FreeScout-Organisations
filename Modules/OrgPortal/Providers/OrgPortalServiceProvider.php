@@ -50,6 +50,16 @@ class OrgPortalServiceProvider extends ServiceProvider
             return $styles;
         });
 
+        // Confirmations and auto-submit from data attributes (inline on*
+        // handlers are blocked by FreeScout's CSP). Both layouts, since the
+        // portal pages extend the End-User Portal layout.
+        $cspHandlers = function ($scripts) {
+            $scripts[] = \Module::getPublicPath(ORGPORTAL_MODULE) . '/js/csp-handlers.js';
+            return $scripts;
+        };
+        \Eventy::addFilter('javascripts', $cspHandlers);
+        \Eventy::addFilter('eup.javascripts', $cspHandlers);
+
         // Register global locale middleware (handles ?eup_locale=xx before route middleware).
         $this->app->make(\Illuminate\Contracts\Http\Kernel::class)
             ->pushMiddleware(\Modules\OrgPortal\Http\Middleware\OrgPortalSetLocale::class);

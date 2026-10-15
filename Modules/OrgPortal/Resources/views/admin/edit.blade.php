@@ -172,7 +172,7 @@
                                     <td class="text-right">
                                         <form method="POST"
                                               action="{{ route('orgportal.admin.units.delete', [$organization->id, $unit->id]) }}"
-                                              onsubmit="return confirm('{{ __('orgportal::messages.confirm_delete_unit') }}')">
+                                              data-orgportal-confirm="{{ __('orgportal::messages.confirm_delete_unit') }}">
                                             {{ csrf_field() }}
                                             {{ method_field('DELETE') }}
                                             <button type="submit" class="btn btn-xs btn-danger">
@@ -282,7 +282,7 @@
                                         </form>
                                         <form method="POST"
                                               action="{{ route('orgportal.admin.members.remove', [$organization->id, $member->id]) }}"
-                                              onsubmit="return confirm('{{ __('orgportal::messages.confirm_remove_member') }}')"
+                                              data-orgportal-confirm="{{ __('orgportal::messages.confirm_remove_member') }}"
                                               style="display:inline">
                                             {{ csrf_field() }}
                                             {{ method_field('DELETE') }}

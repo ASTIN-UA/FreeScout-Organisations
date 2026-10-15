@@ -157,7 +157,7 @@
                                             <form method="POST"
                                                   action="{{ route('orgportal.admin.deactivate', $org->id) }}"
                                                   style="display:inline;"
-                                                  onsubmit="return confirm('{{ $org->is_active ? __('orgportal::messages.confirm_deactivate_org') : __('orgportal::messages.confirm_activate_org') }}')">
+                                                  data-orgportal-confirm="{{ $org->is_active ? __('orgportal::messages.confirm_deactivate_org') : __('orgportal::messages.confirm_activate_org') }}">
                                                 {{ csrf_field() }}
                                                 <button type="submit"
                                                         class="btn btn-xs {{ $org->is_active ? 'btn-warning' : 'btn-success' }}">
@@ -179,7 +179,7 @@
                                         <form method="POST"
                                               action="{{ route('orgportal.admin.destroy', $org->id) }}"
                                               style="display:inline;"
-                                              onsubmit="return confirm('{{ __('orgportal::messages.confirm_delete_org') }}')">
+                                              data-orgportal-confirm="{{ __('orgportal::messages.confirm_delete_org') }}">
                                             {{ csrf_field() }}
                                             {{ method_field('DELETE') }}
                                             <button type="submit" class="btn btn-xs btn-danger">
@@ -501,7 +501,7 @@
                                         <button type="submit"
                                                 formaction="{{ route('orgportal.admin.system.reset-attribution') }}"
                                                 class="btn btn-danger btn-sm"
-                                                onclick="return confirm('{{ __('orgportal::messages.system_reset_confirm') }}')">
+                                                data-orgportal-confirm="{{ __('orgportal::messages.system_reset_confirm') }}">
                                             <i class="glyphicon glyphicon-trash"></i>
                                             {{ __('orgportal::messages.system_reset_attribution') }}
                                         </button>
@@ -702,7 +702,7 @@ window.orgportalLocale   = _tplEl.getAttribute('data-locale') || 'en';
                     var confirmMsg = org.is_active ? cfg.confirmDeactivate : cfg.confirmActivate;
                     var btnClass   = org.is_active ? 'btn-warning' : 'btn-success';
                     var btnLabel   = org.is_active ? cfg.btnDeactivate : cfg.btnActivate;
-                    tr += '<form method="POST" action="' + esc(org.deactivate_url) + '" style="display:inline;" onsubmit="return confirm(\'' + esc(confirmMsg).replace(/'/g,"\\'") + '\')">'
+                    tr += '<form method="POST" action="' + esc(org.deactivate_url) + '" style="display:inline;" data-orgportal-confirm="' + esc(confirmMsg) + '">'
                         + '<input type="hidden" name="_token" value="' + esc(cfg.csrfToken) + '">'
                         + '<button type="submit" class="btn btn-xs ' + btnClass + '">' + esc(btnLabel) + '</button></form> ';
                 } else {
@@ -711,7 +711,7 @@ window.orgportalLocale   = _tplEl.getAttribute('data-locale') || 'en';
                 }
                 // Delete (only when 0 members & 0 tickets)
                 if (org.can_delete) {
-                    tr += '<form method="POST" action="' + esc(org.delete_url) + '" style="display:inline;" onsubmit="return confirm(\'' + esc(cfg.confirmDelete).replace(/'/g,"\\'") + '\')">'
+                    tr += '<form method="POST" action="' + esc(org.delete_url) + '" style="display:inline;" data-orgportal-confirm="' + esc(cfg.confirmDelete) + '">'
                         + '<input type="hidden" name="_token" value="' + esc(cfg.csrfToken) + '">'
                         + '<input type="hidden" name="_method" value="DELETE">'
                         + '<button type="submit" class="btn btn-xs btn-danger">' + esc(cfg.btnDelete) + '</button></form>';
