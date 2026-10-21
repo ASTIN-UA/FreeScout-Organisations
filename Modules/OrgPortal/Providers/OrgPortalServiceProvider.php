@@ -322,10 +322,14 @@ class OrgPortalServiceProvider extends ServiceProvider
             $existing = \Modules\OrgPortal\Models\OrganizationMember::where('customer_id', $customer->id)
                 ->where('is_active', true)->first();
 
-            // "— None —" selected: remove from any org
+            // "— None —" selected: the person leaves the organization the same way
+            // as «Звільнити» on the organization page — deactivated, not deleted,
+            // so he stays in its history and can be restored.
             if (!$orgId) {
                 if ($existing) {
-                    $existing->delete();
+                    $existing->is_active      = false;
+                    $existing->deactivated_at = now();
+                    $existing->save();
                 }
                 return;
             }
@@ -335,12 +339,35 @@ class OrgPortalServiceProvider extends ServiceProvider
                 return;
             }
 
-            if ($existing) {
+            // A deactivated row for the target organization is restored rather
+            // than a second one created (the unique index is on the pair).
+            $inactiveRow = \Modules\OrgPortal\Models\OrganizationMember::where('customer_id', $customer->id)
+                ->where('organization_id', $orgId)
+                ->where('is_active', false)
+                ->first();
+
+            if ($existing && (int) $existing->organization_id === (int) $orgId) {
+                // Same organization: only the role (this form has no unit field).
+                $existing->role = $role;
+                if ($role !== 'manager') {
+                    $existing->can_manage_org = false; // as on the organization page
+                }
+                $existing->save();
+            } elseif ($inactiveRow) {
+                if ($existing) {
+                    $existing->is_active      = false;
+                    $existing->deactivated_at = now();
+                    $existing->save();
+                }
+                $inactiveRow->role           = $role;
+                $inactiveRow->unit_id        = null;
+                $inactiveRow->is_active      = true;
+                $inactiveRow->deactivated_at = null;
+                $inactiveRow->save();
+            } elseif ($existing) {
                 // Moving to a different org invalidates the unit (units belong
                 // to a single organization).
-                if ((int) $existing->organization_id !== (int) $orgId) {
-                    $existing->unit_id = null;
-                }
+                $existing->unit_id         = null;
                 $existing->organization_id = $orgId;
                 $existing->role            = $role;
                 $existing->save();
@@ -715,17 +742,24 @@ class OrgPortalServiceProvider extends ServiceProvider
                 return;
             }
 
-            $member = OrganizationMember::where('customer_id', $customer->id)
-                ->where('role', 'manager')
-                ->where('is_active', true)
-                ->first();
-
-            if (!$member) {
+            $mailboxId = request()->route('mailbox_id');
+            if (!$mailboxId) {
                 return;
             }
 
-            $mailboxId = request()->route('mailbox_id');
-            if (!$mailboxId) {
+            // The same conditions as the company pages: an active manager of an
+            // active organization of this portal's mailbox (or a global one) —
+            // no links that only lead to «Доступ заборонено».
+            $member = OrganizationMember::where('customer_id', $customer->id)
+                ->where('role', 'manager')
+                ->where('is_active', true)
+                ->with('organization')
+                ->first();
+
+            $org = $member ? $member->organization : null;
+            if (!$org || !$org->is_active
+                || ($org->mailbox_id !== null && (int) $org->mailbox_id !== (int) \EndUserPortal::decodeMailboxId((string) $mailboxId))
+            ) {
                 return;
             }
 
@@ -912,6 +946,14 @@ class OrgPortalServiceProvider extends ServiceProvider
             ->get();
 
         foreach ($managers as $manager) {
+            // A unit manager hears only about his own unit — the tickets he can
+            // open: the author is in his unit, or the ticket is stamped with it.
+            if ($manager->isUnitManager()
+                && (int) $manager->unit_id !== (int) $authorMember->unit_id
+                && (int) $manager->unit_id !== (int) ($conversation->org_unit_id ?? 0)
+            ) {
+                continue;
+            }
             OrgPortalNotification::createIfNotDuplicate(
                 $manager->customer_id,
                 $conversation->id,

@@ -173,6 +173,8 @@ return [
     'can_manage_org'         => 'Gestionează întreaga organizație',
     'can_manage_org_hint'    => 'Permite acestui manager global să promoveze alți membri la manager global din portal.',
     'cannot_deactivate_self' => 'Nu vă puteți dezactiva pe dvs. însuși.',
+    'cannot_change_self'     => 'Nu vă puteți modifica propriul rol sau propria subdiviziune.',
+    'cannot_change_global'   => 'Un manager global poate fi modificat doar de cineva care are dreptul să numească manageri globali.',
     'cannot_grant_global'    => 'Nu aveți permisiunea să atribuiți manageri globali.',
     'confirm_deactivate'     => 'Dezactivați acest membru? Aceștia nu vor mai primi atribuiri de tichete.',
     'confirm_delete_unit'    => 'Ștergeți această unitate? Membrii săi vor fi neataşaţi și managerii de unitate retrograduți la membri.',

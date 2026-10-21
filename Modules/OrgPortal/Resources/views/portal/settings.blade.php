@@ -143,7 +143,11 @@
                         </thead>
                         <tbody>
                         @foreach($members as $m)
-                            @php $isGlobal = ($m->role === 'manager' && $m->unit_id === null); @endphp
+                            @php
+                                $isGlobal = ($m->role === 'manager' && $m->unit_id === null);
+                                // Own row and a global manager one may not appoint: read-only (the server refuses too).
+                                $canEdit  = $canManageStructure && $m->id !== $member->id && (!$isGlobal || $canGrantGlobal);
+                            @endphp
                             <tr class="{{ $m->is_active ? '' : 'text-muted orgportal-member-inactive' }}" @if(!$m->is_active) style="display:none;" @endif>
                                 <td>
                                     {{ optional($m->customer)->getFullName() ?: __('orgportal::messages.deleted_customer') }}
@@ -152,7 +156,7 @@
                                     @endif
                                 </td>
 
-                                @if($canManageStructure)
+                                @if($canEdit)
                                     <td colspan="{{ 2 }}">
                                         <form method="POST"
                                               action="{{ route('orgportal.portal.members.update', ['mailbox_id' => $mailbox_id, 'member_id' => $m->id]) }}"

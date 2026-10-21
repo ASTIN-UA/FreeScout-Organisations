@@ -90,6 +90,17 @@ class OrgPortalFrontController extends Controller
     }
 
     /**
+     * The unit a ticket query must be limited to: a unit manager's own unit,
+     * null (the whole organization) for a global manager. Under snapshot
+     * visibility the query filters on org_unit_id, so a unit manager without
+     * it would see the whole organization.
+     */
+    protected function scopeUnitId(OrganizationMember $member): ?int
+    {
+        return $member->isUnitManager() ? (int) $member->unit_id : null;
+    }
+
+    /**
      * Customer IDs this manager may assign as a ticket author — active members
      * only (deactivated members cannot receive new ticket assignments).
      */
@@ -152,7 +163,7 @@ class OrgPortalFrontController extends Controller
             }
         }
 
-        $builder = OrgAttribution::orgConversationQuery($org->id, $filteredMemberIds, $unitId)
+        $builder = OrgAttribution::orgConversationQuery($org->id, $filteredMemberIds, $this->scopeUnitId($member) ?? $unitId)
             ->where('mailbox_id', $mailbox->id)
             ->where('state', '!=', Conversation::STATE_DELETED)
             ->with(['customer', 'user'])
@@ -264,7 +275,7 @@ class OrgPortalFrontController extends Controller
 
         $orgMemberIds = $this->visibleCustomerIds($member);
 
-        $conversation = OrgAttribution::orgConversationQuery($member->organization_id, $orgMemberIds)
+        $conversation = OrgAttribution::orgConversationQuery($member->organization_id, $orgMemberIds, $this->scopeUnitId($member))
             ->where('mailbox_id', $mailbox->id)
             ->findOrFail($conversation_id);
 
@@ -326,7 +337,7 @@ class OrgPortalFrontController extends Controller
 
         $orgMemberIds = $this->visibleCustomerIds($member);
 
-        $conversation = OrgAttribution::orgConversationQuery($member->organization_id, $orgMemberIds)
+        $conversation = OrgAttribution::orgConversationQuery($member->organization_id, $orgMemberIds, $this->scopeUnitId($member))
             ->where('mailbox_id', $mailbox->id)
             ->findOrFail($conversation_id);
 
@@ -394,7 +405,7 @@ class OrgPortalFrontController extends Controller
 
         $orgMemberIds = $this->visibleCustomerIds($member);
 
-        $conversation = OrgAttribution::orgConversationQuery($member->organization_id, $orgMemberIds)
+        $conversation = OrgAttribution::orgConversationQuery($member->organization_id, $orgMemberIds, $this->scopeUnitId($member))
             ->where('mailbox_id', $mailbox->id)
             ->findOrFail($conversation_id);
 
@@ -446,7 +457,7 @@ class OrgPortalFrontController extends Controller
 
         $orgMemberIds = $this->visibleCustomerIds($member);
 
-        $conversation = OrgAttribution::orgConversationQuery($member->organization_id, $orgMemberIds)
+        $conversation = OrgAttribution::orgConversationQuery($member->organization_id, $orgMemberIds, $this->scopeUnitId($member))
             ->where('mailbox_id', $mailbox->id)
             ->findOrFail($conversation_id);
 
@@ -748,6 +759,23 @@ class OrgPortalFrontController extends Controller
         $target = OrganizationMember::where('organization_id', $manager->organization_id)
             ->findOrFail($member_id);
 
+        // Not one's own row: a manager making himself a member (or a unit
+        // manager) would lock himself out, and only an agent could undo it.
+        if ($target->customer_id === $customer->id) {
+            return redirect()
+                ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id, 'tab' => 'members'])
+                ->with('flash_error', __('orgportal::messages.cannot_change_self'));
+        }
+
+        // A global manager is changed only by whoever may appoint one: the same
+        // admin-granted right as for promoting (otherwise a manager without it
+        // could demote those who have it).
+        if ($target->isGlobalManager() && !$manager->can_manage_org) {
+            return redirect()
+                ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id, 'tab' => 'members'])
+                ->with('flash_error', __('orgportal::messages.cannot_change_global'));
+        }
+
         $unitId = (int) $request->input('unit_id') ?: null;
         $role   = $request->input('role');
 
@@ -766,9 +794,19 @@ class OrgPortalFrontController extends Controller
                 ->with('flash_error', __('orgportal::messages.cannot_grant_global'));
         }
 
+        $unitChanged     = ($target->unit_id === null ? null : (int) $target->unit_id) !== $unitId;
         $target->unit_id = $unitId;
         $target->role    = $role;
         $target->save();
+
+        // The member's tickets move with him into the new unit scope, as on the
+        // admin page (OrgPortalAdminController::updateMemberRole()) — otherwise
+        // a unit manager would not find tickets attributed before the change.
+        if ($unitChanged) {
+            \App\Conversation::where('customer_id', $target->customer_id)
+                ->where('org_id', $target->organization_id)
+                ->update(['org_unit_id' => $unitId]);
+        }
 
         return redirect()
             ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id, 'tab' => 'members'])

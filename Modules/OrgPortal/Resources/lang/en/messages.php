@@ -159,6 +159,8 @@ return [
     'show_deactivated'       => 'Show deactivated',
     'confirm_deactivate'     => 'Deactivate this member? They will no longer receive ticket assignments.',
     'cannot_deactivate_self' => 'You cannot deactivate yourself.',
+    'cannot_change_self'     => 'You cannot change your own role or unit.',
+    'cannot_change_global'   => 'Only a manager allowed to appoint global managers can change a global manager.',
 
     // Notification subscriptions (portal)
     'notif_scope'                => 'Scope',

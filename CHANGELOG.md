@@ -4,6 +4,22 @@ All notable changes to OrgPortal are documented here.
 
 ---
 
+## [2.0.13] — 2026-10-21
+
+### Bug Fixes — access rules
+
+- **A unit manager saw the whole organization's tickets** under snapshot visibility: the company tickets list and opening/replying/changing the author/closing a ticket did not pass the manager's unit, so the query filtered on `org_id` only. They pass it now (`scopeUnitId()`); statistics already did.
+- **A manager could change his own role or unit** on the portal's members tab and lock himself out (only an agent could undo it). Refused now (`cannot_change_self`), and his own row shows no form — as deactivating oneself already was.
+- **A global manager without «manage the whole organization» could demote a global manager**, though he may not appoint one. Changing a global manager now needs that right (`cannot_change_global`); such rows show no form.
+- **A unit change on the portal left the member's tickets in the old unit** (the admin page re-stamps `org_unit_id`, the portal did not) — under snapshot visibility a unit manager missed them. The portal re-stamps them now.
+- **«— None —» on the customer form deleted the membership**; it deactivates it now, as on the organization page — the person stays in the history and can be restored. Choosing that organization again on the customer form restores the deactivated row instead of creating a second one; demoting to member there also clears «manage the whole organization».
+- **Portal bell notifications went to every manager of the organization**; a unit manager gets them only for his unit (author in his unit, or the ticket stamped with it), like the e-mail subscriptions.
+- **Company tickets / organization settings links were shown to a manager of a deactivated organization or on another mailbox's portal**, leading to «access denied»; the links now follow the same conditions as the pages.
+
+Data note for existing installs: tickets of members whose unit was changed on the portal before this fix keep the old `org_unit_id` — re-stamp `org_unit_id` = the member's current unit for `org_id` = the member's organization.
+
+---
+
 ## [2.0.12] — 2026-10-16
 
 ### Bug Fixes
