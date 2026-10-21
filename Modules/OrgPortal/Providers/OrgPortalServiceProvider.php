@@ -225,10 +225,18 @@ class OrgPortalServiceProvider extends ServiceProvider
             $currentOrgId    = $currentMember ? $currentMember->organization_id : null;
             $currentRole     = $currentMember ? $currentMember->role : 'member';
 
+            $unitsByOrg = \Modules\OrgPortal\Models\OrganizationUnit::orderBy('name')->get(['id', 'organization_id', 'name'])
+                ->groupBy('organization_id')
+                ->map(function ($units) {
+                    return $units->map(function ($u) { return ['id' => $u->id, 'name' => $u->name]; })->values();
+                });
+
             echo view('orgportal::admin.partials.customer_org_field', [
                 'organizations' => $organizations,
                 'currentOrgId'  => $currentOrgId,
                 'currentRole'   => $currentRole,
+                'currentUnitId' => $currentMember ? $currentMember->unit_id : null,
+                'unitsByOrg'    => $unitsByOrg,
                 'errors'        => $errors,
             ])->render();
         }, 20, 2);
@@ -248,19 +256,36 @@ class OrgPortalServiceProvider extends ServiceProvider
     var elHidden  = document.getElementById('orgportal_org_id');
     var elClear   = document.getElementById('orgportal_org_clear');
     var elList    = document.getElementById('orgportal_org_suggestions');
-    var elRole    = document.querySelector('.orgportal-role-row');
+    var elRoles   = document.querySelectorAll('.orgportal-role-row');
+    var elUnit    = document.getElementById('orgportal_unit_id');
+    var unitsByOrg = {};
+    try { unitsByOrg = JSON.parse(elUnit ? elUnit.getAttribute('data-units') : '{}') || {}; } catch (e) {}
     var timer     = null;
     var activeXhr = null;
 
     function setVisible(el, show) { if (el) el.style.display = show ? '' : 'none'; }
+    function setRolesVisible(show) { for (var i = 0; i < elRoles.length; i++) setVisible(elRoles[i], show); }
+    // The units of the chosen organization; «whole organization» first.
+    function fillUnits(orgId) {
+        if (!elUnit) return;
+        while (elUnit.options.length > 1) elUnit.remove(1);
+        (unitsByOrg[orgId] || []).forEach(function (u) {
+            var o = document.createElement('option');
+            o.value = u.id; o.textContent = u.name;
+            elUnit.appendChild(o);
+        });
+        elUnit.value = '';
+    }
 
     function selectOrg(id, name) {
+        if (String(elHidden.value) !== String(id)) fillUnits(id);
         elHidden.value = id; elSearch.value = name;
-        setVisible(elList, false); setVisible(elRole, true); setVisible(elClear, true);
+        setVisible(elList, false); setRolesVisible(true); setVisible(elClear, true);
     }
     function clearOrg() {
         elHidden.value = ''; elSearch.value = '';
-        setVisible(elList, false); setVisible(elRole, false); setVisible(elClear, false);
+        fillUnits(null);
+        setVisible(elList, false); setRolesVisible(false); setVisible(elClear, false);
     }
     function showSuggestions(data) {
         elList.innerHTML = '';
@@ -310,7 +335,14 @@ class OrgPortalServiceProvider extends ServiceProvider
 
         // Save organization assignment when customer form is submitted
         \Eventy::addAction('customer.updated', function ($customer) {
-            $orgId = request()->input('orgportal_organization_id');
+            // Only the customer form carries the organisation field. Anything
+            // else that fires customer.updated (API, other modules) must not be
+            // read as «— None —» and dismiss the person.
+            if (!request()->has('orgportal_organization_id')) {
+                return;
+            }
+
+            $orgId = (int) request()->input('orgportal_organization_id') ?: null;
             $role  = request()->input('orgportal_role', 'member');
 
             if (!in_array($role, ['member', 'manager'])) {
@@ -339,54 +371,59 @@ class OrgPortalServiceProvider extends ServiceProvider
                 return;
             }
 
-            // A deactivated row for the target organization is restored rather
-            // than a second one created (the unique index is on the pair).
-            $inactiveRow = \Modules\OrgPortal\Models\OrganizationMember::where('customer_id', $customer->id)
-                ->where('organization_id', $orgId)
-                ->where('is_active', false)
-                ->first();
+            // The unit field. A form without it (an older page) keeps the unit
+            // the person has in this organisation; a unit of another
+            // organisation is ignored.
+            $unitGiven = request()->has('orgportal_unit_id');
+            $unitId    = (int) request()->input('orgportal_unit_id') ?: null;
+            if ($unitId && !\Modules\OrgPortal\Models\OrganizationUnit::where('organization_id', $orgId)->where('id', $unitId)->exists()) {
+                $unitId = null;
+            }
 
-            if ($existing && (int) $existing->organization_id === (int) $orgId) {
-                // Same organization: only the role (this form has no unit field).
-                $existing->role = $role;
-                if ($role !== 'manager') {
-                    $existing->can_manage_org = false; // as on the organization page
-                }
+            // Leaving another organisation: deactivated there, as on its page,
+            // so its history keeps him.
+            if ($existing && (int) $existing->organization_id !== $orgId) {
+                $existing->is_active      = false;
+                $existing->deactivated_at = now();
                 $existing->save();
-            } elseif ($inactiveRow) {
-                if ($existing) {
-                    $existing->is_active      = false;
-                    $existing->deactivated_at = now();
-                    $existing->save();
+                $existing = null;
+            }
+
+            // A (organization_id, customer_id) row can already exist — the
+            // active one, or an inactive one from an earlier membership. The
+            // unique index is on that pair regardless of is_active, so it is
+            // updated rather than created again.
+            $member = $existing ?: \Modules\OrgPortal\Models\OrganizationMember::where('customer_id', $customer->id)
+                ->where('organization_id', $orgId)->first();
+
+            if ($member) {
+                $member->role           = $role;
+                $member->is_active      = true;
+                $member->deactivated_at = null;
+                if ($unitGiven) {
+                    $member->unit_id = $unitId;
+                } elseif (!$existing) {
+                    $member->unit_id = null;
                 }
-                $inactiveRow->role           = $role;
-                $inactiveRow->unit_id        = null;
-                $inactiveRow->is_active      = true;
-                $inactiveRow->deactivated_at = null;
-                $inactiveRow->save();
-            } elseif ($existing) {
-                // Moving to a different org invalidates the unit (units belong
-                // to a single organization).
-                $existing->unit_id         = null;
-                $existing->organization_id = $orgId;
-                $existing->role            = $role;
-                $existing->save();
+                // Only a global manager (manager, no unit) may appoint global
+                // managers — as on the organization page.
+                if ($member->role !== 'manager' || $member->unit_id) {
+                    $member->can_manage_org = false;
+                }
+                $member->save();
             } else {
-                \Modules\OrgPortal\Models\OrganizationMember::create([
+                $member = \Modules\OrgPortal\Models\OrganizationMember::create([
                     'organization_id' => $orgId,
                     'customer_id'     => $customer->id,
                     'role'            => $role,
+                    'unit_id'         => $unitGiven ? $unitId : null,
                 ]);
             }
 
-            // Back-fill snapshot on existing un-attributed conversations for this
-            // customer — same as OrgPortalAdminController::addMember(). This hook
-            // is a separate membership-assignment path (customer edit page) and
-            // must re-attribute too, or pre-membership tickets stay org_id=NULL.
-            // unit_id is always null here — this picker has no unit field, unlike
-            // the org edit page's addMember(); a later unit assignment goes through
-            // updateMemberRole(), which syncs org_unit_id on existing tickets itself.
-            OrgAttribution::reattributeForCustomer($customer->id, $orgId, null);
+            // The customer's org-less tickets join the organisation, and his
+            // tickets in it follow his current unit — same as addMember() and
+            // updateMemberRole() on the organisation page.
+            OrgAttribution::reattributeForCustomer($customer->id, $orgId, $member->unit_id ? (int) $member->unit_id : null);
         }, 20, 1);
 
         // Show org / unit / role info in the customer sidebar (conversation view)

@@ -734,6 +734,7 @@ class OrgPortalFrontController extends Controller
 
         // Remaining members get unit_id = NULL via the FK on delete.
         $unit->delete();
+        OrgAttribution::forgetUnit((int) $unit->id);
 
         return redirect()
             ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id, 'tab' => 'units'])
@@ -830,6 +831,14 @@ class OrgPortalFrontController extends Controller
             return redirect()
                 ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id, 'tab' => 'members'])
                 ->with('flash_error', __('orgportal::messages.cannot_deactivate_self'));
+        }
+
+        // Same rule as changing the role: a global manager is dismissed only by
+        // someone allowed to appoint global managers.
+        if ($target->isGlobalManager() && !$manager->can_manage_org) {
+            return redirect()
+                ->route('orgportal.portal.settings', ['mailbox_id' => $mailbox_id, 'tab' => 'members'])
+                ->with('flash_error', __('orgportal::messages.cannot_change_global'));
         }
 
         $target->is_active      = !$target->is_active;

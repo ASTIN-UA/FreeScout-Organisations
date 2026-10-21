@@ -10,6 +10,7 @@ use Modules\OrgPortal\Models\Organization;
 use Modules\OrgPortal\Models\OrganizationMember;
 use Modules\OrgPortal\Models\OrganizationTag;
 use Modules\OrgPortal\Models\OrganizationUnit;
+use Modules\OrgPortal\Services\OrgAttribution;
 
 class OrgPortalApiController extends Controller
 {
@@ -488,6 +489,15 @@ class OrgPortalApiController extends Controller
         }
 
         $member->update($updates);
+        static::revokeManageOrgUnlessGlobal($member);
+
+        // An active member's tickets belong to the organisation and follow his
+        // current unit; a unit change moves them into the new unit.
+        if ($member->is_active) {
+            OrgAttribution::reattributeForCustomer((int) $member->customer_id, $id, $member->unit_id);
+        } elseif (array_key_exists('unit_id', $updates)) {
+            OrgAttribution::restampUnit((int) $member->customer_id, $id, $member->unit_id);
+        }
 
         return response()->json(['success' => true, 'message' => 'Member updated.']);
     }
@@ -728,6 +738,13 @@ class OrgPortalApiController extends Controller
                 'can_manage_org'  => (bool) $request->input('canManageOrg', false),
                 'is_active'       => $request->has('isActive') ? (bool) $request->input('isActive') : true,
             ]);
+            $member = OrganizationMember::where('customer_id', $customerId)->where('organization_id', $orgId)->first();
+            static::revokeManageOrgUnlessGlobal($member);
+            // The customer's existing tickets join the organisation (and his unit),
+            // as when a member is added on the organisation page.
+            if ($member->is_active) {
+                OrgAttribution::reattributeForCustomer($customerId, (int) $orgId, $member->unit_id);
+            }
             return response()->json(['success' => true, 'message' => 'Membership created.'], 201);
         }
 
@@ -758,8 +775,28 @@ class OrgPortalApiController extends Controller
         }
 
         $member->update($updates);
+        static::revokeManageOrgUnlessGlobal($member);
+
+        if ($member->is_active) {
+            OrgAttribution::reattributeForCustomer($customerId, (int) $orgId, $member->unit_id);
+        } elseif (array_key_exists('unit_id', $updates)) {
+            OrgAttribution::restampUnit($customerId, (int) $orgId, $member->unit_id);
+        }
 
         return response()->json(['success' => true, 'message' => 'Membership updated.']);
+    }
+
+    /**
+     * Only a global manager (role=manager, no unit) may hold can_manage_org,
+     * as on the organisation page; an update that makes him a member or a unit
+     * manager takes the right away.
+     */
+    private static function revokeManageOrgUnlessGlobal(OrganizationMember $member): void
+    {
+        if ($member->can_manage_org && ($member->role !== 'manager' || $member->unit_id)) {
+            $member->can_manage_org = false;
+            $member->save();
+        }
     }
 
     // ─── Units ───────────────────────────────────────────────────────────────
@@ -878,6 +915,7 @@ class OrgPortalApiController extends Controller
             ->update(['role' => 'member']);
 
         $unit->delete();
+        OrgAttribution::forgetUnit((int) $unit->id);
 
         return response()->json(['success' => true, 'message' => 'Unit deleted.']);
     }

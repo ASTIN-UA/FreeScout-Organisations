@@ -538,6 +538,7 @@ class OrgPortalAdminController extends Controller
             ->update(['role' => 'member']);
 
         $unit->delete();
+        OrgAttribution::forgetUnit((int) $unit->id);
 
         return redirect()->route('orgportal.admin.edit', $id)
             ->with('flash_success', __('orgportal::messages.unit_deleted'));

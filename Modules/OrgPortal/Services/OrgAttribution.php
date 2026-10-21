@@ -47,6 +47,24 @@ class OrgAttribution
     }
 
     /**
+     * The unit a conversation gets when the tag binding that matched it names
+     * none: the author's unit in that organisation. Tag bindings are often made
+     * for tickets from before units existed; stamping NULL hid those tickets
+     * from the author's unit manager.
+     */
+    public static function unitForAuthor(?int $orgId, ?int $customerId, ?int $unitId): ?int
+    {
+        if ($unitId) return $unitId;
+        if (!$orgId || !$customerId) return null;
+
+        $unit = OrganizationMember::where('organization_id', $orgId)
+            ->where('customer_id', $customerId)
+            ->value('unit_id');
+
+        return $unit ? (int) $unit : null;
+    }
+
+    /**
      * Stamp org_id / org_unit_id onto a single conversation.
      * Source priority depends on attribution_source setting:
      *   member     — membership only
@@ -81,7 +99,7 @@ class OrgAttribution
 
         Conversation::where('id', $conversation->id)->update([
             'org_id'            => $orgId,
-            'org_unit_id'       => $unitId,
+            'org_unit_id'       => static::unitForAuthor($orgId, (int) $conversation->customer_id, $unitId),
             'org_attributed_at' => now(),
         ]);
     }
@@ -100,9 +118,11 @@ class OrgAttribution
         $binding = OrganizationTag::where('tag_id', $tagId)->first();
         if (!$binding) return;
 
+        $customerId = Conversation::where('id', $conversationId)->value('customer_id');
+
         Conversation::where('id', $conversationId)->update([
             'org_id'            => $binding->organization_id,
-            'org_unit_id'       => $binding->unit_id,
+            'org_unit_id'       => static::unitForAuthor((int) $binding->organization_id, $customerId ? (int) $customerId : null, $binding->unit_id),
             'org_attributed_at' => now(),
         ]);
     }
@@ -127,6 +147,34 @@ class OrgAttribution
                 'org_unit_id'       => $unitId,
                 'org_attributed_at' => now(),
             ]);
+
+        static::restampUnit($customerId, $organizationId, $unitId);
+    }
+
+    /**
+     * The tickets already in this organisation follow the author's current
+     * unit, as on the organisation page: a person put into a unit later (or
+     * moved) takes his tickets along, or his unit manager never sees them.
+     */
+    public static function restampUnit(int $customerId, int $organizationId, ?int $unitId): void
+    {
+        Conversation::where('customer_id', $customerId)
+            ->where('org_id', $organizationId)
+            ->where(function ($q) use ($unitId) {
+                $unitId === null ? $q->whereNotNull('org_unit_id') : $q->whereNull('org_unit_id')->orWhere('org_unit_id', '!=', $unitId);
+            })
+            ->update(['org_unit_id' => $unitId]);
+    }
+
+    /**
+     * A deleted unit's tickets leave it with their authors: the members get
+     * unit_id = NULL through the foreign key, the tickets (no foreign key on
+     * conversations) are cleared here, or they keep pointing at a unit that no
+     * longer exists.
+     */
+    public static function forgetUnit(int $unitId): void
+    {
+        Conversation::where('org_unit_id', $unitId)->update(['org_unit_id' => null]);
     }
 
     /**
@@ -188,7 +236,7 @@ class OrgAttribution
 
             Conversation::where('id', $conv->id)->update([
                 'org_id'            => $orgId,
-                'org_unit_id'       => $unitId,
+                'org_unit_id'       => static::unitForAuthor($orgId, (int) $conv->customer_id, $unitId),
                 'org_attributed_at' => $now,
             ]);
         }
@@ -302,7 +350,7 @@ class OrgAttribution
 
             Conversation::where('id', $conv->id)->update([
                 'org_id'            => $orgId,
-                'org_unit_id'       => $unitId,
+                'org_unit_id'       => static::unitForAuthor($orgId, (int) $conv->customer_id, $unitId),
                 'org_attributed_at' => $now,
             ]);
 

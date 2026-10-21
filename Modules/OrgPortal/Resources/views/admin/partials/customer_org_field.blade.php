@@ -54,6 +54,20 @@
     </div>
 </div>
 
+<div class="form-group orgportal-role-row" style="{{ $currentOrgId ? '' : 'display:none;' }}">
+    <label class="col-sm-2 control-label">
+        {{ __('orgportal::messages.member_unit') }}
+    </label>
+    <div class="col-sm-6">
+        <select name="orgportal_unit_id" id="orgportal_unit_id" class="form-control" data-units="{{ json_encode($unitsByOrg) }}">
+            <option value="">{{ __('orgportal::messages.no_unit') }}</option>
+            @foreach(($unitsByOrg[$currentOrgId] ?? []) as $u)
+                <option value="{{ $u['id'] }}" {{ (int) $currentUnitId === (int) $u['id'] ? 'selected' : '' }}>{{ $u['name'] }}</option>
+            @endforeach
+        </select>
+    </div>
+</div>
+
 @if($currentOrgId)
 <div class="form-group">
     <div class="col-sm-offset-2 col-sm-6">

@@ -150,10 +150,12 @@
                             @endphp
                             <tr class="{{ $m->is_active ? '' : 'text-muted orgportal-member-inactive' }}" @if(!$m->is_active) style="display:none;" @endif>
                                 <td>
-                                    {{ optional($m->customer)->getFullName() ?: __('orgportal::messages.deleted_customer') }}
-                                    @if($isGlobal)
-                                        <span class="label label-info">{{ __('orgportal::messages.role_global_manager') }}</span>
-                                    @endif
+                                    {{-- A small mark in a slot every row keeps, so the names stay aligned; the role column says it in words. --}}
+                                    <span style="display:inline-block;width:18px;">
+                                        @if($isGlobal)
+                                            <i class="glyphicon glyphicon-king text-info" title="{{ __('orgportal::messages.role_global_manager') }}" aria-label="{{ __('orgportal::messages.role_global_manager') }}"></i>
+                                        @endif
+                                    </span>{{ optional($m->customer)->getFullName() ?: __('orgportal::messages.deleted_customer') }}
                                 </td>
 
                                 @if($canEdit)
@@ -205,6 +207,7 @@
 
                                 @if($canManageStructure)
                                     <td class="text-right">
+                                    @if($canEdit)
                                         <form method="POST"
                                               action="{{ route('orgportal.portal.members.toggle', ['mailbox_id' => $mailbox_id, 'member_id' => $m->id]) }}"
                                               @if($m->is_active) data-orgportal-confirm="{{ __('orgportal::messages.confirm_deactivate') }}" @endif
@@ -214,6 +217,7 @@
                                                 {{ $m->is_active ? __('orgportal::messages.deactivate') : __('orgportal::messages.activate') }}
                                             </button>
                                         </form>
+                                    @endif
                                     </td>
                                 @endif
                             </tr>

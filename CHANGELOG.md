@@ -4,6 +4,27 @@ All notable changes to OrgPortal are documented here.
 
 ---
 
+## [2.0.14] — 2026-10-21
+
+### Bug Fixes
+
+- **A global manager without "manages the whole organization" could deactivate a global manager** from the portal's members tab (the same gap 2.0.13 closed for the role change). Refused now (`cannot_change_global`); the deactivate button is shown only on rows one may change — not on one's own row nor on a global manager's row without the right.
+- **Tickets attributed by a tag binding without a unit got no unit**, so the author's unit manager never saw them. When the binding names no unit, the ticket now gets the author's unit in that organization — on a new ticket, when the tag is attached and in the background attribution.
+- **Tickets did not follow a person put into a unit later** through the API (`PUT /organizations/{id}/members/{memberId}`, `PUT /customers/{id}/organization`) or the customer form; the API did not attach the customer's earlier tickets to the organization at all. All paths now give the person's tickets in the organization his current unit, like the admin page's role/unit change.
+- **Deleting a unit left its tickets pointing at it** (`conversations.org_unit_id` has no foreign key); they are cleared with the members' unit on the admin page, the portal and the API.
+- **The API could give "manages the whole organization" to a member or a unit manager** (`canManageOrg: true`); only a global manager keeps it, as on the organization page.
+- **Any `customer.updated` without the customer form** (another module, an API call) was read as "— None —" and deactivated the person. The customer form's handler now acts only when the form's organization field is in the request.
+- **Moving a person to another organization on the customer form deleted or rewrote his old membership**; it is deactivated now, so the old organization's history keeps him.
+
+### Improvements
+
+- **Structural unit on the customer form** — the unit list follows the chosen organization; manager + unit is a unit manager, manager + "Entire organization" a global manager.
+- **The global manager badge on the portal's members tab is a small mark before the name** (with a hint), in a slot every row keeps, so the names stay aligned; the role column says it in words.
+
+One-off data fix on an existing install (not in code): tickets whose `org_unit_id` does not match their author's current unit in the organization — re-stamp `org_unit_id` = the member's current unit for `org_id` = the member's organization.
+
+---
+
 ## [2.0.13] — 2026-10-21
 
 ### Bug Fixes — access rules
