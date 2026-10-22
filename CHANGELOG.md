@@ -4,6 +4,14 @@ All notable changes to OrgPortal are documented here.
 
 ---
 
+## [2.0.16] — 2026-10-22
+
+### Translations
+
+- **"Ticket" is a support ticket in every language.** Danish, Norwegian, Swedish, Portuguese (both), Polish: «ticket»; Finnish: «tiketti»; Czech and Slovak: «tiket» — instead of words for a travel or entry ticket (billet, billett, biljett, lippu, bilhete, tíquete, lístek/lístok) or for a request or a case (zgłoszenie, sag, sak). The agreeing words were corrected too. Interface and notification e-mail templates; Georgian templates now say «ტიკეტი» like the Georgian interface. Templates an administrator has already saved are kept.
+
+---
+
 ## [2.0.15] — 2026-10-22
 
 ### Bug Fixes — the notification bell
