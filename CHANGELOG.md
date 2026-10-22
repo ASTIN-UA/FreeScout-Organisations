@@ -4,6 +4,15 @@ All notable changes to OrgPortal are documented here.
 
 ---
 
+## [2.0.15] — 2026-10-22
+
+### Bug Fixes — the notification bell
+
+- **Marking a notification read never worked.** The route is `help/{mailbox_id}/org/notifications/{conversation_id}/read`, but `markRead()` took only one parameter, so it received the encoded mailbox id instead of the conversation id. Neither a click on a notification, nor its «×», nor opening the ticket marked anything read, and the counter only grew. Managers did not notice because the organization's ticket page marks its notifications read on the server.
+- **An ordinary customer's bell led to «Access denied».** Authors get "new reply" notifications, but every item linked to the organization's ticket page, which only managers may open. An item now links to the page the customer can actually open: the organization's ticket page when he is a manager whose scope covers the ticket, otherwise his own ticket on the portal's own page. An item he can no longer open is not listed.
+
+---
+
 ## [2.0.14] — 2026-10-21
 
 ### Bug Fixes
