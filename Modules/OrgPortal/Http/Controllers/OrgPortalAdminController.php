@@ -751,7 +751,10 @@ class OrgPortalAdminController extends Controller
 
     protected static function sanitizeHtml(string $html): string
     {
-        return \Purifier::clean($html);
+        // The purifier percent-encodes the braces of a link's address
+        // (href="{ticket_url}" → "%7Bticket_url%7D"), which leaves the macro
+        // unreplaced in the e-mail: the placeholders are put back.
+        return \Modules\OrgPortal\Services\TemplateMacros::restore(\Purifier::clean($html));
     }
 
     /**

@@ -1126,6 +1126,11 @@ class OrgPortalServiceProvider extends ServiceProvider
             return $this->builtinNotificationTemplate($event, $rawMacros, $ticketUrl);
         }
 
+        // A template saved before the purifier's encoding of the macros in links
+        // was undone (see TemplateMacros) still holds %7Bticket_url%7D.
+        $subject = \Modules\OrgPortal\Services\TemplateMacros::restore((string) $subject);
+        $body    = \Modules\OrgPortal\Services\TemplateMacros::restore((string) $body);
+
         $subject = str_replace(array_keys($rawMacros), array_values($rawMacros), $subject);
         $body    = str_replace(array_keys($htmlMacros), array_values($htmlMacros), $body);
 

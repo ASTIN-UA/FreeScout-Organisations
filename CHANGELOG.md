@@ -4,6 +4,19 @@ All notable changes to OrgPortal are documented here.
 
 ---
 
+## [2.0.17] — 2026-11-12
+
+### Bug Fixes — the «View ticket» button of the notification e-mails led nowhere
+
+A notification template saved in Manage → Organizations → Templates is cleaned by HTMLPurifier, which percent-encodes the braces of a link's address: `href="{ticket_url}"` was stored as `href="%7Bticket_url%7D"`. The renderer replaces the literal `{ticket_url}` only, so the button of every e-mail built from such a template pointed at the placeholder itself. Every template saved in the editor was affected (since 2.0.0); the built-in default templates were not.
+
+- **Saving**: the placeholders are put back after the purifier (`TemplateMacros::restore()`), for the body and the subject.
+- **Sending**: the same restore runs on the template before the macros are replaced, so a template that is still stored in the encoded form already produces a working link.
+- **Stored templates**: migration `2026_11_12_000001` restores the placeholders of the saved templates once; running it again changes nothing.
+- E-mails sent before the fix keep their dead button.
+
+---
+
 ## [2.0.16] — 2026-10-22
 
 ### Translations
