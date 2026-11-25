@@ -61,7 +61,7 @@
     <div class="col-sm-6">
         <select name="orgportal_unit_id" id="orgportal_unit_id" class="form-control" data-units="{{ json_encode($unitsByOrg) }}">
             <option value="">{{ __('orgportal::messages.no_unit') }}</option>
-            @foreach(($unitsByOrg[$currentOrgId] ?? []) as $u)
+            @foreach(($currentOrgId ? ($unitsByOrg[$currentOrgId] ?? []) : []) as $u)
                 <option value="{{ $u['id'] }}" {{ (int) $currentUnitId === (int) $u['id'] ? 'selected' : '' }}>{{ $u['name'] }}</option>
             @endforeach
         </select>

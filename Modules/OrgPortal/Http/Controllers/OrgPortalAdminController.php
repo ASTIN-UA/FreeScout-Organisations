@@ -801,7 +801,9 @@ class OrgPortalAdminController extends Controller
             return response()->json([]);
         }
 
-        $orgs = Organization::where('name', 'like', "%{$query}%")
+        // Only active organizations are offered for assigning a customer.
+        $orgs = Organization::where('is_active', true)
+            ->where('name', 'like', "%{$query}%")
             ->orderBy('name')
             ->limit(25)
             ->get(['id', 'name']);

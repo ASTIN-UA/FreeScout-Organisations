@@ -4,6 +4,15 @@ All notable changes to OrgPortal are documented here.
 
 ---
 
+## [2.0.18] — 2026-11-25
+
+### Bug Fixes — the organization field of the customer card
+
+- **PHP 8.5: a customer without an organization could not be opened** (#8). The unit list looked up `$unitsByOrg[null]`; on a Collection that calls `array_key_exists(null, …)`, which PHP 8.5 deprecates and Laravel turns into an exception, so the whole customer page failed. The lookup is now made only when the customer has an organization. Thanks to @kwm365 for the report and the fix.
+- **The search of the organization field offered deactivated organizations.** Only active organizations are found now, so a customer can no longer be put into an organization that was switched off. A customer who already is in a deactivated one still sees it as their current organization.
+
+---
+
 ## [2.0.17] — 2026-11-12
 
 ### Bug Fixes — the «View ticket» button of the notification e-mails led nowhere
